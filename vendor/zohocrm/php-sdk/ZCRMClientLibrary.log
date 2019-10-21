@@ -1,0 +1,8 @@
+2019-10-20 19:05:44 ERROR: zcrmsdk\crm\exception\ZCRMException Caused by:'current user should either be set in ZCRMRestClient or in configuration  map' in C:\xampp\htdocs\zoho\vendor\zohocrm\php-sdk\src\crm\utility\ZCRMConfigUtil.php(93)
+Trace::#0 C:\xampp\htdocs\zoho\vendor\zohocrm\php-sdk\src\crm\api\APIRequest.php(71): zcrmsdk\crm\utility\ZCRMConfigUtil::getAccessToken()
+#1 C:\xampp\htdocs\zoho\vendor\zohocrm\php-sdk\src\crm\api\APIRequest.php(88): zcrmsdk\crm\api\APIRequest->authenticateRequest()
+#2 C:\xampp\htdocs\zoho\vendor\zohocrm\php-sdk\src\crm\api\handler\OrganizationAPIHandler.php(112): zcrmsdk\crm\api\APIRequest->getAPIResponse()
+#3 C:\xampp\htdocs\zoho\vendor\zohocrm\php-sdk\src\crm\setup\restclient\ZCRMRestClient.php(132): zcrmsdk\crm\api\handler\OrganizationAPIHandler->getOrganizationDetails()
+#4 C:\xampp\htdocs\zoho\rest.php(253): zcrmsdk\crm\setup\restclient\ZCRMRestClient::getOrganizationDetails()
+#5 C:\xampp\htdocs\zoho\rest.php(287): RestC::getOrganizationDetails()
+#6 {main}

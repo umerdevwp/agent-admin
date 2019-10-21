@@ -1,0 +1,28 @@
+2019-10-20 19:17:42 SEVERE: Failed to connect to MySQL: (1049) Unknown database 'zohooauth'
+2019-10-20 19:17:42 SEVERE: Getting result set failed: () 
+2019-10-20 19:17:42 SEVERE: Exception occured while getting OAuthTokens from DB(file::ZohoOAuthPersistenceHandler)(No Tokens exist for the given user-identifier,Please generate and try again.)
+zcrmsdk\oauth\exception\ZohoOAuthException Caused by:'No Tokens exist for the given user-identifier,Please generate and try again.' in C:\xampp\htdocs\zoho\vendor\zohocrm\php-sdk\src\oauth\persistence\ZohoOAuthPersistenceHandler.php(45)
+#0 C:\xampp\htdocs\zoho\vendor\zohocrm\php-sdk\src\oauth\ZohoOAuthClient.php(37): zcrmsdk\oauth\persistence\ZohoOAuthPersistenceHandler->getOAuthTokens('sovankendur@gma...')
+#1 C:\xampp\htdocs\zoho\vendor\zohocrm\php-sdk\src\crm\utility\ZCRMConfigUtil.php(98): zcrmsdk\oauth\ZohoOAuthClient->getAccessToken('sovankendur@gma...')
+#2 C:\xampp\htdocs\zoho\vendor\zohocrm\php-sdk\src\crm\api\APIRequest.php(71): zcrmsdk\crm\utility\ZCRMConfigUtil::getAccessToken()
+#3 C:\xampp\htdocs\zoho\vendor\zohocrm\php-sdk\src\crm\api\APIRequest.php(88): zcrmsdk\crm\api\APIRequest->authenticateRequest()
+#4 C:\xampp\htdocs\zoho\vendor\zohocrm\php-sdk\src\crm\api\handler\OrganizationAPIHandler.php(112): zcrmsdk\crm\api\APIRequest->getAPIResponse()
+#5 C:\xampp\htdocs\zoho\vendor\zohocrm\php-sdk\src\crm\setup\restclient\ZCRMRestClient.php(132): zcrmsdk\crm\api\handler\OrganizationAPIHandler->getOrganizationDetails()
+#6 C:\xampp\htdocs\zoho\rest.php(254): zcrmsdk\crm\setup\restclient\ZCRMRestClient::getOrganizationDetails()
+#7 C:\xampp\htdocs\zoho\rest.php(288): RestC::getOrganizationDetails()
+#8 {main}
+2019-10-20 19:17:42 INFO: Access Token has expired. Hence refreshing.
+2019-10-20 19:17:43 SEVERE: Failed to connect to MySQL: (1049) Unknown database 'zohooauth'
+2019-10-20 19:17:43 SEVERE: Getting result set failed: () 
+2019-10-20 19:17:43 SEVERE: Exception occured while getting OAuthTokens from DB(file::ZohoOAuthPersistenceHandler)(No Tokens exist for the given user-identifier,Please generate and try again.)
+zcrmsdk\oauth\exception\ZohoOAuthException Caused by:'No Tokens exist for the given user-identifier,Please generate and try again.' in C:\xampp\htdocs\zoho\vendor\zohocrm\php-sdk\src\oauth\persistence\ZohoOAuthPersistenceHandler.php(45)
+#0 C:\xampp\htdocs\zoho\vendor\zohocrm\php-sdk\src\oauth\ZohoOAuthClient.php(37): zcrmsdk\oauth\persistence\ZohoOAuthPersistenceHandler->getOAuthTokens('sovankendur@gma...')
+#1 C:\xampp\htdocs\zoho\vendor\zohocrm\php-sdk\src\crm\utility\ZCRMConfigUtil.php(98): zcrmsdk\oauth\ZohoOAuthClient->getAccessToken('sovankendur@gma...')
+#2 C:\xampp\htdocs\zoho\vendor\zohocrm\php-sdk\src\crm\api\APIRequest.php(71): zcrmsdk\crm\utility\ZCRMConfigUtil::getAccessToken()
+#3 C:\xampp\htdocs\zoho\vendor\zohocrm\php-sdk\src\crm\api\APIRequest.php(88): zcrmsdk\crm\api\APIRequest->authenticateRequest()
+#4 C:\xampp\htdocs\zoho\vendor\zohocrm\php-sdk\src\crm\api\handler\OrganizationAPIHandler.php(112): zcrmsdk\crm\api\APIRequest->getAPIResponse()
+#5 C:\xampp\htdocs\zoho\vendor\zohocrm\php-sdk\src\crm\setup\restclient\ZCRMRestClient.php(132): zcrmsdk\crm\api\handler\OrganizationAPIHandler->getOrganizationDetails()
+#6 C:\xampp\htdocs\zoho\rest.php(254): zcrmsdk\crm\setup\restclient\ZCRMRestClient::getOrganizationDetails()
+#7 C:\xampp\htdocs\zoho\rest.php(288): RestC::getOrganizationDetails()
+#8 {main}
+2019-10-20 19:17:43 INFO: Access Token has expired. Hence refreshing.
