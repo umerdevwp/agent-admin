@@ -1,1 +1,21 @@
-.sidebar {	position: fixed;	top: 60px;	bottom: 0;	right: 0;	transform: translateX(101%);	z-index: 14;	width: 280px;	transition: transform .2s ease-in-out;	background: #f9f9f9;	overflow: hidden;	overflow-y: scroll;}.sidebar.active {	transform: translateX(0);}.sidebar-lg {	width: 320px;}
+.sidebar {
+	position: fixed;
+	top: 60px;
+	bottom: 0;
+	right: 0;
+	transform: translateX(101%);
+	z-index: 14;
+	width: 280px;
+	transition: transform .2s ease-in-out;
+	background: #f9f9f9;
+	overflow: hidden;
+	overflow-y: scroll;
+}
+
+.sidebar.active {
+	transform: translateX(0);
+}
+
+.sidebar-lg {
+	width: 320px;
+}
