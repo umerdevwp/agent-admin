@@ -1,20 +1,31 @@
 <?php
 require_once __DIR__ . '/vendor/autoload.php';
 use zcrmsdk\crm\setup\restclient\ZCRMRestClient;
+use zcrmsdk\crm\crud\ZCRMModule;
 
 class RestC
 {
-
+	/*
+	 * {
+    "access_token": "1000.5ba2ab8a0cca1ee3de59876061aa4b50.9631e7d28cc026b1bf26cfc97b797057",
+    "refresh_token": "1000.171d7b086c3c49edf1177dd744159120.c81020dd26cadf54fbdfef7971e49682",
+    "expires_in_sec": 3600,
+    "api_domain": "https://www.zohoapis.com",
+    "token_type": "Bearer",
+    "expires_in": 3600000
+}*/
     public function __construct()
     {
         $configuration = [
-			"client_id" => "1000.6FGQIEZ8QIA8WCKOSLP7KNUKM5U9PH",
-            "client_secret" => "1dd268acffb2ed484e86a27b578a028fe641fff249",
-			"redirect_uri" => "localhonst/zoho/rest.php",
-			"currentUserEmail"=> "sovankendur@gmail.com"
-			
+			"client_id" => "1000.708065VPY62SRIG10KN8GVMT75OVLH",
+            "client_secret" => "ce8f0d7939f3eaa341e62cc5f91b205164c456e31a",
+			"redirect_uri" => "http://portal.youragentservices.com/oauth",
+			"currentUserEmail"=> "cboyce@unitedagentservices.com",
+			"token_persistence_path" => "zohoauth",
+			"accounts_url" => "https://accounts.zoho.com"
+
 		];
-        
+
 
         ZCRMRestClient::initialize($configuration);
     }
@@ -56,6 +67,7 @@ class RestC
             }
             echo $module->isGlobalSearchSupported(); // to check whether the module is global search supported
             echo $module->getSequenceNumber(); // to get the sequence number of the module
+			echo "<br /><br />---------------------<br /><br />";
         }
     }
 
@@ -286,5 +298,20 @@ class RestC
 }
 $obj = new RestC();//object of the class
 
-$obj->getOrganizationDetails();//function call
+//$oAuthClient = ZohoOAuth::getClientInstance();
+//$grantToken = "1000.16aa1707f4c26f03d523829ecfc4d188.aa8b705d2261b39dab1fbb7b30ba6dcd";
+//$oAuthTokens = $oAuthClient->generateAccessToken($grantToken);
+
+//print_r($oAuthTokens);
+
+//$refreshToken = "1000.aa23d533b1fde2a0040d6d094e6693fc.1ae9f1979ebe4b62d365a9cd5f32d2fb";
+//$userIdentifier = "cboyce@unitedagentservices.com";
+//$oAuthTokens = $oAuthClient->generateAccessTokenFromRefreshToken($refreshToken,$userIdentifier);
+
+//$obj->getOrganizationDetails();//function call
+//$obj->getAllModules();
+$zcrmModuleIns = ZCRMModule::getInstance("Contacts");
+$bulkAPIResponse=$zcrmModuleIns->getRecords();
+$recordsArray = $bulkAPIResponse->getData(); // $recordsArray - array of ZCRMRecord instances
+print_r($recordsArray);
 ?>

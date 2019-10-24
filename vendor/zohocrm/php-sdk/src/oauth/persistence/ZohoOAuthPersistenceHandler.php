@@ -25,11 +25,7 @@ class ZohoOAuthPersistenceHandler implements ZohoOAuthPersistenceInterface
             }
         } catch (Exception $ex) {
             OAuthLogger::severe("Exception occured while inserting OAuthTokens into DB(file::ZohoOAuthPersistenceHandler)({$ex->getMessage()})\n{$ex}");
-        } finally {
-            if ($db_link != null) {
-                $db_link->close();
-            }
-        }
+        } 
     }
     
     public function getOAuthTokens($userEmailId)
@@ -54,10 +50,6 @@ class ZohoOAuthPersistenceHandler implements ZohoOAuthPersistenceInterface
             }
         } catch (Exception $ex) {
             OAuthLogger::severe("Exception occured while getting OAuthTokens from DB(file::ZohoOAuthPersistenceHandler)({$ex->getMessage()})\n{$ex}");
-        } finally {
-            if ($db_link != null) {
-                $db_link->close();
-            }
         }
         return $oAuthTokens;
     }
@@ -74,11 +66,7 @@ class ZohoOAuthPersistenceHandler implements ZohoOAuthPersistenceInterface
             }
         } catch (Exception $ex) {
             OAuthLogger::severe("Exception occured while Deleting OAuthTokens from DB(file::ZohoOAuthPersistenceHandler)({$ex->getMessage()})\n{$ex}");
-        } finally {
-            if ($db_link != null) {
-                $db_link->close();
-            }
-        }
+        } 
     }
     
     public function getMysqlConnection()
