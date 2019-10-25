@@ -310,8 +310,42 @@ $obj = new RestC();//object of the class
 
 //$obj->getOrganizationDetails();//function call
 //$obj->getAllModules();
-$zcrmModuleIns = ZCRMModule::getInstance("Contacts");
-$bulkAPIResponse=$zcrmModuleIns->getRecords();
-$recordsArray = $bulkAPIResponse->getData(); // $recordsArray - array of ZCRMRecord instances
-print_r($recordsArray);
+//$zcrmModuleIns = ZCRMModule::getInstance("Accounts");
+//$bulkAPIResponse=$zcrmModuleIns->getRecords();
+//$recordsArray = $bulkAPIResponse->getData(); // $recordsArray - array of ZCRMRecord instances
+//print_r($recordsArray);
+
+
+
+$zcrmModuleIns = ZCRMModule::getInstance("Accounts");
+$bulkAPIResponse=$zcrmModuleIns->searchRecordsByCriteria("Email:equals:dmishesq@getirshelp.com", 1, 1);
+$recordsArray = $bulkAPIResponse->getData();
+if(count($recordsArray) > 0){
+    $record = $recordsArray[0];
+    echo $record->getEntityId() . "<br />";
+    echo $record->getModuleApiName() . "<br />";
+    echo $record->getLookupLabel() . "<br />";
+    echo $record->getCreatedBy()->getId() . "<br />";
+    echo $record->getModifiedBy()->getId() . "<br />";
+    echo $record->getOwner()->getId() . "<br />";
+    echo $record->getCreatedTime() . "<br />";
+    echo $record->getModifiedTime() . "<br />";
+    $map=$record->getData();
+    foreach ($map as $key=>$value)
+    {
+        if($value instanceof ZCRMRecord)
+        {
+            echo "\n".$value->getEntityId().":".$value->getModuleApiName().":".$value->getLookupLabel() . "<br />";
+        }
+        else
+        {
+            echo $key.":".$value . "<br />";
+        }
+    }
+}
+else{
+    echo "No results match your query";
+}
+//print_r($recordsArray);
+
 ?>

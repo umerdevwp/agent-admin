@@ -66,3 +66,21 @@ Trace::#0 D:\morecraf\agentadmin\agentadmin\vendor\zohocrm\php-sdk\src\crm\api\r
 #6 D:\morecraf\agentadmin\agentadmin\rest.php(266): zcrmsdk\crm\setup\restclient\ZCRMRestClient::getOrganizationDetails()
 #7 D:\morecraf\agentadmin\agentadmin\rest.php(310): RestC::getOrganizationDetails()
 #8 {main}
+2019-10-25 16:34:21 ERROR: zcrmsdk\crm\exception\ZCRMException Caused by:'Please check if the URL trying to access is a correct one' in D:\morecraf\agentadmin\agentadmin\vendor\zohocrm\php-sdk\src\crm\api\response\APIResponse.php(93)
+Trace::#0 D:\morecraf\agentadmin\agentadmin\vendor\zohocrm\php-sdk\src\crm\api\response\CommonAPIResponse.php(76): zcrmsdk\crm\api\response\APIResponse->handleForFaultyResponses()
+#1 D:\morecraf\agentadmin\agentadmin\vendor\zohocrm\php-sdk\src\crm\api\response\CommonAPIResponse.php(67): zcrmsdk\crm\api\response\CommonAPIResponse->processResponse()
+#2 D:\morecraf\agentadmin\agentadmin\vendor\zohocrm\php-sdk\src\crm\api\response\APIResponse.php(34): zcrmsdk\crm\api\response\CommonAPIResponse->__construct('HTTP/1.1 404 \r\n...', 404, NULL)
+#3 D:\morecraf\agentadmin\agentadmin\vendor\zohocrm\php-sdk\src\crm\api\APIRequest.php(97): zcrmsdk\crm\api\response\APIResponse->__construct('HTTP/1.1 404 \r\n...', 404)
+#4 D:\morecraf\agentadmin\agentadmin\vendor\zohocrm\php-sdk\src\crm\api\handler\EntityAPIHandler.php(38): zcrmsdk\crm\api\APIRequest->getAPIResponse()
+#5 D:\morecraf\agentadmin\agentadmin\vendor\zohocrm\php-sdk\src\crm\crud\ZCRMModule.php(1070): zcrmsdk\crm\api\handler\EntityAPIHandler->getRecord()
+#6 D:\morecraf\agentadmin\agentadmin\rest.php(322): zcrmsdk\crm\crud\ZCRMModule->getRecord(4.0719930000004E+18)
+#7 {main}
+2019-10-25 16:34:48 ERROR: zcrmsdk\crm\exception\ZCRMException Caused by:'Please check if the URL trying to access is a correct one' in D:\morecraf\agentadmin\agentadmin\vendor\zohocrm\php-sdk\src\crm\api\response\APIResponse.php(93)
+Trace::#0 D:\morecraf\agentadmin\agentadmin\vendor\zohocrm\php-sdk\src\crm\api\response\CommonAPIResponse.php(76): zcrmsdk\crm\api\response\APIResponse->handleForFaultyResponses()
+#1 D:\morecraf\agentadmin\agentadmin\vendor\zohocrm\php-sdk\src\crm\api\response\CommonAPIResponse.php(67): zcrmsdk\crm\api\response\CommonAPIResponse->processResponse()
+#2 D:\morecraf\agentadmin\agentadmin\vendor\zohocrm\php-sdk\src\crm\api\response\APIResponse.php(34): zcrmsdk\crm\api\response\CommonAPIResponse->__construct('HTTP/1.1 404 \r\n...', 404, NULL)
+#3 D:\morecraf\agentadmin\agentadmin\vendor\zohocrm\php-sdk\src\crm\api\APIRequest.php(97): zcrmsdk\crm\api\response\APIResponse->__construct('HTTP/1.1 404 \r\n...', 404)
+#4 D:\morecraf\agentadmin\agentadmin\vendor\zohocrm\php-sdk\src\crm\api\handler\EntityAPIHandler.php(38): zcrmsdk\crm\api\APIRequest->getAPIResponse()
+#5 D:\morecraf\agentadmin\agentadmin\vendor\zohocrm\php-sdk\src\crm\crud\ZCRMModule.php(1070): zcrmsdk\crm\api\handler\EntityAPIHandler->getRecord()
+#6 D:\morecraf\agentadmin\agentadmin\rest.php(322): zcrmsdk\crm\crud\ZCRMModule->getRecord(4.0719930000004E+18)
+#7 {main}
