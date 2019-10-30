@@ -2,6 +2,7 @@
 require_once __DIR__ . '/vendor/autoload.php';
 use zcrmsdk\crm\setup\restclient\ZCRMRestClient;
 use zcrmsdk\crm\crud\ZCRMModule;
+use zcrmsdk\crm\crud\ZCRMRecord;
 
 class RestC
 {
@@ -295,6 +296,50 @@ class RestC
         echo $orgIns->getTrialExpiry();//to get the trial expiration
         echo $orgIns->getZipCode();//to get the zip code of the organization
     }
+
+    public static function dumpObject($record){
+        echo $record->getEntityId() . "<br />";
+        echo $record->getModuleApiName() . "<br />";
+        echo $record->getLookupLabel() . "<br />";
+        echo $record->getCreatedBy()->getId() . "<br />";
+        echo $record->getModifiedBy()->getId() . "<br />";
+        echo $record->getOwner()->getId() . "<br />";
+        echo $record->getCreatedTime() . "<br />";
+        echo $record->getModifiedTime() . "<br />";
+        $map=$record->getData();
+        foreach ($map as $key=>$value)
+        {
+            if($value instanceof ZCRMRecord)
+            {
+                echo "\n".$value->getEntityId().":".$value->getModuleApiName().":".$value->getLookupLabel() . "<br />";
+            }
+            else
+            {
+                echo $key.":".$value . "<br />";
+            }
+        }
+    }
+
+    public static function getChildObjects($account, $recordsArray){
+        $children = array();
+        for($i = 0; $i < count($recordsArray); $i++){
+            $rec = $recordsArray[$i];
+            $map=$rec->getData();
+            foreach ($map as $key=>$value)
+            {
+                if($value instanceof ZCRMRecord)
+                {
+                    if($value->getModuleApiName() == "Parent_Account"){
+                        //echo "\n".$value->getEntityId().":".$value->getModuleApiName().":".$value->getLookupLabel() . "<br />";
+                    }
+                    if($account == $value->getEntityId()){
+                        array_push($children, $rec);
+                    }
+                }
+            }
+        }
+        return $children;
+    }
 }
 $obj = new RestC();//object of the class
 
@@ -316,36 +361,37 @@ $obj = new RestC();//object of the class
 //print_r($recordsArray);
 
 
-
+$account = "4071993000000247062";
 $zcrmModuleIns = ZCRMModule::getInstance("Accounts");
-$bulkAPIResponse=$zcrmModuleIns->searchRecordsByCriteria("Email:equals:dmishesq@getirshelp.com", 1, 1);
+$bulkAPIResponse=$zcrmModuleIns->searchRecordsByCriteria("id:equals:$account", 1, 1);
 $recordsArray = $bulkAPIResponse->getData();
+echo "<br /><br /><br /><br />Main Record: -----------------------------------------------------------<br />";
 if(count($recordsArray) > 0){
     $record = $recordsArray[0];
-    echo $record->getEntityId() . "<br />";
-    echo $record->getModuleApiName() . "<br />";
-    echo $record->getLookupLabel() . "<br />";
-    echo $record->getCreatedBy()->getId() . "<br />";
-    echo $record->getModifiedBy()->getId() . "<br />";
-    echo $record->getOwner()->getId() . "<br />";
-    echo $record->getCreatedTime() . "<br />";
-    echo $record->getModifiedTime() . "<br />";
-    $map=$record->getData();
-    foreach ($map as $key=>$value)
-    {
-        if($value instanceof ZCRMRecord)
-        {
-            echo "\n".$value->getEntityId().":".$value->getModuleApiName().":".$value->getLookupLabel() . "<br />";
-        }
-        else
-        {
-            echo $key.":".$value . "<br />";
-        }
-    }
+    RestC::dumpObject($record);
 }
 else{
     echo "No results match your query";
 }
-//print_r($recordsArray);
+
+echo "<br /><br /><br /><br />Child Records: -----------------------------------------------------------<br />";
+$bulkAPIResponse=$zcrmModuleIns->getRecords();
+$recordsArray = $bulkAPIResponse->getData();
+$children = RestC::getChildObjects($account, $recordsArray);
+
+for($i = 0; $i < count($children); $i++){
+    echo "Child Record: -----------------------<br /><br />";
+    $record = $children[$i];
+    RestC::dumpObject($record);
+}
+
+$subAccounts = ZCRMRecord::getInstance("Accounts", "4071993000000247062");
+$bulkAPIResponse=$subAccounts->getRelatedListRecords("Contacts");
+$relatedRecordsList=$bulkAPIResponse->getData();
+echo "<br /><br /><br /><br />Contacts: -----------------------------------------------------------<br />";
+for($i = 0; $i < count($relatedRecordsList); $i++){
+    echo "Contact: ---- <br />";
+    RestC::dumpObject($relatedRecordsList[$i]);
+}
 
 ?>
