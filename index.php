@@ -1,7 +1,7 @@
 <?php
 
 date_default_timezone_set("Asia/Kolkata");
- 
+
 /**
  * CodeIgniter
  *
@@ -55,7 +55,7 @@ date_default_timezone_set("Asia/Kolkata");
  *
  * NOTE: If you change these, also change the error_reporting() code below
  */
-define('ENVIRONMENT', 'development');//(isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development'));
+define('ENVIRONMENT', 'testing');//(isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development'));
 
 /*
  * ---------------------------------------------------------------
@@ -270,7 +270,7 @@ define('VIEWPATH', $view_folder . DIRECTORY_SEPARATOR);
  *
  * And away we go...
  */
- 
+
 require (__DIR__) . '/vendor/autoload.php';
- 
+
 require_once BASEPATH . 'core/CodeIgniter.php';

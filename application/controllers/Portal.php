@@ -2,6 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Portal extends CI_Controller {
+    var $account = "4071993000000247062";
 
 	/**
 	 * Index Page for this controller.
@@ -20,6 +21,23 @@ class Portal extends CI_Controller {
 	 */
 	public function index()
 	{
-		$this->load->view('portal');
+        $this->load->model('ZoHo_Account');
+        $this->ZoHo_Account->LoadAccount($this->account);
+        //$this->ZoHo_Account->dumpAll();
+        $data['account'] = $this->ZoHo_Account;
+        $this->load->view('header');
+		$this->load->view('portal', $data);
+        $this->load->view('footer');
 	}
+
+    public function entity($id)
+    {
+        $this->load->model('ZoHo_Account');
+        $this->ZoHo_Account->LoadAccount($id);
+        //$this->ZoHo_Account->dumpAll();
+        $data['account'] = $this->ZoHo_Account;
+		$this->load->view('header');
+		$this->load->view('entity', $data);
+		$this->load->view('footer');
+    }
 }
