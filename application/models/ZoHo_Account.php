@@ -14,6 +14,8 @@ class ZoHo_Account extends CI_Model
     var $AccountData;
     var $ChildAccounts;
     var $Contacts;
+    var $Tasks;
+    var $PastDue = false;
 /*
 	 * {
     "access_token": "1000.5ba2ab8a0cca1ee3de59876061aa4b50.9631e7d28cc026b1bf26cfc97b797057",
@@ -306,14 +308,14 @@ class ZoHo_Account extends CI_Model
     }
 
     public static function dumpObject($record){
-        echo $record->getEntityId() . "<br />";
-        echo $record->getModuleApiName() . "<br />";
-        echo $record->getLookupLabel() . "<br />";
-        echo $record->getCreatedBy()->getId() . "<br />";
-        echo $record->getModifiedBy()->getId() . "<br />";
-        echo $record->getOwner()->getId() . "<br />";
-        echo $record->getCreatedTime() . "<br />";
-        echo $record->getModifiedTime() . "<br />";
+        echo "EntityID: " . $record->getEntityId() . "<br />";
+        echo "API Name: " . $record->getModuleApiName() . "<br />";
+        echo "Lookup Label: " . $record->getLookupLabel() . "<br />";
+        echo "Created By: " . $record->getCreatedBy()->getId() . "<br />";
+        echo "Modified By: " . $record->getModifiedBy()->getId() . "<br />";
+        echo "Owner: " . $record->getOwner()->getId() . "<br />";
+        echo "Create Time: " . $record->getCreatedTime() . "<br />";
+        echo "Modified Time: " . $record->getModifiedTime() . "<br />";
         $map=$record->getData();
         foreach ($map as $key=>$value)
         {
@@ -395,5 +397,33 @@ class ZoHo_Account extends CI_Model
             }
         }
         catch(Exception $e){ }
+
+        $this->Tasks = array();
+        $entityId = strval($this->AccountData->getEntityId());
+        $zcrmModuleTsk = ZCRMModule::getInstance("Tasks");
+        $bulkAPIResponse = $zcrmModuleTsk->searchRecordsByCriteria("Status:equals:Not Started", 1, 200);
+        $taskArray = $bulkAPIResponse->getData();
+        for($i = 0; $i < count($taskArray); $i++){
+            $record = $taskArray[$i];
+
+            $map=$record->getData();
+            foreach ($map as $key=>$value)
+            {
+                if($value instanceof ZCRMRecord)
+                {
+                    if($value->getEntityId() == $entityId){
+                        array_push($this->Tasks, $record);
+                    }
+                }
+            }
+        }
+
+        $now = new DateTime();
+        for($i = 0; $i < count($this->Tasks); $i++){
+            $date = date_create($this->Tasks[$i]->getFieldValue('Due_Date'));
+            if($date < $now){
+                $this->PastDue = true;
+            }
+        }
     }
 }

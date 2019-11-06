@@ -67,28 +67,33 @@
           </div>
         </div>
       </div>
-	<div class="row">
-        <div class="col-md-9 col-lg-12">
+    <?php if(count($account->Tasks) > 0){ ?>
+	<div class="row" style="width:100%">
+        <div class="col-md-12 col-lg-12">
           <div class="panel">
             <div class="panel-header">
-              <div class="panel-title">Compliance Check List <span class="span badge badge-danger">1</span></div>
+              <div class="panel-title">Compliance Check List <span class="span badge badge-danger"><?php echo count($account->Tasks); ?></span></div>
             </div>
+          <?php if($account->PastDue){ ?>
           <div class="alert alert-danger alert-darker alert-lg"><span class="alert-icon fa-remove"></span><span>WARNING! Open Compliance Tasks May Be Past Due</span></div>
+          <?php } ?>
            <div class="panel-body">
               <h3 class="list-sortable-title">Compliance Tasks</h3>
               <ul class="list-sortable sortable sortable-current" data-connect-group=".sortable-completed">
+                <?php for($i = 0; $i < count($account->Tasks); $i++){ ?>
                 <li class="list-sortable-item-primary">
                   <div class="custom-control custom-checkbox custom-check custom-checkbox-primary">
-                    <input class="custom-control-input" type="checkbox" id="taskCheck1"/>
-                    <label class="custom-control-label" for="taskCheck1"><b>June 16, 2018: Annual Report Notification - AZ</b><br>
-                      The annual report filing is due yearly by the entity's formation date. Specific instruction can be found on the <a href="http:\\ecorp.azcc.fov/Entity#acc-annual-report-detail-container1.">state's website</a>. You can also contact the commission at (602) 542-3285. </label>
+                    <input class="custom-control-input" type="checkbox" id="taskCheck<?php echo $i; ?>"/>
+                      <label class="custom-control-label" for="taskCheck<?php echo $i; ?>"><?php echo date_format(date_create($account->Tasks[$i]->getFieldValue('Due_Date')), "m/d/Y"); ?> - <?php echo $account->Tasks[$i]->getFieldValue('Subject'); ?></label>
                   </div>
                 </li>
+                <?php } ?>
               </ul>
             </div>
           </div>
         </div>
 	</div>
+    <?php } ?>
 	
 <div class="row">
 	<div class="col-md-9 col-lg-12">
