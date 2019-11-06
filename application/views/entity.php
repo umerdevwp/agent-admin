@@ -33,14 +33,14 @@
 		<div class="col-md-3">
         <div class="panel">
           <div class="panel-header">
-            <div class="panel-title"><span class="panel-icon fa-map-marker"></span><span>Registered Address </span><span class="badge badge-success">Active</span> </div>
+            <div class="panel-title"><span class="panel-icon fa-map-marker"></span><span>RA Address </span><span class="badge badge-success">Active</span> </div>
           </div>
           <div class="panel-body">
             <address>
             <strong>United Agent Services LLC</strong><br>
             2 East Congress<br>
             Suite 900-126<br>
-            Tucson, AZ 85701
+            City, ST 99999
             </address>
           </div>
         </div>
@@ -52,7 +52,7 @@
           </div>
           <div class="panel-body">
               <dl class="dl-horizontal">
-              <dt>Account Number</dt>
+              <dt>State ID</dt>
               <dd><?php echo $account->AccountData->getFieldValue('Account_Number'); ?></dd>
             </dl>
             <dl class="dl-horizontal">
@@ -118,7 +118,7 @@
                         <th class="sorting_disabled" data-column-index="2" rowspan="1" colspan="1" style="width: 241.217px;">Email</th>
                         <th class="sorting_disabled" data-column-index="3" rowspan="1" colspan="1" style="width: 241.2px;">Address</th>
                         <th class="sorting_disabled" data-column-index="4" rowspan="1" colspan="1" style="width: 241.217px;">Phone</th>
-                        <th class="sorting_disabled" data-column-index="5" rowspan="1" colspan="1" style="width: 241.2px;">Edit</th>
+                       <!-- <th class="sorting_disabled" data-column-index="5" rowspan="1" colspan="1" style="width: 241.2px;">Edit</th> -->
                       </tr>
                     </thead>
                     <tbody>
@@ -131,7 +131,7 @@
                         <td><?php echo $account->Contacts[$i]->getFieldValue('Email'); ?></td>
                         <td><?php echo $account->Contacts[$i]->getFieldValue('Mailing_Street'); ?>, <?php echo $account->Contacts[$i]->getFieldValue('Mailing_City'); ?> <?php echo $account->Contacts[$i]->getFieldValue('Mailing_State'); ?> <?php echo $account->Contacts[$i]->getFieldValue('Mailing_Zip'); ?></td>
                         <td><?php echo $account->Contacts[$i]->getFieldValue('Phone'); ?></td>
-                        <td><span class="panel-icon fa-pencil"></span></td>
+                        <!-- <td><span class="panel-icon fa-pencil"></span></td> -->
                       </tr>
                       <?php } 
                         } ?>

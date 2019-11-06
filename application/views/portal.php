@@ -32,7 +32,7 @@
                         <th class="sorting_disabled" data-column-index="1" rowspan="1" colspan="1" style="width: 249.967px;">Entity Type</th>
                         <th class="sorting_disabled" data-column-index="2" rowspan="1" colspan="1" style="width: 241.217px;">Filing State</th>
                         <th class="sorting_disabled" data-column-index="3" rowspan="1" colspan="1" style="width: 241.2px;">Formation Date</th>
-                        <th class="sorting_disabled" data-column-index="4" rowspan="1" colspan="1" style="width: 241.217px;">Expiration Date</th>
+                        <!-- <th class="sorting_disabled" data-column-index="4" rowspan="1" colspan="1" style="width: 241.217px;">Expiration Date</th> -->
                       </tr>
                     </thead>
                     <tbody>
@@ -42,7 +42,7 @@
                             <td><?php echo $account->ChildAccounts[$i]->getFieldValue('Entity_Type'); ?></td>
                             <td><?php echo $account->ChildAccounts[$i]->getFieldValue('Filing_State'); ?></td>
                             <td><?php echo $account->ChildAccounts[$i]->getFieldValue('Formation_Date'); ?></td>
-                            <td><?php echo $account->ChildAccounts[$i]->getFieldValue('Expiration_Date'); ?></td>
+                           <!-- <td><?php echo $account->ChildAccounts[$i]->getFieldValue('Expiration_Date'); ?></td> -->
                           </tr>
                       <?php } ?>
                     </tbody>
