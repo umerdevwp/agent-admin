@@ -1,4 +1,4 @@
-<!--   <div class="sidebar scroller">
+   <div class="sidebar scroller">
         <div class="panel">
           <div class="panel-header">
             <div class="panel-title"><span class="panel-icon fa-trophy"></span><span>Right Sidebar Content</span></div>
@@ -28,6 +28,6 @@
           </ul>
         </div>
       </div>
-    </div> -->
+    </div> 
 </ul></nav></div></div></div></body>
 </html>

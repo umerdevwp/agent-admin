@@ -22,7 +22,7 @@
             <div class="col-lg-8">
               <div class="row row-10 align-items-end">
                 <div class="col-6 col-sm-7"><a href="index.html"><img src="images/AgentAdmin_Logo.png" alt=""></a></div>
-                <div class="col-6 col-sm-5 text-right"><a class="font-weight-bold" href="/portal">Sign In</a><span class="px-2">|</span><a href="register.html">Register</a></div>
+                <div class="col-6 col-sm-5 text-right"><a class="font-weight-bold" href="/portal">Sign In</a><span class="px-2">|</span><a href="https://zfrmz.com/HkojFayuoZH8407xrVaR">Register</a></div>
               </div>
               <form class="panel" method="post">
                 <div class="panel-header">
