@@ -12,6 +12,11 @@
     <link rel="icon" href="images/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="components/base/base.css">
     <script src="components/base/script.js"></script>
+
+	<!-- Latest CDN production Javascript and CSS -->
+	<script src="https://global.oktacdn.com/okta-signin-widget/3.1.0/js/okta-sign-in.min.js" type="text/javascript"></script>
+	<link href="https://global.oktacdn.com/okta-signin-widget/3.1.0/css/okta-sign-in.min.css" type="text/css" rel="stylesheet"/>
+
   </head>
   <body>
     <div class="page page-gradient-bg">
@@ -40,7 +45,7 @@
                 </div>
                 <div class="panel-body">
                   <div class="row row-30">
-                    <div class="col-lg-5 order-lg-2">
+                    <div class="col-lg-5 order-lg-2 login-description">
                       <h4>You'll Have Access To Your:</h4>
                       <ul>
                         <li>Corporate Documents</li>
@@ -50,25 +55,11 @@
 						  <li>Commercial Mail</li>
                       </ul>
                     </div>
-                    <div class="col-lg-7 order-lg-1">
-                      <div class="form-group">
-                        <label for="user">Username</label>
-                        <div class="input-group">
-                          <div class="input-group-prepend"><span class="input-group-text fa fa-user"></span></div>
-                          <input class="form-control" id="user" type="text" name="user" placeholder="Enter username">
-                        </div>
-                      </div>
-                      <div class="form-group">
-                        <label for="pass">Password</label>
-                        <div class="input-group">
-                          <div class="input-group-prepend"><span class="input-group-text fa fa-lock"></span></div>
-                          <input class="form-control" id="pass" type="password" name="password" placeholder="Enter password">
-                        </div>
-                      </div>
-                    </div>
+                    
+					<div class="col-lg-7 order-lg-1" id="osw-container2"></div>
                   </div>
                 </div>
-                <div class="panel-footer">
+                <div class="panel-footer hide">
                   <div class="row row-10">
                     <div class="col-sm-6">
                       <div class="custom-control custom-switch custom-switch-lg custom-switch-primary">
@@ -83,6 +74,7 @@
                   </div>
                 </div>
               </form>
+
             </div>
           </div>
         </div>
@@ -117,4 +109,110 @@ window.location = sUrl
 }
 //-->
 </script>
+
+<script>
+
+var signIn = new OktaSignIn(
+  {
+    baseUrl: 'https://dev-493430.okta.com',
+	logo: '',
+	language: 'en',
+	i18n: {
+		en: {
+		  'primaryauth.title': ' '
+		}
+	},
+  }
+);
+
+signIn.renderEl(
+  // Assumes there is an empty element on the page with an id of 'osw-container'
+  {el: '#osw-container2'},
+  /*
+  function success(res) {
+    // The properties in the response object depend on two factors:
+    // 1. The type of authentication flow that has just completed, determined by res.status
+    // 2. What type of token the widget is returning
+
+    // The user has started the password recovery flow, and is on the confirmation
+    // screen letting them know that an email is on the way.
+    if (res.status === 'FORGOT_PASSWORD_EMAIL_SENT') {
+      // Any followup action you want to take
+      return;
+    }
+
+    // The user has started the unlock account flow, and is on the confirmation
+    // screen letting them know that an email is on the way.
+    if (res.status === 'UNLOCK_ACCOUNT_EMAIL_SENT') {
+      // Any followup action you want to take
+      return;
+    }
+
+    // The user has successfully completed the authentication flow
+    if (res.status === 'SUCCESS') {
+
+      // Handle success when the widget is not configured for OIDC
+
+      if (res.type === 'SESSION_STEP_UP') {
+        // Session step up response
+        // If the widget is not configured for OIDC and the authentication type is SESSION_STEP_UP,
+        // the response will contain user metadata and a stepUp object with the url of the resource
+        // and a 'finish' function to navigate to that url
+        console.log(res.user);
+        console.log('Target resource url: ' + res.stepUp.url);
+        res.stepUp.finish();
+        return;
+      } else {
+        // If the widget is not configured for OIDC, the response will contain
+        // user metadata and a sessionToken that can be converted to an Okta
+        // session cookie:
+        console.log(res.user);
+        res.session.setCookieAndRedirect('https://acme.com/app');
+        return;
+      }
+
+
+      // OIDC response
+
+      // If the widget is configured for OIDC with a single responseType, the
+      // response will be the token.
+      // i.e. authParams.responseType = 'id_token':
+      console.log(res.claims);
+      signIn.tokenManager.add('my_id_token', res);
+
+      // If the widget is configured for OIDC with multiple responseTypes, the
+      // response will be an array of tokens:
+      // i.e. authParams.responseType = ['id_token', 'token']
+      signIn.tokenManager.add('my_id_token', res[0]);
+      signIn.tokenManager.add('my_access_token', res[1]);
+
+      return;
+    }
+
+  },*/
+  function success(res) {
+	  if (res.status === 'SUCCESS') {
+		res.session.setCookieAndRedirect('http://agentadmin.loc/index.php/portal');
+	  }
+  },
+
+  function error(err) {
+    // This function is invoked with errors the widget cannot recover from:
+    // Known errors: CONFIG_ERROR, UNSUPPORTED_BROWSER_ERROR
+  }
+);
+</script>
+<style>
+#okta-sign-in {
+	margin: 0 auto;
+	border: none;
+	width: 100%;
+}
+.okta-sign-in-header{
+	display:none;
+}
+.login-description {
+	margin-bottom: 0;
+}
+</style>
 </html>
