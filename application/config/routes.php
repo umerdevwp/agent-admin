@@ -50,5 +50,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |		my-controller/my-method	-> my_controller/my_method
 */
 $route['default_controller'] = 'login';
+// okta auth
+$route['login'] = 'user/login';
+$route['logout'] = 'user/logout';
+$route['callback'] = 'user/callback';
+
+$route['portal'] = 'portal';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;

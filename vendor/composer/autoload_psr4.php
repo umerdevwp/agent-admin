@@ -7,4 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'zcrmsdk\\' => array($vendorDir . '/zohocrm/php-sdk/src'),
+    'Symfony\\Polyfill\\Ctype\\' => array($vendorDir . '/symfony/polyfill-ctype'),
+    'Src\\Services\\' => array($baseDir . '/application/services'),
+    'Dotenv\\' => array($vendorDir . '/vlucas/phpdotenv/src'),
 );

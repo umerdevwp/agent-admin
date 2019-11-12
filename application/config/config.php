@@ -23,7 +23,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['base_url'] = '';
+$config['base_url'] = 'http://agentadmin.loc/';
 
 /*
 |--------------------------------------------------------------------------
@@ -384,6 +384,7 @@ $config['sess_save_path'] = NULL;
 $config['sess_match_ip'] = FALSE;
 $config['sess_time_to_update'] = 300;
 $config['sess_regenerate_destroy'] = FALSE;
+$config['sess_save_path'] = APPPATH . '/storage';
 
 /*
 |--------------------------------------------------------------------------
