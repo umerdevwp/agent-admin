@@ -1,5 +1,9 @@
 {
     "require": {
-        "zohocrm/php-sdk": "^2.0"
+        "zohocrm/php-sdk": "^2.0",
+        "vlucas/phpdotenv": "^3.6"
+    },
+	"autoload": {
+        "psr-4": {"Src\\Services\\": "application/services"}
     }
 }
