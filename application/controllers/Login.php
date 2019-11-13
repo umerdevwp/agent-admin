@@ -22,4 +22,37 @@ class Login extends CI_Controller {
 	{
 		$this->load->view('login');
 	}
+
+	public function callback()
+    {
+		//$this->getProfile();
+
+		redirect('/portal');
+
+    }
+
+	public function getProfile()
+	{
+
+	$ch = curl_init("https://dev-612069.okta.com/api/v1/users/me");
+
+    $headers = array(
+    'Accept: application/json',
+    'Content-Type: application/json',
+	'Authorization: SSWS ' . '00ZyFQxPdYbOmLGd1Fd5W3b3Z_MJ9ChASu0sV-wYIY'
+    );
+curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+curl_setopt($ch, CURLOPT_HEADER, 0);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$response = curl_exec($ch);
+var_dump($response);
+die;
+/*
+        $userId = $this->users_model->find_or_create($result['username']);
+
+        $this->session->userId = $userId;
+        $this->session->username = $result['username'];
+        redirect('/portal');*/
+	}
+
 }
