@@ -33,13 +33,14 @@ class Login extends CI_Controller {
 
 	public function getProfile()
 	{
-
-	$ch = curl_init("https://dev-612069.okta.com/api/v1/users/me");
+	
+	
+	$ch = curl_init(getenv('OKTA_BASE_URL') . "api/v1/users/me");
 
     $headers = array(
     'Accept: application/json',
     'Content-Type: application/json',
-	'Authorization: SSWS ' . '00ZyFQxPdYbOmLGd1Fd5W3b3Z_MJ9ChASu0sV-wYIY'
+	'Authorization: SSWS ' . getenv('OKTA_API_TOKEN')
     );
 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 curl_setopt($ch, CURLOPT_HEADER, 0);

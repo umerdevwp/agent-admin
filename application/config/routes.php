@@ -51,11 +51,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 */
 $route['default_controller'] = 'login';
 $route['callback'] = 'login/callback';
+
 // okta auth
+/*
 $route['login'] = 'user/login';
 $route['logout'] = 'user/logout';
 $route['callback'] = 'user/callback';
 
 $route['portal'] = 'portal';
+*/
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
