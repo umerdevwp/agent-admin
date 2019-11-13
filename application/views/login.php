@@ -115,6 +115,10 @@ window.location = sUrl
 var signIn = new OktaSignIn(
   {
     baseUrl: 'https://dev-493430.okta.com',
+	el: '#osw-container2',
+	authParams: {
+		issuer: 'https://dev-493430.okta.com/oauth2/default'
+	},
 	logo: '',
 	language: 'en',
 	i18n: {
@@ -125,6 +129,33 @@ var signIn = new OktaSignIn(
   }
 );
 
+signIn.showSignInToGetTokens({
+  clientId: '0oa1sdv0ncV3NTJ83357',
+
+  // must be in the list of redirect URIs enabled for the OIDC app
+  redirectUri: 'http://agentadmin.loc/index.php/callback',
+
+  // Return an access token from the authorization server
+  getAccessToken: true,
+
+  // Return an ID token from the authorization server
+  getIdToken: true,
+  scope: 'openid email'},
+  function success(res) {
+	  if (res.status === 'SUCCESS') {
+		
+		console.log("Access Token: " + signIn.tokenManager.get('access_token'));
+		//res.session.setCookieAndRedirect('http://agentadmin.loc/index.php/portal');
+	  }
+  },
+
+  function error(err) {
+  console.log("ERROR IS: " + err);
+    // This function is invoked with errors the widget cannot recover from:
+    // Known errors: CONFIG_ERROR, UNSUPPORTED_BROWSER_ERROR
+  }
+);
+/*
 signIn.renderEl(
   // Assumes there is an empty element on the page with an id of 'osw-container'
   {el: '#osw-container2'},
@@ -189,7 +220,7 @@ signIn.renderEl(
       return;
     }
 
-  },*/
+  },*//*
   function success(res) {
 	  if (res.status === 'SUCCESS') {
 		res.session.setCookieAndRedirect('http://agentadmin.loc/index.php/portal');
@@ -200,7 +231,7 @@ signIn.renderEl(
     // This function is invoked with errors the widget cannot recover from:
     // Known errors: CONFIG_ERROR, UNSUPPORTED_BROWSER_ERROR
   }
-);
+);*/
 </script>
 <style>
 #okta-sign-in {
