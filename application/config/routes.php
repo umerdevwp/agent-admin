@@ -60,5 +60,6 @@ $route['callback'] = 'user/callback';
 
 $route['portal'] = 'portal';
 */
+$route['callback'] = 'login/callback';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
