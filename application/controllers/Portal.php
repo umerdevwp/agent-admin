@@ -2,8 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Portal extends CI_Controller {
-    var $account = "4071993000000247062";
-
+	var $account = "";
 	/**
 	 * Index Page for this controller.
 	 *
@@ -23,11 +22,14 @@ class Portal extends CI_Controller {
 	{
 		$this->load->library(["session"]);
 		$this->load->helper(["email"]);
-		//echo strlen($this->session->user["oktaId"]);
+		
 		if(!valid_email($this->session->user["email"]))
 		{
 			redirect("");
 		}
+
+		// set zoho id from okta
+		$this->account = $this->session->user['zohoId'];
 
         $this->load->model('ZoHo_Account');
         $this->ZoHo_Account->LoadAccount($this->account);
