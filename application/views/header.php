@@ -116,7 +116,7 @@
     <div class="btn btn-navbar-panel" data-multi-switch='{"targets":"#subpanel-user","scope":"#subpanel-user","isolate":"[data-multi-switch]"}'>
       <div class="media align-items-center"><img class="rounded-circle" src="/images/users/jv_50x50.jpg" width="30" height="30" alt=""/>
         <div class="media-body ml-2">
-          <p>Jake Varghese</p>
+          <p><?=$this->session->user["firstName"]." ".$this->session->user["lastName"];?></p>
         </div>
       </div>
     </div>
@@ -124,7 +124,7 @@
       <div class="panel">
         <div class="panel-header">
           <div class="group-5 d-flex flex-wrap align-items-center"><img class="rounded mr-2" src="/images/users/jv_50x50.jpg" width="50" height="50" alt=""/>
-            <div class="panel-title">Jake Varghese</div>
+            <div class="panel-title"><?=$this->session->user["firstName"]." ".$this->session->user["lastName"];?></div>
           </div>
         </div>
         <div class="panel-body p-0 scroller scroller-vertical">
@@ -168,7 +168,7 @@
             </a></div>
         </div>
         <div class="panel-footer p-2">
-          <div class="d-flex align-items-center justify-content-between"><a class="btn btn-danger btn-sm" href="#">Sign Out</a><a class="btn btn-sm btn-light" href="#">Upgrade Plan</a></div>
+          <div class="d-flex align-items-center justify-content-between"><a class="btn btn-danger btn-sm" href="index.php/logout">Sign Out</a><a class="btn btn-sm btn-light" href="#">Upgrade Plan</a></div>
         </div>
       </div>
     </div>

@@ -21,6 +21,14 @@ class Portal extends CI_Controller {
 	 */
 	public function index()
 	{
+		$this->load->library(["session"]);
+		$this->load->helper(["email"]);
+		//echo strlen($this->session->user["oktaId"]);
+		if(!valid_email($this->session->user["email"]))
+		{
+			redirect("");
+		}
+
         $this->load->model('ZoHo_Account');
         $this->ZoHo_Account->LoadAccount($this->account);
         //$this->ZoHo_Account->dumpAll();

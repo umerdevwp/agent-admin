@@ -65,3 +65,27 @@
     </div>
 	  </div></div></div>
 </section>
+<script>
+function callMessagesApi() {
+  var accessToken = oktaSignIn.tokenManager.get("accessToken");
+
+  if (!accessToken) {
+    return;
+  }
+
+  // Make the request using jQuery
+  $.ajax({
+    url: 'http://localhost:{serverPort}/api/messages',
+    headers: {
+      Authorization : 'Bearer ' + accessToken.accessToken
+    },
+    success: function(response) {
+      // Received messages!
+      console.log('Messages', response);
+    },
+    error: function(response) {
+      console.error(response);
+    }
+  });
+}
+</script>
