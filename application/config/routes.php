@@ -53,6 +53,11 @@ $route['default_controller'] = 'login';
 $route['callback'] = 'login/callback';
 $route['logout'] = 'login/logout';
 
+$route['portal/entity/(.+)'] = 'portal/entity/$1';
+$route['portal/attachments/(:num)/(:num)'] = 'portal/attachments/$1/$2';
+$route['confirm'] = 'tasks/getAccessToken';
+$route['zoho'] = 'tasks/getZohoCode';
+$route['update/task/(:num)'] = 'tasks/completeTaskInZoho/$1';
 // okta auth
 /*
 $route['login'] = 'user/login';

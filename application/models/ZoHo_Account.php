@@ -28,12 +28,12 @@ class ZoHo_Account extends CI_Model
     public function __construct()
     {
         $configuration = [
-			"client_id" => "1000.708065VPY62SRIG10KN8GVMT75OVLH",
-            "client_secret" => "ce8f0d7939f3eaa341e62cc5f91b205164c456e31a",
-			"redirect_uri" => "http://portal.youragentservices.com/oauth",
+			"client_id" => getenv("ZOHO_CLIENT_ID"),
+            "client_secret" => getenv("ZOHO_CLIENT_SECRET"),
+			"redirect_uri" => getenv("ZOHO_REDIRECT_URI"),
 			"currentUserEmail"=> "cboyce@unitedagentservices.com",
 			"token_persistence_path" => "zohoauth",
-			"accounts_url" => "https://accounts.zoho.com"
+			"accounts_url" => getenv("ZOHO_ACCOUNTS_URL"),
 
 		];
 
@@ -425,5 +425,16 @@ class ZoHo_Account extends CI_Model
                 $this->PastDue = true;
             }
         }
+    }
+    
+    public function enableNotification()
+    {
+        $accessToken = (new ZCRMConfigUtil())->getAccessToken();
+        echo $accessToken;
+        /*
+        curl "https://www.zohoapis.com/crm/v2/actions/watch"
+        -X POST
+        -H "Authorization: Zoho-oauthtoken 1000.8cb99dxxxxxxxxxxxxx9be93.9b8xxxxxxxxxxxxxxxf"
+        -d "@inputData.json"*/
     }
 }
