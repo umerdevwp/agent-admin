@@ -88,7 +88,7 @@
                 <?php for($i = 0; $i < count($tasks); $i++){ ?>
                 <li class="list-sortable-item-primary">
                   <div class="custom-control custom-checkbox custom-check custom-checkbox-primary">
-                    <input class="custom-control-input" type="checkbox" id="taskCheck<?php echo $i; ?>"  data-toggle="modal" data-target="#sure" onclick="setTaskId(<?=$tasks[$i]->id;?>)" />
+                    <input class="custom-control-input taskListInput" type="checkbox" id="taskCheck<?php echo $i; ?>"  data-toggle="modal" data-target="#sure" onclick="setTaskId(<?=$tasks[$i]->id;?>)" />
                       <label class="custom-control-label" for="taskCheck<?php echo $i; ?>"><?php echo date_format(date_create($tasks[$i]->due_date), "m/d/Y"); ?> - <?php echo $tasks[$i]->subject; ?></label>
                   </div>
                 </li>
@@ -234,14 +234,15 @@
         Do you want to update the task as complete?
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-dismiss="modal">NO</button>
-        <button type="button" class="btn btn-success" onclick='updateTask();'>YES</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal" id="no">NO</button>
+        <button type="button" class="btn btn-success" id="yes">YES</button>
       </div>
     </div>
   </div>
 </div>
 </section>
 <script>
+
 var iTaskId = 0;
 function setTaskId(id)
 {
@@ -249,8 +250,21 @@ function setTaskId(id)
 }
 function updateTask()
 {
+  console.log(iTaskId);
   if(iTaskId>0){
     document.location = 'update/task/'+iTaskId;
   }
 }
+function uncheckTaskId()
+{
+  iTaskId = 0;
+  jQuery(".taskListInput").prop("checked",false);
+}
+
+setTimeout(() => {
+  jQuery("#no").on("click",uncheckTaskId);
+  jQuery("#yes").on("click",updateTask);
+}, 2000);
+  
+
 </script>
