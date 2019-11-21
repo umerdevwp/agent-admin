@@ -24,7 +24,7 @@ class Login extends CI_Controller
     {
         $this->load->library(["session"]);
         $this->load->helper(["email"]);
-        
+
         if (valid_email($this->session->user["email"])) {
             redirect("/portal");
         }
@@ -37,14 +37,90 @@ class Login extends CI_Controller
         $this->load->library(['session']);
         $this->load->helper(["email"]);
 
-        $this->getProfile();
+        if(empty($_GET['code'])) $this->validateOktaState();
+        else if(empty($this->session->user['access_token'])) $this->getAccessToken($_GET['code']);
 
-        //$this->exchangeCode();
+        if(!valid_email($this->session->user["email"])) $this->createProfileSession($this->getOktaId());
+        
         if (valid_email($this->session->user["email"])) {
             redirect("/portal");
+            //error_log("Valid email, redirecting");
         } else {
             redirect(getenv("SITE_URL")."?msg=Unable to verify your account");
+            //error_log("Failed email, going login");
         }
+    }
+
+    public function validateOktaState()
+    {
+        // working url for code return as querystring
+        
+        $url = getenv('OKTA_BASE_URL') . "oauth2/default/v1/authorize?client_id=". getenv('OKTA_CLIENT_ID') 
+        . "&redirect_uri=". getenv('OKTA_REDIRECT_URI') 
+        . "&state=".$_COOKIE['okta-oauth-state']
+        . "&nonce=".$_COOKIE['okta-oauth-nonce'] 
+        . "&response_type=code&scope=openid&prompt=none";
+
+        header("Location: " . $url);
+        /*
+        $ch = curl_init( $url );
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($ch);
+        echo "<pre>";
+        print_r($response);*/
+        die;
+    }
+
+    public function getAccessToken($code)
+    {
+        $url = getenv('OKTA_BASE_URL') . "oauth2/default/v1/token?client_id=". getenv('OKTA_CLIENT_ID') 
+        . "&client_secret=" . getenv('OKTA_CLIENT_SECRET')
+        . "&redirect_uri=". getenv('OKTA_REDIRECT_URI') 
+        . "&grant_type=authorization_code"
+        . "&code=".$code;
+
+        $ch = curl_init($url);
+        $headers = array(
+                'Accept: application/json',
+                'Content-Type: application/x-www-form-urlencoded'
+            );
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_POST,1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        
+        $response = json_decode(curl_exec($ch));
+        
+        if(isset($response->access_token))
+            $this->session->user = ["access_token"=>$response->access_token];
+        else 
+            log_message("error","OKTA " . $response->error_description);
+
+        echo "Got Access token in session: " . $this->session->user["access_token"];
+        //echo "----";
+        
+        //die;
+    }
+
+    public function getOktaId()
+    {
+
+        $url = getenv('OKTA_BASE_URL') . "oauth2/default/v1/userinfo";
+        
+        $headers = array(
+            'Accept: application/json',
+            'Content-Type: application/x-www-form-urlencoded',
+            'Authorization: Bearer '. $this->session->user['access_token']
+        );
+        
+        $ch = curl_init($url);
+        curl_setopt($ch,CURLOPT_HTTPHEADER,$headers);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_POST,1);
+        curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
+        $response = json_decode(curl_exec($ch));
+
+        return $response->sub;
     }
 
     public function logout()
@@ -55,59 +131,41 @@ class Login extends CI_Controller
         redirect(getenv("OKTA_BASE_URL") . "login/signout?fromURI=" . getenv("SITE_URL"));
     }
 
-    public function getProfile()
+
+    /**
+     * Get user profile from OKTA
+     */
+    public function createProfileSession($oktaId)
     {
-        //	echo $_GET['id_token'];die;
-        $ch = curl_init(getenv('OKTA_BASE_URL') . "api/v1/users/" . $_GET['user_id']);
+        // TODO: check user active in OKTA
+
+        // initiate okta api call, verify login user
+        $ch = curl_init(getenv('OKTA_BASE_URL') . "api/v1/users/" . $oktaId);
     
         $headers = array(
-    'Accept: application/json',
-    'Content-Type: application/json',
-    'Authorization: SSWS ' . getenv('OKTA_API_TOKEN')
-    );
+                'Accept: application/json',
+                'Content-Type: application/json',
+                'Authorization: SSWS ' . getenv('OKTA_API_TOKEN')
+            );
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        
         $response = json_decode(curl_exec($ch));
-
-        $this->session->user = array(
-            "oktaId"=>$this->input->get("user_id"),
-            "zohoId"=>$response->profile->organization,
-            "email"=>$response->profile->email,
-            "organization"=>$response->profile->organization,
-            "firstName"=>$response->profile->firstName,
-            "lastName"=>$response->profile->lastName,
-        );
-        //var_dump($this->session->user);
-        //var_dump($response);die;
-    }
-    /*
-        function exchangeCode() {
-            $authHeaderSecret = base64_encode( getenv("OKTA_CLIENT_ID").':'.getenv("OKTA_CLIENT_SECRET") );
-    
-            $headers = [
-                'Authorization: Basic ' . $authHeaderSecret,
-                'Accept: application/json',
-                'Content-Type: application/x-www-form-urlencoded',
-                'Connection: close',
-                'Content-Length: 0'
-            ];
-            $url = getenv('OKTA_BASE_URL') . 'oauth2/default/v1/introspect?token='.$_GET['access_token'].'&token_type_hint=access_token';
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_HEADER, 0);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_POST, 1);
-        //	curl_setopt($ch, CURLOPT_POSTFIELDS,"token=eyJraWQiOiJ6Z0RaUGtQQjFfTEtPa1pOWkwyVFROVUlUVGhXLVNSQUd2cUZhWkJTNzU4IiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULmF1V011UGxfTERPdWt4eFRQZjJDeVBSNjZIV1pZeVYyRWZyWm9Bb2ROZGsiLCJpc3MiOiJodHRwczovL2Rldi00OTM0MzAub2t0YS5jb20vb2F1dGgyL2RlZmF1bHQiLCJhdWQiOiJhcGk6Ly9kZWZhdWx0IiwiaWF0IjoxNTczNjY3NzYwLCJleHAiOjE1NzM2NzEzNjAsImNpZCI6IjBvYTFzZHYwbmNWM05USjgzMzU3IiwidWlkIjoiMDB1MXNmOHJsYTF1OVVBVXYzNTciLCJzY3AiOlsiZW1haWwiLCJvcGVuaWQiXSwic3ViIjoidGVzdDFAZ21haWwuY29tIn0.UajdgEwu8vWdQw84l7_-7fWaHNu5sfxWnF5x2ydqboPpBdEg9wupO4BnHuNiMV1gmReijEVT92IqjmMRMJHYI9hxXMMb3EN_khG9pyZcE7-UaENS-TUtbpedjETD_hMDBBf4iA6bZmm8eDaC_Bh0znA965eywSZUXPpjINbNCFbSuT_tt5dYgSyONOvATAjA6oJ4GocV0nCuQJk1esKhR3iTtmo0iXS96iksMJIXl4W4wLbWtZgdHAWsEYZgHD88-Y7Q1Vj6hm-ymQ3nRr6REJKefYbhjxZCu5_IzLi2ixMxFBWu9eATVvTISaS9MuuQvOKGiu27DbTTfi5T1lCjUg&token_type_hint=access_token");
-            $output = curl_exec($ch);
-            $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            if(curl_error($ch)) {
-                $httpcode = 500;
-            }
-            curl_close($ch);
-            var_dump($output);
-            die;
+        
+        // user verified with valid email
+        if (isset($response->profile) && valid_email($response->profile->email)) {
+            $this->session->user = array(
+                "oktaId"=>$this->input->get("user_id"),
+                "zohoId"=>$response->profile->organization,
+                "email"=>$response->profile->email,
+                "organization"=>$response->profile->organization,
+                "firstName"=>$response->profile->firstName,
+                "lastName"=>$response->profile->lastName,
+            );
+        } else {
+            // log error for back tracking
+            log_message("error","OKTA_API: " . json_encode($response));
         }
-    */
+    }
 }
