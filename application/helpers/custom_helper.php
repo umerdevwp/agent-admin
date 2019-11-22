@@ -14,3 +14,20 @@ function getFileSize($iBytes)
     else
         return $iBytes." kbs";
 }
+
+function isDateDue($strDateTime)
+{
+    $now = new DateTime();
+    $bResult = false;
+    if(!empty($strDateTime))
+    {
+        $date = date_create($strDateTime);
+        if($date < $now){
+            $bResult = true;
+        }
+    } else {
+        $bResult = true;
+    }
+    
+    return $bResult;
+}

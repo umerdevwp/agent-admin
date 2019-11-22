@@ -13,8 +13,8 @@ class Tasks_model extends CI_Model
     {
         // TODO: remove fake id
         $data = [
-            //'id' => $id,
-            'task_owner'    =>  '4071993000000224013', // fake id
+            'id' => $id,
+            //'task_owner'    =>  '4071993000000224013', // fake id
         ];
 
         $query = $this->db->get_where($this->table, $data);
