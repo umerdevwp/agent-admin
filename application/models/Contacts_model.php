@@ -13,8 +13,8 @@ class Contacts_model extends CI_Model
     {
         // TODO: remove fake id
         $data = [
-            //'contact_owner' => $id,
-            'contact_owner'    =>  '4071993000000244001', // fake id
+            'contact_owner' => $id,
+            //'contact_owner'    =>  '4071993000000244001', // fake id
         ];
 
         $query = $this->db->get_where($this->table, $data);

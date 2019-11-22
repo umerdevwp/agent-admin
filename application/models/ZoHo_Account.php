@@ -427,14 +427,4 @@ class ZoHo_Account extends CI_Model
         }
     }
     
-    public function enableNotification()
-    {
-        $accessToken = (new ZCRMConfigUtil())->getAccessToken();
-        echo $accessToken;
-        /*
-        curl "https://www.zohoapis.com/crm/v2/actions/watch"
-        -X POST
-        -H "Authorization: Zoho-oauthtoken 1000.8cb99dxxxxxxxxxxxxx9be93.9b8xxxxxxxxxxxxxxxf"
-        -d "@inputData.json"*/
-    }
 }

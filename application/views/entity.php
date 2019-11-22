@@ -8,7 +8,7 @@
   <ul class="breadcrumbs">
     <li class="breadcrumbs-item"><a class="breadcrumbs-link" href="/portal"><span class="breadcrumbs-icon fa-home"></span><span>Dashboard</span></a></li>
     <li class="breadcrumbs-item"><a class="breadcrumbs-link" href="/portal">Entities</a> </li>
-    <li class="breadcrumbs-item"><?php echo $entity->entity_name; ?></li>
+    <li class="breadcrumbs-item"><?php echo $entity->entity_name; ?><span style="display:none;"><?php echo $entity->id; ?></style></li>
   </ul>
 </section>
 	
@@ -58,7 +58,7 @@
           <div class="panel-body">
               <dl class="dl-horizontal">
               <dt>State ID</dt>
-              <dd><?php echo $entity->account_number; ?></dd>
+              <dd><?php echo $entity->entity_number; ?></dd>
             </dl>
             <dl class="dl-horizontal">
               <dt>Formation Date</dt>
@@ -72,14 +72,19 @@
           </div>
         </div>
       </div>
-    <?php if(count($tasks) > 0){ ?>
+    
 	<div class="row" style="width:100%">
         <div class="col-md-12 col-lg-12">
           <div class="panel">
             <div class="panel-header">
               <div class="panel-title">Compliance Check List <span class="span badge badge-danger"><?php echo count($tasks); ?></span></div>
             </div>
-          <?php if($entity->PastDue){ ?>
+          
+          <?php if(count($tasks) > 0){ ?>
+
+          <?php
+          // TODO: check tasks date to show warning on due tasks
+          if($entity->PastDue){ ?>
           <div class="alert alert-danger alert-darker alert-lg"><span class="alert-icon fa-remove"></span><span>WARNING! Open Compliance Tasks May Be Past Due</span></div>
           <?php } ?>
            <div class="panel-body">
@@ -96,10 +101,12 @@
               </ul>
             </div>
           </div>
+
+          <?php } ?>
+
         </div>
 	</div>
-    <?php } ?>
-	
+    
 <div class="row">
 	<div class="col-md-9 col-lg-12">
       <div class="panel">

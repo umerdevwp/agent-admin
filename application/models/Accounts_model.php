@@ -27,4 +27,21 @@ class Accounts_model extends CI_Model
 
         return $result;
     }
+
+    public function loadChildAccounts($id)
+    {
+        $data = [
+            'id'    =>  $id
+        ];
+
+        $query = $this->db->get_where($this->table,$data);
+        $result = $query->result();
+        
+        if(!is_array($result))
+        {
+            return ['msg'=>'Entities not found.','msg_type'=>'error'];
+        }
+
+        return $result;
+    }
 }
