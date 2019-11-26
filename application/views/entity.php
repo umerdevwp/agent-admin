@@ -111,7 +111,7 @@
 	<div class="col-md-9 col-lg-12">
       <div class="panel">
         <div class="panel-header">
-          <div class="panel-title"><span class="panel-icon fa-tasks"></span><span>Attachments</span> </div>
+          <div class="panel-title"><span class="panel-icon fa-tasks"></span><span>Attachments</span> (Note: under dev, <a href="/portal/download?id=4071993000000813044">download attachments</a>)</div>
         </div>
         <div class="panel-body p-0">
           <div class="table-responsive scroller scroller-horizontal py-3">
@@ -137,7 +137,13 @@
                         if(count($attachments)>0) {
                             for($i = 0; $i < count($attachments); $i++){ ?>
                       <tr role="row" class="odd">
-                        <td><a href="portal/attachments/<?=$attachments[$i]->parent_id;?>/<?=$attachments[$i]->id;?>"><?php echo $attachments[$i]->file_name; ?></a></td>
+                        <td>
+                        <?php if($attachments[$i]->link_url=="Attachment"): ?>
+                          <a href="portal/attachments/<?=$attachments[$i]->parent_id;?>/<?=$attachments[$i]->id;?>"><?php echo $attachments[$i]->file_name; ?></a>
+                        <?php else: ?>
+                          <a target="_blank" href="<?=$attachments[$i]->link_url;?>"><?php echo $attachments[$i]->file_name; ?></a>
+                        <?php endif; ?>
+                        </td>
                         <td><?php echo $attachments[$i]->created_by_name; ?></td>
                         <td><?php echo date_format(date_create($attachments[$i]->create_time), "m/d/Y H:i"); ?></td>
                         <td><?php echo getFileSize($attachments[$i]->size); ?></td>
@@ -145,18 +151,6 @@
                       </tr>
                       <?php } 
                         } ?>
-                        <?php 
-                        //if(count($ccount->getAttachments()->getData())>0) {
-                            for($i = 0; $i < count($account->Attachments); $i++){ ?>
-                      <tr role="row" class="odd">
-                        <td><a href="portal/attachments/<?=$account->Attachments[$i]->owner;?>/<?=$account->Attachments[$i]->id;?>"><?php echo $account->Attachments[$i]->file_name; ?></a></td>
-                        <td><?php echo $account->Attachments[$i]->created_by_name; ?></td>
-                        <td><?php echo date_format(date_create($account->Attachments[$i]->create_time), "m/d/Y H:i"); ?></td>
-                        <td><?php echo getFileSize($account->Attachments[$i]->size); ?></td>
-                        <!-- <td><span class="panel-icon fa-pencil"></span></td> -->
-                      </tr>
-                      <?php } 
-                        //} ?>
                     </tbody>
                     <tfoot>
                       <tr>

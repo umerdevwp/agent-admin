@@ -13,7 +13,7 @@ class Contacts_model extends CI_Model
     {
         // TODO: remove fake id
         $data = [
-            'contact_owner' => $id,
+            'entity_name' => $id,
             //'contact_owner'    =>  '4071993000000244001', // fake id
         ];
 

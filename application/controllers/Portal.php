@@ -101,42 +101,47 @@ class Portal extends CI_Controller {
 		
 		$this->load->model("Attachments_model");
 		// here check parent is allowed to download entity file
-		$id = $this->Attachments_model->checkOwnership($owner,$id);
+		$row = $this->Attachments_model->checkOwnership($owner,$id);
 		//var_dump($id);die;
-		if($id>0){
-			try{
-				$entity = $this->ZoHo_Account->LoadAccountOnly($owner);
-				$fileResponseIns = $entity->downloadAttachment($id);
-				
-				$file = "temp786/".$fileResponseIns->getFileName();
-				$fp=fopen($file,"w");
-				$stream=$fileResponseIns->getFileContent();
-				fputs($fp,$stream);
-				fclose($fp);
+		if($row->id>0){
+			$id = $row->id;
+			if($row->link_url=="Attachment"){
+				try{
+					$entity = $this->ZoHo_Account->LoadAccountOnly($owner);
+					$fileResponseIns = $entity->downloadAttachment($id);
+					
+					$file = "temp786/".$fileResponseIns->getFileName();
+					$fp=fopen($file,"w");
+					$stream=$fileResponseIns->getFileContent();
+					fputs($fp,$stream);
+					fclose($fp);
 
-				$quoted = sprintf('"%s"', addcslashes(basename($file), '"\\'));
-				$size   = filesize($file);
+					$quoted = sprintf('"%s"', addcslashes(basename($file), '"\\'));
+					$size   = filesize($file);
 
-				header('Content-Description: File Transfer');
-				header('Content-Type: application/octet-stream');
-				header('Content-Disposition: attachment; filename=' . $quoted); 
-				header('Content-Transfer-Encoding: binary');
-				header('Connection: Keep-Alive');
-				header('Expires: 0');
-				header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-				//header('Pragma: public');
-				header('Content-Length: ' . $size);
-			}catch (ZCRMException $e)
-			{
-				/*
-				echo $e->getMessage();
-				echo $e->getExceptionCode();
-				echo $e->getCode();
-				*/
+					header('Content-Description: File Transfer');
+					header('Content-Type: application/octet-stream');
+					header('Content-Disposition: attachment; filename=' . $quoted); 
+					header('Content-Transfer-Encoding: binary');
+					header('Connection: Keep-Alive');
+					header('Expires: 0');
+					header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+					//header('Pragma: public');
+					header('Content-Length: ' . $size);
+				}catch (ZCRMException $e)
+				{
+					/*
+					echo $e->getMessage();
+					echo $e->getExceptionCode();
+					echo $e->getCode();
+					*/
 
-				log_message('error',$e->getMessage());
-				$this->session->set_flashdata('error','Download failed, server error');
-				redirect($_SERVER['HTTP_REFERER']);
+					log_message('error',$e->getMessage());
+					$this->session->set_flashdata('error','Download failed, server error');
+					redirect($_SERVER['HTTP_REFERER']);
+				}
+			} else {
+				//header("Location: " . $row->link_url);
 			}
 		} else {
 			$this->session->set_flashdata('error','Unable to find attachment requested');
@@ -163,5 +168,7 @@ class Portal extends CI_Controller {
 	{
 		$this->load->model('ZoHo_Account');
 		$this->ZoHo_Account->downloadAttachments();
+
+		header("Location: ". $_SERVER['HTTP_REFERER']);
 	}
 }
