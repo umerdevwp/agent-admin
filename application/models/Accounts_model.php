@@ -31,7 +31,7 @@ class Accounts_model extends CI_Model
     public function loadChildAccounts($id)
     {
         $data = [
-            'id'    =>  $id
+            'parent_entity'    =>  $id
         ];
 
         $query = $this->db->get_where($this->table,$data);
@@ -43,5 +43,25 @@ class Accounts_model extends CI_Model
         }
 
         return $result;
+    }
+
+    public function hasEntities($id)
+    {
+        $data = [
+            "parent_entity" =>  $id
+        ];
+
+        $result = $this->db->get_where($this->table,$data,1,1);
+        //echo $this->db->last_query();
+        
+        $row = $result->row();
+        //var_dump($row);
+
+        if($row->id>0)
+        {
+            return true;
+        }
+
+        return false;
     }
 }

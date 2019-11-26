@@ -36,18 +36,40 @@ class Login extends CI_Controller
     {
         $this->load->library(['session']);
         $this->load->helper(["email"]);
+        // if session exist
+        if (!valid_email($this->session->user["email"])) {
 
-        if(empty($_GET['code'])) $this->validateOktaState();
-        else if(empty($this->session->user['access_token'])) $this->getAccessToken($_GET['code']);
+            if(empty($_GET['code'])) $this->validateOktaState();
+            else if(empty($this->session->user['access_token'])) $this->getAccessToken($_GET['code']);
 
-        if(!valid_email($this->session->user["email"])) $this->createProfileSession($this->getOktaId());
-        
-        if (valid_email($this->session->user["email"])) {
-            redirect("/portal");
-            //error_log("Valid email, redirecting");
+            if(!valid_email($this->session->user["email"])) $this->createProfileSession($this->getOktaId());
+            
+            if (valid_email($this->session->user["email"])) {
+
+                $this->redirectToDashboard();
+                //error_log("Valid email, redirecting");
+            } else {
+                redirect(getenv("SITE_URL")."?msg=Unable to verify your account");
+                //error_log("Failed email, going login");
+            }
         } else {
-            redirect(getenv("SITE_URL")."?msg=Unable to verify your account");
-            //error_log("Failed email, going login");
+            $this->redirectToDashboard();
+        }
+    }
+
+    private function redirectToDashboard()
+    {
+        $this->load->model("Accounts_model");
+
+        $bParentAccount = $this->Accounts_model->hasEntities($this->session->user["zohoId"]);
+        
+        if($bParentAccount)
+        {
+            $this->session->user = array_merge($this->session->user,['child'=>1]);
+            redirect("/portal");
+        } else {
+            $this->session->user = array_merge($this->session->user,['child'=>1]);
+            redirect("/portal/entity/" . $this->session->user["zohoId"]);
         }
     }
 
@@ -96,7 +118,7 @@ class Login extends CI_Controller
         else 
             log_message("error","OKTA " . $response->error_description);
 
-        echo "Got Access token in session: " . $this->session->user["access_token"];
+        //echo "Got Access token in session: " . $this->session->user["access_token"];
         //echo "----";
         
         //die;
@@ -120,7 +142,7 @@ class Login extends CI_Controller
         curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
         $response = json_decode(curl_exec($ch));
 
-        return $response->sub;
+        return trim($response->sub);
     }
 
     public function logout()
@@ -137,8 +159,6 @@ class Login extends CI_Controller
      */
     public function createProfileSession($oktaId)
     {
-        // TODO: check user active in OKTA
-
         // initiate okta api call, verify login user
         $ch = curl_init(getenv('OKTA_BASE_URL') . "api/v1/users/" . $oktaId);
     
@@ -156,7 +176,7 @@ class Login extends CI_Controller
         // user verified with valid email
         if (isset($response->profile) && valid_email($response->profile->email)) {
             $this->session->user = array(
-                "oktaId"=>$this->input->get("user_id"),
+                "oktaId"=>$oktaId,
                 "zohoId"=>$response->profile->organization,
                 "email"=>$response->profile->email,
                 "organization"=>$response->profile->organization,

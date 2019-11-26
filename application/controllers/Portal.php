@@ -26,6 +26,12 @@ class Portal extends CI_Controller {
 		$this->load->library(["session"]);
 		$this->load->helper(["email"]);
 
+		// has no child, show entity page
+		if($this->session->user["child"]==0)
+		{
+			redirect("/portal/entity/".$this->session->user["zohoId"]);
+		}
+
 		//okta have returned valid login email
 		if(!valid_email($this->session->user["email"]))
 		{
@@ -38,16 +44,12 @@ class Portal extends CI_Controller {
 		// set zoho id from okta
 		$this->account = $this->session->user['zohoId'];
 		
-		$this->load->model('ZoHo_Account');
+		//$this->load->model('ZoHo_Account');
 		
-		$res = $this->ZoHo_Account->LoadAccount($this->account);
-		/*
-		$accessToken = (new ZCRMConfigUtil())->getAccessToken();
-        echo $accessToken;
-        echo "------------";
-		die;*/
+		//$res = $this->ZoHo_Account->LoadAccount($this->account);
+		
         //$this->ZoHo_Account->dumpAll();
-		$data['account'] = $this->ZoHo_Account;
+		//$data['account'] = $this->ZoHo_Account;
 		
 		$this->load->model('Accounts_model');
 		$data['entity'] = $this->Accounts_model->loadAccount($this->session->user['zohoId']);
@@ -61,7 +63,7 @@ class Portal extends CI_Controller {
 
     public function entity($id)
     {
-		$this->load->model('ZoHo_Account');
+		//$this->load->model('ZoHo_Account');
 		$this->load->model('Accounts_model');
 		$this->load->model('Tasks_model');
 		$this->load->model('Contacts_model');
@@ -70,14 +72,15 @@ class Portal extends CI_Controller {
 		$this->load->helper("custom");
 
 		// fetch data from zoho api
-        /*$this->ZoHo_Account->LoadAccount($id);
+        //$this->ZoHo_Account->LoadAccount($id);
         //$this->ZoHo_Account->dumpAll();
-		$data['account'] = $this->ZoHo_Account;*/
+		//$data['account'] = $this->ZoHo_Account;
 		
 		// fetch data from DB
 		$data['entity'] = $this->Accounts_model->loadAccount($id);
 		$data['tasks'] = $this->Tasks_model->getAll($id);
 		$data['contacts'] = $this->Contacts_model->getAll($id);
+		//$data['attachments'] = $this->ZoHo_Account->arAttachments;
 		$data['attachments'] = $this->Attachments_model->getAll($id);
 		
 		//var_dump($data['account']);die;
@@ -88,24 +91,41 @@ class Portal extends CI_Controller {
 	
 	public function attachments($owner,$id)
 	{
+		$this->load->model('ZoHo_Account');
+		$this->load->helper("custom");
+		
+		// TODO: check parent is allowed to download this child entity file
+		// TODO: track number of downloads in table, for unique filename move
+
 		$this->load->library("session");
-		// TODO: test download attachment zoho code
+		
 		$this->load->model("Attachments_model");
+		// here check parent is allowed to download entity file
 		$id = $this->Attachments_model->checkOwnership($owner,$id);
 		//var_dump($id);die;
 		if($id>0){
 			try{
-				$record = ZCRMRecord::getInstance(“Accounts”,$owner);
-				$fileResponseIns = $record->downloadAttachment($id); // 410405000001519501 - Attachment ID.
-				header("Location: " . $filePath.$fileResponseIns->getFileName());
-				/*
-				$fp=fopen($filePath.$fileResponseIns->getFileName(),"w"); // $filePath - absolute path where downloaded file has to be stored.
-				echo "HTTP Status Code:".$fileResponseIns->getHttpStatusCode();
-				echo "File Name:".$fileResponseIns->getFileName();
+				$entity = $this->ZoHo_Account->LoadAccountOnly($owner);
+				$fileResponseIns = $entity->downloadAttachment($id);
+				
+				$file = "temp786/".$fileResponseIns->getFileName();
+				$fp=fopen($file,"w");
 				$stream=$fileResponseIns->getFileContent();
 				fputs($fp,$stream);
 				fclose($fp);
-				*/
+
+				$quoted = sprintf('"%s"', addcslashes(basename($file), '"\\'));
+				$size   = filesize($file);
+
+				header('Content-Description: File Transfer');
+				header('Content-Type: application/octet-stream');
+				header('Content-Disposition: attachment; filename=' . $quoted); 
+				header('Content-Transfer-Encoding: binary');
+				header('Connection: Keep-Alive');
+				header('Expires: 0');
+				header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+				//header('Pragma: public');
+				header('Content-Length: ' . $size);
 			}catch (ZCRMException $e)
 			{
 				/*
@@ -119,8 +139,29 @@ class Portal extends CI_Controller {
 				redirect($_SERVER['HTTP_REFERER']);
 			}
 		} else {
-			$this->session->set_flashdata('error','Unable to authorize attachment');
+			$this->session->set_flashdata('error','Unable to find attachment requested');
 			redirect($_SERVER['HTTP_REFERER']);
 		}
+	}
+
+	public function attachments2()
+	{
+		
+		/*$this->load->model('ZoHo_Account');
+        $this->ZoHo_Account->LoadAccount($this->input->get("id"));
+        //$this->ZoHo_Account->dumpAll();
+		$account = $this->ZoHo_Account;
+		//echo "<pre>";print_r($account);die;
+		echo $account->AccountData->getFieldValue('Account_Name');
+		die;*/
+		$this->load->model("Attachments_model");
+
+		$this->Attachments_model->getAllApi();
+	}
+
+	public function download()
+	{
+		$this->load->model('ZoHo_Account');
+		$this->ZoHo_Account->downloadAttachments();
 	}
 }
