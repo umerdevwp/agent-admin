@@ -103,7 +103,7 @@ class Attachments_model extends CI_Model
         $row = $query->row();
         if (isset($row))
         {
-            return $row->id;
+            return $row;
         }
         return false;
     }

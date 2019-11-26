@@ -10,7 +10,10 @@
     <meta property="og:image" content="http://digipunk.netii.net/images/radar.gif">
     <meta property="og:url" content="http://digipunk.netii.net">
     <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+    
     <link rel="stylesheet" href="components/base/base.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+
     <script src="components/base/script.js"></script>
 
 	<!-- Latest CDN production Javascript and CSS -->
@@ -56,7 +59,8 @@
                       </ul>
                     </div>
                     
-					<div class="col-lg-7 order-lg-1" id="osw-container2"></div>
+          <div class="col-lg-7 order-lg-1" id="osw-container2"></div>
+          
                   </div>
                 </div>
                 <div class="panel-footer hide">
@@ -73,10 +77,21 @@
                     </div>
                   </div>
                 </div>
+                <div id="divPositiveSSL">
+            <script type="text/javascript"> //<![CDATA[
+var tlJsHost = ((window.location.protocol == "https:") ? "https://secure.trust-provider.com/" : "http://www.trustlogo.com/");
+document.write(unescape("%3Cscript src='" + tlJsHost + "trustlogo/javascript/trustlogo.js' type='text/javascript'%3E%3C/script%3E"));
+//]]></script>
+<script language="JavaScript" type="text/javascript">
+TrustLogo("https://www.positivessl.com/images/seals/positivessl_trust_seal_sm_124x32.png", "POSDV", "none");
+</script>
+            </div>
               </form>
 
             </div>
+            
           </div>
+          
         </div>
       </section>
       <div class="template-panel">
@@ -100,6 +115,7 @@
         </div>
       </div>
     </div>
+    
   </body>
 
 <script type="text/javascript">
@@ -144,17 +160,4 @@ signIn.showSignInToGetTokens({
   scope: 'openid profile'
 });
 </script>
-<style>
-#okta-sign-in {
-	margin: 0 auto;
-	border: none;
-	width: 100%;
-}
-.okta-sign-in-header{
-	display:none;
-}
-.login-description {
-	margin-bottom: 0;
-}
-</style>
 </html>

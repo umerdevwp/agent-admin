@@ -1,0 +1,15 @@
+#okta-sign-in {
+	margin: 0 auto;
+	border: none;
+	width: 100%;
+}
+.okta-sign-in-header{
+	display:none;
+}
+.login-description {
+	margin-bottom: 0;
+}
+#divPositiveSSL {
+  padding: 0 0 10px 0;
+  text-align: right;
+}
