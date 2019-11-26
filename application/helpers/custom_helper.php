@@ -31,3 +31,12 @@ function isDateDue($strDateTime)
     
     return $bResult;
 }
+
+function getClassMethods($class)
+{
+    $class_methods = get_class_methods($class);
+    foreach ($class_methods as $method_name) 
+    {
+        echo "$method_name<br/>";
+    }
+}

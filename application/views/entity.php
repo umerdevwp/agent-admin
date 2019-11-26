@@ -137,7 +137,7 @@
                         if(count($attachments)>0) {
                             for($i = 0; $i < count($attachments); $i++){ ?>
                       <tr role="row" class="odd">
-                        <td><a href="portal/attachments/<?=$attachments[$i]->owner;?>/<?=$attachments[$i]->id;?>"><?php echo $attachments[$i]->file_name; ?></a></td>
+                        <td><a href="portal/attachments/<?=$attachments[$i]->parent_id;?>/<?=$attachments[$i]->id;?>"><?php echo $attachments[$i]->file_name; ?></a></td>
                         <td><?php echo $attachments[$i]->created_by_name; ?></td>
                         <td><?php echo date_format(date_create($attachments[$i]->create_time), "m/d/Y H:i"); ?></td>
                         <td><?php echo getFileSize($attachments[$i]->size); ?></td>
@@ -145,6 +145,18 @@
                       </tr>
                       <?php } 
                         } ?>
+                        <?php 
+                        //if(count($ccount->getAttachments()->getData())>0) {
+                            for($i = 0; $i < count($account->Attachments); $i++){ ?>
+                      <tr role="row" class="odd">
+                        <td><a href="portal/attachments/<?=$account->Attachments[$i]->owner;?>/<?=$account->Attachments[$i]->id;?>"><?php echo $account->Attachments[$i]->file_name; ?></a></td>
+                        <td><?php echo $account->Attachments[$i]->created_by_name; ?></td>
+                        <td><?php echo date_format(date_create($account->Attachments[$i]->create_time), "m/d/Y H:i"); ?></td>
+                        <td><?php echo getFileSize($account->Attachments[$i]->size); ?></td>
+                        <!-- <td><span class="panel-icon fa-pencil"></span></td> -->
+                      </tr>
+                      <?php } 
+                        //} ?>
                     </tbody>
                     <tfoot>
                       <tr>

@@ -13,6 +13,7 @@ class ZoHo_Account extends CI_Model
     var $AccountNumber;
     var $AccountData;
     var $ChildAccounts;
+    var $arAttachments;
     var $Contacts;
     var $Tasks;
     var $PastDue = false;
@@ -418,6 +419,33 @@ class ZoHo_Account extends CI_Model
             }
         }
 
+        //$entityId = strval($this->AccountData->getEntityId());
+        //$zcrmModuleTsk = ZCRMModule::getInstance("Attachments");
+        
+        //$bulkAPIResponse = $zcrmModuleTsk->searchRecordsByCriteria("Status:equals:Not Started", 1, 200);
+        $arAttachments = $this->AccountData->getAttachments()->getData();//$zcrmModuleTsk->getData();
+        $this->arAttachments = array();
+
+        for($i = 0; $i < count($arAttachments); $i++){
+            $record = $arAttachments[$i];
+
+            $map = array(
+                "id"            =>  $record->getId(),
+                "modified_by"   =>  $record->getModifiedBy()->getId(),
+                "owner"         =>  $record->getOwner()->getId(),
+                "parent_id"     =>  $record->getParentId(),
+                "create_time"   =>  $record->getCreatedTime(),
+                "modified_time" =>  $record->getModifiedTime(),
+                "created_by"    =>  $record->getCreatedBy()->getId(),
+                "file_name"     =>  $record->getFileName(),
+                "size"          =>  $record->getSize(),
+                "created_by_name"=> $record->getCreatedBy()->getName(),
+                "modified_by_name"=>$record->getModifiedBy()->getName(),
+                "owner_name"    =>  $record->getOwner()->getName(),
+            );
+            $this->arAttachments[] =  (object)$map;
+        }
+        
         $now = new DateTime();
         for($i = 0; $i < count($this->Tasks); $i++){
             $date = date_create($this->Tasks[$i]->getFieldValue('Due_Date'));
@@ -426,5 +454,81 @@ class ZoHo_Account extends CI_Model
             }
         }
     }
-    
+
+
+    public function loadAttachments($zohoId)
+    {
+        $this->load->helpers("custom");
+
+        $zcrmModuleIns = ZCRMModule::getInstance("Accounts");
+        $bulkAPIResponse = $zcrmModuleIns->searchRecordsByCriteria("id:equals:{$this->input->get("id")}", 1, 1);
+        $recordsArray = $bulkAPIResponse->getData();
+        
+        echo $recordsArray[0]->getFieldValue('Account_Name');
+        echo "<pre>";print_r($recordsArray[0]->getAttachments()->getData());
+
+        return $recordsArray[0]->getAttachments()->getData();
+    }
+
+    public function LoadAccountOnly($account_number){
+        $id = $account_number;
+        $account = null;
+        if($id>0){
+            $zcrmModuleIns = ZCRMModule::getInstance("Accounts");
+            $bulkAPIResponse = $zcrmModuleIns->searchRecordsByCriteria("id:equals:$account_number", 1, 1);
+            $recordsArray = $bulkAPIResponse->getData();
+            if(count($recordsArray) > 0){
+                $account = $recordsArray[0];
+            }
+        }
+        return $account;
+    }
+
+    public function downloadAttachments()
+    {
+        // TODO: check user is admin type
+        // check user is loggedin
+        if(!empty($this->session->user["oktaId"])){
+
+            $this->load->model("Attachments_model");
+            $this->load->helper("custom");
+            
+            $account = $this->LoadAccountOnly($this->input->get("id"));
+            $arAttachments = $account->getAttachments()->getData();//$zcrmModuleTsk->getData();
+            
+            $data = array();
+            //getClassMethods($arAttachments[0]);
+
+            for($i = 0; $i < count($arAttachments); $i++){
+                $record = $arAttachments[$i];
+
+                $map = array(
+                    "id"            =>  $record->getId(),
+                    "modified_by"   =>  $record->getModifiedBy()->getId(),
+                    "owner"         =>  $record->getOwner()->getId(),
+                    "parent_id"     =>  $record->getParentId(),
+                    "create_time"   =>  $record->getCreatedTime(),
+                    "modified_time" =>  $record->getModifiedTime(),
+                    "created_by"    =>  $record->getCreatedBy()->getId(),
+                    "file_name"     =>  $record->getFileName(),
+                    "size"          =>  $record->getSize(),
+                    "created_by_name"=> $record->getCreatedBy()->getName(),
+                    "modified_by_name"=>$record->getModifiedBy()->getName(),
+                    "owner_name"    =>  $record->getOwner()->getName(),
+                    "document_count"=>  0,// it is not available in API response
+                    "link_url"      =>  $record->getAttachmentType(),
+                );                
+                $data[] =  (object)$map;
+            }
+
+            if(count($data)>0)
+            {
+                for($i=0;$i<count($data);$i++)
+                {
+                    $this->Attachments_model->replace($data[$i]->id,$data[$i]);
+                }
+            }
+        }
+    }
+ 
 }
