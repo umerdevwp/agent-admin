@@ -1,7 +1,7 @@
 #okta-sign-in {
-	margin: 0 auto;
+	margin: 0 auto !important;
 	border: none;
-	width: 100%;
+	width: 100% !important;
 }
 .okta-sign-in-header{
 	display:none;

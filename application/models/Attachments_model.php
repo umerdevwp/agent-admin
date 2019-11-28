@@ -7,7 +7,7 @@ use zcrmsdk\crm\crud\ZCRMRecord;
 class Attachments_model extends CI_Model
 {
 
-    private $table = "temp_attachments";
+    private $table = "zoho_attachments3";
 
     public function __construct()
     {
@@ -23,7 +23,6 @@ class Attachments_model extends CI_Model
 			"currentUserEmail"=> "cboyce@unitedagentservices.com",
 			"token_persistence_path" => "zohoauth",
 			"accounts_url" => getenv("ZOHO_ACCOUNTS_URL"),
-
 		];
 
         ZCRMRestClient::initialize($configuration);
