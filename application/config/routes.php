@@ -58,6 +58,8 @@ $route['portal/attachments/(:num)/(:num)'] = 'portal/attachments/$1/$2';
 $route['confirm'] = 'tasks/getAccessToken';
 $route['zoho'] = 'tasks/getZohoCode';
 $route['update/task/(:num)'] = 'tasks/completeTaskInZoho/$1';
+
+$route['entity/form/(:num)'] = 'entity/form/$1';
 // okta auth
 /*
 $route['login'] = 'user/login';

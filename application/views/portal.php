@@ -1,9 +1,21 @@
+<?php if($this->session->flashdata("error")): ?>
+  <div class="alert alert-danger" role="alert">
+  <?=$this->session->flashdata("error");?>
+</div>
+<?php endif; ?>
+<?php if($this->session->flashdata("ok")): ?>
+  <div class="alert alert-success" role="alert">
+  <?=$this->session->flashdata("ok");?>
+</div>
+<?php endif; ?>
 <section class="topbar"> 
   <!-- Breadcrumbs-->
   <ul class="breadcrumbs">
     <li class="breadcrumbs-item"><a class="breadcrumbs-link" href="index.html"><span class="breadcrumbs-icon fa-home"></span><span>Dashboard</span></a></li>
     <li class="breadcrumbs-item"><?php echo $entity->entity_name; ?><span style='display:none;' id="tempId"><?=$this->session->user["zohoId"];?></span></li>
+    
   </ul>
+  <h2><a href="/entity/form">Add Entity</a></h2>
 </section>
 	
 	
