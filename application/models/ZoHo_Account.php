@@ -42,6 +42,7 @@ class ZoHo_Account extends CI_Model
         ZCRMRestClient::initialize($configuration);
     }
 
+
     public function getAllModules()
     {
         $rest = ZCRMRestClient::getInstance(); // to get the rest client
@@ -531,4 +532,11 @@ class ZoHo_Account extends CI_Model
         }
     }
  
+    /**
+     * Get instance of zcrm for api calls
+     */
+    public function getInstance()
+    {
+        return ZCRMRestClient::getInstance();
+    }
 }

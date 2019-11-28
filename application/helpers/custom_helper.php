@@ -40,3 +40,49 @@ function getClassMethods($class)
         echo "$method_name<br/>";
     }
 }
+
+/**
+ * Validate file size
+ * 
+ * $strFileFullPath file path
+ */
+function validateFileSize($strFileFullPath,$iSize)
+{
+    $iFileSize = filesize($strFileFullPath);
+
+    if($iFileSize > $iSize)
+    {
+        return false;
+    }
+
+    return true;
+
+}
+
+/**
+ * Validate file extention
+ * 
+ * @param string $strFileFullPath File full path
+ * @param array $arAllowedExts Allowed extention numeric array
+ * 
+ * @return bool 
+ */
+function validateFileExt($strFileFullPath,$arAllowedExts)
+{
+    $type = false;
+
+    if(file_exists($strFileFullPath))
+    {
+        
+        $finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type
+        $type = finfo_file($finfo, $strFileFullPath);
+        finfo_close($finfo);
+    }
+    
+    if(!in_array($type,$arAllowedExts))
+    {
+        return false;
+    } else {
+        return true;
+    }
+}

@@ -64,4 +64,20 @@ class Accounts_model extends CI_Model
 
         return false;
     }
+
+    public function getOne($id)
+    {
+        $data = [
+            'id'    =>  $id
+        ];
+
+        $query = $this->db->get_where($this->table, $data);
+        $result = $query->row();
+        
+        if ($result) {
+            return ['msg'=>'No such account found','msg_type'=>'error'];
+        }
+
+        return $result;
+    }
 }
