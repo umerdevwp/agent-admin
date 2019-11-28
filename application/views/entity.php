@@ -111,7 +111,7 @@
 	<div class="col-md-9 col-lg-12">
       <div class="panel">
         <div class="panel-header">
-          <div class="panel-title"><span class="panel-icon fa-tasks"></span><span>Attachments</span> (Note: under dev, <a href="/portal/download?id=4071993000000813044">download attachments</a>)</div>
+          <div class="panel-title"><span class="panel-icon fa-tasks"></span><span>Attachments</span></div>
         </div>
         <div class="panel-body p-0">
           <div class="table-responsive scroller scroller-horizontal py-3">
