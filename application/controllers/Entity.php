@@ -31,11 +31,26 @@ class Entity extends CI_Controller {
     {
         $this->load->helper("custom");
         $this->load->library('form_validation');
-        
+
+        // try to correct user date format, then validate
+        if($this->input->post("inputFormationDate")!="")
+        {
+            $strFormationDate = str_replace("  "," ",$this->input->post("inputFormationDate"));
+            $strFormationDate = str_replace(" ","-",$strFormationDate);
+            $strFormationDate = date("Y-m-d",strtotime($strFormationDate));
+            
+            if($strFormationDate=="1970-01-01")
+            {
+                //$_POST["inputFormationDate"] = "0000 00 00";
+            } else {
+                $_POST["inputFormationDate"] = $strFormationDate;
+            }
+        }
+
         $this->form_validation->set_rules('inputName', 'Account Name', 'required|regex_match[/[a-zA-Z\s]+/]',["regex_match"=>"Only alphabets and spaces allowed."]);
         $this->form_validation->set_rules('inputFillingState', 'Filing State', 'required|alpha');
         $this->form_validation->set_rules('inputFillingStructure', 'Entity Type', 'required|regex_match[/[A-Z\-]+/]');
-        $this->form_validation->set_rules('inputFormationDate', 'Formation Date');//, 'regex_match[/[0-9]+\-[0-9]+\-[0-9]+/]',["regex_match"=>"Allowed %s format: 01-01-2019"]);
+        $this->form_validation->set_rules('inputFormationDate', 'Formation Date', 'required|regex_match[/[0-9]{4,}\-[0-9]{2,}\-[0-9]{2,}/]',["regex_match"=>"Allowed %s format: 2019-01-01"]);
         $this->form_validation->set_rules('inputNotificationEmail', 'Notification Email', 'required|valid_email');
         $this->form_validation->set_rules('inputNotificationPhone', 'Phone', 'required|regex_match[/[\+\s\-0-9]+/]');
         $this->form_validation->set_rules('inputNotificationAddress', 'Shipping Street', 'required');
@@ -93,16 +108,13 @@ class Entity extends CI_Controller {
         $this->load->model('ZoHo_Account');
 
         $oApi = $this->ZoHo_Account->getInstance()->getRecordInstance("Accounts",null);
-        
-        //$_POST["inputName"] = "Jhon9";
-        //$_POST["inputFormationDate"] = "20-Apr-2018 16:40:05";
+
         $oApi->setFieldValue("Account_Name", $this->input->post("inputName")); // This function use to set FieldApiName and value similar to all other FieldApis and Custom field
         $oApi->setFieldValue("Filing_State", $this->input->post("inputFillingState")); // Account Name can be given for a new account, account_id is not mandatory in that case
         $oApi->setFieldValue("Entity_Type", $this->input->post("inputFillingStructure")); // Account Name can be given for a new account, account_id is not mandatory in that case
         
-        if(!empty($this->input->post("inputFormationDate"))){
-            $oApi->setFieldValue("Formation_Date",$this->input->post("inputFormationDate"));
-        }
+        $oApi->setFieldValue("Formation_Date",$this->input->post("inputFormationDate"));
+
         // fields should exist in the crm admin
         //$oApi->setFieldValue("firstName",$this->input->post("inputFirstName"));
         //$oApi->setFieldValue("lastName",$this->input->post("inputLastName"));
@@ -127,6 +139,7 @@ class Entity extends CI_Controller {
 
             $oResponse = $responseIns->getDetails();
         } catch(Exception $e) {
+            //echo "<pre>";print_r($e);die;
             // message
             $arError[] = "code: " . $e->getCode() . ", error: Api: " . $e->getMessage();
         }
@@ -150,6 +163,7 @@ class Entity extends CI_Controller {
                     } catch(Exception $e) {
                         $arError[] = "code: " . $e->getCode() . ", error: Api: " . $e->getMessage();
                     }
+                    // TODO: remove uploaded file from directory getenv("UPLOAD_PATH")
                 } else {
                     $arError[] = "User created successfully, Internal Server Error: file upload failed.";
                 }
