@@ -107,6 +107,7 @@ class Entity extends CI_Controller {
 
         $this->load->model('ZoHo_Account');
 
+        
         $oApi = $this->ZoHo_Account->getInstance()->getRecordInstance("Accounts",null);
 
         $oApi->setFieldValue("Account_Name", $this->input->post("inputName")); // This function use to set FieldApiName and value similar to all other FieldApis and Custom field
@@ -115,7 +116,7 @@ class Entity extends CI_Controller {
         
         $oApi->setFieldValue("Formation_Date",$this->input->post("inputFormationDate"));
 
-        // fields should exist in the crm admin
+        // these 2 fields going under contacts
         //$oApi->setFieldValue("firstName",$this->input->post("inputFirstName"));
         //$oApi->setFieldValue("lastName",$this->input->post("inputLastName"));
         
@@ -139,16 +140,16 @@ class Entity extends CI_Controller {
 
             $oResponse = $responseIns->getDetails();
         } catch(Exception $e) {
-            //echo "<pre>";print_r($e);die;
             // message
             $arError[] = "code: " . $e->getCode() . ", error: Api: " . $e->getMessage();
         }
         
         if($oResponse["id"]>0)
         {
+
             // setting 2, so error only reports attachment issue
             $iErrorType = 2;
-            //$oAttachmentResponse = array();
+            
             $oAttachment = null;
             
             // if file is give for attachment
@@ -169,20 +170,22 @@ class Entity extends CI_Controller {
                 }
             }
 
-            /*
-            echo "HTTP Status Code:" . $responseIns->getHttpStatusCode(); // To get http response code
-            echo "Status:" . $responseIns->getStatus(); // To get response status
-            echo "Message:" . $responseIns->getMessage(); // To get response message
-            echo "Code:" . $responseIns->getCode(); // To get status code
-            echo "Details:" . json_encode($responseIns->getDetails());*/
+            //$oApi->setModuleApiName("Contacts");
+            $oApi = $this->ZoHo_Account->getInstance()->getRecordInstance("Contacts",null);
+            
+            $oApi->setFieldValue("Account_Name", $this->input->post("inputName"));
+            
+            $oApi->setFieldValue("First_Name",$this->input->post("inputFirstName"));
+            $oApi->setFieldValue("Last_Name",$this->input->post("inputLastName"));
+            try {
+                $oApi->create();
+            } catch(Exception $e){
+                if(count($arError)>0) $arError[0] .= ", contacts failed.";
+                else $arError[] = "User created successfully, contacts failed.";
+            }
+
         }
-        /*
-        var_dump($oAttachmentResponse);
-        echo "-- previous responds ---";
-        var_dump($oResponse);
-        echo "-- errors -- ";
-        var_dump($arError);
-        */
+
         if(count($arError)>0)
         {
             return ['error'=>$arError[0],'error_code'=>$iErrorType];
@@ -191,199 +194,3 @@ class Entity extends CI_Controller {
         return ['ok'=>"Entity created successfully."];
     }
 }
-
-/*
- {
-  "code": 0,
-  "message": "The contact has been added.",
-  "contact": {
-  "contact_id": "478XXXXXXXXXXX001",
-  "contact_name": "Shawn",
-  "company_name": "",
-  "first_name": "",
-  "last_name": "",
-  "designation": "",
-  "department": "",
-  "website": "",
-  "language_code": "",
-  "language_code_formatted": "",
-  "contact_salutation": "",
-  "email": "",
-  "phone": "",
-  "mobile": "",
-  "portal_status": "disabled",
-  "is_client_review_asked": false,
-  "has_transaction": false,
-  "contact_type": "customer",
-  "customer_sub_type": "business",
-  "owner_id": "",
-  "owner_name": "",
-  "source": "api",
-  "documents": [
-  ],
-  "twitter": "",
-  "facebook": "",
-  "is_crm_customer": false,
-  "is_linked_with_zohocrm": false,
-  "primary_contact_id": "",
-  "zcrm_account_id": "",
-  "zcrm_contact_id": "",
-  "crm_owner_id": "",
-  "payment_terms": 0,
-  "payment_terms_label": "Due On Receipt",
-  "credit_limit_exceeded_amount": 0.0,
-  "currency_id": "478XXXXXXXXXXX099",
-  "currency_code": "INR",
-  "currency_symbol": "Rs.",
-  "price_precision": 2,
-  "exchange_rate": "",
-  "can_show_customer_ob": true,
-  "can_show_vendor_ob": true,
-  "opening_balance_amount": 0.0,
-  "opening_balance_amount_bcy": "",
-  "outstanding_ob_receivable_amount": 0.0,
-  "outstanding_ob_payable_amount": 0.0,
-  "outstanding_receivable_amount": 0.0,
-  "outstanding_receivable_amount_bcy": 0.0,
-  "outstanding_payable_amount": 0.0,
-  "outstanding_payable_amount_bcy": 0.0,
-  "unused_credits_receivable_amount": 0.0,
-  "unused_credits_receivable_amount_bcy": 0.0,
-  "unused_credits_payable_amount": 0.0,
-  "unused_credits_payable_amount_bcy": 0.0,
-  "unused_retainer_payments": 0.0,
-  "status": "active",
-  "payment_reminder_enabled": true,
-  "is_sms_enabled": true,
-  "is_client_review_settings_enabled": false,
-  "custom_fields": [
-  ],
-  "custom_field_hash": {
-  },
-  "contact_category": "",
-  "sales_channel": "direct_sales",
-  "ach_supported": false,
-  "billing_address": {
-  "address_id": "478XXXXXXXXXXX003",
-  "attention": "",
-  "address": "",
-  "street2": "",
-  "city": "",
-  "state_code": "",
-  "state": "",
-  "zip": "",
-  "country": "",
-  "phone": "",
-  "fax": ""
-  },
-  "shipping_address": {
-  "address_id": "478XXXXXXXXXXX005",
-  "attention": "",
-  "address": "",
-  "street2": "",
-  "city": "",
-  "state_code": "",
-  "state": "",
-  "zip": "",
-  "country": "",
-  "phone": "",
-  "fax": ""
-  },
-  "contact_persons": [
-  ],
-  "addresses": [
-  ],
-  "pricebook_id": "",
-  "pricebook_name": "",
-  "default_templates": {
-  "invoice_template_id": "",
-  "invoice_template_name": "",
-  "bill_template_id": "",
-  "bill_template_name": "",
-  "estimate_template_id": "",
-  "estimate_template_name": "",
-  "creditnote_template_id": "",
-  "creditnote_template_name": "",
-  "purchaseorder_template_id": "",
-  "purchaseorder_template_name": "",
-  "salesorder_template_id": "",
-  "salesorder_template_name": "",
-  "paymentthankyou_template_id": "",
-  "paymentthankyou_template_name": "",
-  "invoice_email_template_id": "",
-  "invoice_email_template_name": "",
-  "estimate_email_template_id": "",
-  "estimate_email_template_name": "",
-  "creditnote_email_template_id": "",
-  "creditnote_email_template_name": "",
-  "purchaseorder_email_template_id": "",
-  "purchaseorder_email_template_name": "",
-  "salesorder_email_template_id": "",
-  "salesorder_email_template_name": "",
-  "paymentthankyou_email_template_id": "",
-  "paymentthankyou_email_template_name": "",
-  "payment_remittance_email_template_id": "",
-  "payment_remittance_email_template_name": ""
-  },
-  "associated_with_square": false,
-  "cards": [
-  ],
-  "checks": [
-  ],
-  "bank_accounts": [
-  ],
-  "vpa_list": [
-  ],
-  "notes": "",
-  "created_time": "2019-08-29T15:51:04+0530",
-  "last_modified_time": "2019-08-29T15:51:04+0530",
-  "tags": [
-  ],
-  "zohopeople_client_id": ""
-  },
-  "instrumentation": {
-  "query_execution_time": 59,
-  "request_handling_time": 1049,
-  "response_write_time": 82,
-  "page_context_write_time": 0
-  }
-  }
-
-    /* -----------------------------------------------
-[ { "recordId": 173907000000181100,
-"Date of joining": "",
-"Employee Role": "Team member",
-"Work phone": "",
-"AbouMe": "",
-"EmployeeID": "123",
-"Extension": "",
-"Nick Name": "",
-"ID Proof": "",
-"Department": "",
-"Work location": "",
-"createdTime": 1351588396243,
-"modifiedTime": 1351588396243,
-"Job Description": "",
-"Employee Type": "",
-"Mobile Phone": "",
-"Photo": "",
-"Title": "",
-"Marital Status": "",
-"Tags": "",
-"Source of Hire": "",
-"Offer Letter": "",
-"Birth Date": "", "Address": "", "Reporting To": "", "Ask me about/Expertise": "", "Employee Status": "Active",
-"Other Email": "",
-"Email ID": "",
-"Last Name": "",
-"First Name": "dummy123" },
-{ "recordId": 173907000000111000,
-"Date of joining": "19-Nov-2016",
-"Employee Role": "Team member",
-"Work phone": "",
-"AbouMe": "",
-"EmployeeID": "HRM3",
-"Extension": "",
-"Nick Name": "",
-"ID Proof": "" } ]
-*/
