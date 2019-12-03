@@ -68,12 +68,14 @@
               <dt>Expiration Date</dt>
               <dd><?php echo $entity->expiration_date; ?></dd>
             </dl>
-			  <dl class="dl-horizontal"><dt>Tax Id</dt><dd><?php echo $entity->ein; ?></dd></dl>
+			      <dl class="dl-horizontal"><dt>Tax Id</dt><dd><?php echo $entity->ein; ?></dd></dl>
           </div>
         </div>
       </div>
     
-	<div class="row" style="width:100%">
+	
+</div>
+<div class="row">
         <div class="col-md-12 col-lg-12">
           <div class="panel">
             <div class="panel-header">
@@ -154,10 +156,10 @@
                     </tbody>
                     <tfoot>
                       <tr>
-                        <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Name"></th>
+                        <!-- <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Name"></th>
                         <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search By"></th>
                         <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Added"></th>
-                        <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Size"></th>
+                        <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Size"></th> -->
                         <!--<th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Phone"></th>-->
                       </tr>
                     </tfoot>
@@ -169,10 +171,9 @@
         </div>
       </div>
     </div>
-	  </div></div></div>
+  </div>
 
-
-    <div class="row">
+<div class="row">
 	<div class="col-md-9 col-lg-12">
       <div class="panel">
         <div class="panel-header">
@@ -215,11 +216,11 @@
                     </tbody>
                     <tfoot>
                       <tr>
-                        <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Name"></th>
+                        <!-- <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Name"></th>
                         <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Type"></th>
                         <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Email"></th>
                         <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Address"></th>
-                        <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Phone"></th>
+                        <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Phone"></th> -->
                       </tr>
                     </tfoot>
                   </table>
