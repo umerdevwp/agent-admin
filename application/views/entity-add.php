@@ -120,9 +120,9 @@
     <div class="form-group col-md-4">
       <label for="inputFormationDate">Formation Date</label>
       <?php echo form_error('inputFormationDate'); ?>
-        <div class="input-group date" id="datetimepicker1">
+        <div class="input-group date" id="datetime">
             <input type="text" class="form-control" name="inputFormationDate" id="inputFormationDate" value="<?=$this->input->post("inputFormationDate");?>" placeholder="Formation Date" />
-            <span class="input-group-addon">
+            <span class="input-group-addon" for="datetime">
                 <span class="input-group-text"><span class="fa fa-calendar"></span></span>
             </span>
         </div>
@@ -172,7 +172,7 @@
     <?php echo form_error('inputBusinessPurpose'); ?>
     <textarea class="form-control" id="inputBusinessPurpose" name="inputBusinessPurpose" rows="3"><?=$this->input->post("inputBusinessPurpose");?></textarea>
   </div>
-  <div class="input-group col-md-6 offset-md-3">
+  <div class="input-group col-md-6">
   <?php echo form_error('inputFiling'); ?>
     <div class="input-group-prepend">
       <span class="input-group-text">Filing</span>

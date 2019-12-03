@@ -10,6 +10,7 @@
 <meta property="og:description" content="Customer portal for United Agent Services">
 <link rel="icon" href="images/favicon.ico" type="image/x-icon">
 <link rel="stylesheet" href="/components/base/base.css">
+<link rel="stylesheet" href="/components/base/custom.css">
 <script src="/components/base/script.js"></script>
 </head>
 	
@@ -191,15 +192,10 @@
   </div>
   <button class="btn btn-navbar-panel rd-navbar-sidebar-toggle" data-navigation-switch="data-navigation-switch"><span class="fa-bars"></span></button>
 </div>
-<ul class="rd-navbar-nav">
-<li class="rd-navbar-nav-item">
-  <div class="rd-navbar-title"><span class="rd-navbar-title-icon"><span class="fa-ellipsis-h"></span></span><span class="rd-navbar-title-text">Menu</span></div>
-</li>
-<li class="rd-navbar-nav-item"><a class="rd-navbar-link" href="uas_portal_demo.html"><span class="rd-navbar-icon fa-home"></span><span class="rd-navbar-link-text">Dashboard</span></a> </li>
-<li class="rd-navbar-nav-item">
-  <div class="rd-navbar-title"><span class="rd-navbar-title-icon"><span class="fa-ellipsis-h"></span></span><span class="rd-navbar-title-text">company profile</span></div>
-</li>
-<li class="rd-navbar-nav-item"><a class="rd-navbar-link" href="calendar.html"><span class="rd-navbar-icon fa-calendar"></span><span class="rd-navbar-link-text">Calendar</span></a> </li>
+<?php $this->load->view("sidebar"); ?>
+
+<!-- COMMENTS THIS SECTION -->
+<!-- <li class="rd-navbar-nav-item"><a class="rd-navbar-link" href="calendar.html"><span class="rd-navbar-icon fa-calendar"></span><span class="rd-navbar-link-text">Calendar</span></a> </li>
 <li class="rd-navbar-nav-item"><a class="rd-navbar-link" href="documents.html"><span class="rd-navbar-icon fa-envelope-o"></span><span class="rd-navbar-link-text">Documents</span></a> </li>
 <li class="rd-navbar-nav-item"><a class="rd-navbar-link" href="#"><span class="rd-navbar-icon fa-address-book-o"></span><span class="rd-navbar-link-text">Directory</span></a>
   <ul class="rd-navbar-dropdown">
@@ -209,5 +205,5 @@
     <li class="rd-navbar-dropdown-item"><a class="rd-navbar-link" href="shareholder.html"><span class="rd-navbar-icon fa-group"></span>Shareholders</a> </li>
   </ul>
 </li>
-<li class="rd-navbar-nav-item"><a class="rd-navbar-link" href="#"><span class="rd-navbar-icon fa-file-o"></span><span class="rd-navbar-link-text">Corporate Minutes</span></a> </li>
+<li class="rd-navbar-nav-item"><a class="rd-navbar-link" href="#"><span class="rd-navbar-icon fa-file-o"></span><span class="rd-navbar-link-text">Corporate Minutes</span></a> </li> -->
 </header>
