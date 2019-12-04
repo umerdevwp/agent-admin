@@ -47,7 +47,7 @@ class Entity extends CI_Controller {
         }
         
 		$data['tasks'] = $this->Tasks_model->getAll($id);
-		$data['contacts'] = $this->Contacts_model->getAll($id);
+		$data['contacts'] = $this->Contacts_model->getAllFromEntityId($id);
 		//$data['attachments'] = $this->ZoHo_Account->arAttachments;
 		$data['attachments'] = $this->Attachments_model->getAll($id);
 		
