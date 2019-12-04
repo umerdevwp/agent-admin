@@ -28,9 +28,9 @@
           </div>
           <div class="panel-body">
             <address>
-                <?php echo $entity->billing_street; ?><br>
-                <?php echo $entity->billing_city; ?>, <?php echo $entity->billing_state; ?> <?php echo $entity->billing_code; ?><br>
-            <abbr title="Phone">E:</abbr> <?php echo $entity->billing_email; ?>
+                <?php echo $entity->shipping_street; ?><br>
+                <?php echo $entity->shipping_city; ?>, <?php echo $entity->shipping_state; ?> <?php echo $entity->shipping_code; ?><br>
+            <abbr title="Phone">E:</abbr> <?php echo $entity->shipping_email; ?>
             </address>
           </div>
         </div>
@@ -42,15 +42,15 @@
           </div>
           <div class="panel-body">
             <address>
-            <strong>United Agent Services LLC</strong><br>
-            2 East Congress<br>
-            Suite 900-126<br>
-            City, ST 99999
+            <strong><?php echo $AgentAddress['file_as']; ?></strong><br>
+            <?php echo $AgentAddress['address']; ?><br>
+            <?php echo $AgentAddress['address2']; ?><br>
+            <?php echo $AgentAddress['city'].", ".$AgentAddress['state'].", ".$AgentAddress['zip_code']; ?>
             </address>
           </div>
         </div>
       </div>
-		<div class="col-md-4">
+		<div class="col-md-3">
         <div class="panel">
           <div class="panel-header">
             <div class="panel-title"><span class="panel-icon fa-address-card-o"></span><span>Company Info</span></div>
@@ -71,8 +71,21 @@
 			      <dl class="dl-horizontal"><dt>Tax Id</dt><dd><?php echo $entity->ein; ?></dd></dl>
           </div>
         </div>
+    </div>
+    <div class="col-md-3">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><span class="panel-icon fa-address-card-o"></span><span>Billing Address</span></div>
+        </div>
+        <div class="panel-body">
+          <address>
+                <?php echo $entity->billing_street; ?><br>
+                <?php echo $entity->billing_city; ?>, <?php echo $entity->billing_state; ?> <?php echo $entity->billing_code; ?><br>
+            <abbr title="Phone">E:</abbr> <?php echo $entity->billing_email; ?>
+            </address>
+        </div>
       </div>
-    
+    </div>    
 	
 </div>
 <div class="row">

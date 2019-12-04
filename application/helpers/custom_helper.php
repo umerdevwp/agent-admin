@@ -34,6 +34,12 @@ function isDateDue($strDateTime)
 
 function getClassMethods($class)
 {
+    $class_props = get_class_vars($class);
+    foreach ($class_props as $props_name) 
+    {
+        echo "$props_name<br/>";
+    }
+    echo "-----------------------<br />";
     $class_methods = get_class_methods($class);
     foreach ($class_methods as $method_name) 
     {
@@ -84,5 +90,39 @@ function validateFileExt($strFileFullPath,$arAllowedExts)
         return false;
     } else {
         return true;
+    }
+}
+
+
+/**
+ * Validate user session for system and permission of an action allowed
+ * 
+ * @param String $action name of method callee 
+ */
+function isSessionValid($action)
+{
+    $CI =& get_instance();
+    if(isset($CI->session->user["zohoId"]))
+    {
+        if(in_array($action,$CI->session->user["permissions"]))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Redirect user based on session made, else to home page
+ */
+function redirectSession()
+{
+    $CI =& get_instance();
+    if(isset($CI->session->user["defaultRedirect"]))
+    {
+        redirect($CI->session->user["defaultRedirect"]);
+    } else {
+        redirect(getenv("SITE_URL"));
     }
 }

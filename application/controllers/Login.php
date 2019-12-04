@@ -65,10 +65,10 @@ class Login extends CI_Controller
         
         if($bParentAccount)
         {
-            $this->session->user = array_merge($this->session->user,['child'=>1]);
+            $this->session->user = array_merge($this->session->user,['child'=>1,'defaultRedirect'=>'/portal']);
             redirect("/portal");
         } else {
-            $this->session->user = array_merge($this->session->user,['child'=>1]);
+            $this->session->user = array_merge($this->session->user,['child'=>1,'defaultRedirect'=>'/portal/entity/']);
             redirect("/portal/entity/" . $this->session->user["zohoId"]);
         }
     }
@@ -182,6 +182,13 @@ class Login extends CI_Controller
                 "organization"=>$response->profile->organization,
                 "firstName"=>$response->profile->firstName,
                 "lastName"=>$response->profile->lastName,
+                
+                // permissions
+                "permissions"=> array(
+                                    "Entity",
+                                    "Entity_Add",
+                                    "Contacts",
+                                ),
             );
         } else {
             // log error for back tracking
