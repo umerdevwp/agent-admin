@@ -79,7 +79,7 @@ class Portal extends CI_Controller {
 		// fetch data from DB
 		$data['entity'] = $this->Accounts_model->loadAccount($id);
 		$data['tasks'] = $this->Tasks_model->getAll($id);
-		$data['contacts'] = $this->Contacts_model->getAll($id);
+		$data['contacts'] = $this->Contacts_model->getAllFromEntityId($id);
 		//$data['attachments'] = $this->ZoHo_Account->arAttachments;
 		$data['attachments'] = $this->Attachments_model->getAll($id);
 		
