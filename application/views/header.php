@@ -195,7 +195,7 @@
 <div class="rd-navbar-sidebar-panel">
   <div>
     <div class="group-15">
-      <div class="rd-navbar-brand"><a href="index.html"><img src="/images/AgentAdmin_Logo.png" alt=""/></a></div>
+      <div class="rd-navbar-brand"><a href="portal"><img src="/images/AgentAdmin_Logo.png" alt=""/></a></div>
       <div class="rd-navbar-sidebar-search">
         <input class="form-control" type="text" placeholder="Search"/>
       </div>
