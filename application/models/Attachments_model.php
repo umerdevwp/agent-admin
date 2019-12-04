@@ -74,7 +74,7 @@ class Attachments_model extends CI_Model
         catch(Exception $e){ }
     }
 
-    public function getAll($id)
+    public function getAllFromEntityId($id)
     {
         // TODO: remove fake id
         $data = [
@@ -87,6 +87,21 @@ class Attachments_model extends CI_Model
         //var_dump($result);die;
         if (! is_array($result)) {
             return ['msg'=>'No attachments available','msg_type'=>'error'];
+        }
+
+        return $result;
+    }
+
+    public function getAllFromEntityList($arCommaIds)
+    {
+        $this->db->from($this->table);
+        $this->db->where_in('parent_id',$arCommaIds);
+        $query = $this->db->get();
+        $result = $query->result_object();
+        //echo $this->db->last_query();
+        //var_dump($result);die;
+        if (! is_array($result)) {
+            return ['msg'=>'No contacts available','msg_type'=>'error'];
         }
 
         return $result;

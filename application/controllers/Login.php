@@ -188,6 +188,7 @@ class Login extends CI_Controller
                                     "Entity",
                                     "Entity_Add",
                                     "Contacts",
+                                    "Attachments",
                                 ),
             );
         } else {
