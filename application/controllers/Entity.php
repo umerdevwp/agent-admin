@@ -4,17 +4,64 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Entity extends CI_Controller {
 
-	public function index()
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->load->helper("custom");
+
+    }
+
+	public function index($id="")
 	{
-        $this->load->view('header');
-		$this->load->view('entity');
-        $this->load->view('footer');
+        if(!isSessionValid("Entity")) redirectSession();
+        if(empty($id)){
+            $this->session->set_flashdata("error","Invalid entity id");
+            redirectSession();
+        }
+        //$this->load->model('ZoHo_Account');
+		$this->load->model('Accounts_model');
+		$this->load->model('Tasks_model');
+		$this->load->model('Contacts_model');
+		$this->load->model('Attachments_model');
+
+		// fetch data from zoho api
+        //$this->ZoHo_Account->LoadAccount($id);
+        //$this->ZoHo_Account->dumpAll();
+		//$data['account'] = $this->ZoHo_Account;
+		
+		// fetch data from DB
+        $data['entity'] = $this->Accounts_model->loadAccount($id);
+        
+        $oAgetAddress = $this->Accounts_model->getAgentAddress($id);
+        
+        if(is_object($oAgetAddress)){
+            $data['AgentAddress']['file_as'] = $oAgetAddress->file_as;
+            $data['AgentAddress']['address'] = $oAgetAddress->address;
+            $data['AgentAddress']['address2'] = $oAgetAddress->address2;
+            $data['AgentAddress']['city'] = $oAgetAddress->city;
+            $data['AgentAddress']['state'] = $oAgetAddress->state;
+            $data['AgentAddress']['zip_code'] = $oAgetAddress->zip_code;
+        } else {
+            $data['AgentAddress'] = false;
+        }
+        
+		$data['tasks'] = $this->Tasks_model->getAll($id);
+		$data['contacts'] = $this->Contacts_model->getAll($id);
+		//$data['attachments'] = $this->ZoHo_Account->arAttachments;
+		$data['attachments'] = $this->Attachments_model->getAll($id);
+		
+		//var_dump($data['account']);die;
+		$this->load->view('header');
+		$this->load->view('entity', $data);
+		$this->load->view('footer');
     }
     
     public function form($id=0)
     {
-        $this->load->library('form_validation');
+        if(!isSessionValid("Entity_Add")) redirectSession();
 
+        $this->load->library('form_validation');
         $this->load->model("Accounts_model");
 
         if($id>0)
@@ -29,6 +76,8 @@ class Entity extends CI_Controller {
 
     public function add()
     {
+        if(!isSessionValid("Entity_Add")) redirectSession();
+
         $this->load->helper("custom");
         $this->load->library('form_validation');
 
@@ -106,10 +155,41 @@ class Entity extends CI_Controller {
         $iErrorType = 1;// 1 means user creation failed, 2 means only attachment failed
 
         $this->load->model('ZoHo_Account');
-
         
         $oApi = $this->ZoHo_Account->getInstance()->getRecordInstance("Accounts",null);
-
+        /* //testing contacts for new entity
+        
+        $oApi = $this->ZoHo_Account->getInstance("Accounts");
+        $oApiData = $oApi->searchRecordsByCriteria("id:equals:4071993000001672002", 1, 1);
+        
+        $oApiSingleRecord = $oApiData->getData()[0];
+        //$oContacts = $oApi->getRelatedListRecords("Contacts");
+        
+        //$oSingleContact = $oContacts->getData()[0];
+        //echo $oSingleContact->getModuleApiName();
+        
+        $oNewContact = $this->ZoHo_Account->getInstance("Contacts");
+        echo "<pre>";getClassMethods($oNewContact);print_r($oNewContact);die;
+            //$oContacts->setData($oNewContact);
+            //$oNewContact->setOwner($oApi->getData()[0]);
+            $oApi->setFieldValue("Account_Name", $oApiData->getData()[0]);
+            $oNewContact->setFieldValue("First_Name","Najm");
+            $oNewContact->setFieldValue("Last_Name","A2");
+        try{
+            $obj = $oNewContact->create();
+            echo "Done";
+        } catch(Exception $e){
+            echo "<Pre>";
+            print_r($e);
+        }
+        die;
+        
+        
+        echo "<pre>";
+        getClassMethods($oApiSingleRecord);
+        print_r($oApiSingleRecord);
+        
+        die;*/
         $oApi->setFieldValue("Account_Name", $this->input->post("inputName")); // This function use to set FieldApiName and value similar to all other FieldApis and Custom field
         $oApi->setFieldValue("Filing_State", $this->input->post("inputFillingState")); // Account Name can be given for a new account, account_id is not mandatory in that case
         $oApi->setFieldValue("Entity_Type", $this->input->post("inputFillingStructure")); // Account Name can be given for a new account, account_id is not mandatory in that case
@@ -193,4 +273,5 @@ class Entity extends CI_Controller {
 
         return ['ok'=>"Entity created successfully."];
     }
+
 }

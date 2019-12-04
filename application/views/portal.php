@@ -49,7 +49,7 @@
                     </thead>
                     <tbody>
                       <?php for($i = 0; $i < count($arChildEntity); $i++) { ?>
-                          <tr role="row" class="odd" onclick="window.location = '/portal/entity/<?php echo $arChildEntity[$i]->id; ?>';">
+                          <tr role="row" class="odd" onclick="window.location = '/entity/<?php echo $arChildEntity[$i]->id; ?>';">
                             <td><?php echo $arChildEntity[$i]->entity_name ?></td>
                             <td><?php echo $arChildEntity[$i]->entity_type; ?></td>
                             <td><?php echo $arChildEntity[$i]->filing_state; ?></td>
@@ -64,7 +64,7 @@
                         <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Type"></th>
                         <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search State"></th>
                         <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Seach Date"></th>
-                        <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Exp Date"></th>
+                        <!-- <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Exp Date"></th> -->
                       </tr>
                     </tfoot>
                   </table>

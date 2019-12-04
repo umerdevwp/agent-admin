@@ -49,25 +49,21 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | Examples:	my-controller/index	-> my_controller/index
 |		my-controller/my-method	-> my_controller/my_method
 */
+// auth
 $route['default_controller'] = 'login';
 $route['callback'] = 'login/callback';
 $route['logout'] = 'login/logout';
-
-$route['portal/entity/(.+)'] = 'portal/entity/$1';
-$route['portal/attachments/(:num)/(:num)'] = 'portal/attachments/$1/$2';
 $route['confirm'] = 'tasks/getAccessToken';
+
+// views
+$route['portal/attachments/(:num)/(:num)'] = 'portal/attachments/$1/$2';
+$route['entity/form/(:num)'] = 'entity/form/$1';
+$route['entity/(:num)'] = 'entity/index/$1';
+
+// actions
 $route['zoho'] = 'tasks/getZohoCode';
 $route['update/task/(:num)'] = 'tasks/completeTaskInZoho/$1';
 
-$route['entity/form/(:num)'] = 'entity/form/$1';
-// okta auth
-/*
-$route['login'] = 'user/login';
-$route['logout'] = 'user/logout';
-$route['callback'] = 'user/callback';
-
-$route['portal'] = 'portal';
-*/
 
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;

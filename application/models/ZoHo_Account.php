@@ -535,8 +535,18 @@ class ZoHo_Account extends CI_Model
     /**
      * Get instance of zcrm for api calls
      */
-    public function getInstance()
+    public function getInstance($module_name="",$id="")
     {
-        return ZCRMRestClient::getInstance();
+        /*if(empty($module_name))
+        {*/
+            return ZCRMRestClient::getInstance();
+        /*} else {
+            if(empty($id))
+            {
+                return ZCRMRestClient::getInstance()->getModuleInstance($module_name); // to get dummy record object
+            } else {
+                return ZCRMRestClient::getInstance()->getRecordInstance($module_name, $id); // to get dummy record object
+            }
+        }*/
     }
 }
