@@ -9,7 +9,7 @@
         </div>
       </div>
      <div class="template-panel">
-        <div class="template-panel-heading">Template Panel
+        <div class="template-panel-heading">Preferences
           <button class="template-panel-switch fa-cog" data-multi-switch='{"targets":".template-panel","scope":".template-panel","isolate":"[data-multi-switch]"}'></button>
         </div>
         <div class="template-panel-body">
