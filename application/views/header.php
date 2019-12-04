@@ -9,9 +9,9 @@
 <meta property="og:title" content="United Agent Services Portal">
 <meta property="og:description" content="Customer portal for United Agent Services">
 <link rel="icon" href="images/favicon.ico" type="image/x-icon">
-<link rel="stylesheet" href="/components/base/base.css">
-<link rel="stylesheet" href="/components/base/custom.css">
-<script src="/components/base/script.js"></script>
+<link rel="stylesheet" href="components/base/base.css">
+<link rel="stylesheet" href="components/base/custom.css">
+
 </head>
 	
 <body>
@@ -82,7 +82,9 @@
       </div>
     </div>
   </div>
-  <div class="rd-navbar-panel-cell">
+
+<!-- PANEL FOR NOTIFICATION -->
+<!--<div class="rd-navbar-panel-cell">
 <button class="btn btn-navbar-panel" data-multi-switch='{"targets":"#subpanel-notifications","scope":"#subpanel-notifications","isolate":"[data-multi-switch]"}'><span class="fa-bell"></span><span class="badge badge-warning">2</span></button>
 <div class="rd-navbar-subpanel" id="subpanel-notifications">
       <div class="panel">
@@ -108,14 +110,23 @@
       <div class="panel-footer p-2"><a class="btn btn-primary btn-sm" href="alerts.html">See more</a></div>
       </div>
     </div>
-  </div>
-  <div class="rd-navbar-panel-cell">
+  </div> -->
+
+<!-- PANEL FOR COUNTRY FLAG -->
+  <!-- <div class="rd-navbar-panel-cell">
     <button class="btn btn-navbar-panel dropdown-toggle" data-toggle="dropdown"><span class="fa-flag"></span></button>
-    <div class="dropdown-menu"><a class="dropdown-item d-flex align-items-center" href="#"><img class="pr-1" src="/images/image-07-14x11.jpg" width="14" height="11" alt=""/><span>France</span></a><a class="dropdown-item d-flex align-items-center" href="#"><img class="pr-1" src="images/image-08-14x11.jpg" width="14" height="11" alt=""/><span>Germany</span></a><a class="dropdown-item d-flex align-items-center" href="#"><img class="pr-1" src="images/image-10-14x11.jpg" width="14" height="11" alt=""/><span>Turkey</span></a><a class="dropdown-item d-flex align-items-center" href="#"><img class="pr-1" src="images/image-11-14x11.jpg" width="14" height="11" alt=""/><span>USA</span></a></div>
-  </div>
+    <div class="dropdown-menu">
+      <a class="dropdown-item d-flex align-items-center" href="#"><img class="pr-1" src="/images/image-07-14x11.jpg" width="14" height="11" alt=""/><span>France</span></a>
+      <a class="dropdown-item d-flex align-items-center" href="#"><img class="pr-1" src="images/image-08-14x11.jpg" width="14" height="11" alt=""/><span>Germany</span></a>
+      <a class="dropdown-item d-flex align-items-center" href="#"><img class="pr-1" src="images/image-10-14x11.jpg" width="14" height="11" alt=""/><span>Turkey</span></a>
+      <a class="dropdown-item d-flex align-items-center" href="#"><img class="pr-1" src="images/image-11-14x11.jpg" width="14" height="11" alt=""/><span>USA</span></a>
+    </div>
+  </div> -->
+
+<!-- PANEL FOR PROFILING DROPDOWN -->  
   <div class="rd-navbar-panel-cell rd-navbar-panel-cell-user">
     <div class="btn btn-navbar-panel" data-multi-switch='{"targets":"#subpanel-user","scope":"#subpanel-user","isolate":"[data-multi-switch]"}'>
-      <div class="media align-items-center"><img class="rounded-circle" src="/images/users/jv_50x50.jpg" width="30" height="30" alt=""/>
+      <div class="media align-items-center"><!--<img class="rounded-circle" src="/images/users/jv_50x50.jpg" width="30" height="30" alt=""/>-->
         <div class="media-body ml-2">
           <p><?=$this->session->user["firstName"]." ".$this->session->user["lastName"];?></p>
         </div>
