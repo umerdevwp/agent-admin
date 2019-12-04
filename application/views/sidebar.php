@@ -13,3 +13,4 @@
     <li class="rd-navbar-dropdown-item"><a class="rd-navbar-link" href="entity/form"><span class="rd-navbar-icon fa-user"></span>Add Entity</a> </li>
   </ul>
 </li>
+<li class="rd-navbar-nav-item"><a class="rd-navbar-link" href="contacts"><span class="rd-navbar-icon fa-home"></span><span class="rd-navbar-link-text">Contacts List</span></a> </li>
