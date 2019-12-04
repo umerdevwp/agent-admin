@@ -18,7 +18,7 @@
 	<div class="row">
 	<div class="col"> 
 	<h2><?php echo $entity->entity_name; ?><br>
-      <span class="badge badge-primary"><?php echo $entity->entity_type; ?></span> <span class="badge badge-secondary"><?php echo $entity->filing_state; ?></span></h2>
+      <span class="badge badge-primary"><?php echo $entity->entity_structure; ?></span> <span class="badge badge-secondary"><?php echo $entity->filing_state; ?></span></h2>
 		</div></div>
 	<div class="row">
 		<div class="col-md-3">
