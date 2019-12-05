@@ -3,6 +3,11 @@
   <?=$this->session->flashdata("error");?>
 </div>
 <?php endif; ?>
+<?php if($this->session->flashdata("ok")): ?>
+  <div class="alert alert-success" role="alert">
+  <?=$this->session->flashdata("ok");?>
+</div>
+<?php endif; ?>
 <section class="topbar"> 
   <!-- Breadcrumbs-->
   <ul class="breadcrumbs">
@@ -35,9 +40,9 @@
                 <?php echo $entity->shipping_city; ?>, <?php echo $entity->shipping_state; ?> <?php echo $entity->shipping_code; ?><br>
             <abbr title="Phone">E:</abbr> <?php echo $entity->shipping_email; ?>
             </address>
-          </div>
         </div>
       </div>
+    </div>
 		<div class="col-md-3">
         <div class="panel">
           <div class="panel-header">
@@ -51,8 +56,8 @@
             <?php echo $AgentAddress['city'].", ".$AgentAddress['state'].", ".$AgentAddress['zip_code']; ?>
             </address>
           </div>
-        </div>
       </div>
+    </div>
 		<div class="col-md-3">
         <div class="panel">
           <div class="panel-header">
@@ -93,38 +98,38 @@
 
 <!-- THIS IS COMPLIANCE CHECK LIST -->
 <div class="row">
-        <div class="col-md-12 col-lg-12">
-          <div class="panel">
-            <div class="panel-header">
-              <div class="panel-title">Compliance Check List <span class="span badge badge-danger"><?php echo count($tasks); ?></span></div>
+  <div class="col-md-12 col-lg-12">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Compliance Check List <span class="span badge badge-danger"><?php echo count($tasks); ?></span></div>
+      </div>
+    
+    <?php if(count($tasks) > 0){ ?>
+
+    <?php
+    // TODO: check tasks date to show warning on due tasks
+    if($entity->PastDue){ ?>
+    <div class="alert alert-danger alert-darker alert-lg"><span class="alert-icon fa-remove"></span><span>WARNING! Open Compliance Tasks May Be Past Due</span></div>
+    <?php } ?>
+      <div class="panel-body">
+        <h3 class="list-sortable-title">Compliance Tasks</h3>
+        <ul class="list-sortable sortable sortable-current" data-connect-group=".sortable-completed">
+          <?php for($i = 0; $i < count($tasks); $i++){ ?>
+          <li class="list-sortable-item-primary">
+            <div class="custom-control custom-checkbox custom-check custom-checkbox-primary">
+              <input class="custom-control-input taskListInput" type="checkbox" id="taskCheck<?php echo $i; ?>"  data-toggle="modal" data-target="#sure" onclick="setTaskId('<?=$tasks[$i]->id;?>')" />
+                <label class="custom-control-label" for="taskCheck<?php echo $i; ?>"><?php echo date_format(date_create($tasks[$i]->due_date), "m/d/Y"); ?> - <?php echo $tasks[$i]->subject; ?></label>
             </div>
-          
-          <?php if(count($tasks) > 0){ ?>
-
-          <?php
-          // TODO: check tasks date to show warning on due tasks
-          if($entity->PastDue){ ?>
-          <div class="alert alert-danger alert-darker alert-lg"><span class="alert-icon fa-remove"></span><span>WARNING! Open Compliance Tasks May Be Past Due</span></div>
+          </li>
           <?php } ?>
-           <div class="panel-body">
-              <h3 class="list-sortable-title">Compliance Tasks</h3>
-              <ul class="list-sortable sortable sortable-current" data-connect-group=".sortable-completed">
-                <?php for($i = 0; $i < count($tasks); $i++){ ?>
-                <li class="list-sortable-item-primary">
-                  <div class="custom-control custom-checkbox custom-check custom-checkbox-primary">
-                    <input class="custom-control-input taskListInput" type="checkbox" id="taskCheck<?php echo $i; ?>"  data-toggle="modal" data-target="#sure" onclick="setTaskId(<?=$tasks[$i]->id;?>)" />
-                      <label class="custom-control-label" for="taskCheck<?php echo $i; ?>"><?php echo date_format(date_create($tasks[$i]->due_date), "m/d/Y"); ?> - <?php echo $tasks[$i]->subject; ?></label>
-                  </div>
-                </li>
-                <?php } ?>
-              </ul>
-            </div>
-          </div>
+        </ul>
+      </div>
+    </div>
 
-          <?php } ?>
+    <?php } ?>
 
-        </div>
-	</div>
+  </div>
+</div>
 
 
 <!-- THIS IS FOR ATTACHMENT -->
@@ -190,7 +195,7 @@
         </div>
       </div>
     </div>
-  </div>
+</div>
 
 <!-- THIS IS CONTACT LIST -->
 <div class="row">
@@ -251,7 +256,8 @@
         </div>
       </div>
     </div>
-	  </div></div></div>
+</div>
+</div>
 
 
 <!-- Modal -->
@@ -284,7 +290,6 @@ function setTaskId(id)
 }
 function updateTask()
 {
-  console.log(iTaskId);
   if(iTaskId>0){
     document.location = 'update/task/'+iTaskId;
   }

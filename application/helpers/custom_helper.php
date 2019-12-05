@@ -126,3 +126,15 @@ function redirectSession()
         redirect(getenv("SITE_URL"));
     }
 }
+
+/**
+ * Debug class or object or array, print_r optional debug class methods
+ * @param $var Dynamic variable 
+ * @param $bFindMethod debug available methods and props
+ */
+function debug($var,$bFindMethod=false)
+{
+    if($bFindMethod) getClassMethods($var);
+    echo "<pre>";
+    print_r($var);
+}

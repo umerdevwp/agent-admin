@@ -64,12 +64,55 @@ class Tasks extends CI_Controller
 
     }
     /**
+     * Complete task using zoho client api
+     */
+    public function completeTask($id)
+    {
+        if(!isSessionValid("Task_Update")) redirectSession();
+
+        $this->load->model("Zoho_Account");
+        $this->load->model("Tasks_model");
+        $this->load->model("Accounts_model");
+        
+        $parentid = $this->session->user["zohoId"];
+
+        if($this->session->user["child"]){
+            $row = $this->Tasks_model->getOneParentId($id,$parentid);
+        } else {
+            $row = $this->Tasks_model->getOne($id,$parentid);
+        }
+
+        if($row->id>0)
+        {
+            try{
+                // real id
+                $oZohoApi = $this->Zoho_Account->getInstance("Tasks",$id);
+
+                //$oZohoApi->setFieldValue("percent_complete",100);
+                $oZohoApi->setFieldValue("Status","Completed");
+                $resp = $oZohoApi->update();
+                $this->session->set_flashdata("ok","Task updated successfully");
+
+                redirect($_SERVER["HTTP_REFERER"]);
+            } catch(Exception $e)
+            {
+                log_message("error","Zoho server errror: " . $e->getMessage());
+                redirect($_SERVER["HTTP_REFERER"]);
+            }
+        } else {
+            $this->session->set_flashdata("error","Permission denied, no such tasks found");
+            redirect($_SERVER["HTTP_REFERER"]);
+        }
+    }
+
+    /**
      * Mark task complete in ZOHO CRM
      * 
      */
     public function completeTaskInZoho($id)
     {
-        $this->load->library("session");
+        $this->completeTask($id);die;
+
         $this->load->model("Tasks_model");
         // check zoho access token exist
         if(empty($this->session->user["zoho_access_token"]))
