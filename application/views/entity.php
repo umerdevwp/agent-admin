@@ -15,12 +15,15 @@
 	
 <section class="Jumbotron"><!--Company Summary Info-->
 <div class="container">
+  <!-- THIS IS THE HEADING FOR ENTITY -->
 	<div class="row">
 	<div class="col"> 
 	<h2><?php echo $entity->entity_name; ?><br>
       <span class="badge badge-primary"><?php echo $entity->entity_structure; ?></span> <span class="badge badge-secondary"><?php echo $entity->filing_state; ?></span></h2>
-		</div></div>
-	<div class="row">
+    </div></div>
+    
+  <!-- THIS IS FOR ADDRESS AND BILLING DETAIL BOXES -->
+	<div class="row address-billing">
 		<div class="col-md-3">
         <div class="panel">
           <div class="panel-header">
@@ -86,8 +89,9 @@
         </div>
       </div>
     </div>    
-	
 </div>
+
+<!-- THIS IS COMPLIANCE CHECK LIST -->
 <div class="row">
         <div class="col-md-12 col-lg-12">
           <div class="panel">
@@ -121,7 +125,9 @@
 
         </div>
 	</div>
-    
+
+
+<!-- THIS IS FOR ATTACHMENT -->
 <div class="row">
 	<div class="col-md-9 col-lg-12">
       <div class="panel">
@@ -186,6 +192,7 @@
     </div>
   </div>
 
+<!-- THIS IS CONTACT LIST -->
 <div class="row">
 	<div class="col-md-9 col-lg-12">
       <div class="panel">

@@ -1,1 +1,9 @@
-#form
+#formAdd{
+    margin-bottom:40px
+}
+.input-group-prepend{
+    margin-left: -1px;
+}
+.address-billing .panel{
+    min-height: 190px;
+}
