@@ -15,7 +15,7 @@
     <li class="breadcrumbs-item"><?php echo $entity->entity_name; ?><span style='display:none;' id="tempId"><?=$this->session->user["zohoId"];?></span></li>
     
   </ul>
-  <h2><a href="/entity/form">Add Entity</a></h2>
+  <h2>Add Entity</h2>
 </section>
 	
 	
@@ -58,15 +58,15 @@
                           </tr>
                       <?php } ?>
                     </tbody>
-                    <tfoot>
+                    <!--<tfoot>
                       <tr>
                         <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Name"></th>
                         <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Type"></th>
                         <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search State"></th>
                         <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Seach Date"></th>
-                        <!-- <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Exp Date"></th> -->
+                        <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Exp Date"></th> 
                       </tr>
-                    </tfoot>
+                    </tfoot>-->
                   </table>
                 </div>
               </div>
