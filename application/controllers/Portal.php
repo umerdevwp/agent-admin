@@ -29,7 +29,7 @@ class Portal extends CI_Controller {
 		// has no child, show entity page
 		if($this->session->user["child"]==0)
 		{
-			redirect("/portal/entity/".$this->session->user["zohoId"]);
+			redirect("/entity/".$this->session->user["zohoId"]);
 		}
 
 		//okta have returned valid login email

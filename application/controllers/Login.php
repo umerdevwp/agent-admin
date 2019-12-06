@@ -26,7 +26,7 @@ class Login extends CI_Controller
         $this->load->helper(["email"]);
 
         if (valid_email($this->session->user["email"])) {
-            redirect("/portal");
+                $this->redirectToDashboard();
         }
 
         $this->load->view('login');
@@ -60,16 +60,26 @@ class Login extends CI_Controller
     private function redirectToDashboard()
     {
         $this->load->model("Accounts_model");
-
         $bParentAccount = $this->Accounts_model->hasEntities($this->session->user["zohoId"]);
+
+        if($this->session->user["child"]>0)
+        {
+            $bParentAccount = true;
+        } else {
+            $bParentAccount = false;
+        }
+
+        if(!isset($this->session->user["child"]))
+        {
+            $bParentAccount = $this->Accounts_model->hasEntities($this->session->user["zohoId"]);
+            $this->session->user = array_merge($this->session->user,['child'=>(int)$bParentAccount,'defaultRedirect'=>'/portal']);
+        }
         
         if($bParentAccount)
         {
-            $this->session->user = array_merge($this->session->user,['child'=>1,'defaultRedirect'=>'/portal']);
             redirect("/portal");
         } else {
-            $this->session->user = array_merge($this->session->user,['child'=>0,'defaultRedirect'=>'/portal/entity/']);
-            redirect("/portal/entity/" . $this->session->user["zohoId"]);
+            redirect("/entity/" . $this->session->user["zohoId"]);
         }
     }
 
