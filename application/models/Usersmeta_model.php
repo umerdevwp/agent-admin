@@ -21,7 +21,7 @@ class Usersmeta_model extends CI_Model
         $query = $this->db->get_where($this->table, $data);
         $result = $query->row();
         
-        if ($result) {
+        if (!$result) {
             return ['msg'=>'No tasks available','msg_type'=>'error'];
         }
 
@@ -48,5 +48,73 @@ class Usersmeta_model extends CI_Model
             } else {
                 $this->db->insert($this->table, $data);
             }
+    }
+
+    public function updateTheme($id,$val)
+    {
+        $data = [
+            "personal_theme"    =>  $val,
+        ];
+
+        $where = [
+            "id"    =>  $id,
+        ];
+
+        if($this->insertNotExist($id))
+        {
+            $result = $this->db->update($this->table,$data,$where);
+            if($result)
+            {
+                return ["ok"=>"Updated successfully"];
+            } else {
+                return ["error"=>"failed to update theme"];
+            }
+        } else {
+            return ["error"=>"failed to update theme"];
+        }
+    }
+
+    public function getMeta($id,$metaname,$bReturnArray)
+    {
+        $arWhere = [
+            "id"    =>  $id,
+        ];
+
+        $this->db->select(["id",$metaname]);
+        $this->db->from($this->table);
+        $this->db->where($arWhere);
+        
+        if($bReturnArray) $result = $this->db->get()->row_array();
+        else $result = $this->db->get()->row();
+        
+        if($result)
+        {
+            return $result;
+        } else {
+            return false;
+        }
+    }
+
+    private function insertNotExist($id)
+    {
+        // check user has a meta row
+        $row = $this->getOne($id);
+        
+        if($row->id>0)
+        {
+            return true;
+        } else {
+            $data['id'] = $id;
+            $result = $this->db->insert($this->table, $data);
+            
+            if(!$result)
+            {
+                return false;
+            }
+            
+        }
+
+        return true;
+        
     }
 }

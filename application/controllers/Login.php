@@ -190,6 +190,8 @@ class Login extends CI_Controller
                                     "Contacts",
                                     "Attachments",
                                     "Task_Update",
+                                    "Theme_Update",
+                                    "Theme_View",
                                 ),
             );
         } else {

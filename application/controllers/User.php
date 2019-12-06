@@ -50,4 +50,52 @@ class User extends CI_Controller
         $this->session->username = null;
         redirect('/');
     }
+
+    public function saveThemeAjax()
+    {
+        $string = $this->input->post("number");
+
+        if(!isSessionValid("Theme_Update")) redirectSession();
+
+        //echo $this->session->user["zohoId"];die;
+        $this->load->model("Usersmeta_model");
+
+        if(!empty($string))
+        {
+            $response = $this->Usersmeta_model->updateTheme($this->session->user["zohoId"],$string);
+        } else {
+            $response["error"] = "Field cannot be empty";
+        }
+
+        echo json_encode($response);
+    }
+
+    public function getThemeAjax($metaname="")
+    {
+        if(!isSessionValid("Theme_View")) redirectSession();
+
+        $arAllowedMeta = array(
+            "name"  =>  "personal_theme",
+        );
+
+        // if meta name in db
+        if(array_key_exists($metaname,$arAllowedMeta))
+        {
+            $metaname = $arAllowedMeta[$metaname];
+            //echo $this->session->user["zohoId"];die;
+            $this->load->model("Usersmeta_model");
+            $row = $this->Usersmeta_model->getMeta($this->session->user["zohoId"],$metaname,1);
+
+        // requested meta do not exist
+        } else {
+            $row["id"] = 0;
+        }
+
+        if($row["id"]>0)
+        {
+            echo json_encode(["ok"=>$row[$metaname]]);
+        } else {
+            echo json_encode(['error'=>'Unable to find requested data.']);
+        }
+    }
 }
