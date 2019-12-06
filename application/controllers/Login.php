@@ -68,7 +68,7 @@ class Login extends CI_Controller
             $this->session->user = array_merge($this->session->user,['child'=>1,'defaultRedirect'=>'/portal']);
             redirect("/portal");
         } else {
-            $this->session->user = array_merge($this->session->user,['child'=>1,'defaultRedirect'=>'/portal/entity/']);
+            $this->session->user = array_merge($this->session->user,['child'=>0,'defaultRedirect'=>'/portal/entity/']);
             redirect("/portal/entity/" . $this->session->user["zohoId"]);
         }
     }

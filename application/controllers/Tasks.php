@@ -68,25 +68,28 @@ class Tasks extends CI_Controller
      */
     public function completeTask($id)
     {
+        
         if(!isSessionValid("Task_Update")) redirectSession();
 
-        $this->load->model("Zoho_Account");
+        $this->load->model("ZoHo_Account");
         $this->load->model("Tasks_model");
         $this->load->model("Accounts_model");
         
         $parentid = $this->session->user["zohoId"];
-
-        if($this->session->user["child"]){
+        
+        // validate that user as parent or entity are authority to update it
+        if($this->session->user["child"]>0){
             $row = $this->Tasks_model->getOneParentId($id,$parentid);
         } else {
             $row = $this->Tasks_model->getOne($id,$parentid);
         }
 
+        // if valid authority found
         if($row->id>0)
         {
             try{
                 // real id
-                $oZohoApi = $this->Zoho_Account->getInstance("Tasks",$id);
+                $oZohoApi = $this->ZoHo_Account->getInstance("Tasks",$id);
 
                 //$oZohoApi->setFieldValue("percent_complete",100);
                 $oZohoApi->setFieldValue("Status","Completed");
