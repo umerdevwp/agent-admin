@@ -14,7 +14,7 @@
         </div>
         <div class="template-panel-body">
           <div class="template-panel-group">
-            <button class="theme-switch fa-check active" title="Navbar Theme" style="border-color: #b5b5b5 #b5b5b5 #4b4a4a #4b4a4a; color: white;" data-theme-switch="concrete-navbar-default" data-theme='{"navbar-color":"#fff","navbar-bg":"#3d3c3c","navbar-hover-color":"#fff","navbar-hover-bg":"#fff","navbar-title-color":"#adb5bd","navbar-panel-bg":"#b5b5b5","navbar-brand-invert":"0%"}'></button>
+            <button class="theme-switch fa-check" title="Navbar Theme" style="border-color: #b5b5b5 #b5b5b5 #4b4a4a #4b4a4a; color: white;" data-theme-switch="concrete-navbar-default" data-theme='{"navbar-color":"#fff","navbar-bg":"#3d3c3c","navbar-hover-color":"#fff","navbar-hover-bg":"#fff","navbar-title-color":"#adb5bd","navbar-panel-bg":"#b5b5b5","navbar-brand-invert":"0%"}'></button>
             <button class="theme-switch fa-check" title="Navbar Theme" style="border-color: #29d999 #29d999 #1a1f21 #1a1f21; color: white;" data-theme-switch="concrete-navbar-success" data-theme='{"navbar-color":"#fff","navbar-bg":"#1a1f21","navbar-hover-color":"#fff","navbar-hover-bg":"#ededed","navbar-title-color":"#adb5bd","navbar-panel-bg":"#29d999","navbar-brand-invert":"0%"}'></button>
             <button class="theme-switch fa-check" title="Navbar Theme" style="border-color: #3e84d7 #3e84d7 #1a1f21 #1a1f21; color: white;" data-theme-switch="concrete-navbar-primary" data-theme='{"navbar-color":"#fff","navbar-bg":"#1a1f21","navbar-hover-color":"#fff","navbar-hover-bg":"#ededed","navbar-title-color":"#adb5bd","navbar-panel-bg":"#3e84d7","navbar-brand-invert":"0%"}'></button>
             <button class="theme-switch fa-check" title="Navbar Theme" style="border-color: #fff #fff #666 #666; color: black;" data-theme-switch="concrete-navbar-light" data-theme='{"navbar-color":"#666","navbar-bg":"#efefef","navbar-hover-color":"#333","navbar-hover-bg":"#333","navbar-title-color":"#333","navbar-panel-bg":"#eee","navbar-brand-invert":"100%"}'></button>
@@ -48,6 +48,32 @@ $(document).ready(function(){
   $('.template-panel-switch').on('click', function(){
     $('.template-panel').toggleClass('active');
   });
+  $('button.theme-switch').each(function(num,obj){
+
+    $(obj).click(function(){
+        $.ajax({
+          type:"POST",
+          url:"ajax/theme/save/",
+          data:{ number: num },
+          success: function(msg){
+            // already saving data, no need to show modal
+          }
+        });
+      });
+  });
   
+  getTheme();
 });
+
+function getTheme()
+{
+  $.ajax({
+          type:"GET",
+          url:"ajax/theme/name",
+          success: function(msg){
+            var obj = JSON.parse(msg);
+            $("button.theme-switch").eq(obj.ok).addClass("active");
+          }
+        });
+}
 </script>

@@ -7,3 +7,6 @@
 .address-billing .panel{
     min-height: 190px;
 }
+.entities-data tfoot{
+    display:none;
+}
