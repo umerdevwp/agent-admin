@@ -104,13 +104,13 @@
         <div class="panel-title">Compliance Check List <span class="span badge badge-danger"><?php echo count($tasks); ?></span></div>
       </div>
     
-    <?php if(count($tasks) > 0){ ?>
+      <?php if(count($tasks) > 0){ ?>
 
-    <?php
-    // TODO: check tasks date to show warning on due tasks
-    if($entity->PastDue){ ?>
-    <div class="alert alert-danger alert-darker alert-lg"><span class="alert-icon fa-remove"></span><span>WARNING! Open Compliance Tasks May Be Past Due</span></div>
-    <?php } ?>
+      <?php
+      // TODO: check tasks date to show warning on due tasks
+      if($entity->PastDue){ ?>
+      <div class="alert alert-danger alert-darker alert-lg"><span class="alert-icon fa-remove"></span><span>WARNING! Open Compliance Tasks May Be Past Due</span></div>
+      <?php } ?>
       <div class="panel-body">
         <h3 class="list-sortable-title">Compliance Tasks</h3>
         <ul class="list-sortable sortable sortable-current" data-connect-group=".sortable-completed">
@@ -123,11 +123,9 @@
           </li>
           <?php } ?>
         </ul>
+        <div>
       </div>
-    </div>
-
     <?php } ?>
-
   </div>
 </div>
 
@@ -291,7 +289,7 @@ function setTaskId(id)
 function updateTask()
 {
   if(iTaskId>0){
-    document.location = 'update/task/'+iTaskId;
+    document.location = 'task/update/'+iTaskId;
   }
 }
 function uncheckTaskId()

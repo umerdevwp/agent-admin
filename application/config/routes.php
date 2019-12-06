@@ -65,7 +65,7 @@ $route['attachments'] = 'attachments/index';
 
 // actions
 $route['zoho'] = 'tasks/getZohoCode';
-$route['update/task/(:num)'] = 'tasks/completeTaskInZoho/$1';
+$route['task/update/(:num)'] = 'tasks/completeTask/$1';
 
 
 $route['404_override'] = '';
