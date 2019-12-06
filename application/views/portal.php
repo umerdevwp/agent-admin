@@ -36,7 +36,7 @@
                 <div class="col-sm-12 col-md-6 pr-3"> </div>
               </div>
               <div class="row">
-                <div class="col-sm-12">
+                <div class="col-sm-12 entities-data">
                   <table class="table table-striped table-hover data-table dataTable" data-page-length="5" data-table-mode="multi-filter" id="DataTables_Table_3" role="grid" aria-describedby="DataTables_Table_3_info">
                     <thead>
                       <tr role="row">
@@ -58,15 +58,15 @@
                           </tr>
                       <?php } ?>
                     </tbody>
-                    <!--<tfoot>
+                    <tfoot>
                       <tr>
                         <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Name"></th>
                         <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Type"></th>
                         <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search State"></th>
                         <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Seach Date"></th>
-                        <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Exp Date"></th> 
+                        <!-- <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Exp Date"></th>  -->
                       </tr>
-                    </tfoot>-->
+                    </tfoot>
                   </table>
                 </div>
               </div>
