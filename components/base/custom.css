@@ -7,6 +7,22 @@
 .address-billing .panel{
     min-height: 190px;
 }
+/* .address-billing .panel .panel-body{
+    overflow-x: scroll;
+} */
 .entities-data tfoot{
     display:none;
+}
+
+.dl-horizontal dt{
+    text-align: left !important;
+    min-width:120px !important;
+}
+.attachment-table table tfoot{
+    display: none;
+}
+@media (max-width:320px){
+    .four-boxes{
+        width: 100%;
+    }
 }

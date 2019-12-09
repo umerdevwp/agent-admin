@@ -29,7 +29,7 @@
     
   <!-- THIS IS FOR ADDRESS AND BILLING DETAIL BOXES -->
 	<div class="row address-billing">
-		<div class="col-md-3">
+		<div class="col-md-3 four-boxs">
         <div class="panel">
           <div class="panel-header">
             <div class="panel-title"><span class="panel-icon fa-map-marker"></span><span>Forwarding Address</span></div>
@@ -43,7 +43,7 @@
         </div>
       </div>
     </div>
-		<div class="col-md-3">
+		<div class="col-md-3 four-boxs">
         <div class="panel">
           <div class="panel-header">
             <div class="panel-title"><span class="panel-icon fa-map-marker"></span><span> RA Address </span><span class="badge badge-success">Active</span> </div>
@@ -58,7 +58,7 @@
           </div>
       </div>
     </div>
-		<div class="col-md-3">
+		<div class="col-md-3 four-boxs">
         <div class="panel">
           <div class="panel-header">
             <div class="panel-title"><span class="panel-icon fa-address-card-o"></span><span>Company Info</span></div>
@@ -80,7 +80,7 @@
           </div>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-3 four-boxs">
       <div class="panel">
         <div class="panel-header">
           <div class="panel-title"><span class="panel-icon fa-address-card-o"></span><span>Billing Address</span></div>
@@ -145,7 +145,7 @@
                 <div class="col-sm-12 col-md-6 pr-3"> </div>
               </div>
               <div class="row">
-                <div class="col-sm-12">
+                <div class="col-sm-12 attachment-table">
                   <table class="table table-striped table-hover data-table dataTable" data-page-length="5" data-table-mode="multi-filter" id="DataTables_Table_3" role="grid" aria-describedby="DataTables_Table_3_info">
                     <thead>
                       <tr role="row">
@@ -178,10 +178,10 @@
                     </tbody>
                     <tfoot>
                       <tr>
-                        <!-- <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Name"></th>
+                        <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Name"></th>
                         <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search By"></th>
                         <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Added"></th>
-                        <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Size"></th> -->
+                        <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Size"></th>
                         <!--<th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Phone"></th>-->
                       </tr>
                     </tfoot>
