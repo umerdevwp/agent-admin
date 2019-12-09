@@ -15,7 +15,7 @@
     <li class="breadcrumbs-item"><?php echo $entity->entity_name; ?><span style='display:none;' id="tempId"><?=$this->session->user["zohoId"];?></span></li>
     
   </ul>
-  <h2>Add Entity</h2>
+  <!--<h2>Add Entity</h2>-->
 </section>
 	
 	
