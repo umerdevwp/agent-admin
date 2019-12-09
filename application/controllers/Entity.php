@@ -155,6 +155,7 @@ class Entity extends CI_Controller {
         $iErrorType = 1;// 1 means user creation failed, 2 means only attachment failed
 
         $this->load->model('ZoHo_Account');
+        $this->load->model("RegisterAgent_model");
         
         $oApi = $this->ZoHo_Account->getInstance()->getRecordInstance("Accounts",null);
         /* //testing contacts for new entity
@@ -209,6 +210,26 @@ class Entity extends CI_Controller {
         $oApi->setFieldValue("Business_purpose",$this->input->post("inputBusinessPurpose"));
 
         $oApi->setFieldValue("Parent_Account",$iParentZohoId);
+
+        // additional detail as default values for new entity
+        $oApi->setFieldValue("entity_Type","Distributor");
+        $oApi->setFieldValue("Layout","Customer");
+        $oApi->setFieldValue("status","InProcess");
+        $oApi->setFieldValue("tag",'[{"name":"OnBoard","id":"4071993000001742546"}]');
+
+        // fetch RA (registered agent) id from DB
+        $oApi = $this->ZoHo_Account->getInstance();
+        $strFilingState = $this->input->post("inputFillingState");
+        $strFilingState = "DC";
+        $row = $this->RegisterAgent_model->find(["registered_agent_name"=>$strFilingState." - UAS"]);
+        $iRAId = "";
+        if($row->id>0)
+        {
+            $iRAId = $row->id;
+        }
+
+        // push the id to zoho
+        $oApi->setFieldValue("ra",$iRAId);
 
         $trigger=array();//triggers to include
         $lar_id="";//lead assignment rule id
