@@ -153,7 +153,6 @@ class Entity extends CI_Controller {
     {
         $arError = array();
         $iErrorType = 1;// 1 means user creation failed, 2 means only attachment failed
-
         $this->load->model('ZoHo_Account');
         $this->load->model("RegisterAgent_model");
         
@@ -193,7 +192,7 @@ class Entity extends CI_Controller {
         die;*/
         $oApi->setFieldValue("Account_Name", $this->input->post("inputName")); // This function use to set FieldApiName and value similar to all other FieldApis and Custom field
         $oApi->setFieldValue("Filing_State", $this->input->post("inputFillingState")); // Account Name can be given for a new account, account_id is not mandatory in that case
-        $oApi->setFieldValue("Entity_Type", $this->input->post("inputFillingStructure")); // Account Name can be given for a new account, account_id is not mandatory in that case
+        //$oApi->setFieldValue("Entity_Type", $this->input->post("inputFillingStructure")); // Account Name can be given for a new account, account_id is not mandatory in that case
         
         $oApi->setFieldValue("Formation_Date",$this->input->post("inputFormationDate"));
 
@@ -212,15 +211,13 @@ class Entity extends CI_Controller {
         $oApi->setFieldValue("Parent_Account",$iParentZohoId);
 
         // additional detail as default values for new entity
-        $oApi->setFieldValue("entity_Type","Distributor");
-        $oApi->setFieldValue("Layout","Customer");
+        $oApi->setFieldValue("Entity_Type","Distributor");
+        //$oApi->setFieldValue("Layout","Customer");
         $oApi->setFieldValue("status","InProcess");
         $oApi->setFieldValue("tag",'[{"name":"OnBoard","id":"4071993000001742546"}]');
 
         // fetch RA (registered agent) id from DB
-        $oApi = $this->ZoHo_Account->getInstance();
         $strFilingState = $this->input->post("inputFillingState");
-        $strFilingState = "DC";
         $row = $this->RegisterAgent_model->find(["registered_agent_name"=>$strFilingState." - UAS"]);
         $iRAId = "";
         if($row->id>0)
@@ -229,7 +226,7 @@ class Entity extends CI_Controller {
         }
 
         // push the id to zoho
-        $oApi->setFieldValue("ra",$iRAId);
+        $oApi->setFieldValue("RA",$iRAId);
 
         $trigger=array();//triggers to include
         $lar_id="";//lead assignment rule id
