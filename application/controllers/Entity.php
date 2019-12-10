@@ -60,6 +60,28 @@ class Entity extends CI_Controller {
     public function form($id=0)
     {
         if(!isSessionValid("Entity_Add")) redirectSession();
+        /*$this->load->model("ZoHo_Account");
+        //$oApi = $this->ZoHo_Account->getInstance("Accounts","4071993000001828026");
+        
+        $oApi = $this->ZoHo_Account->getInstance("Contacts",null);
+
+        $oApi->setFieldValue("AccountId","4071993000001828026");
+
+        $oApi->setFieldValue("First_Name","NAJM");
+        $oApi->setFieldValue("Last_Name","TC5");
+        
+        $arError = array();
+
+        try {
+            $oApi->create();
+        } catch(Exception $e){
+            if(count($arError)>0) $arError[0] .= ", contacts failed.";
+            else $arError[] = "User created successfully, contacts failed.";
+
+            debug($e);
+        }
+        var_dump($arError);
+        die;*/
 
         $this->load->library('form_validation');
         $this->load->model("Accounts_model");
@@ -192,13 +214,11 @@ class Entity extends CI_Controller {
         die;*/
         $oApi->setFieldValue("Account_Name", $this->input->post("inputName")); // This function use to set FieldApiName and value similar to all other FieldApis and Custom field
         $oApi->setFieldValue("Filing_State", $this->input->post("inputFillingState")); // Account Name can be given for a new account, account_id is not mandatory in that case
-        //$oApi->setFieldValue("Entity_Type", $this->input->post("inputFillingStructure")); // Account Name can be given for a new account, account_id is not mandatory in that case
+        $oApi->setFieldValue("Entity_Type", $this->input->post("inputFillingStructure")); // Account Name can be given for a new account, account_id is not mandatory in that case
         
         $oApi->setFieldValue("Formation_Date",$this->input->post("inputFormationDate"));
 
-        // these 2 fields going under contacts
-        //$oApi->setFieldValue("firstName",$this->input->post("inputFirstName"));
-        //$oApi->setFieldValue("lastName",$this->input->post("inputLastName"));
+        // firstName, lastName fields going under contacts
         
         $oApi->setFieldValue("Notification_Email",$this->input->post("inputNotificationEmail"));
         $oApi->setFieldValue("Phone",$this->input->post("inputNotificationPhone"));
@@ -211,10 +231,12 @@ class Entity extends CI_Controller {
         $oApi->setFieldValue("Parent_Account",$iParentZohoId);
 
         // additional detail as default values for new entity
-        $oApi->setFieldValue("Entity_Type","Distributor");
-        //$oApi->setFieldValue("Layout","Customer");
+        $oApi->setFieldValue("Account_Type","Distributor");
+        $oApi->setFieldValue("Layout","4071993000001376034");// for customer layout id = Customer
         $oApi->setFieldValue("status","InProcess");
-        $oApi->setFieldValue("tag",'[{"name":"OnBoard","id":"4071993000001742546"}]');
+        // tag call needs account id instance, added below after attachments
+        //$oApi->setFieldValue("tag",'[{"name":"OnBoard","id":"4071993000001742546"}]');
+        
 
         // fetch RA (registered agent) id from DB
         $strFilingState = $this->input->post("inputFillingState");
@@ -282,8 +304,19 @@ class Entity extends CI_Controller {
                 else $arError[] = "User created successfully, contacts failed.";
             }
 
+            // add tags
+            
+            $oApi = $this->ZoHo_Account->getInstance("Accounts",$oResponse["id"]);
+            
+            try {
+                $oResponseTags = $oApi->addTags(["name"=>"OnBoard","id"=>"4071993000001742546"]);
+                $oData = $oResponseTags->getData();
+            } catch(Exception $e){
+                if(count($arError)>0) $arError[0] .= ", tags failed.";
+                else $arError[] = "User created successfully, tags failed.";
+            }
         }
-
+        //var_dump($arError);die;
         if(count($arError)>0)
         {
             return ['error'=>$arError[0],'error_code'=>$iErrorType];
