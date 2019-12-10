@@ -95,6 +95,14 @@ class Tasks extends CI_Controller
                 $oZohoApi->setFieldValue("Status","Completed");
                 $resp = $oZohoApi->update();
                 $this->session->set_flashdata("ok","Task updated successfully");
+                
+                if(isset($this->session->temp["tasks_complete"])){
+                    $aTemp = $this->session->temp["tasks_complete"];
+                    $aTemp[] = $id;
+                    $this->session->temp = $aTemp;
+                } else {
+                    $this->session->temp = ["tasks_complete"=>[$id]];
+                }
 
                 redirect($_SERVER["HTTP_REFERER"]);
             } catch(Exception $e)
