@@ -114,14 +114,20 @@
       <div class="panel-body">
         <h3 class="list-sortable-title">Compliance Tasks</h3>
         <ul class="list-sortable sortable sortable-current" data-connect-group=".sortable-completed">
-          <?php for($i = 0; $i < count($tasks); $i++){ ?>
+          <?php for($i = 0; $i < count($tasks); $i++)
+                { 
+                  if(!in_array($tasks[$i]->id,$this->session->temp["tasks_complete"]))
+                  {
+            ?>
           <li class="list-sortable-item-primary">
             <div class="custom-control custom-checkbox custom-check custom-checkbox-primary">
+              <?php var_dump($this->session->temp);?>
               <input class="custom-control-input taskListInput" type="checkbox" id="taskCheck<?php echo $i; ?>"  data-toggle="modal" data-target="#sure" onclick="setTaskId('<?=$tasks[$i]->id;?>')" />
                 <label class="custom-control-label" for="taskCheck<?php echo $i; ?>"><?php echo date_format(date_create($tasks[$i]->due_date), "m/d/Y"); ?> - <?php echo $tasks[$i]->subject; ?></label>
             </div>
           </li>
-          <?php } ?>
+          <?php }
+              } ?>
         </ul>
         <div>
       </div>
