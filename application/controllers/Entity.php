@@ -60,6 +60,32 @@ class Entity extends CI_Controller {
     public function form($id=0)
     {
         if(!isSessionValid("Entity_Add")) redirectSession();
+        // test tags with compliance only
+        /*
+        $this->load->model("ZoHo_Account");
+        $_POST["inputComplianceOnly"] = 1;
+        
+        $oApi = $this->ZoHo_Account->getInstance("Accounts",4071993000001828002);
+        $arError = array();
+        try {
+            $sComplianceOnly = ($this->input->post("inputComplianceOnly")??0);
+
+            $aTags = ["name"=>"OnBoard","id"=>"4071993000001742546"];
+            
+            if($sComplianceOnly)
+            {
+                $aTags["ComplianceOnly"] = "Compliance Only";
+            }
+
+            $oResponseTags = $oApi->addTags($aTags);
+            
+            $oData = $oResponseTags->getData();
+        } catch(Exception $e){
+            if(count($arError)>0) $arError[0] .= ", tags failed.";
+            else $arError[] = "User created successfully, tags failed.";
+        }
+var_dump($arError);die;*/
+        // test contacts based on id
         /*$this->load->model("ZoHo_Account");
         //$oApi = $this->ZoHo_Account->getInstance("Accounts","4071993000001828026");
         
@@ -309,7 +335,17 @@ class Entity extends CI_Controller {
             $oApi = $this->ZoHo_Account->getInstance("Accounts",$oResponse["id"]);
             
             try {
-                $oResponseTags = $oApi->addTags(["name"=>"OnBoard","id"=>"4071993000001742546"]);
+                $sComplianceOnly = ($this->input->post("inputComplianceOnly")??0);
+    
+                $aTags = ["name"=>"OnBoard","id"=>"4071993000001742546"];
+                
+                if($sComplianceOnly)
+                {
+                    $aTags["ComplianceOnly"] = "Compliance Only";
+                }
+    
+                $oResponseTags = $oApi->addTags($aTags);
+                
                 $oData = $oResponseTags->getData();
             } catch(Exception $e){
                 if(count($arError)>0) $arError[0] .= ", tags failed.";
