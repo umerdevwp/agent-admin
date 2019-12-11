@@ -29,71 +29,119 @@
     
   <!-- THIS IS FOR ADDRESS AND BILLING DETAIL BOXES -->
 	<div class="row address-billing">
-		<div class="col-md-3 four-boxs">
+    <div class="col-md-12 four-boxes">
+        <div class="panel-header">
+          <div class="panel-title"><span class="panel-icon fa-address-card-o"></span><span>Company Info</span></div>
+        </div>
+    
         <div class="panel">
-          <div class="panel-header">
-            <div class="panel-title"><span class="panel-icon fa-map-marker"></span><span>Forwarding Address</span></div>
+          
+          <div class="panel-body">
+            <div class="row">
+              <dl class="dl-horizontal col-md-3">
+                <div class="border-section">
+                <dt>State ID</dt>
+                <dd><?php echo $entity->entity_number; ?></dd>
+                </div>
+              </dl>
+              <dl class="dl-horizontal col-md-3">
+                <div class="border-section">
+                <dt>Formation Date</dt>
+                <dd><?php echo $entity->formation_date; ?></dd>
+                </div>
+              </dl>
+              <dl class="dl-horizontal col-md-3">
+                <div class="border-section">
+                <dt>Expiration Date</dt>
+                <dd><?php echo $entity->expiration_date; ?></dd>
+                </div>
+              </dl>
+			        <dl class="dl-horizontal col-md-3">
+                <div class="border-section">
+                <dt>Tax Id</dt>
+                <dd><?php echo $entity->ein; ?></dd>
+                </div>
+              </dl>
+            </div>  
           </div>
+        </div>
+    </div>
+  
+    <div class="col-md-12 four-boxes">
+        <div class="panel-header">
+          <div class="panel-title"><span class="panel-icon fa-map-marker"></span><span> RA Address </span><span class="badge badge-success">Active</span> </div>
+        </div>
+        <div class="panel">
+          
           <div class="panel-body">
             <address>
-                <?php echo $entity->shipping_street; ?><br>
-                <?php echo $entity->shipping_city; ?>, <?php echo $entity->shipping_state; ?> <?php echo $entity->shipping_code; ?><br>
-            <abbr title="Phone">E:</abbr> <?php echo $entity->shipping_email; ?>
+            <div class="row">  
+            <div class="col-md-6">
+              <div class="border-section"><strong><?php echo $AgentAddress['file_as']; ?></strong></div>
+            </div>
+            <!-- <div class="col-md-6"><?php //echo $AgentAddress['address']; ?></div>
+            <?php //echo $AgentAddress['address2']; ?><br> -->
+            <div class="col-md-2">
+              <div class="border-section"><?php echo $AgentAddress['city']; ?></div>
+            </div>
+            <div class="col-md-2">
+              <div class="border-section"><?php echo $AgentAddress['state']; ?></div> 
+            </div>  
+            <div class="col-md-2">
+              <div class="border-section"><?php echo $AgentAddress['zip_code']; ?></div>
+            </div>  
+            </div>
+            <div class="row">
+            <div class="col-md-3">
+              <div class="border-section"><?php echo $AgentNumber['phone_number']; ?></div>
+            </div>
+            <div class="col-md-3">
+              <div class="border-section"><?php echo $AgentEmail['email']; ?></div>
+            </div>
+            </div>
+            </address>
+          </div>
+      </div>
+    </div>
+		<div class="col-md-12 four-boxes">
+        <div class="panel-header">
+          <div class="panel-title"><span class="panel-icon fa-map-marker"></span><span>Forwarding Address</span></div>
+        </div>
+        <div class="panel">
+          
+          <div class="panel-body">
+            <address>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="border-section">
+                  <?php echo $entity->shipping_street; ?>
+                  <?php echo $entity->shipping_city; ?>, <?php echo $entity->shipping_state; ?> <?php echo $entity->shipping_code; ?>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="border-section">
+                  <abbr title="Phone">E:</abbr> <?php echo $entity->shipping_email; ?>
+                  </div>
+                </div>
+              </div>
             </address>
         </div>
       </div>
     </div>
-		<div class="col-md-3 four-boxs">
-        <div class="panel">
-          <div class="panel-header">
-            <div class="panel-title"><span class="panel-icon fa-map-marker"></span><span> RA Address </span><span class="badge badge-success">Active</span> </div>
-          </div>
-          <div class="panel-body">
-            <address>
-            <strong><?php echo $AgentAddress['file_as']; ?></strong><br>
-            <?php echo $AgentAddress['address']; ?><br>
-            <?php echo $AgentAddress['address2']; ?><br>
-            <?php echo $AgentAddress['city'].", ".$AgentAddress['state'].", ".$AgentAddress['zip_code']; ?>
-            </address>
-          </div>
-      </div>
-    </div>
-		<div class="col-md-3 four-boxs">
-        <div class="panel">
-          <div class="panel-header">
-            <div class="panel-title"><span class="panel-icon fa-address-card-o"></span><span>Company Info</span></div>
-          </div>
-          <div class="panel-body">
-              <dl class="dl-horizontal">
-              <dt>State ID</dt>
-              <dd><?php echo $entity->entity_number; ?></dd>
-            </dl>
-            <dl class="dl-horizontal">
-              <dt>Formation Date</dt>
-              <dd><?php echo $entity->formation_date; ?></dd>
-            </dl>
-            <dl class="dl-horizontal">
-              <dt>Expiration Date</dt>
-              <dd><?php echo $entity->expiration_date; ?></dd>
-            </dl>
-			      <dl class="dl-horizontal"><dt>Tax Id</dt><dd><?php echo $entity->ein; ?></dd></dl>
-          </div>
-        </div>
-    </div>
-    <div class="col-md-3 four-boxs">
+    <!--<div class="col-md-3 four-boxs">
       <div class="panel">
         <div class="panel-header">
           <div class="panel-title"><span class="panel-icon fa-address-card-o"></span><span>Billing Address</span></div>
         </div>
         <div class="panel-body">
           <address>
-                <?php echo $entity->billing_street; ?><br>
-                <?php echo $entity->billing_city; ?>, <?php echo $entity->billing_state; ?> <?php echo $entity->billing_code; ?><br>
-            <abbr title="Phone">E:</abbr> <?php echo $entity->billing_email; ?>
+                <?php //echo $entity->billing_street; ?><br>
+                <?php //echo $entity->billing_city; ?>, <?php //echo $entity->billing_state; ?> <?php //echo $entity->billing_code; ?><br>
+            <abbr title="Phone">E:</abbr> <?php //echo $entity->billing_email; ?>
             </address>
         </div>
       </div>
-    </div>    
+    </div>-->    
 </div>
 
 <!-- THIS IS COMPLIANCE CHECK LIST -->

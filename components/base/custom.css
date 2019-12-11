@@ -4,10 +4,10 @@
 .input-group-prepend{
     margin-left: -1px;
 }
-.address-billing .panel{
+/*.address-billing .panel{
     min-height: 190px;
 }
-/* .address-billing .panel .panel-body{
+ .address-billing .panel .panel-body{
     overflow-x: scroll;
 } */
 .entities-data tfoot{
@@ -20,6 +20,35 @@
 }
 .attachment-table table tfoot{
     display: none;
+}
+.four-boxes{
+    margin-bottom: 20px;
+}
+.four-boxes .panel-header{
+    background: #333;
+    padding-left: 15px;
+    color: #fff;
+}
+.four-boxes .panel{
+    margin-top:0;
+}
+.four-boxes .panel .dl-horizontal{
+    display: inline-block;
+    
+}
+.four-boxes .panel .dl-horizontal .border-section, .four-boxes .panel .border-section{
+    border-bottom: 1px solid #ccc;
+    display: block;
+    padding-bottom:0
+}
+.four-boxes .panel .border-section{
+    padding-bottom:15px
+}
+.four-boxes .panel .dl-horizontal dd{
+    line-height:50px
+}
+dl + dl{
+    margin-top: 0px;
 }
 @media (max-width:320px){
     .four-boxes{
