@@ -184,6 +184,11 @@
     </div>
    
   </div>
+  <div class="form-group col-md-6">
+    <label for="inputComplianceOnly">Compliance Only:</label>
+    <?php echo form_error('inputComplianceOnly'); ?>
+    <input type="checkbox" class="form-control" id="inputComplianceOnly" name="inputComplianceOnly" value="1" <?=($this->input->post("inputComplianceOnly")??"checked='checked'");?>>
+  </div>
 
 
   </div><!--form row div-->
