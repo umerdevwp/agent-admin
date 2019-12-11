@@ -41,7 +41,7 @@
                     <thead>
                       <tr role="row">
                         <th class="sorting_disabled" data-column-index="0" rowspan="1" colspan="1" style="width: 241.2px;">Name</th>
-                        <th class="sorting_disabled" data-column-index="1" rowspan="1" colspan="1" style="width: 249.967px;">Entity Type</th>
+                        <th class="sorting_disabled" data-column-index="1" rowspan="1" colspan="1" style="width: 249.967px;">Entity Structure</th>
                         <th class="sorting_disabled" data-column-index="2" rowspan="1" colspan="1" style="width: 241.217px;">Filing State</th>
                         <th class="sorting_disabled" data-column-index="3" rowspan="1" colspan="1" style="width: 241.2px;">Formation Date</th>
                         <!-- <th class="sorting_disabled" data-column-index="4" rowspan="1" colspan="1" style="width: 241.217px;">Expiration Date</th> -->
@@ -51,7 +51,7 @@
                       <?php for($i = 0; $i < count($arChildEntity); $i++) { ?>
                           <tr role="row" class="odd" onclick="window.location = '/entity/<?php echo $arChildEntity[$i]->id; ?>';">
                             <td><?php echo $arChildEntity[$i]->entity_name ?></td>
-                            <td><?php echo $arChildEntity[$i]->entity_type; ?></td>
+                            <td><?php echo $arChildEntity[$i]->entity_structure; ?></td>
                             <td><?php echo $arChildEntity[$i]->filing_state; ?></td>
                             <td><?php echo $arChildEntity[$i]->formation_date; ?></td>
                            <!-- <td><?php echo $arChildEntity[$i]->expiration_date; ?></td> -->
