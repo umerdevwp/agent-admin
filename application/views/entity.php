@@ -146,11 +146,12 @@
 
 <!-- THIS IS COMPLIANCE CHECK LIST -->
 <div class="row">
-  <div class="col-md-12 col-lg-12">
+  <div class="col-md-12 col-lg-12 four-boxes">
+    <div class="panel-header">
+      <div class="panel-title">Compliance Check List <span class="span badge badge-danger"><?php echo count($tasks); ?></span></div>
+    </div>
     <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title">Compliance Check List <span class="span badge badge-danger"><?php echo count($tasks); ?></span></div>
-      </div>
+      
     
       <?php if(count($tasks) > 0){ ?>
 
@@ -186,10 +187,11 @@
 <!-- THIS IS FOR ATTACHMENT -->
 <div class="row">
 	<div class="col-md-9 col-lg-12">
+      <div class="panel-header">
+        <div class="panel-title"><span class="panel-icon fa-tasks"></span><span>Attachments</span></div>
+      </div>
       <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title"><span class="panel-icon fa-tasks"></span><span>Attachments</span></div>
-        </div>
+        
         <div class="panel-body p-0">
           <div class="table-responsive scroller scroller-horizontal py-3">
             <div id="DataTables_Table_3_wrapper" class="dataTables_wrapper dt-bootstrap4">
@@ -251,10 +253,11 @@
 <!-- THIS IS CONTACT LIST -->
 <div class="row">
 	<div class="col-md-9 col-lg-12">
+      <div class="panel-header">
+        <div class="panel-title"><span class="panel-icon fa-tasks"></span><span>Contacts</span> </div>
+      </div>
       <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title"><span class="panel-icon fa-tasks"></span><span>Contacts</span> </div>
-        </div>
+        
         <div class="panel-body p-0">
           <div class="table-responsive scroller scroller-horizontal py-3">
             <div id="DataTables_Table_3_wrapper" class="dataTables_wrapper dt-bootstrap4">
