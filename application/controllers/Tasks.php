@@ -74,6 +74,7 @@ class Tasks extends CI_Controller
         $this->load->model("ZoHo_Account");
         $this->load->model("Tasks_model");
         $this->load->model("Accounts_model");
+        $this->load->model("Tempmeta_model");
         
         $parentid = $this->session->user["zohoId"];
         
@@ -96,13 +97,33 @@ class Tasks extends CI_Controller
                 $resp = $oZohoApi->update();
                 $this->session->set_flashdata("ok","Task updated successfully");
                 
-                if(isset($this->session->temp["tasks_complete"])){
-                    $aTemp = $this->session->temp["tasks_complete"];
-                    $aTemp[] = $id;
-                    $this->session->temp = $aTemp;
-                } else {
-                    $this->session->temp = ["tasks_complete"=>[$id]];
+                // dump into temp for later logins,
+                // fetch temp records into session
+                // push new records into temp
+                // update session with new records
+                $sTempSlug = "tasks_complete";
+                // fetch temporary table for session updates, unless DB is synched
+                if(isset($this->session->temp[$sTempSlug])){
+                    if(!in_array($id,$this->session->temp[$sTempSlug]))
+                    {
+                        $aTemp[$sTempSlug] = $this->session->temp[$sTempSlug];
+                        $aTemp[$sTempSlug][] = (int)$id;
+                        // replicate session in variable
+                        $aCompleteSession = $this->session->temp;
+                        // remove previous array of key tasks_complete
+                        unset($aCompleteSession[$sTempSlug]);
+                        $this->session->temp = array_merge($aTemp,$aCompleteSession);
+                    }
+                } else { 
+                    $aTemp = [$sTempSlug=>[$id]];
+                    // replicate session in variable
+                    $aCompleteSession = $this->session->temp;
+                    // remove previous array of key tasks_complete
+                    unset($aCompleteSession[$sTempSlug]);
+                    $this->session->temp = array_merge($aTemp,$aCompleteSession);
                 }
+                // update temp table as well
+                $this->Tempmeta_model->update($this->session->user["zohoId"],$sTempSlug,json_encode($this->session->temp[$sTempSlug]));
 
                 redirect($_SERVER["HTTP_REFERER"]);
             } catch(Exception $e)

@@ -138,3 +138,25 @@ function debug($var,$bFindMethod=false)
     echo "<pre>";
     print_r($var);
 }
+
+/**
+ * Convert table result array to associative array using key from rows
+ * @param String $key column name that will be key of associative array
+ * @param Array $records Sql records as indexed array
+ * 
+ * @return Array Associative array of all records
+ */
+function tempTableToAssoc($key,$records)
+{
+    $assocArray = [];
+    foreach($records as $row)
+    {
+        $rowArray = json_decode($row['json']);
+        if(!isset($assocArray[$row[$key]]))
+        {
+            $assocArray[$row[$key]] = $rowArray;
+        }
+    }
+
+    return $assocArray;
+}
