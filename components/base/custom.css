@@ -10,7 +10,10 @@
  .address-billing .panel .panel-body{
     overflow-x: scroll;
 } */
-.entities-data tfoot{
+/* .entities-data tfoot{
+    display:block;
+} */
+.entities-data tfoot th:nth-child(2) input, .entities-data tfoot th:nth-child(3) input{
     display:none;
 }
 

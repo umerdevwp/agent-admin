@@ -69,7 +69,7 @@
   
     <div class="col-md-12 four-boxes">
         <div class="panel-header">
-          <div class="panel-title"><span class="panel-icon fa-map-marker"></span><span> RA Address </span><span class="badge badge-success">Active</span> </div>
+          <div class="panel-title"><span class="panel-icon fa-map-marker"></span><span> RA Address </span><!--<span class="badge badge-success">Active</span>--> </div>
         </div>
         <div class="panel">
           
@@ -148,7 +148,7 @@
 <div class="row">
   <div class="col-md-12 col-lg-12 four-boxes">
     <div class="panel-header">
-      <div class="panel-title">Compliance Check List <span class="span badge badge-danger"><?php echo count($tasks); ?></span></div>
+      <div class="panel-title">Compliance Check List <span class="span badge badge-danger"><?php echo count($tasks) - count($this->session->temp["tasks_complete"]); ?></span></div>
     </div>
     <div class="panel">
       
