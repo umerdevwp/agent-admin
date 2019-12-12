@@ -61,7 +61,7 @@ let components = {
 
 				if ( switchStorage ) {
 					if ( switchName === switchStorage ) {
-						node.classList.add( 'active' );
+						//node.classList.add( 'active' );
 						window.activeSwitch = node;
 					} else {
 						node.classList.remove( 'active' );
