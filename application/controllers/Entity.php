@@ -70,7 +70,7 @@ class Entity extends CI_Controller {
         try {
             $sComplianceOnly = ($this->input->post("inputComplianceOnly")??0);
 
-            $aTags = ["name"=>"OnBoard","id"=>"4071993000001742546"];
+            $aTags = ["name"=>"OnBoard"];
             
             if($sComplianceOnly)
             {
@@ -337,7 +337,7 @@ var_dump($arError);die;*/
             try {
                 $sComplianceOnly = ($this->input->post("inputComplianceOnly")??0);
     
-                $aTags = ["name"=>"OnBoard","id"=>"4071993000001742546"];
+                $aTags = ["name"=>"OnBoard"];
                 
                 if($sComplianceOnly)
                 {

@@ -204,6 +204,14 @@ class Login extends CI_Controller
                                     "Theme_View",
                                 ),
             );
+            
+            $this->load->model("Tempmeta_model");
+            // fetch temporary table for session updates, unless DB is synched
+            $aResult = $this->Tempmeta_model->getAll($this->session->user["zohoId"]);
+
+            if($aResult) 
+                $this->session->temp = tempTableToAssoc("slug",$aResult);
+            
         } else {
             // log error for back tracking
             log_message("error","OKTA_API: " . json_encode($response));
