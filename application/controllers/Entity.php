@@ -61,54 +61,7 @@ class Entity extends CI_Controller {
     {
         if(!isSessionValid("Entity_Add")) redirectSession();
         // test tags with compliance only
-        /*
-        $this->load->model("ZoHo_Account");
-        $_POST["inputComplianceOnly"] = 1;
         
-        $oApi = $this->ZoHo_Account->getInstance("Accounts",4071993000001828002);
-        $arError = array();
-        try {
-            $sComplianceOnly = ($this->input->post("inputComplianceOnly")??0);
-
-            $aTags = ["name"=>"OnBoard"];
-            
-            if($sComplianceOnly)
-            {
-                $aTags["ComplianceOnly"] = "Compliance Only";
-            }
-
-            $oResponseTags = $oApi->addTags($aTags);
-            
-            $oData = $oResponseTags->getData();
-        } catch(Exception $e){
-            if(count($arError)>0) $arError[0] .= ", tags failed.";
-            else $arError[] = "User created successfully, tags failed.";
-        }
-var_dump($arError);die;*/
-        // test contacts based on id
-        /*$this->load->model("ZoHo_Account");
-        //$oApi = $this->ZoHo_Account->getInstance("Accounts","4071993000001828026");
-        
-        $oApi = $this->ZoHo_Account->getInstance("Contacts",null);
-
-        $oApi->setFieldValue("AccountId","4071993000001828026");
-
-        $oApi->setFieldValue("First_Name","NAJM");
-        $oApi->setFieldValue("Last_Name","TC5");
-        
-        $arError = array();
-
-        try {
-            $oApi->create();
-        } catch(Exception $e){
-            if(count($arError)>0) $arError[0] .= ", contacts failed.";
-            else $arError[] = "User created successfully, contacts failed.";
-
-            debug($e);
-        }
-        var_dump($arError);
-        die;*/
-
         $this->load->library('form_validation');
         $this->load->model("Accounts_model");
 
@@ -202,6 +155,7 @@ var_dump($arError);die;*/
         $arError = array();
         $iErrorType = 1;// 1 means user creation failed, 2 means only attachment failed
         $this->load->model('ZoHo_Account');
+        $this->load->model("Accounts_model");
         $this->load->model("RegisterAgent_model");
         
         $oApi = $this->ZoHo_Account->getInstance()->getRecordInstance("Accounts",null);
@@ -257,12 +211,25 @@ var_dump($arError);die;*/
         $oApi->setFieldValue("Parent_Account",$iParentZohoId);
 
         // additional detail as default values for new entity
+        // tag call needs account id instance, added below after attachments
         $oApi->setFieldValue("Account_Type","Distributor");
         $oApi->setFieldValue("Layout","4071993000001376034");// for customer layout id = Customer
         $oApi->setFieldValue("status","InProcess");
-        // tag call needs account id instance, added below after attachments
-        //$oApi->setFieldValue("tag",'[{"name":"OnBoard","id":"4071993000001742546"}]');
+
+        $oLoginUser = $this->Accounts_model->getOne($this->session->user["zohoId"]);
         
+        if($oLoginUser->id)
+        {
+            // billing info using entity profile
+            $oApi->setFieldValue("Billing_City",$oLoginUser->billing_city);
+            $oApi->setFieldValue("Billing_Code",$oLoginUser->billing_code);
+            $oApi->setFieldValue("Billing_Country","US");
+            $oApi->setFieldValue("Billing_State",$oLoginUser->billing_state);
+            $oApi->setFieldValue("Billing_Street",$oLoginUser->billing_street);
+            $oApi->setFieldValue("Billing_Street_2",$oLoginUser->billing_street_2);
+        } else {
+            $arError[] = "Billing addresses failed";
+        }
 
         // fetch RA (registered agent) id from DB
         $strFilingState = $this->input->post("inputFillingState");
