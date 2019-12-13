@@ -43,11 +43,14 @@ TrustLogo("https://www.positivessl.com/images/seals/positivessl_trust_seal_sm_12
 </html>
 <script src="components/base/script.js"></script>
 <script src="components/base/jquery-3.4.1.min.js"></script>
+<script src="components/base/moment.min.js"></script>
+<script src="components/datepicker/bootstrap-datepicker.js"></script>
 <script>
 $(document).ready(function(){
   $('.template-panel-switch').on('click', function(){
     $('.template-panel').toggleClass('active');
   });
+  $('#inputFormationDate').datepicker();
   $('button.theme-switch').each(function(num,obj){
 
     $(obj).click(function(){
@@ -63,6 +66,7 @@ $(document).ready(function(){
   });
   
   getTheme();
+
 });
 
 function getTheme()
@@ -76,4 +80,8 @@ function getTheme()
           }
         });
 }
+$(function(){
+  
+})
+
 </script>

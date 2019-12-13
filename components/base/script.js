@@ -556,65 +556,65 @@ let components = {
 			});
 		}
 	},
-	datetimepicker: {
-		selector: '[data-datetimepicker]',
-		styles: [
-			'./components/button/button.css',
-			'./components/dropdown/dropdown.css',
-			'./components/datetimepicker/bootstrap-datetimepicker.css'
-		],
-		script: [
-			'./components/base/moment.min.js',
-			'./components/base/jquery-3.4.1.min.js',
-			'./components/datetimepicker/bootstrap-datetimepicker.min.js'
-		],
-		dependencies: 'currentDevice',
-		init: function ( nodes ) {
-			nodes.forEach( function ( node ) {
-				let
-					$node = $( node ),
-					params = parseJSON( $node.attr( 'data-datetimepicker' ) ),
-					defaults = {
-						format: 'L LT',
-						widgetParent: $node.parent().hasClass( 'input-group' ) ? $node.parent().parent() : $node.parent()
-					};
+	// datetimepicker: {
+	// 	selector: '[data-datetimepicker]',
+	// 	styles: [
+	// 		'./components/button/button.css',
+	// 		'./components/dropdown/dropdown.css',
+	// 		'./components/datetimepicker/bootstrap-datetimepicker.css'
+	// 	],
+	// 	script: [
+	// 		'./components/base/moment.min.js',
+	// 		'./components/base/jquery-3.4.1.min.js',
+	// 		'./components/datetimepicker/bootstrap-datetimepicker.min.js'
+	// 	],
+	// 	dependencies: 'currentDevice',
+	// 	init: function ( nodes ) {
+	// 		nodes.forEach( function ( node ) {
+	// 			let
+	// 				$node = $( node ),
+	// 				params = parseJSON( $node.attr( 'data-datetimepicker' ) ),
+	// 				defaults = {
+	// 					format: 'L LT',
+	// 					widgetParent: $node.parent().hasClass( 'input-group' ) ? $node.parent().parent() : $node.parent()
+	// 				};
 
-				if ( params.inline && params.target ) {
-					let $target = $( params.target );
-					delete params.target;
+	// 			if ( params.inline && params.target ) {
+	// 				let $target = $( params.target );
+	// 				delete params.target;
 
-					$node.on( 'dp.change', function( event ) {
-						$target.val( event.date.format( params.format || 'L LT' ) );
-					});
+	// 				$node.on( 'dp.change', function( event ) {
+	// 					$target.val( event.date.format( params.format || 'L LT' ) );
+	// 				});
 
-					params.widgetParent = null;
-				}
+	// 				params.widgetParent = null;
+	// 			}
 
-				if ( ( device.ios() || device.android() ) && !params.inline ) {
-					let
-						windowClickHandler = ( function ( event ) {
-							if ( !this.data( 'DateTimePicker' ).widgetParent()[0].contains( event.target ) ) {
-								this.data( 'DateTimePicker' ).hide();
-								window.removeEventListener( 'touchstart', windowClickHandler );
-							}
-						}).bind( $node ),
-						inputClickHandler = ( function ( event ) {
-							event.preventDefault();
-							this.data( 'DateTimePicker' ).show();
-							window.addEventListener( 'touchstart', windowClickHandler );
-						}).bind( $node );
+	// 			if ( ( device.ios() || device.android() ) && !params.inline ) {
+	// 				let
+	// 					windowClickHandler = ( function ( event ) {
+	// 						if ( !this.data( 'DateTimePicker' ).widgetParent()[0].contains( event.target ) ) {
+	// 							this.data( 'DateTimePicker' ).hide();
+	// 							window.removeEventListener( 'touchstart', windowClickHandler );
+	// 						}
+	// 					}).bind( $node ),
+	// 					inputClickHandler = ( function ( event ) {
+	// 						event.preventDefault();
+	// 						this.data( 'DateTimePicker' ).show();
+	// 						window.addEventListener( 'touchstart', windowClickHandler );
+	// 					}).bind( $node );
 
-					params.focusOnShow = false;
-					$node.on( 'mousedown', inputClickHandler );
-				}
+	// 				params.focusOnShow = false;
+	// 				$node.on( 'mousedown', inputClickHandler );
+	// 			}
 
-				$node.datetimepicker({
-					...defaults,
-					...params
-				});
-			});
-		}
-	},
+	// 			$node.datetimepicker({
+	// 				...defaults,
+	// 				...params
+	// 			});
+	// 		});
+	// 	}
+	// },
 	tagManager: {
 		selector: '.tag-manager',
 		styles: [
