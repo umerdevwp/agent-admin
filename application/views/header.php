@@ -11,6 +11,8 @@
 <link rel="icon" href="images/favicon.ico" type="image/x-icon">
 <link rel="stylesheet" href="components/base/base.css">
 <link rel="stylesheet" href="components/base/custom.css">
+<link rel="stylesheet" href="components/dropdown/dropdown.css">
+<link rel="stylesheet" href="components/datepicker/datepicker.css">
 
 </head>
 	

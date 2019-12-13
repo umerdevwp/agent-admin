@@ -27,12 +27,12 @@
 .four-boxes{
     margin-bottom: 20px;
 }
-.four-boxes .panel-header{
+.four-boxes .panel-header, .entity-form .panel-header{
     background: #333;
     padding-left: 15px;
     color: #fff;
 }
-.four-boxes .panel{
+.four-boxes .panel, .entity-form .panel{
     margin-top:0;
 }
 .four-boxes .panel .dl-horizontal{
@@ -53,7 +53,16 @@
 dl + dl{
     margin-top: 0px;
 }
-
+.attachment{
+    display: block;
+    width: 100%;
+}
+.input-group .custom-file{
+    margin-top: 7px;
+}
+.compliance input[type=checkbox]{
+    width: auto;
+}
 @media (max-width:768px){
     .four-boxes .panel .border-section{
         margin-bottom:15px

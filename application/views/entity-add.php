@@ -24,11 +24,12 @@
     </div>
 
     <div class="row">
-	<div class="col-md-9 col-lg-12">
+	<div class="col-md-12 col-lg-12 entity-form">
+      <div class="panel-header">
+        <div class="panel-title"><span class="panel-icon fa-tasks"></span><span>New RA Client</span> </div>
+      </div>
       <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title"><span class="panel-icon fa-tasks"></span><span>New RA Client</span> </div>
-        </div>
+        
         <div class="panel-body p-0">
           <div class="table-responsive scroller scroller-horizontal py-3">
             <div id="DataTables_Table_3_wrapper" class="dataTables_wrapper dt-bootstrap4">
@@ -121,15 +122,15 @@
       <label for="inputFormationDate">Formation Date</label>
       <?php echo form_error('inputFormationDate'); ?>
         
-        <div class="input-group date" id="datetime">
+        <div class="input-group" id="datetime">
             <input type="text" class="form-control" name="inputFormationDate" id="inputFormationDate" value="<?=$this->input->post("inputFormationDate");?>" placeholder="Formation Date" />
-            <span class="input-group-addon" for="datetime">
+            <!-- <span class="input-group-addon" for="datetime">
                 <span class="input-group-text"><span class="fa fa-calendar"></span></span>
-            </span>
+            </span> -->
         </div>
     </div>
     <div class="form-group col-md-6">
-      <label for="inputFirstName">Contact Name</label>
+      <label for="inputFirstName">First Name</label>
       <?php echo form_error('inputFirstName'); ?>
       <input type="text" class="form-control" id="inputFirstName" name="inputFirstName" placeholder="First Name" value="<?=$this->input->post("inputFirstName");?>">
     </div>
@@ -168,12 +169,9 @@
     <?php echo form_error('inputNotificationZip'); ?>
     <input type="text" class="form-control" id="inputNotificationZip" name="inputNotificationZip" placeholder="Postal / Zip Code" value="<?=$this->input->post("inputNotificationZip");?>">
   </div>
-  <div class="form-group col-md-6">
-    <label for="inputBusinessPurpose">Business Purpose</label>
-    <?php echo form_error('inputBusinessPurpose'); ?>
-    <textarea class="form-control" id="inputBusinessPurpose" name="inputBusinessPurpose" rows="3"><?=$this->input->post("inputBusinessPurpose");?></textarea>
-  </div>
-  <div class="input-group col-md-6">
+  
+  <div class="input-group col-md-6 form-group">
+    <label class="attachment">Attachment</label>
   <?php echo form_error('inputFiling'); ?>
     <div class="input-group-prepend">
       <span class="input-group-text">Filing</span>
@@ -185,7 +183,12 @@
     </div>
    
   </div>
-  <div class="form-group col-md-6">
+  <div class="form-group col-md-12">
+    <label for="inputBusinessPurpose">Business Purpose</label>
+    <?php echo form_error('inputBusinessPurpose'); ?>
+    <textarea class="form-control" id="inputBusinessPurpose" name="inputBusinessPurpose" rows="3"><?=$this->input->post("inputBusinessPurpose");?></textarea>
+  </div>
+  <div class="form-group col-md-6 compliance">
     <label for="inputComplianceOnly">Compliance Only:</label>
     <?php echo form_error('inputComplianceOnly'); ?>
     <input type="checkbox" class="form-control" id="inputComplianceOnly" name="inputComplianceOnly" value="1" <?=($this->input->post("inputComplianceOnly")?'checked':'');?>>
