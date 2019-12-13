@@ -111,7 +111,7 @@ class Accounts_model extends CI_Model
         $query = $this->db->get_where($this->table, $data);
         $result = $query->row();
         
-        if ($result) {
+        if (!$result) {
             return ['msg'=>'No such account found','msg_type'=>'error'];
         }
 

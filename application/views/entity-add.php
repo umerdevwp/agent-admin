@@ -120,6 +120,7 @@
     <div class="form-group col-md-4">
       <label for="inputFormationDate">Formation Date</label>
       <?php echo form_error('inputFormationDate'); ?>
+        
         <div class="input-group date" id="datetime">
             <input type="text" class="form-control" name="inputFormationDate" id="inputFormationDate" value="<?=$this->input->post("inputFormationDate");?>" placeholder="Formation Date" />
             <span class="input-group-addon" for="datetime">
@@ -187,7 +188,7 @@
   <div class="form-group col-md-6">
     <label for="inputComplianceOnly">Compliance Only:</label>
     <?php echo form_error('inputComplianceOnly'); ?>
-    <input type="checkbox" class="form-control" id="inputComplianceOnly" name="inputComplianceOnly" value="1" <?=($this->input->post("inputComplianceOnly")??"checked='checked'");?>>
+    <input type="checkbox" class="form-control" id="inputComplianceOnly" name="inputComplianceOnly" value="1" <?=($this->input->post("inputComplianceOnly")?'checked':'');?>>
   </div>
 
 
