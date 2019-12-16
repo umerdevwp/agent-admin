@@ -254,7 +254,7 @@
 <div class="row">
 	<div class="col-md-9 col-lg-12">
       <div class="panel-header">
-        <div class="panel-title"><span class="panel-icon fa-tasks"></span><span>Contacts</span> </div>
+        <div class="panel-title"><span class="panel-icon fa-tasks"></span><span>Contacts</span> <a href="#addMultiple" class="pull-right add-contact"><span class="fa-user-plus"></span> Add Contact</a></div>
       </div>
       <div class="panel">
         
@@ -330,6 +330,46 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-dismiss="modal" id="no">NO</button>
         <button type="button" class="btn btn-success" id="yes">YES</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal For Add Multiple Contacts-->
+<div class="modal" id="addMultiple" tabindex="-1" role="dialog" >
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel"> Add Contact</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="contact-form" action="post" id="">
+          <label>First Name <span>*</span></label>
+          <input type="text" class="form-control" id="inputFirstName" name="inputFirstName" placeholder="First Name" value="<?=$this->input->post("inputFirstName");?>">
+          <label>Last Name</label>
+          <input type="text" class="form-control" id="inputLastName" name="inputLastName" placeholder="Last Name" value="<?=$this->input->post("inputLastName");?>">
+          <label>Contact Type</label>
+          <label>Email</label>
+          <input type="email" class="form-control" id="inputNotificationEmail" name="inputNotificationEmail" placeholder="Notification Email" value="<?=$this->input->post("inputNotificationEmail");?>">
+          <label>Address</label>
+          <input type="text" class="form-control" id="inputNotificationAddress" name="inputNotificationAddress" placeholder="Street Address" value="<?=$this->input->post("inputNotificationAddress");?>">
+          <label>City</label>
+          <input type="text" class="form-control" id="inputNotificationCity" name="inputNotificationCity" placeholder="City" value="<?=$this->input->post("inputNotificationCity");?>">
+          <label>State</label>
+          <input type="text" class="form-control" id="inputNotificationState" name="inputNotificationState" placeholder="State/Region/Province" value="<?=$this->input->post("inputNotificationState");?>">
+          <label>Zipcode</label>
+          <input type="text" class="form-control" id="inputNotificationZip" name="inputNotificationZip" placeholder="Postal / Zip Code" value="<?=$this->input->post("inputNotificationZip");?>">
+          <label>Phone</label>
+          <input type="text" class="form-control" id="inputNotificationPhone" name="inputNotificationPhone" placeholder="Phone Number" value="<?=$this->input->post("inputNotificationPhone");?>">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary save" >Save changes</button>
       </div>
     </div>
   </div>

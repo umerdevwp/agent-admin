@@ -50,6 +50,9 @@ $(document).ready(function(){
   $('.template-panel-switch').on('click', function(){
     $('.template-panel').toggleClass('active');
   });
+  $('.add-contact').click(function(){
+    $('#addMultiple').modal();
+  });
   $('#inputFormationDate').datepicker();
   $('button.theme-switch').each(function(num,obj){
 
@@ -66,7 +69,7 @@ $(document).ready(function(){
   });
   
   getTheme();
-
+  
 });
 
 function getTheme()
@@ -80,8 +83,6 @@ function getTheme()
           }
         });
 }
-$(function(){
-  
-})
+
 
 </script>
