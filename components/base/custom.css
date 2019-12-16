@@ -63,6 +63,27 @@ dl + dl{
 .compliance input[type=checkbox]{
     width: auto;
 }
+.add-contact{
+    color: #fff;
+    padding-right:20px;
+    padding-left: 15px;
+    line-height: 46px;
+    margin-top: -12px;
+}
+.add-contact:hover{
+    background: #666;
+    color: #fff;
+}
+.client-form span.steric{
+    color: red
+}
+.client-form .compliance{
+    margin-top:0
+}
+.client-form label.custom-file-label{
+    border-radius: 4px;
+    border:1px solid #ccc
+}
 @media (max-width:768px){
     .four-boxes .panel .border-section{
         margin-bottom:15px

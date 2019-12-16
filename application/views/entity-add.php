@@ -38,18 +38,22 @@
                 <div class="col-sm-12 col-md-6 pr-3"> </div>
               </div>
               <div class="row">
-                <div class="col-sm-12">
+                <div class="col-sm-12 client-form">
                   
                 <form method="post" action="/entity/add" enctype="multipart/form-data" name="formAdd" id="formAdd">
   <div class="form-row">
-    <div class="form-group col-md-12">
-      <label for="inputName">Entity Name</label>
-      <?php echo form_error('inputName'); ?>
+    <div class="form-group col-md-6">
+      <label for="inputName">Entity Name <span class="steric">*</span></label>
       <input type="text" class="form-control"  name="inputName" id="inputName" value="<?=$this->input->post("inputName");?>" placeholder="Entity Name">
+      <?php echo form_error('inputName'); ?>
+    </div>
+    <div class="form-group col-md-6 compliance">
+    <label for="inputComplianceOnly">Compliance Only:</label>
+    <input type="checkbox" class="form-control" id="inputComplianceOnly" name="inputComplianceOnly" value="1" <?=($this->input->post("inputComplianceOnly")?'checked':'');?>>
+    <?php echo form_error('inputComplianceOnly'); ?>
     </div>
     <div class="form-group col-md-4">
-      <label for="inputFillingState">Filling State</label>
-      <?php echo form_error('inputFillingState'); ?>
+      <label for="inputFillingState">Filling State <span class="steric">*</span></label>
       <select id="inputFillingState" class="form-control" name="inputFillingState">
 
         <option selected="true" value="-Select-">-Select-</option>
@@ -105,10 +109,11 @@
         <option value="WY" formula_val="">WY</option>
 
       </select>
+      <?php echo form_error('inputFillingState'); ?>
+      
     </div>
     <div class="form-group col-md-4">
-      <label for="inputFillingStructure">Filling Structure</label>
-      <?php echo form_error('inputFillingStructure'); ?>
+      <label for="inputFillingStructure">Filling Structure <span class="steric">*</span></label>
       <select id="inputFillingStructure" class="form-control" name="inputFillingStructure">
         <option selected="true" value="-Select-">-Select-</option>
         <option value="Corporation" formula_val="">Corporation</option>
@@ -117,10 +122,11 @@
         <option value="Limited Partnership" formula_val="">Limited Partnership</option>
         <option value="LLP" formula_val="">LLP</option>
       </select>
+      <?php echo form_error('inputFillingStructure'); ?>
+      
     </div>
     <div class="form-group col-md-4">
-      <label for="inputFormationDate">Formation Date</label>
-      <?php echo form_error('inputFormationDate'); ?>
+      <label for="inputFormationDate">Formation Date <span class="steric">*</span></label>
         
         <div class="input-group" id="datetime">
             <input type="text" class="form-control" name="inputFormationDate" id="inputFormationDate" value="<?=$this->input->post("inputFormationDate");?>" placeholder="Formation Date" />
@@ -128,59 +134,60 @@
                 <span class="input-group-text"><span class="fa fa-calendar"></span></span>
             </span> -->
         </div>
+        <?php echo form_error('inputFormationDate'); ?>
+      
     </div>
     <div class="form-group col-md-6">
-      <label for="inputFirstName">First Name</label>
-      <?php echo form_error('inputFirstName'); ?>
+      <label for="inputFirstName">First Name <span class="steric">*</span></label>
       <input type="text" class="form-control" id="inputFirstName" name="inputFirstName" placeholder="First Name" value="<?=$this->input->post("inputFirstName");?>">
+      <?php echo form_error('inputFirstName'); ?>
     </div>
 	<div class="form-group col-md-6">
-      <label for="inputLastName">Last Name</label>
-      <?php echo form_error('inputLastName'); ?>
+      <label for="inputLastName">Last Name <span class="steric">*</span></label>
       <input type="text" class="form-control" id="inputLastName" name="inputLastName" placeholder="Last Name" value="<?=$this->input->post("inputLastName");?>">
+      <?php echo form_error('inputLastName'); ?>
     </div>
 	<div class="form-group col-md-6">
-      <label for="inputNotificationEmail">Notification Email</label>
-      <?php echo form_error('inputNotificationEmail'); ?>
+      <label for="inputNotificationEmail">Notification Email <span class="steric">*</span></label>
       <input type="email" class="form-control" id="inputNotificationEmail" name="inputNotificationEmail" placeholder="Notification Email" value="<?=$this->input->post("inputNotificationEmail");?>">
+      <?php echo form_error('inputNotificationEmail'); ?>
     </div>
 	<div class="form-group col-md-6">
-    <label for="inputNotificationPhone">Notification Phone</label>
-    <?php echo form_error('inputNotificationPhone'); ?>
+    <label for="inputNotificationPhone">Notification Phone <span class="steric">*</span></label>
     <input type="text" class="form-control" id="inputNotificationPhone" name="inputNotificationPhone" placeholder="Phone Number" value="<?=$this->input->post("inputNotificationPhone");?>">
+    <?php echo form_error('inputNotificationPhone'); ?>
   </div>
   <div class="form-group col-md-12">
-    <label for="inputNotificationAddress">Notification Address</label>
-    <?php echo form_error('inputNotificationAddress'); ?>
+    <label for="inputNotificationAddress">Notification Address <span class="steric">*</span></label>
     <input type="text" class="form-control" id="inputNotificationAddress" name="inputNotificationAddress" placeholder="Street Address" value="<?=$this->input->post("inputNotificationAddress");?>">
+    <?php echo form_error('inputNotificationAddress'); ?>
   </div>
   <div class="form-group col-md-6">
-    <label for="inputNotificationCity">City</label>
-    <?php echo form_error('inputNotificationCity'); ?>
+    <label for="inputNotificationCity">City <span class="steric">*</span></label>
     <input type="text" class="form-control" id="inputNotificationCity" name="inputNotificationCity" placeholder="City" value="<?=$this->input->post("inputNotificationCity");?>">
+    <?php echo form_error('inputNotificationCity'); ?>
   </div>
     <div class="form-group col-md-6">
-    <label for="inputNotificationState">State/Region/Province</label>
-    <?php echo form_error('inputNotificationState'); ?>
+    <label for="inputNotificationState">State/Region/Province <span class="steric">*</span></label>
     <input type="text" class="form-control" id="inputNotificationState" name="inputNotificationState" placeholder="State/Region/Province" value="<?=$this->input->post("inputNotificationState");?>">
+    <?php echo form_error('inputNotificationState'); ?>
   </div>
   <div class="form-group col-md-6">
-    <label for="inputNotificationZip">Postal / Zip Code</label>
-    <?php echo form_error('inputNotificationZip'); ?>
+    <label for="inputNotificationZip">Postal / Zip Code <span class="steric">*</span></label>
     <input type="text" class="form-control" id="inputNotificationZip" name="inputNotificationZip" placeholder="Postal / Zip Code" value="<?=$this->input->post("inputNotificationZip");?>">
+    <?php echo form_error('inputNotificationZip'); ?>
   </div>
   
   <div class="input-group col-md-6 form-group">
-    <label class="attachment">Attachment</label>
-  <?php echo form_error('inputFiling'); ?>
-    <div class="input-group-prepend">
+    <label class="attachment">Attachment <span class="steric">*</span></label>
+    <!-- <div class="input-group-prepend">
       <span class="input-group-text">Filing</span>
-    </div>
+    </div> -->
     <div class="custom-file">
       <input type="file" class="custom-file-input" id="inputFiling" name="inputFiling">
       <label class="custom-file-label" for="inputFiling">Choose file</label>
-      
     </div>
+    <?php echo form_error('inputFiling'); ?>
    
   </div>
   <div class="form-group col-md-12">
@@ -188,11 +195,7 @@
     <?php echo form_error('inputBusinessPurpose'); ?>
     <textarea class="form-control" id="inputBusinessPurpose" name="inputBusinessPurpose" rows="3"><?=$this->input->post("inputBusinessPurpose");?></textarea>
   </div>
-  <div class="form-group col-md-6 compliance">
-    <label for="inputComplianceOnly">Compliance Only:</label>
-    <?php echo form_error('inputComplianceOnly'); ?>
-    <input type="checkbox" class="form-control" id="inputComplianceOnly" name="inputComplianceOnly" value="1" <?=($this->input->post("inputComplianceOnly")?'checked':'');?>>
-  </div>
+  
 
 
   </div><!--form row div-->
@@ -237,6 +240,9 @@
     </div>
   </div>
 </div>
+
+
+
 </section>
 
 <script>
