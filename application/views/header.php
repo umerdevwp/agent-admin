@@ -17,9 +17,8 @@
 </head>
 	
 <body>
-
+<div class="preloader" id="contactLoader"><img src="images/loader.svg" alt=""></div>
 <div class="page">
-	
 	
 <header class="section page-header">
 <!--RD Navbar--><div class="rd-navbar-wrap">

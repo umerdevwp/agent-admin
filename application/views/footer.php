@@ -49,11 +49,13 @@ TrustLogo("https://www.positivessl.com/images/seals/positivessl_trust_seal_sm_12
 $(document).ready(function(){
   $('.template-panel-switch').on('click', function(){
     $('.template-panel').toggleClass('active');
+    
   });
   $('.add-contact').click(function(){
     $('#addMultiple').modal();
   });
   $('#inputFormationDate').datepicker();
+  
   $('button.theme-switch').each(function(num,obj){
 
     $(obj).click(function(){
@@ -74,14 +76,26 @@ $(document).ready(function(){
 
 function getTheme()
 {
+  let switchStorage = window.localStorage.getItem( 'concrete-theme-switch' );
+ if(switchStorage){
+   // Do nothing becase script.js code implement theme
+ }
+ else{
+   
   $.ajax({
           type:"GET",
           url:"ajax/theme/name",
           success: function(msg){
             var obj = JSON.parse(msg);
             $("button.theme-switch").eq(obj.ok).addClass("active");
+            var switchName = $("button.theme-switch").eq(obj.ok).attr( 'data-theme-switch' )
+            window.localStorage.setItem( 'concrete-theme-switch', switchName );
+            window.theme.setTheme( JSON.parse($("button.theme-switch").eq(obj.ok).attr( 'data-theme' ) ) );
+					window.theme.applyTheme();
           }
         });
+        
+ }
 }
 
 
