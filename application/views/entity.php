@@ -254,7 +254,7 @@
 <div class="row">
 	<div class="col-md-9 col-lg-12">
       <div class="panel-header">
-        <div class="panel-title"><span class="panel-icon fa-tasks"></span><span>Contacts</span> <a href="#addMultiple" class="pull-right add-contact"><span class="fa-user-plus"></span> Add Contact</a></div>
+        <div class="panel-title"><span class="panel-icon fa-tasks"></span><span>Contacts</span> <a href="#"   data-toggle="modal" data-target="#addMultiple" class="pull-right add-contact"><span class="fa-user-plus"></span> Add Contact</a></div>
       </div>
       <div class="panel">
         
@@ -337,44 +337,70 @@
 
 
 <!-- Modal For Add Multiple Contacts-->
-<div class="modal" id="addMultiple" tabindex="-1" role="dialog" >
-  <div class="modal-dialog" role="document">
+<div class="modal fade" id="addMultiple" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" >
+  <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel"> Add Contact</h5>
+        <h2 class="modal-title" id="exampleModalLabel"> Add Contact</h2>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <form class="contact-form" action="post" id="">
-          <label>First Name <span>*</span></label>
-          <input type="text" class="form-control" id="inputFirstName" name="inputFirstName" placeholder="First Name" value="<?=$this->input->post("inputFirstName");?>">
-          <label>Last Name</label>
-          <input type="text" class="form-control" id="inputLastName" name="inputLastName" placeholder="Last Name" value="<?=$this->input->post("inputLastName");?>">
-          <label>Contact Type</label>
-          <label>Email</label>
-          <input type="email" class="form-control" id="inputNotificationEmail" name="inputNotificationEmail" placeholder="Notification Email" value="<?=$this->input->post("inputNotificationEmail");?>">
-          <label>Address</label>
-          <input type="text" class="form-control" id="inputNotificationAddress" name="inputNotificationAddress" placeholder="Street Address" value="<?=$this->input->post("inputNotificationAddress");?>">
-          <label>City</label>
-          <input type="text" class="form-control" id="inputNotificationCity" name="inputNotificationCity" placeholder="City" value="<?=$this->input->post("inputNotificationCity");?>">
-          <label>State</label>
-          <input type="text" class="form-control" id="inputNotificationState" name="inputNotificationState" placeholder="State/Region/Province" value="<?=$this->input->post("inputNotificationState");?>">
-          <label>Zipcode</label>
-          <input type="text" class="form-control" id="inputNotificationZip" name="inputNotificationZip" placeholder="Postal / Zip Code" value="<?=$this->input->post("inputNotificationZip");?>">
-          <label>Phone</label>
-          <input type="text" class="form-control" id="inputNotificationPhone" name="inputNotificationPhone" placeholder="Phone Number" value="<?=$this->input->post("inputNotificationPhone");?>">
+        <form class="contact-form" action="post" id="formContactMultiple">
+          <div class="row">
+            <div class="col-md-6">
+                <label>First Name <span>*</span></label>
+                <input type="text" class="form-control" id="inputContactFirstName" name="inputContactFirstName" placeholder="First Name" value="">
+                <p id="inputContactFirstNameReq" class="errorMsg"></p>
+                <label>Last Name</label>
+                <input type="text" class="form-control" id="inputContactLastName" name="inputContactLastName" placeholder="Last Name" value="">
+                <p id="inputContactLastNameReq" class="errorMsg"></p>
+                <label>Contact Type</label>
+                <input type="text" class="form-control" id="inputContactType" name="inputContactType" placeholder="Contact Type" value="">
+                <p id="inputContactTypeReq" class="errorMsg"></p>
+                <label>Email</label>
+                <input type="email" class="form-control" id="inputContactEmail" name="inputContactEmail" placeholder="Notification Email" value="">
+                <p id="inputContactEmailReq" class="errorMsg"></p>
+                <label>Address</label>
+                <input type="text" class="form-control" id="inputContactStreet" name="inputContactStreet" placeholder="Street Address" value="">
+                <p id="inputContactStreetReq" class="errorMsg"></p>
+            </div>
+            <div class="col-md-6">
+                <label>City</label>
+                <input type="text" class="form-control" id="inputContactCity" name="inputContactCity" placeholder="City" value="">
+                <p id="inputContactCityReq" class="errorMsg"></p>
+                <label>State</label>
+                <input type="text" class="form-control" id="inputContactState" name="inputContactState" placeholder="State/Region/Province" value="">
+                <p id="inputContactStateReq" class="errorMsg"></p>
+                <label>Zipcode</label>
+                <input type="text" class="form-control" id="inputContactZipcode" name="inputContactZipcode" placeholder="Postal / Zip Code" value="">
+                <p id="inputContactZipcodeReq" class="errorMsg"></p>
+                <label>Phone</label>
+                <input type="text" class="form-control" id="inputContactPhone" name="inputContactPhone" placeholder="Phone Number" value="">
+                <p id="inputContactPhoneReq" class="errorMsg"></p>
+            </div>
+          </div>  
+        
+          <div id="serverError" class="servererror">
+            <span>Sorry we are unable to process your request, please try again.</span>
+          </div>
+          <div id="validateAddress" class="validaddress">
+           <span>Sorry we are unable to validate contact address.</span> <br> 
+           <input type="checkbox" name="acceptInvalidAddress" value="1" > Are you sure, you want to add this address?
+          </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary save" >Save changes</button>
+        <button type="button" class="btn btn-success save" id="saveClose" >Save Changes</button>
+        <button type="button" class="btn btn-primary save" id="saveClose" >Save/Add New</button>
       </div>
     </div>
   </div>
 </div>
 </section>
+<script src="components/base/jquery-3.4.1.min.js"></script>
 <script>
 
 var iTaskId = 0;
@@ -400,4 +426,47 @@ setTimeout(() => {
 }, 2000);
   
 
+</script>
+<script>
+  $('#saveClose, #saveAddNew').click(function(){
+    // empty all error messages to send form again
+    $(".errorMsg").text("");
+    $('#contactLoader').show();
+
+    $.ajax({
+      type:"POST",
+      url:"ajax/contact/save/",
+      data:$('#formContactMultiple').serialize(),
+      success: function(response){
+        var returnedData = JSON.parse(response);
+        $(".errorMsg").text("");
+        $('#contactLoader').hide();
+
+        // check there are any errors in response
+        if(returnedData.type=='error'){
+          for(field in returnedData.results)
+          {
+            $('#'+field+'Req').text(returnedData.results[field]);
+          } 
+          if(returnedData.results.length == 0){
+            $('#validateAddress').show();
+            //console.log("Sorry we are unable to validate contact address.");
+            //console.log(returnedData);
+          }else if(returnedData.results == "Add contact failed"){
+            $('#serverError').show();
+          }
+          
+        // save or exit / save or reset
+        } else if(returnedData.type=='ok'){
+          
+          $('#formContactMultiple')[0].reset();
+          console.log("Close modal or reset for new entries");
+        } else {
+          console.log("Server not responding, please try again later");
+          console.log(returnedData);
+        }
+
+      }
+    });
+  });
 </script>
