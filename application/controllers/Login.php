@@ -197,11 +197,15 @@ class Login extends CI_Controller
                 "permissions"=> array(
                                     "Entity",
                                     "Entity_Add",
+                                    
                                     "Contacts",
+                                    "Contacts_Add",
+                                    
                                     "Attachments",
                                     "Task_Update",
                                     "Theme_Update",
                                     "Theme_View",
+                                    
                                 ),
             );
             
