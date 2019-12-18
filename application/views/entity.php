@@ -349,36 +349,45 @@
       <div class="modal-body">
         <form class="contact-form" action="post" id="formContactMultiple">
           <div class="row">
+            <div class="col-md-12 note">
+              <p>Note: All fields are required to fill.</p>
+            </div>
+          </div>
+          <div class="row">
             <div class="col-md-6">
-                <label>First Name <span>*</span></label>
-                <input type="text" class="form-control" id="inputContactFirstName" name="inputContactFirstName" placeholder="First Name" value="">
+                <label>First Name <span class="require">*</span></label>
+                <input type="text" class="form-control" id="inputContactFirstName" name="inputContactFirstName" placeholder="First Name" value="" tabindex="1">
                 <p id="inputContactFirstNameReq" class="errorMsg"></p>
-                <label>Last Name</label>
-                <input type="text" class="form-control" id="inputContactLastName" name="inputContactLastName" placeholder="Last Name" value="">
-                <p id="inputContactLastNameReq" class="errorMsg"></p>
-                <label>Contact Type</label>
-                <input type="text" class="form-control" id="inputContactType" name="inputContactType" placeholder="Contact Type" value="">
+                
+                <label>Contact Type <span class="require">*</span></label>
+                <input type="text" class="form-control" id="inputContactType" name="inputContactType" placeholder="Contact Type" value="" tabindex="3">
                 <p id="inputContactTypeReq" class="errorMsg"></p>
-                <label>Email</label>
-                <input type="email" class="form-control" id="inputContactEmail" name="inputContactEmail" placeholder="Notification Email" value="">
-                <p id="inputContactEmailReq" class="errorMsg"></p>
-                <label>Address</label>
-                <input type="text" class="form-control" id="inputContactStreet" name="inputContactStreet" placeholder="Street Address" value="">
+                
+                <label>Address <span class="require">*</span></label>
+                <input type="text" class="form-control" id="inputContactStreet" name="inputContactStreet" placeholder="Street Address" value="" tabindex="5">
                 <p id="inputContactStreetReq" class="errorMsg"></p>
+                <label>State <span class="require">*</span></label>
+                <input type="text" class="form-control" id="inputContactState" name="inputContactState" placeholder="State/Region/Province" value="" tabindex="7">
+                <p id="inputContactStateReq" class="errorMsg"></p>
+                <label>Phone <span class="require">*</span></label>
+                <input type="text" class="form-control" id="inputContactPhone" name="inputContactPhone" placeholder="Phone Number" value="" tabindex="9">
+                <p id="inputContactPhoneReq" class="errorMsg"></p>
             </div>
             <div class="col-md-6">
-                <label>City</label>
-                <input type="text" class="form-control" id="inputContactCity" name="inputContactCity" placeholder="City" value="">
+                <label>Last Name <span class="require">*</span></label>
+                <input type="text" class="form-control" id="inputContactLastName" name="inputContactLastName" placeholder="Last Name" value="" tabindex="2">
+                <p id="inputContactLastNameReq" class="errorMsg"></p>
+                <label>Email <span class="require">*</span></label>
+                <input type="email" class="form-control" id="inputContactEmail" name="inputContactEmail" placeholder="Notification Email" value="" tabindex="4">
+                <p id="inputContactEmailReq" class="errorMsg"></p>
+                <label>City <span class="require">*</span></label>
+                <input type="text" class="form-control" id="inputContactCity" name="inputContactCity" placeholder="City" value="" tabindex="6">
                 <p id="inputContactCityReq" class="errorMsg"></p>
-                <label>State</label>
-                <input type="text" class="form-control" id="inputContactState" name="inputContactState" placeholder="State/Region/Province" value="">
-                <p id="inputContactStateReq" class="errorMsg"></p>
-                <label>Zipcode</label>
-                <input type="text" class="form-control" id="inputContactZipcode" name="inputContactZipcode" placeholder="Postal / Zip Code" value="">
+                
+                <label>Zipcode <span class="require">*</span></label>
+                <input type="text" class="form-control" id="inputContactZipcode" name="inputContactZipcode" placeholder="Postal / Zip Code" value="" tabindex="8">
                 <p id="inputContactZipcodeReq" class="errorMsg"></p>
-                <label>Phone</label>
-                <input type="text" class="form-control" id="inputContactPhone" name="inputContactPhone" placeholder="Phone Number" value="">
-                <p id="inputContactPhoneReq" class="errorMsg"></p>
+                <input type="hidden" name="entityId" value="<?=$iEntityId;?>">
             </div>
           </div>  
         
@@ -386,20 +395,33 @@
             <span>Sorry we are unable to process your request, please try again.</span>
           </div>
           <div id="validateAddress" class="validaddress">
-           <span>Sorry we are unable to validate contact address.</span> <br> 
-           <input type="checkbox" name="acceptInvalidAddress" value="1" > Are you sure, you want to add this address?
+           <span>Sorry we are unable to validate contact address.</span>
+            <div class="custom-control custom-switch custom-switch-sm">
+            <label class="custom-control-label" for="customSwitch21"> Are you sure, you want to add this address?</label>
+            <input class="custom-control-input" type="checkbox" id="customSwitch21" name="acceptInvalidAddress" value="1"/>
+            
+            </div>
+           <!--<input type="checkbox" name="acceptInvalidAddress" value="1" >  Are you sure, you want to add this address?-->
           </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-success save" id="saveClose" >Save Changes</button>
+        <button type="button" class="btn btn-success save" id="saveClose" >Save/Close</button>
         <button type="button" class="btn btn-primary save" id="saveClose" >Save/Add New</button>
+        
       </div>
     </div>
   </div>
 </div>
 </section>
+<div class="successMessage" id="successMessageBox">
+  <div class="smessage">Your information is successfully save!.</div>
+</div>
+<div class="editMessage" id="successEditMessageBox">
+  <div class="semessage">Contact edit successfully update.</div>
+</div>
+
 <script src="components/base/jquery-3.4.1.min.js"></script>
 <script>
 
@@ -460,7 +482,9 @@ setTimeout(() => {
         } else if(returnedData.type=='ok'){
           
           $('#formContactMultiple')[0].reset();
-          console.log("Close modal or reset for new entries");
+          $('#successMessageBox').show().delay(5000).fadeout();
+          
+          //console.log("Close modal or reset for new entries");
         } else {
           console.log("Server not responding, please try again later");
           console.log(returnedData);

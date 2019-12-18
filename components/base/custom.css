@@ -90,6 +90,7 @@ dl + dl{
 }
 .contact-form label{
     font-size:16px;
+    color: #000;
 }
 .contact-form input[type=text]{
     font-size:14px
@@ -109,10 +110,38 @@ dl + dl{
 }
 .servererror, .validaddress{
     display:none;
+    font-size: 14px;
 }
 .validaddress span, .servererror span{
     color:red;
-
+    display: block;
+    margin-bottom: 15px;
+}
+.contact-form label span.require{
+    color: red;
+}
+.note p{
+    color: #000;
+    font-size: 14px;
+}
+.successMessage, .editMessage{
+    position: fixed;
+    top:0;
+    left: 0;
+    width:100%;
+    /* margin:0 auto; */
+    z-index: 99;
+    text-align: center;
+    transition: linear .3s ease-in-out;
+    display: none;
+}
+.successMessage .smessage, .editMessage .semessage{
+    background: #6fbb47;
+    color:#fff;
+    font-size:14px;
+    padding:10px 15px;
+    border-radius:5px;
+    display: inline-block;
 }
 @media (max-width:768px){
     .four-boxes .panel .border-section{
