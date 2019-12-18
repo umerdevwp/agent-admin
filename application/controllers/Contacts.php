@@ -42,6 +42,7 @@ class Contacts extends CI_Controller
         
         $this->load->library('form_validation');
 
+        $this->form_validation->set_rules('entityId', 'Entity', 'required|numeric');
         $this->form_validation->set_rules('inputContactFirstName', 'First Name', 'required|regex_match[/[a-zA-Z\s]+/]',["regex_match"=>"Only alphabets and spaces allowed."]);
         $this->form_validation->set_rules('inputContactLastName', 'Last Name', 'required|regex_match[/[a-zA-Z\s]+/]',["regex_match"=>"Only alphabets and spaces allowed."]);
         $this->form_validation->set_rules('inputContactEmail', 'Contact Email', 'required|valid_email');
@@ -98,8 +99,10 @@ class Contacts extends CI_Controller
         $this->load->model("Accounts_model");
 
         $arError = [];
-        $iLoginId = $this->session->user['zohoId'];
+        //$iLoginId = $this->session->user['zohoId'];
+        $iLoginId = $this->input->post("entityId");
         //$iLoginId = 4071993000000411118;
+        // TODO: validate user is the child entity of login parent
         $oAccountRow = $this->Accounts_model->getOne($iLoginId);
         $sAccountName = $oAccountRow->entity_name;
         //$sAccountName = "Najm Test Comliance";

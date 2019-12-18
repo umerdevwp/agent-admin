@@ -51,7 +51,15 @@ class Entity extends CI_Controller {
 		//$data['attachments'] = $this->ZoHo_Account->arAttachments;
 		$data['attachments'] = $this->Attachments_model->getAllFromEntityId($id);
 		
-		//var_dump($data['account']);die;
+        // use login entity id
+        $iEntityId = $this->session->user['zohoId'];
+
+        // if session is parent then get entity ID from url
+        if($this->session->user['child'])
+            $iEntityId = $id;
+
+        $data['iEntityId'] = $iEntityId;
+
 		$this->load->view('header');
 		$this->load->view('entity', $data);
 		$this->load->view('footer');
