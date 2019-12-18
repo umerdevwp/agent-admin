@@ -4,3 +4,4 @@ application/logs/*
 docs/*
 .vs/*
 vendor/*
+composer.lock

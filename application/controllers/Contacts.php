@@ -102,7 +102,7 @@ class Contacts extends CI_Controller
         //$iLoginId = 4071993000000411118;
         $oAccountRow = $this->Accounts_model->getOne($iLoginId);
         $sAccountName = $oAccountRow->entity_name;
-        $sAccountName = "Najm Test Comliance";
+        //$sAccountName = "Najm Test Comliance";
 //var_dump($oAccountRow);
 //die;
         
