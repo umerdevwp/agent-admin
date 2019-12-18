@@ -1,9 +1,14 @@
 {
     "require": {
         "zohocrm/php-sdk": "^2.0",
-        "vlucas/phpdotenv": "^3.6"
+        "vlucas/phpdotenv": "^3.6",
+        "okta/sdk": "^1.1.0",
+        "smartystreets/phpsdk": "4.7.1"
     },
 	"autoload": {
         "psr-4": {"Src\\Services\\": "application/services"}
+    },
+    "require-dev": {
+        "kenjis/ci-phpunit-test": "^0.17.0"
     }
 }

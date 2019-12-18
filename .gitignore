@@ -1,2 +1,6 @@
 .env
 application/storage/*
+application/logs/*
+docs/*
+.vs/*
+vendor/*
