@@ -474,7 +474,7 @@ setTimeout(() => {
           if(returnedData.results.length == 0){
             $('#validateAddress').show();
             //$('#addMultiple, .modal-backdrop').toggle();
-            $('#successEditMessageBox').show().delay(10000).fadeOut();
+            //$('#successEditMessageBox').show().delay(10000).fadeOut();
             //console.log("Sorry we are unable to validate contact address.");
             //console.log(returnedData);
           }else if(returnedData.results == "Add contact failed"){
@@ -485,6 +485,7 @@ setTimeout(() => {
         } else if(returnedData.type=='ok'){
           
           $('#formContactMultiple')[0].reset();
+          $('#validateAddress').hide();
           $('#successMessageBox').show().delay(10000).fadeOut();
           
           //console.log("Close modal or reset for new entries");
