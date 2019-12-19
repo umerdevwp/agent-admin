@@ -169,8 +169,8 @@
                   {
             ?>
           <li class="list-sortable-item-primary">
-            <div class="custom-control custom-checkbox custom-check custom-checkbox-primary">
-              <input class="custom-control-input taskListInput" type="checkbox" id="taskCheck<?php echo $i; ?>"  data-toggle="modal" data-target="#sure" onclick="setTaskId('<?=$tasks[$i]->id;?>')" />
+            <div class="custom-control custom-checkbox custom-check custom-checkbox-primary ">
+              <input class="custom-control-input taskListInput" type="checkbox" id="taskCheck<?php echo $i; ?>"  data-toggle="modal" data-target="#sure" onclick="setTaskId('<?=$tasks[$i]->id;?>')" <?=($tasks[$i]->status=="Completed"?"checked":"");?> />
                 <label class="custom-control-label" for="taskCheck<?php echo $i; ?>"><?php echo date_format(date_create($tasks[$i]->due_date), "m/d/Y"); ?> - <?php echo $tasks[$i]->subject; ?></label>
             </div>
           </li>
@@ -283,7 +283,7 @@
                         if(count($contacts)>0) {
                             for($i = 0; $i < count($contacts); $i++){ ?>
                       <tr role="row" class="odd">
-                        <td><?php echo $contacts[$i]->full_name; ?></td>
+                        <td><?php echo $contacts[$i]->first_name . ' ' . $contacts[$i]->last_name; ?></td>
                         <td><?php echo $contacts[$i]->title; ?></td>
                         <td><?php echo $contacts[$i]->email; ?></td>
                         <td><?php echo $contacts[$i]->mailing_street; ?>, <?php echo $contacts[$i]->mailing_city; ?> <?php echo $contacts[$i]->mailing_state; ?> <?php echo $contacts[$i]->mailing_zip; ?></td>
@@ -397,8 +397,8 @@
           <div id="validateAddress" class="validaddress">
            <span>Sorry we are unable to validate contact address.</span>
             <div class="custom-control custom-switch custom-switch-sm">
-            <label class="custom-control-label" for="customSwitch21"> Are you sure, you want to add this address?</label>
             <input class="custom-control-input" type="checkbox" id="customSwitch21" name="acceptInvalidAddress" value="1"/>
+            <label class="custom-control-label" for="customSwitch21"> Are you sure, you want to add this address?</label>
             
             </div>
            <!--<input type="checkbox" name="acceptInvalidAddress" value="1" >  Are you sure, you want to add this address?-->
@@ -450,7 +450,8 @@ setTimeout(() => {
 
 </script>
 <script>
-  $('#saveClose, #saveAddNew').click(function(){
+  $('#saveClose, #saveAddNew').click(function(ev){
+    //console.log($(ev.target).attr("id"));
     // empty all error messages to send form again
     $(".errorMsg").text("");
     $('#contactLoader').show();
@@ -472,6 +473,8 @@ setTimeout(() => {
           } 
           if(returnedData.results.length == 0){
             $('#validateAddress').show();
+            //$('#addMultiple, .modal-backdrop').toggle();
+            $('#successEditMessageBox').show().delay(10000).fadeOut();
             //console.log("Sorry we are unable to validate contact address.");
             //console.log(returnedData);
           }else if(returnedData.results == "Add contact failed"){
@@ -482,7 +485,7 @@ setTimeout(() => {
         } else if(returnedData.type=='ok'){
           
           $('#formContactMultiple')[0].reset();
-          $('#successMessageBox').show().delay(5000).fadeout();
+          $('#successMessageBox').show().delay(10000).fadeOut();
           
           //console.log("Close modal or reset for new entries");
         } else {
@@ -494,3 +497,18 @@ setTimeout(() => {
     });
   });
 </script>
+<!-- <script>
+$('#saveAddNew').on('click', function(){
+  var fname = $('#inputContactFirstName').val();
+  var lname = $('#inputContactLastName').val();
+  var ctype = $('#inputContactType').val();
+  var email = $('#inputContactEmail').val();
+  var street = $('#inputContactStreet').val();
+  var city = $('#inputContactCity').val();
+  var state = $('#inputContactState').val();
+  var zipcode = $('#inputContactZipcode').val();
+  var phone = $('#inputContactPhone').val();
+  var markup = "<tr><td>" + fname.lname + "</td><td>" + ctype + "</td><td>" + email + "</td><td>" + street.city.state.zipcode + "</td><td>" + phone + "</td>";
+  $('table#DataTables_Table_3 tbody').append(markup);
+});
+</script> -->
