@@ -157,9 +157,7 @@ class Login extends CI_Controller
 
     public function logout()
     {
-        unset(
-            $_SESSION['user']
-        );
+        $this->session->sess_destroy();
         redirect(getenv("OKTA_BASE_URL") . "login/signout?fromURI=" . getenv("SITE_URL"));
     }
 
@@ -208,14 +206,6 @@ class Login extends CI_Controller
                                     
                                 ),
             );
-            
-            $this->load->model("Tempmeta_model");
-            // fetch temporary table for session updates, unless DB is synched
-            $aResult = $this->Tempmeta_model->getAll($this->session->user["zohoId"]);
-            // TODO: move temporary tasks too, to entity.php
-            if($aResult['type']=='ok') {
-                $this->session->temp = tempTableToAssoc("slug",$aResult['results']);
-            }
             
         } else {
             // log error for back tracking

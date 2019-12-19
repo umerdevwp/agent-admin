@@ -78,8 +78,10 @@ class Tempmeta_model extends CI_Model
         $query = $this->db->get_where($this->table, $data);
         $result = $query->row();
         
-        if (!$result) {
-            return ['msg'=>'No record available','type'=>'error'];
+        if ($result) {
+            return ['results'=>$result,'type'=>'ok'];
+        } else {
+            return ['results'=>'No record available','type'=>'error'];
         }
 
         return $result;
@@ -96,8 +98,7 @@ class Tempmeta_model extends CI_Model
         ];
         // check 
         $row = $this->getOne($iUserid,$sSlugname);
-
-        if($row->id>0)
+        if($row['type']=='ok')
         {
             $result = $this->db->update($this->table, $aData,$aWhere);
         // insert
@@ -165,18 +166,18 @@ HC;
 
     public function appendRow($iId,$sSlug,$aData)
     {
-        $aResult = $this->getAll($iId,$sSlug,true);
-        $aAllData = [];
+        $aResult = $this->getOne($iId,$sSlug);
+
+        $aTempData = [];
+
         if($aResult['type']=='ok')
         {
-            $aResult['results'][] = $aData;
-            $aAllData = $aResult['results'];
+            $aTempData = json_decode($aResult['results']->json);
         }
 
-        //var_dump($aAllData);
+        $aTempData[] = $aData;
         
-        $this->update($iId,$sSlug,json_encode($aAllData));
-        
+        $this->update($iId,$sSlug,json_encode($aTempData));
 
     }
 

@@ -24,6 +24,7 @@ class Entity extends CI_Controller {
 		$this->load->model('Tasks_model');
 		$this->load->model('Contacts_model');
 		$this->load->model('Attachments_model');
+        $this->load->model("Tempmeta_model");
 
 		// fetch data from zoho api
         //$this->ZoHo_Account->LoadAccount($id);
@@ -46,10 +47,13 @@ class Entity extends CI_Controller {
             $data['AgentAddress'] = false;
         }
         
-		$data['tasks'] = $this->Tasks_model->getAll($id);
+        $data['tasks'] = $this->Tasks_model->getAll($id);
+        
+        $data['tasks_completed'] = json_decode($this->Tempmeta_model->getOne($id,$this->Tempmeta_model->slugTasksComplete)['results']->json);
+        
         $data['contacts'] = $this->Contacts_model->getAllFromEntityId($id);
         
-        $this->load->model("Tempmeta_model");
+        
         $aTempRows = $this->Tempmeta_model->getAll($id,$this->model->slugNewContact,false);
         
         $data['contacts'] = array_merge($data['contacts'],json_decode($aTempRows['results'][0]->json));
