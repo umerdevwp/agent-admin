@@ -126,6 +126,24 @@ class Contacts extends CI_Controller
         
         try {
             $oApi->create();
+
+            $this->load->model("Tempmeta_model");
+
+            $data = [
+                        "first_name"    =>  $this->input->post("inputContactFirstName"),
+                        "last_name"    =>  $this->input->post("inputContactLastName"),
+
+                        "email"    =>  $this->input->post("inputContactEmail"),
+                        "phone"    =>  $this->input->post("inputContactPhone"),
+                        "title"    =>  $this->input->post("inputContactType"),
+
+                        "mailing_street"    =>  $this->input->post("inputContactStreet"),
+                        "mailing_city"    =>  $this->input->post("inputContactCity"),
+                        "mailing_state"    =>  $this->input->post("inputContactState"),
+                        "mailing_zip"    =>  $this->input->post("inputContactZipcode"),
+            ];
+
+            $this->Tempmeta_model->appendRow($iLoginId,"Contacts",$data);
         } catch(Exception $e){
             $arError[] = "Add contact failed: " . $e->getMessage();
         }

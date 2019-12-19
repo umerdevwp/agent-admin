@@ -212,9 +212,10 @@ class Login extends CI_Controller
             $this->load->model("Tempmeta_model");
             // fetch temporary table for session updates, unless DB is synched
             $aResult = $this->Tempmeta_model->getAll($this->session->user["zohoId"]);
-
-            if($aResult) 
-                $this->session->temp = tempTableToAssoc("slug",$aResult);
+            // TODO: move temporary tasks too, to entity.php
+            if($aResult['type']=='ok') {
+                $this->session->temp = tempTableToAssoc("slug",$aResult['results']);
+            }
             
         } else {
             // log error for back tracking

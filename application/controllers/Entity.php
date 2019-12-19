@@ -47,8 +47,15 @@ class Entity extends CI_Controller {
         }
         
 		$data['tasks'] = $this->Tasks_model->getAll($id);
-		$data['contacts'] = $this->Contacts_model->getAllFromEntityId($id);
-		//$data['attachments'] = $this->ZoHo_Account->arAttachments;
+        $data['contacts'] = $this->Contacts_model->getAllFromEntityId($id);
+        
+        $this->load->model("Tempmeta_model");
+        $aTempRows = $this->Tempmeta_model->getAll($id,$this->model->slugNewContact,false);
+        
+        $data['contacts'] = array_merge($data['contacts'],json_decode($aTempRows['results'][0]->json));
+
+//var_dump($data['contacts']);
+//die;
 		$data['attachments'] = $this->Attachments_model->getAllFromEntityId($id);
 		
         // use login entity id
