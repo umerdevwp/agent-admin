@@ -4,6 +4,10 @@ class Tempmeta_model extends CI_Model
 
     private $table = "tempmeta";
 
+    public $slugContactNew = "new_contacts";
+
+    public $slugTasksComplete = "tasks_complete";
+
     public function __construct()
     {
         $this->load->database();
@@ -33,11 +37,14 @@ class Tempmeta_model extends CI_Model
                 $result = $query->result_array();
             else
                 $result = $query->result();
-            echo $this->db->last_query();
+            //echo $this->db->last_query();
             if (! is_array($result)) {
-                return ['msg'=>'No slugs available','msg_type'=>'error'];
+                return ['results'=>['message'=>'No slugs available'],'type'=>'error'];
+            } else {
+                return ['type'=>'ok','results'=>$result];
             }
         }
+
         return $result;
     }
 
@@ -153,6 +160,23 @@ HC;
         } else {
             return false;
         }
+
+    }
+
+    public function appendRow($iId,$sSlug,$aData)
+    {
+        $aResult = $this->getAll($iId,$sSlug,true);
+        $aAllData = [];
+        if($aResult['type']=='ok')
+        {
+            $aResult['results'][] = $aData;
+            $aAllData = $aResult['results'];
+        }
+
+        //var_dump($aAllData);
+        
+        $this->update($iId,$sSlug,json_encode($aAllData));
+        
 
     }
 
