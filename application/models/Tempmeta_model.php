@@ -57,7 +57,7 @@ class Tempmeta_model extends CI_Model
         if($result)
         {
             $this->updateDbSynchTime();
-            echo $this->db->last_query();
+            //echo $this->db->last_query();
             return true;
         } else {
             return false;
@@ -134,7 +134,7 @@ class Tempmeta_model extends CI_Model
             $this->db->update("appmeta",$aData,"slug='synched_datetime'");
         }
 
-        echo $this->db->last_query();
+        //echo $this->db->last_query();
     }
 
     public function isDbSynched()
