@@ -151,10 +151,6 @@
       <div class="panel-title">Compliance Check List <span class="span badge badge-danger"><?php echo count($tasks) - count($this->session->temp["tasks_complete"]); ?></span></div>
     </div>
     <div class="panel">
-      
-    
-      <?php if(count($tasks) > 0){ ?>
-
       <?php
       // TODO: check tasks date to show warning on due tasks
       if($entity->PastDue){ ?>
@@ -162,6 +158,7 @@
       <?php } ?>
       <div class="panel-body">
         <h3 class="list-sortable-title">Compliance Tasks</h3>
+        <?php if(count($tasks) > 0){ ?>
         <ul class="list-sortable sortable sortable-current" data-connect-group=".sortable-completed">
           <?php for($i = 0; $i < count($tasks); $i++)
                 { 
@@ -170,16 +167,17 @@
             ?>
           <li class="list-sortable-item-primary">
             <div class="custom-control custom-checkbox custom-check custom-checkbox-primary ">
-              <input class="custom-control-input taskListInput" type="checkbox" id="taskCheck<?php echo $i; ?>"  data-toggle="modal" data-target="#sure" onclick="setTaskId('<?=$tasks[$i]->id;?>')" <?=($tasks[$i]->status=="Completed"?"checked":"");?> />
+              <input class="custom-control-input taskListInput" type="checkbox" id="taskCheck<?php echo $i; ?>"  data-toggle="modal" data-target="#sure" onclick="setTaskId('<?=$tasks[$i]->id;?>')" <?=($tasks[$i]->status=="Completed"||in_array($tasks[$i]->id,$tasks_completed)?"checked":"");?> />
                 <label class="custom-control-label" for="taskCheck<?php echo $i; ?>"><?php echo date_format(date_create($tasks[$i]->due_date), "m/d/Y"); ?> - <?php echo $tasks[$i]->subject; ?></label>
             </div>
           </li>
           <?php }
               } ?>
         </ul>
+        
+    <?php } ?>
         <div>
       </div>
-    <?php } ?>
   </div>
 </div>
 
@@ -278,7 +276,7 @@
                        <!-- <th class="sorting_disabled" data-column-index="5" rowspan="1" colspan="1" style="width: 241.2px;">Edit</th> -->
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="contactTableTbody">
                       <?php 
                         if(count($contacts)>0) {
                             for($i = 0; $i < count($contacts); $i++){ ?>
@@ -433,7 +431,7 @@ function setTaskId(id)
 function updateTask()
 {
   if(iTaskId>0){
-    document.location = 'task/update/'+iTaskId;
+    document.location = 'task/update/'+iTaskId+'?eid=<?=$iEntityId;?>';
   }
 }
 function uncheckTaskId()
@@ -473,7 +471,8 @@ setTimeout(() => {
           } 
           if(returnedData.results.length == 0){
             $('#validateAddress').show();
-            //$('#addMultiple, .modal-backdrop').toggle();
+            $('#addMultiple').modal('hide');
+            //$('.modal-backdrop').hide();
             //$('#successEditMessageBox').show().delay(10000).fadeOut();
             //console.log("Sorry we are unable to validate contact address.");
             //console.log(returnedData);
@@ -487,7 +486,15 @@ setTimeout(() => {
           $('#formContactMultiple')[0].reset();
           $('#validateAddress').hide();
           $('#successMessageBox').show().delay(10000).fadeOut();
+          $('#addMultiple').modal('hide');
           
+            var row = '<tr><td>';
+            for(field in returnedData.results)
+            {
+               row += $(field).val() + "</td><td>";
+            }
+            row += "</td></tr>";
+            $('#contactTableTbody').append(row);
           //console.log("Close modal or reset for new entries");
         } else {
           console.log("Server not responding, please try again later");
