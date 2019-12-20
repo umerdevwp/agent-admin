@@ -7,7 +7,7 @@ class Entity extends CI_Controller {
     public function __construct()
     {
         parent::__construct();
-
+        
         $this->load->helper("custom");
 
     }
@@ -53,11 +53,12 @@ class Entity extends CI_Controller {
         
         $data['contacts'] = $this->Contacts_model->getAllFromEntityId($id);
         
-        
         $aTempRows = $this->Tempmeta_model->getAll($id,$this->model->slugNewContact,false);
-        
-        $data['contacts'] = array_merge($data['contacts'],json_decode($aTempRows['results'][0]->json));
 
+        if($aTempRows['type']=='ok' && count($aTempRows['results']))
+        {
+            $data['contacts'] = array_merge($data['contacts'],json_decode($aTempRows['results'][0]->json));
+        }
 //var_dump($data['contacts']);
 //die;
 		$data['attachments'] = $this->Attachments_model->getAllFromEntityId($id);
@@ -127,14 +128,17 @@ class Entity extends CI_Controller {
         $this->form_validation->set_rules('inputNotificationState', 'Shipping State', 'required');
         $this->form_validation->set_rules('inputNotificationZip', 'Shipping Code', 'required');
         $this->form_validation->set_rules('inputBusinessPurpose', 'Business purpose', 'required');
+
         // allow without file, else check type and size
-        if($_FILES["inputFiling"]["name"]!=""){
+        if($_FILES["inputFiling"]["name"]!="" || $this->input->post("inputComplianceOnly")){
             $this->form_validation->set_rules('inputFiling', 'Filing Attachment', 
                 array(
+                    'required',
                     array('validate_extention',function(){return validateFileExt($_FILES['inputFiling']['tmp_name'],['application/pdf']);}),
                     array('validate_size',function(){return validateFileSize($_FILES['inputFiling']['tmp_name'],10*1000*1000);}),
                 ),
                 array(
+                    'required'=>'This field is required',
                     'validate_extention'=>'Only MIME .pdf files are allowed',
                     'validate_size'=>'Input file: ' . getFileSize(filesize($_FILES['inputFiling']['tmp_name'])) . ' exceeding limit of 10MB.'
                 )
@@ -305,13 +309,25 @@ class Entity extends CI_Controller {
             //$oApi->setModuleApiName("Contacts");
             $oApi = $this->ZoHo_Account->getInstance()->getRecordInstance("Contacts",null);
             
-            $oApi->setFieldValue("Account_Name", $this->input->post("inputName"));
             
-            $oApi->setFieldValue("First_Name",$this->input->post("inputFirstName"));
-            $oApi->setFieldValue("Last_Name",$this->input->post("inputLastName"));
-            try {
-                $oApi->create();
-            } catch(Exception $e){
+            $aResponse = $this->ZoHo_Account->newZohoContact(
+                $this->input->post("inputName"),
+                [
+                    "First_Name"    =>$this->input->post("inputFirstName"),
+                    "Last_Name"     =>$this->input->post("inputLastName"),
+
+                    "Email"         =>$this->input->post("inputNotificationEmail"),
+                    "Phone"         =>$this->input->post("inputNotificationPhone"),
+                    "Contact_Type"  =>"",
+
+                    "Mailing_Street"=>$this->input->post("inputNotificationAddress"),
+                    "Mailing_City"  =>$this->input->post("inputNotificationCity"),
+                    "Mailing_State" =>$this->input->post("inputNotificationState"),
+                    "Mailing_Zip"   =>$this->input->post("inputNotificationZip")
+                ]
+            );
+
+            if($aResponse['type']=='error'){
                 if(count($arError)>0) $arError[0] .= ", contacts failed.";
                 else $arError[] = "User created successfully, contacts failed.";
             }

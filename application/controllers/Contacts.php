@@ -109,44 +109,44 @@ class Contacts extends CI_Controller
 //var_dump($oAccountRow);
 //die;
         
-        $oApi = $this->ZoHo_Account->getInstance("Contacts",null);
+$aResponse = $this->ZoHo_Account->newZohoContact(
+    $sAccountName,
+    [
+        "First_Name"    =>$this->input->post("inputContactFirstName"),
+        "Last_Name"     =>$this->input->post("inputContactLastName"),
 
-        $oApi->setFieldValue("Account_Name", $sAccountName);
-        $oApi->setFieldValue("First_Name",$this->input->post("inputContactFirstName"));
-        $oApi->setFieldValue("Last_Name",$this->input->post("inputContactLastName"));
-        
-        $oApi->setFieldValue("Email",$this->input->post("inputContactEmail"));
-        $oApi->setFieldValue("Phone",$this->input->post("inputContactPhone"));
-        $oApi->setFieldValue("Contact_Type",$this->input->post("inputContactType"));
+        "Email"         =>$this->input->post("inputContactEmail"),
+        "Phone"         =>$this->input->post("inputContactPhone"),
+        "Contact_Type"  =>$this->input->post("inputContactType"),
 
-        $oApi->setFieldValue("Mailing_Street",$this->input->post("inputContactStreet"));
-        $oApi->setFieldValue("Mailing_City",$this->input->post("inputContactCity"));
-        $oApi->setFieldValue("Mailing_State",$this->input->post("inputContactState"));
-        $oApi->setFieldValue("Mailing_Zip",$this->input->post("inputContactZipcode"));
-        
-        try {
-            $oApi->create();
+        "Mailing_Street"=>$this->input->post("inputContactStreet"),
+        "Mailing_City"  =>$this->input->post("inputContactCity"),
+        "Mailing_State" =>$this->input->post("inputContactState"),
+        "Mailing_Zip"   =>$this->input->post("inputContactZipcode")
+    ]
+);
 
-            $this->load->model("Tempmeta_model");
+if($aResponse['type']=='error'){
+    $arError[] = $aResponse['results'];
+} else {
+    $this->load->model("Tempmeta_model");
 
-            $data = [
-                        "first_name"    =>  $this->input->post("inputContactFirstName"),
-                        "last_name"    =>  $this->input->post("inputContactLastName"),
+    $data = [
+                "first_name"    =>  $this->input->post("inputContactFirstName"),
+                "last_name"    =>  $this->input->post("inputContactLastName"),
 
-                        "email"    =>  $this->input->post("inputContactEmail"),
-                        "phone"    =>  $this->input->post("inputContactPhone"),
-                        "title"    =>  $this->input->post("inputContactType"),
+                "email"    =>  $this->input->post("inputContactEmail"),
+                "phone"    =>  $this->input->post("inputContactPhone"),
+                "title"    =>  $this->input->post("inputContactType"),
 
-                        "mailing_street"    =>  $this->input->post("inputContactStreet"),
-                        "mailing_city"    =>  $this->input->post("inputContactCity"),
-                        "mailing_state"    =>  $this->input->post("inputContactState"),
-                        "mailing_zip"    =>  $this->input->post("inputContactZipcode"),
-            ];
+                "mailing_street"    =>  $this->input->post("inputContactStreet"),
+                "mailing_city"    =>  $this->input->post("inputContactCity"),
+                "mailing_state"    =>  $this->input->post("inputContactState"),
+                "mailing_zip"    =>  $this->input->post("inputContactZipcode"),
+    ];
 
-            $this->Tempmeta_model->appendRow($iLoginId,"Contacts",$data);
-        } catch(Exception $e){
-            $arError[] = "Add contact failed: " . $e->getMessage();
-        }
+    $this->Tempmeta_model->appendRow($iLoginId,"Contacts",$data);
+}
 
         if(count($arError))
         {

@@ -549,4 +549,39 @@ class ZoHo_Account extends CI_Model
             }
         }
     }
+
+    /**
+     * 
+     * @param Array $aData Associative array of keys: First_Name,Last_Name,Email,Phone,Contact_Type,Mailing_Street,Mailing_City,Mailing_State,Mailing_Zip
+     */
+    public function newZohoContact($sForAccountName,$aData)
+    {
+        $arError = ['type'=>'ok','results'=>"Added successfully"];
+
+        extract($aData);
+
+        $oApi = $this->getInstance("Contacts",null);
+            
+        $oApi->setFieldValue("Account_Name", $sForAccountName);
+        
+        $oApi->setFieldValue("First_Name",$First_Name);
+        $oApi->setFieldValue("Last_Name",$Last_Name);
+
+        $oApi->setFieldValue("Email",$Email);
+        $oApi->setFieldValue("Phone",$Phone);
+        $oApi->setFieldValue("Contact_Type",$Contact_Type);
+
+        $oApi->setFieldValue("Mailing_Street",$Mailing_Street);
+        $oApi->setFieldValue("Mailing_City",$Mailing_City);
+        $oApi->setFieldValue("Mailing_State",$Mailing_State);
+        $oApi->setFieldValue("Mailing_Zip",$Mailing_Zip);
+        
+        try {
+            $oApi->create();
+        } catch(Exception $e){
+            $arError = ['type'=>'error','results'=>"Server failed to add contact."];
+        }
+
+        return $arError;
+    }
 }
