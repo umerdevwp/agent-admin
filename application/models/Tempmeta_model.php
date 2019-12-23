@@ -181,4 +181,27 @@ HC;
 
     }
 
+    public function deduceRow($iId,$sSlug,$aData)
+    {
+        $aResult = $this->getOne($iId,$sSlug);
+
+        $aTempData = $aNewData = [];
+
+        if($aResult['type']=='ok')
+        {
+            $aTempData = json_decode($aResult['results']->json);
+            foreach($aTempData as $k=>$v)
+            {
+                if($v==$aData)
+                {
+                    continue;
+                }
+                $aNewData[] = $v;
+            }
+
+        }
+
+        $this->update($iId,$sSlug,json_encode($aNewData));
+
+    }
 }

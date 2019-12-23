@@ -65,7 +65,7 @@ $route['attachments'] = 'attachments/index';
 
 // actions
 $route['zoho'] = 'tasks/getZohoCode';
-$route['task/update/(:num)'] = 'tasks/completeTask/$1';
+$route['task/update/(:num)'] = 'tasks/completeTaskInZoho/$1';
 $route['ajax/theme/save']['post'] = 'user/saveThemeAjax/$1';
 $route['ajax/theme/(:any)']['get'] = 'user/getThemeAjax/$1';
 $route['ajax/contact/save']['post'] = 'contacts/addAjax';
