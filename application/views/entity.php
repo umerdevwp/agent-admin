@@ -77,7 +77,7 @@
             <address>
             <div class="row">  
             <div class="col-md-6">
-              <div class="border-section"><strong><?php echo $AgentAddress['file_as']; ?></strong></div>
+              <div class="border-section"><strong><?php echo $AgentAddress['registered_agent_name']; ?></strong></div>
             </div>
             <!-- <div class="col-md-6"><?php //echo $AgentAddress['address']; ?></div>
             <?php //echo $AgentAddress['address2']; ?><br> -->
@@ -167,8 +167,8 @@
             ?>
           <li class="list-sortable-item-primary">
             <div class="custom-control custom-checkbox custom-check custom-checkbox-primary ">
-              <input class="custom-control-input taskListInput" type="checkbox" id="taskCheck<?php echo $i; ?>"  data-toggle="modal" data-target="#sure" onclick="setTaskId('<?=$tasks[$i]->id;?>')" <?=($tasks[$i]->status=="Completed"||in_array($tasks[$i]->id,$tasks_completed)?"checked":"");?> />
-                <label class="custom-control-label" for="taskCheck<?php echo $i; ?>"><?php echo date_format(date_create($tasks[$i]->due_date), "m/d/Y"); ?> - <?php echo $tasks[$i]->subject; ?></label>
+              <input class="custom-control-input taskListInput" type="checkbox" id="taskCheckbox<?=$tasks[$i]->id;?>"  data-toggle="modal" data-target="#sure" onclick="setTaskId('<?=$tasks[$i]->id;?>')" <?=($tasks[$i]->status=="Completed"||in_array($tasks[$i]->id,$tasks_completed)?"checked":"");?> />
+                <label class="custom-control-label" for="taskCheckbox<?=$tasks[$i]->id;?>"><?php echo date_format(date_create($tasks[$i]->due_date), "m/d/Y"); ?> - <?php echo $tasks[$i]->subject; ?></label>
             </div>
           </li>
           <?php }
@@ -394,19 +394,20 @@
           </div>
           <div id="validateAddress" class="validaddress">
            <span>Sorry we are unable to validate contact address.</span>
-            <div class="custom-control custom-switch custom-switch-sm">
+           Are you sure, you want to add this address? <input type="checkbox" data-toggle="toggle" data-style="ios" name="acceptInvalidAddress" value="1">
+            <!-- <div class="custom-control custom-switch custom-switch-sm">
             <input class="custom-control-input" type="checkbox" id="customSwitch21" name="acceptInvalidAddress" value="1"/>
             <label class="custom-control-label" for="customSwitch21"> Are you sure, you want to add this address?</label>
             
-            </div>
+            </div> -->
            <!--<input type="checkbox" name="acceptInvalidAddress" value="1" >  Are you sure, you want to add this address?-->
           </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-success save" id="saveClose" >Save/Close</button>
-        <button type="button" class="btn btn-primary save" id="saveClose" >Save/Add New</button>
+        <button type="button" class="btn btn-success save" id="saveClose" >Save &amp; Close</button>
+        <button type="button" class="btn btn-primary addnew" id="saveAddNew" >Save &amp; Add New</button>
         
       </div>
     </div>
@@ -421,6 +422,7 @@
 </div>
 
 <script src="components/base/jquery-3.4.1.min.js"></script>
+<script src="components/bootstrapswitch/bootstrap-toggle.min.js"></script>
 <script>
 
 var iTaskId = 0;
@@ -430,8 +432,13 @@ function setTaskId(id)
 }
 function updateTask()
 {
+  var iStatus = 1;
   if(iTaskId>0){
-    document.location = 'task/update/'+iTaskId+'?eid=<?=$iEntityId;?>';
+    if(!$("#taskCheckbox"+iTaskId).is(":checked"))
+    {
+      iStatus = 0;
+    }
+    document.location = 'task/update/'+iTaskId+'?eid=<?=$iEntityId;?>&status='+iStatus;
   }
 }
 function uncheckTaskId()
@@ -471,7 +478,6 @@ setTimeout(() => {
           } 
           if(returnedData.results.length == 0){
             $('#validateAddress').show();
-            $('#addMultiple').modal('hide');
             //$('.modal-backdrop').hide();
             //$('#successEditMessageBox').show().delay(10000).fadeOut();
             //console.log("Sorry we are unable to validate contact address.");
@@ -486,15 +492,20 @@ setTimeout(() => {
           $('#formContactMultiple')[0].reset();
           $('#validateAddress').hide();
           $('#successMessageBox').show().delay(10000).fadeOut();
-          $('#addMultiple').modal('hide');
+          if($(ev.target).attr("id")=='saveClose'){
+            $('#addMultiple').modal('hide');
+          } else{
+            // Do nothing
+          }
+          //$('#addMultiple').modal('hide');
           
-            var row = '<tr><td>';
-            for(field in returnedData.results)
-            {
-               row += $(field).val() + "</td><td>";
-            }
-            row += "</td></tr>";
-            $('#contactTableTbody').append(row);
+            // var row = '<tr><td>';
+            // for(field in returnedData.results)
+            // {
+            //    row += $(field).val() + "</td><td>";
+            // }
+            // row += "</td></tr>";
+            // $('#contactTableTbody').append(row);
           //console.log("Close modal or reset for new entries");
         } else {
           console.log("Server not responding, please try again later");
