@@ -164,20 +164,34 @@ HC;
 
     }
 
-    public function appendRow($iId,$sSlug,$aData)
+    public function appendRow($iId,$sSlug,$aData,$sRowKey="id")
     {
         $aResult = $this->getOne($iId,$sSlug);
 
-        $aTempData = [];
+        $aTempData = $aNewData = [];
 
         if($aResult['type']=='ok')
         {
             $aTempData = json_decode($aResult['results']->json);
-        }
 
-        $aTempData[] = $aData;
+            if(count($aTempData)){
+                foreach($aTempData as $k=>$v)
+                {
+                    $aRow = (array)$v;
+                    // replace the complete row if exists
+                    if($aRow[$sRowKey]==$aData[$sRowKey])
+                    {
+                        $aNewData[] = $aData;
+                    } else { // add the row in the list
+                        $aNewData[] = $v;
+                    }
+                }
+            } else { // add the row when list was blank
+                $aNewData[] = $aData;
+            }
+        }
         
-        $this->update($iId,$sSlug,json_encode($aTempData));
+        $this->update($iId,$sSlug,json_encode($aNewData));
 
     }
 

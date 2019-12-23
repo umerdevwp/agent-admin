@@ -75,10 +75,9 @@ class Tasks extends CI_Controller
                 //$this->Tempmeta_model->update($this->session->user["zohoId"],$sTempSlug,json_encode($this->session->temp[$sTempSlug]));
                 if($iEntityId>0)
                 {
-                    if($iStatus)
-                        $this->Tempmeta_model->appendRow($iEntityId,$this->Tempmeta_model->slugTasksComplete,$id);
-                    else
-                        $this->Tempmeta_model->deduceRow($iEntityId,$this->Tempmeta_model->slugTasksComplete,$id);
+                    $aData = ['id'=>$id,'status'=>$iStatus];
+                    $this->Tempmeta_model->appendRow($iEntityId,$this->Tempmeta_model->slugTasksComplete,$aData);
+
                 } 
 
                 redirect($_SERVER["HTTP_REFERER"]);
