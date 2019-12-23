@@ -130,15 +130,13 @@ class Entity extends CI_Controller {
         $this->form_validation->set_rules('inputBusinessPurpose', 'Business purpose', 'required');
 
         // allow without file, else check type and size
-        if($_FILES["inputFiling"]["name"]!="" || $this->input->post("inputComplianceOnly")){
+        if($_FILES["inputFiling"]["name"]!=""){
             $this->form_validation->set_rules('inputFiling', 'Filing Attachment', 
                 array(
-                    'required',
                     array('validate_extention',function(){return validateFileExt($_FILES['inputFiling']['tmp_name'],['application/pdf']);}),
                     array('validate_size',function(){return validateFileSize($_FILES['inputFiling']['tmp_name'],10*1000*1000);}),
                 ),
                 array(
-                    'required'=>'This field is required',
                     'validate_extention'=>'Only MIME .pdf files are allowed',
                     'validate_size'=>'Input file: ' . getFileSize(filesize($_FILES['inputFiling']['tmp_name'])) . ' exceeding limit of 10MB.'
                 )
