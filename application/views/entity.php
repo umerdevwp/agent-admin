@@ -162,16 +162,22 @@
         <ul class="list-sortable sortable sortable-current" data-connect-group=".sortable-completed">
           <?php for($i = 0; $i < count($tasks); $i++)
                 { 
-                  if(!in_array($tasks[$i]->id,$this->session->temp["tasks_complete"]))
+                  $bInCompletedTasks = false;
+                  foreach($tasks_completed as $v)
                   {
+                    if($v->status)
+                    {
+                      $bInCompletedTasks = true;
+                    }
+                  }
             ?>
           <li class="list-sortable-item-primary">
             <div class="custom-control custom-checkbox custom-check custom-checkbox-primary ">
-              <input class="custom-control-input taskListInput" type="checkbox" id="taskCheckbox<?=$tasks[$i]->id;?>"  data-toggle="modal" data-target="#sure" onclick="setTaskId('<?=$tasks[$i]->id;?>')" <?=($tasks[$i]->status=="Completed"||in_array($tasks[$i]->id,$tasks_completed)?"checked":"");?> />
+              <input class="custom-control-input taskListInput" type="checkbox" id="taskCheckbox<?=$tasks[$i]->id;?>"  data-toggle="modal" data-target="#sure" onclick="setTaskId('<?=$tasks[$i]->id;?>')" <?=($tasks[$i]->status=="Completed"||$bInCompletedTasks?"checked":"");?> />
                 <label class="custom-control-label" for="taskCheckbox<?=$tasks[$i]->id;?>"><?php echo date_format(date_create($tasks[$i]->due_date), "m/d/Y"); ?> - <?php echo $tasks[$i]->subject; ?></label>
             </div>
           </li>
-          <?php }
+          <?php
               } ?>
         </ul>
         
@@ -415,10 +421,10 @@
 </div>
 </section>
 <div class="successMessage" id="successMessageBox">
-  <div class="smessage">Your information is successfully save!.</div>
+  <div class="smessage">Contact have been saved successfully!.</div>
 </div>
 <div class="editMessage" id="successEditMessageBox">
-  <div class="semessage">Contact edit successfully update.</div>
+  <div class="semessage">Contact have been update successfully!.</div>
 </div>
 
 <script src="components/base/jquery-3.4.1.min.js"></script>

@@ -145,7 +145,7 @@ if($aResponse['type']=='error'){
                 "mailing_zip"    =>  $this->input->post("inputContactZipcode"),
     ];
 
-    $this->Tempmeta_model->appendRow($iLoginId,"Contacts",$data);
+    $this->Tempmeta_model->appendRow($iLoginId,"Contacts",$data,"email");
 }
 
         if(count($arError))
