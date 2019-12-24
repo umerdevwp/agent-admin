@@ -37,7 +37,7 @@ class Entity extends CI_Controller {
         $oAgetAddress = $this->Accounts_model->getAgentAddress($id);
         
         if(is_object($oAgetAddress)){
-            $data['AgentAddress']['registered_agent_name'] = $oAgetAddress->registered_agent_name;
+            $data['AgentAddress']['file_as'] = $oAgetAddress->file_as;
             $data['AgentAddress']['address'] = $oAgetAddress->address;
             $data['AgentAddress']['address2'] = $oAgetAddress->address2;
             $data['AgentAddress']['city'] = $oAgetAddress->city;

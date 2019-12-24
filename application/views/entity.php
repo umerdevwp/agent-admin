@@ -77,26 +77,26 @@
             <address>
             <div class="row">  
             <div class="col-md-6">
-              <div class="border-section"><strong><?php echo $AgentAddress['registered_agent_name']; ?></strong></div>
+              <div class="border-section"><strong><?php echo $AgentAddress['file_as']; ?></strong></div>
             </div>
             <!-- <div class="col-md-6"><?php //echo $AgentAddress['address']; ?></div>
             <?php //echo $AgentAddress['address2']; ?><br> -->
             <div class="col-md-2">
-              <div class="border-section"><?php echo $AgentAddress['city']; ?></div>
+              <div class="border-section"><?php echo $AgentAddress['address']; ?></div>
             </div>
             <div class="col-md-2">
-              <div class="border-section"><?php echo $AgentAddress['state']; ?></div> 
+              <div class="border-section"><?php echo $AgentAddress['address2']; ?></div> 
             </div>  
             <div class="col-md-2">
-              <div class="border-section"><?php echo $AgentAddress['zip_code']; ?></div>
+              <div class="border-section"><?php echo $AgentAddress['city']; ?></div>
             </div>  
             </div>
             <div class="row">
             <div class="col-md-3">
-              <div class="border-section"><?php echo $AgentNumber['phone_number']; ?></div>
+              <div class="border-section"><?php echo $AgentAddress['state']; ?></div>
             </div>
             <div class="col-md-3">
-              <div class="border-section"><?php echo $AgentEmail['email']; ?></div>
+              <div class="border-section"><?php echo $AgentAddress['zip_code']; ?></div>
             </div>
             </div>
             </address>
