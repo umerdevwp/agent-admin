@@ -45,7 +45,7 @@ class Contacts extends CI_Controller
         $this->form_validation->set_rules('entityId', 'Entity', 'required|numeric');
         $this->form_validation->set_rules('inputContactFirstName', 'First Name', 'required|regex_match[/[a-zA-Z\s]+/]',["regex_match"=>"Only alphabets and spaces allowed."]);
         $this->form_validation->set_rules('inputContactLastName', 'Last Name', 'required|regex_match[/[a-zA-Z\s]+/]',["regex_match"=>"Only alphabets and spaces allowed."]);
-        $this->form_validation->set_rules('inputContactEmail', 'Contact Email', 'required|valid_email');
+        $this->form_validation->set_rules('inputContactEmail', 'Contact Email', ['required','valid_email']);//,'callback_checkEmailExist']);
         $this->form_validation->set_rules('inputContactPhone', 'Contact Phone', 'required|regex_match[/[\+\s\-0-9]+/]');
         
         $this->form_validation->set_rules('inputContactType', 'Contact Type', 'required');
@@ -91,6 +91,28 @@ class Contacts extends CI_Controller
             echo json_encode($aResponse);
             
         }
+    }
+
+    private function checkEmailExist($strEmail)
+    {
+        $bExist = true;
+        $this->load->model("contacts_model");
+        $this->load->model("Tempmeta_model");
+
+        $aData = ['email'=>$strEmail,'entity_name'=>$this->input->post('entityId')];
+
+        $oContactRow = $this->Contacts_model->checkRowExist($aData);
+        if($oContactRow['type']=='ok')
+        {
+            $this->form_validation->set_message('checkEmailExist', 'The {field} already exist');
+            $bExist = false;
+        }
+        
+        $aData = ['json_email'=>$strEmail,'id'=>$this->input->post('entityId')];
+        $oTempmetaRow = $this->Tempmeta_model->checkRowExist($aData);
+
+
+        return $bExist;
     }
 
     private function addZoho()

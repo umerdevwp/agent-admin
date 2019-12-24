@@ -99,6 +99,7 @@ class Entity extends CI_Controller {
     {
         if(!isSessionValid("Entity_Add")) redirectSession();
 
+        $arError = [];
         $this->load->helper("custom");
         $this->load->library('form_validation');
 
@@ -129,6 +130,35 @@ class Entity extends CI_Controller {
         $this->form_validation->set_rules('inputNotificationZip', 'Shipping Code', 'required');
         $this->form_validation->set_rules('inputBusinessPurpose', 'Business purpose', 'required');
 
+        $this->load->model("Smartystreets_model");
+        
+        $oSmartyStreetResponse = $this->Smartystreets_model->find(
+            $this->input->post("inputNotificationAddress"),
+            $this->input->post("inputNotificationCity"),
+            $this->input->post("inputNotificationState"),
+            $this->input->post("inputBusinessPurpose")
+        );
+
+        // check wether invalid address entered the 1st time
+        if($oSmartyStreetResponse['type']=='error' && !$this->session->invalid_address_count)
+        {
+            $arError[] = "Unable to validate your address, please recheck and confirm ...";
+            $this->session->invalid_address_count = 1;
+
+        // qualify address if invalid address entered 2nd time
+        } else if($oSmartyStreetResponse['type']=='error' && $this->session->invalid_address_count==1){
+            $this->session->invalid_address_count = 0;
+
+        // replace user address with validated smartystreet address
+        } else {
+            $_POST['inputNotificationAddress'] = $oSmartyStreetResponse['results'][0]->getDeliveryLine1();
+            $_POST['inputNotificationCity'] = $oSmartyStreetResponse['results'][0]->getComponents()->getCityName();
+            $_POST['inputNotificationState'] = $oSmartyStreetResponse['results'][0]->getComponents()->getStateAbbreviation();
+            $_POST['inputNotificationZip'] = $oSmartyStreetResponse['results'][0]->getComponents()->getZIPCode();
+            $this->session->invalid_address_count = 0;
+        }
+        //var_dump($this->session->invalid_address_count);die;
+
         // allow without file, else check type and size
         if($_FILES["inputFiling"]["name"]!=""){
             $this->form_validation->set_rules('inputFiling', 'Filing Attachment', 
@@ -145,10 +175,15 @@ class Entity extends CI_Controller {
 
         $response = array();
 
-        if($this->form_validation->run() == FALSE)
+        if($this->form_validation->run() == FALSE || count($arError)>0)
         {
-            $this->form();
+            if(count($arError)>0)
+            {
+                $this->session->set_flashdata("error",$arError[0]);
+            }
 
+            $this->form();
+            
             return false;
 
         } else {
@@ -180,39 +215,7 @@ class Entity extends CI_Controller {
         $this->load->model("RegisterAgent_model");
         
         $oApi = $this->ZoHo_Account->getInstance()->getRecordInstance("Accounts",null);
-        /* //testing contacts for new entity
         
-        $oApi = $this->ZoHo_Account->getInstance("Accounts");
-        $oApiData = $oApi->searchRecordsByCriteria("id:equals:4071993000001672002", 1, 1);
-        
-        $oApiSingleRecord = $oApiData->getData()[0];
-        //$oContacts = $oApi->getRelatedListRecords("Contacts");
-        
-        //$oSingleContact = $oContacts->getData()[0];
-        //echo $oSingleContact->getModuleApiName();
-        
-        $oNewContact = $this->ZoHo_Account->getInstance("Contacts");
-        echo "<pre>";getClassMethods($oNewContact);print_r($oNewContact);die;
-            //$oContacts->setData($oNewContact);
-            //$oNewContact->setOwner($oApi->getData()[0]);
-            $oApi->setFieldValue("Account_Name", $oApiData->getData()[0]);
-            $oNewContact->setFieldValue("First_Name","Najm");
-            $oNewContact->setFieldValue("Last_Name","A2");
-        try{
-            $obj = $oNewContact->create();
-            echo "Done";
-        } catch(Exception $e){
-            echo "<Pre>";
-            print_r($e);
-        }
-        die;
-        
-        
-        echo "<pre>";
-        getClassMethods($oApiSingleRecord);
-        print_r($oApiSingleRecord);
-        
-        die;*/
         $oApi->setFieldValue("Account_Name", $this->input->post("inputName")); // This function use to set FieldApiName and value similar to all other FieldApis and Custom field
         $oApi->setFieldValue("Filing_State", $this->input->post("inputFillingState")); // Account Name can be given for a new account, account_id is not mandatory in that case
         $oApi->setFieldValue("Entity_Type", $this->input->post("inputFillingStructure")); // Account Name can be given for a new account, account_id is not mandatory in that case
