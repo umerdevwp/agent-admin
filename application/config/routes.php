@@ -58,6 +58,7 @@ $route['confirm'] = 'tasks/getAccessToken';
 // views
 $route['portal/attachments/(:num)/(:num)'] = 'portal/attachments/$1/$2';
 $route['entity/form/(:num)'] = 'entity/form/$1';
+$route['entity/add']['post'] = 'entity/add';
 $route['entity/(:num)'] = 'entity/index/$1';
 $route['contacts'] = 'contacts/index';
 $route['attachments'] = 'attachments/index';
