@@ -81,7 +81,7 @@ class Tempmeta_model extends CI_Model
         if ($result) {
             return ['results'=>$result,'type'=>'ok'];
         } else {
-            return ['results'=>'No record available','type'=>'error'];
+            return ['results'=>$result,'type'=>'error'];
         }
 
         return $result;
@@ -98,6 +98,7 @@ class Tempmeta_model extends CI_Model
         ];
         // check 
         $row = $this->getOne($iUserid,$sSlugname);
+        //var_dump($row);
         if($row['type']=='ok')
         {
             $result = $this->db->update($this->table, $aData,$aWhere);
@@ -168,9 +169,9 @@ HC;
     {
         $aResult = $this->getOne($iId,$sSlug);
 
-        $aTempData = $aNewData = [];
+        $aTempData = $aNewData = array();
 
-        if($aResult['type']=='ok')
+        if($aResult['type']=='ok' && !is_null($aResult['results']))
         {
             $aTempData = json_decode($aResult['results']->json);
 
@@ -189,10 +190,12 @@ HC;
             } else { // add the row when list was blank
                 $aNewData[] = $aData;
             }
+        } else { // add the row when no record in table
+            $aNewData[] = $aData;
         }
         
         $this->update($iId,$sSlug,json_encode($aNewData));
-
+        
     }
 
     public function deduceRow($iId,$sSlug,$aData)
@@ -218,4 +221,43 @@ HC;
         $this->update($iId,$sSlug,json_encode($aNewData));
 
     }
+
+    public function checkRowExist($aData)
+    {
+        $aNewData = [];
+
+        $strWhere = " WHERE 1=1";
+        foreach($aData as $k=>$v)
+        {
+            $iJsonPos = strpos($k,"json_");
+            
+            if($iJsonPos!==false)
+            {
+                //$strWhere .= ' AND json_data->\'$.'.substr($k,5).'\'=\''.$v.'\'';
+                $strWhere .= ' AND !ISNULL(JSON_SEARCH(json, "one", "'.$v.'"))';
+            } else {
+                
+                $strWhere .= " AND $k='".$v."'";
+                
+            }
+        }
+
+        $sQuery = "SELECT id FROM " . $this->table . $strWhere;
+
+        $oQuery = $this->db->query($sQuery);
+        $row = $oQuery->row();
+        //echo $this->db->last_query();
+        //var_dump($row);die;
+        $bResult = false;
+
+        if($row)
+        {
+            $bResult = true;
+        }
+
+        return $bResult;
+
+    }
+
+
 }

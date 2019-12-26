@@ -45,7 +45,8 @@ class Contacts extends CI_Controller
         $this->form_validation->set_rules('entityId', 'Entity', 'required|numeric');
         $this->form_validation->set_rules('inputContactFirstName', 'First Name', 'required|regex_match[/[a-zA-Z\s]+/]',["regex_match"=>"Only alphabets and spaces allowed."]);
         $this->form_validation->set_rules('inputContactLastName', 'Last Name', 'required|regex_match[/[a-zA-Z\s]+/]',["regex_match"=>"Only alphabets and spaces allowed."]);
-        $this->form_validation->set_rules('inputContactEmail', 'Contact Email', ['required','valid_email']);//,'callback_checkEmailExist']);
+
+        $this->form_validation->set_rules('inputContactEmail', 'Contact Email', ['required','valid_email','callback_checkEmailExist']);
         $this->form_validation->set_rules('inputContactPhone', 'Contact Phone', 'required|regex_match[/[\+\s\-0-9]+/]');
         
         $this->form_validation->set_rules('inputContactType', 'Contact Type', 'required');
@@ -93,26 +94,36 @@ class Contacts extends CI_Controller
         }
     }
 
-    private function checkEmailExist($strEmail)
+    public function checkEmailExist($strEmail)
     {
-        $bExist = true;
-        $this->load->model("contacts_model");
+        
+        $bDontExist = true;
+        $this->load->model("Contacts_model");
         $this->load->model("Tempmeta_model");
 
         $aData = ['email'=>$strEmail,'entity_name'=>$this->input->post('entityId')];
 
-        $oContactRow = $this->Contacts_model->checkRowExist($aData);
-        if($oContactRow['type']=='ok')
+        $bContactRow = $this->Contacts_model->checkRowExist($aData);
+        // check in zoho contacts list
+        if($bContactRow)
         {
             $this->form_validation->set_message('checkEmailExist', 'The {field} already exist');
-            $bExist = false;
+            $bDontExist = false;
         }
-        
-        $aData = ['json_email'=>$strEmail,'id'=>$this->input->post('entityId')];
-        $oTempmetaRow = $this->Tempmeta_model->checkRowExist($aData);
+        //var_dump($bDontExist);
+        // if not in zoho then check in temp table
+        if($bDontExist){
+            $aData = ['json_email'=>$strEmail,'userid'=>$this->input->post('entityId')];
+            $bTempmetaRow = $this->Tempmeta_model->checkRowExist($aData);
+            
+            if($bTempmetaRow)
+            {
+                $this->form_validation->set_message('checkEmailExist', 'The {field} already exist');
+                $bDontExist = false;
+            }
+        }
 
-
-        return $bExist;
+        return $bDontExist;
     }
 
     private function addZoho()

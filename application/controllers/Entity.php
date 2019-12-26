@@ -48,9 +48,16 @@ class Entity extends CI_Controller {
         }
         
         $data['tasks'] = $this->Tasks_model->getAll($id);
+        //var_dump($data['tasks']);
+        $aTasksCompleted = $this->Tempmeta_model->getOne($id,$this->Tempmeta_model->slugTasksComplete);
+        if(!is_null($aTasksCompleted['results']))
+            $data['tasks_completed'] = json_decode($aTasksCompleted['results']->json);
+        else 
+            $data['tasks_completed'] = [];
         
-        $data['tasks_completed'] = json_decode($this->Tempmeta_model->getOne($id,$this->Tempmeta_model->slugTasksComplete)['results']->json);
-        
+            //var_dump($data['tasks']);
+            //var_dump($data['tasks_completed']);
+            //die;
         $data['contacts'] = $this->Contacts_model->getAllFromEntityId($id);
         
         $aTempRows = $this->Tempmeta_model->getAll($id,$this->model->slugNewContact,false);
