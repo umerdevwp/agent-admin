@@ -55,9 +55,9 @@ class Entity extends CI_Controller {
         else 
             $data['tasks_completed'] = [];
         
-            //var_dump($data['tasks']);
-            //var_dump($data['tasks_completed']);
-            //die;
+        //var_dump($data['tasks']);
+        //var_dump($data['tasks_completed']);
+        //die;
         $data['contacts'] = $this->Contacts_model->getAllFromEntityId($id);
         
         $aTempRows = $this->Tempmeta_model->getAll($id,$this->model->slugNewContact,false);
@@ -66,8 +66,8 @@ class Entity extends CI_Controller {
         {
             $data['contacts'] = array_merge($data['contacts'],json_decode($aTempRows['results'][0]->json));
         }
-//var_dump($data['contacts']);
-//die;
+        //var_dump($data['contacts']);
+        //die;
 		$data['attachments'] = $this->Attachments_model->getAllFromEntityId($id);
 		
         // use login entity id
@@ -87,8 +87,7 @@ class Entity extends CI_Controller {
     public function form($id=0)
     {
         if(!isSessionValid("Entity_Add")) redirectSession();
-        // test tags with compliance only
-        
+
         $this->load->library('form_validation');
         $this->load->model("Accounts_model");
 
@@ -105,7 +104,7 @@ class Entity extends CI_Controller {
     public function add()
     {
         if(!isSessionValid("Entity_Add")) redirectSession();
-
+        $bTagSmartyValidated = true;
         $arError = [];
         $this->load->helper("custom");
         $this->load->library('form_validation');
@@ -155,6 +154,7 @@ class Entity extends CI_Controller {
         // qualify address if invalid address entered 2nd time
         } else if($oSmartyStreetResponse['type']=='error' && $this->session->invalid_address_count==1){
             $this->session->invalid_address_count = 0;
+            $bTagSmartyValidated = false;
 
         // replace user address with validated smartystreet address
         } else {
@@ -195,7 +195,7 @@ class Entity extends CI_Controller {
 
         } else {
 
-            $response = $this->zohoCreateEntity($this->session->user['zohoId']);
+            $response = $this->zohoCreateEntity($this->session->user['zohoId'],$bTagSmartyValidated);
             // succcess redirect to dashboard
             if(isset($response["ok"]))
             {
@@ -213,7 +213,7 @@ class Entity extends CI_Controller {
         }
     }
 
-    private function zohoCreateEntity($iParentZohoId)
+    private function zohoCreateEntity($iParentZohoId,$bTagSmartyValidated)
     {
         $arError = array();
         $iErrorType = 1;// 1 means user creation failed, 2 means only attachment failed
@@ -352,6 +352,11 @@ class Entity extends CI_Controller {
                 if($sComplianceOnly)
                 {
                     $aTags["ComplianceOnly"] = "Compliance Only";
+                }
+
+                if(!$bTagSmartyValidated)
+                {
+                    $aTags["InvalidatedAddress"] = "Invalidated Address";
                 }
     
                 $oResponseTags = $oApi->addTags($aTags);
