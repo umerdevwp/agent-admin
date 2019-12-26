@@ -41,4 +41,20 @@ class Contacts_model extends CI_Model
 
         return $result;
     }
+
+    public function checkRowExist($aData)
+    {
+        $query = $this->db->select("id")->get_where($this->table,$aData);
+
+        $row = $query->row();
+        
+        $bResult = false;
+
+        if($row)
+        {
+            $bResult = true;
+        }
+
+        return $bResult;
+    }
 }
