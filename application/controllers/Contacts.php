@@ -35,7 +35,7 @@ class Contacts extends CI_Controller
 
     public function addAjax()
     {
-        //if(!isSessionValid("Contacts_Add")) redirectSession();
+        if(!isSessionValid("Contacts_Add")) redirectSession();
 
         $aResponse = [];
         $this->load->model("Smartystreets_model");

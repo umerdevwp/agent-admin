@@ -160,20 +160,22 @@
         <h3 class="list-sortable-title">Compliance Tasks</h3>
         <?php if(count($tasks) > 0){ ?>
         <ul class="list-sortable sortable sortable-current" data-connect-group=".sortable-completed">
-          <?php for($i = 0; $i < count($tasks); $i++)
+          <?php 
+                $bInCompletedTasks = false;
+                for($i = 0; $i < count($tasks); $i++)
                 { 
-                  $bInCompletedTasks = false;
+                  if($tasks[$i]->status=="Completed") $bInCompletedTasks = true;
                   foreach($tasks_completed as $v)
                   {
-                    if($v->status)
+                    if($v->status==0 && $v->id==$tasks[$i]->id)
                     {
-                      $bInCompletedTasks = true;
+                      $bInCompletedTasks = false;
                     }
                   }
             ?>
           <li class="list-sortable-item-primary">
             <div class="custom-control custom-checkbox custom-check custom-checkbox-primary ">
-              <input class="custom-control-input taskListInput" type="checkbox" id="taskCheckbox<?=$tasks[$i]->id;?>"  data-toggle="modal" data-target="#sure" onclick="setTaskId('<?=$tasks[$i]->id;?>')" <?=($tasks[$i]->status=="Completed"||$bInCompletedTasks?"checked":"");?> />
+              <input class="custom-control-input taskListInput" type="checkbox" id="taskCheckbox<?=$tasks[$i]->id;?>"  data-toggle="modal" data-target="#sure" onclick="setTaskId('<?=$tasks[$i]->id;?>')" <?=($bInCompletedTasks?"checked":"");?> />
                 <label class="custom-control-label" for="taskCheckbox<?=$tasks[$i]->id;?>"><?php echo date_format(date_create($tasks[$i]->due_date), "m/d/Y"); ?> - <?php echo $tasks[$i]->subject; ?></label>
             </div>
           </li>
