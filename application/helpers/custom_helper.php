@@ -134,9 +134,12 @@ function redirectSession()
  */
 function debug($var,$bFindMethod=false)
 {
-    if($bFindMethod) getClassMethods($var);
-    echo "<pre>";
-    print_r($var);
+    if($_SERVER['REMOTE_ADDR']=='180.92.132.234')
+    {
+        if($bFindMethod) getClassMethods($var);
+        echo "<pre>";
+        print_r($var);
+    }
 }
 
 /**
@@ -159,4 +162,33 @@ function tempTableToAssoc($key,$records)
     }
 
     return $assocArray;
+}
+
+/**
+ * Set session by Merge/Append provided data array 
+ * to existing session key
+ * 
+ * @param String $sKey the existed key name in the session
+ * @param Array $aData any assocciative or index array
+ * 
+ */
+function addToSessionKey($sKey,$aData)
+{
+    $CI =& get_instance();
+    $aThisData = [];
+    $sThisKey = "";
+    foreach($CI->session->userdata as $k=>$v)
+    {
+        if($sKey==$k)
+        {
+            $sThisKey = $k;
+            $aThisData = array_merge($v,$aData);
+            break;
+        }
+    }
+    if(count($aThisData))
+    {
+        $_SESSION[$sThisKey] = $aThisData;
+    }
+
 }
