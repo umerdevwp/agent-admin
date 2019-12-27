@@ -28,7 +28,7 @@ class Login extends CI_Controller
         if (valid_email($this->session->user["email"])) {
                 $this->redirectToDashboard();
         }
-
+        
         $this->load->view('login');
     }
 
@@ -59,23 +59,7 @@ class Login extends CI_Controller
 
     private function redirectToDashboard()
     {
-        $this->load->model("Accounts_model");
-        $bParentAccount = $this->Accounts_model->hasEntities($this->session->user["zohoId"]);
-
-        if($this->session->user["child"]>0)
-        {
-            $bParentAccount = true;
-        } else {
-            $bParentAccount = false;
-        }
-
-        if(!isset($this->session->user["child"]))
-        {
-            $bParentAccount = $this->Accounts_model->hasEntities($this->session->user["zohoId"]);
-            $this->session->user = array_merge($this->session->user,['child'=>(int)$bParentAccount,'defaultRedirect'=>'/portal']);
-        }
-        
-        if($bParentAccount)
+        if($this->session->user['child'])
         {
             redirect("/portal");
         } else {
@@ -183,6 +167,7 @@ class Login extends CI_Controller
         
         // user verified with valid email
         if (isset($response->profile) && valid_email($response->profile->email)) {
+
             $this->session->user = array(
                 "oktaId"=>$oktaId,
                 "zohoId"=>$response->profile->organization,
@@ -190,26 +175,57 @@ class Login extends CI_Controller
                 "organization"=>$response->profile->organization,
                 "firstName"=>$response->profile->firstName,
                 "lastName"=>$response->profile->lastName,
-                
-                // permissions
-                "permissions"=> array(
-                                    "Entity",
-                                    "Entity_Add",
-                                    
-                                    "Contacts",
-                                    "Contacts_Add",
-                                    
-                                    "Attachments",
-                                    "Task_Update",
-                                    "Theme_Update",
-                                    "Theme_View",
-                                    
-                                ),
             );
-            
+            // set child bit
+            addToSessionKey("user",['child'=>$this->hasChild()]);
+
+            // add permission based on child
+            addToSessionKey('user',['permissions'=>$this->getPermissions($this->session->user['child'])]);
         } else {
             // log error for back tracking
             log_message("error","OKTA_API: " . json_encode($response));
         }
+    }
+
+    private function getPermissions($bParent=true)
+    {
+        // if entity is parent, permissions are
+        $aPermission = array(
+                            "Entity",
+                            "Entity_Add",
+                            
+                            "Contacts",
+                            "Contacts_Add",
+                            
+                            "Attachments",
+                            "Task_Update",
+                            "Theme_Update",
+                            "Theme_View",
+                        );
+        // if not parent, cut down permissions
+        if(!$bParent)
+        {   
+            // remove permission
+            $aRemovePermission = array(
+                "Entity_Add"
+            );
+
+            foreach($aRemovePermission as $v){
+                $iIndex = array_search($v,$aPermission);
+                unset($aPermission[$iIndex]);
+            }
+        }
+
+        return $aPermission;
+        
+    }
+
+    private function hasChild()
+    {
+        $this->load->model("Accounts_model");
+        
+        $bParentAccount = $this->Accounts_model->hasEntities($this->session->user["zohoId"]);
+
+        return (int)$bParentAccount;
     }
 }

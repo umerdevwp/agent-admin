@@ -15,6 +15,7 @@ class Entity extends CI_Controller {
 	public function index($id="")
 	{
         if(!isSessionValid("Entity")) redirectSession();
+
         if(empty($id)){
             $this->session->set_flashdata("error","Invalid entity id");
             redirectSession();
@@ -48,16 +49,13 @@ class Entity extends CI_Controller {
         }
         
         $data['tasks'] = $this->Tasks_model->getAll($id);
-        //var_dump($data['tasks']);
+
         $aTasksCompleted = $this->Tempmeta_model->getOne($id,$this->Tempmeta_model->slugTasksComplete);
         if(!is_null($aTasksCompleted['results']))
             $data['tasks_completed'] = json_decode($aTasksCompleted['results']->json);
         else 
             $data['tasks_completed'] = [];
         
-        //var_dump($data['tasks']);
-        //var_dump($data['tasks_completed']);
-        //die;
         $data['contacts'] = $this->Contacts_model->getAllFromEntityId($id);
         
         $aTempRows = $this->Tempmeta_model->getAll($id,$this->model->slugNewContact,false);
@@ -66,8 +64,6 @@ class Entity extends CI_Controller {
         {
             $data['contacts'] = array_merge($data['contacts'],json_decode($aTempRows['results'][0]->json));
         }
-        //var_dump($data['contacts']);
-        //die;
 		$data['attachments'] = $this->Attachments_model->getAllFromEntityId($id);
 		
         // use login entity id
@@ -104,6 +100,7 @@ class Entity extends CI_Controller {
     public function add()
     {
         if(!isSessionValid("Entity_Add")) redirectSession();
+
         $bTagSmartyValidated = true;
         $arError = [];
         $this->load->helper("custom");
@@ -200,17 +197,25 @@ class Entity extends CI_Controller {
             if(isset($response["ok"]))
             {
                 $this->session->set_flashdata("ok",$response["ok"]);
-                redirect("portal");
+                $this->redirectAfterAdd();
             // redirect to form, show error
             } else if($response["error_code"]==2){
                 $this->session->set_flashdata("error",$response["error"]);
-                redirect("portal");
+                $this->redirectAfterAdd();
             } else {
                 $this->session->set_flashdata("error",$response["error"]);
                 $this->form();
             }
             
         }
+    }
+
+    private function redirectAfterAdd()
+    {
+        if(!empty($this->input->post('btnSaveClose')))
+            redirect("portal");
+        else
+            redirect("entity/form");
     }
 
     private function zohoCreateEntity($iParentZohoId,$bTagSmartyValidated)
