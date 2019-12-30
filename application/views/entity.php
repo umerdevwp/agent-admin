@@ -8,6 +8,13 @@
   <?=$this->session->flashdata("ok");?>
 </div>
 <?php endif; ?>
+<?php if($this->session->flashdata("info")): ?>
+  <div class="infoparent">
+  <div class="alert alert-info alert-darker infobox" role="alert">
+  <?=$this->session->flashdata("info");?>
+  </div>
+  </div>
+<?php endif; ?>
 <section class="topbar"> 
   <!-- Breadcrumbs-->
   <ul class="breadcrumbs">
@@ -29,7 +36,7 @@
     
   <!-- THIS IS FOR ADDRESS AND BILLING DETAIL BOXES -->
 	<div class="row address-billing">
-    <div class="col-md-12 four-boxes">
+    <div class="col-md-4 four-boxes">
         <div class="panel-header">
           <div class="panel-title"><span class="panel-icon fa-address-card-o"></span><span>Company Info</span></div>
         </div>
@@ -38,25 +45,25 @@
           
           <div class="panel-body">
             <div class="row">
-              <dl class="dl-horizontal col-md-3">
+              <dl class="dl-horizontal col-md-12">
                 <div class="border-section">
                 <dt>State ID</dt>
                 <dd><?php echo $entity->entity_number; ?></dd>
                 </div>
               </dl>
-              <dl class="dl-horizontal col-md-3">
+              <dl class="dl-horizontal col-md-12">
                 <div class="border-section">
                 <dt>Formation Date</dt>
                 <dd><?php echo $entity->formation_date; ?></dd>
                 </div>
               </dl>
-              <dl class="dl-horizontal col-md-3">
+              <dl class="dl-horizontal col-md-12">
                 <div class="border-section">
                 <dt>Expiration Date</dt>
                 <dd><?php echo $entity->expiration_date; ?></dd>
                 </div>
               </dl>
-			        <dl class="dl-horizontal col-md-3">
+			        <dl class="dl-horizontal col-md-12">
                 <div class="border-section">
                 <dt>Tax Id</dt>
                 <dd><?php echo $entity->ein; ?></dd>
@@ -67,7 +74,7 @@
         </div>
     </div>
   
-    <div class="col-md-12 four-boxes">
+    <div class="col-md-4 four-boxes">
         <div class="panel-header">
           <div class="panel-title"><span class="panel-icon fa-map-marker"></span><span> RA Address </span><!--<span class="badge badge-success">Active</span>--> </div>
         </div>
@@ -76,34 +83,32 @@
           <div class="panel-body">
             <address>
             <div class="row">  
-            <div class="col-md-6">
-              <div class="border-section"><strong><?php echo $AgentAddress['file_as']; ?></strong></div>
+            <div class="col-md-12">
+              <div class="border-section" contentEditable=false data-text="Agent File Name" ><span class="fa fa-user fa-fw"></span> <strong><?php echo $AgentAddress['file_as']; ?></strong></div>
             </div>
             <!-- <div class="col-md-6"><?php //echo $AgentAddress['address']; ?></div>
             <?php //echo $AgentAddress['address2']; ?><br> -->
-            <div class="col-md-2">
-              <div class="border-section"><?php echo $AgentAddress['address']; ?></div>
+            <div class="col-md-12">
+              <div class="border-section" contentEditable=false data-text="Agent Address"><span class="fa fa-map-marker fa-fw"></span> <?php echo $AgentAddress['address']; ?></div>
             </div>
-            <div class="col-md-2">
-              <div class="border-section"><?php echo $AgentAddress['address2']; ?></div> 
+            <div class="col-md-12">
+              <div class="border-section" contentEditable=false data-text="Agent Address 2"><span class="addresstwo"></span> <?php echo $AgentAddress['address2']; ?></div> 
             </div>  
-            <div class="col-md-2">
-              <div class="border-section"><?php echo $AgentAddress['city']; ?></div>
+            <div class="col-md-12">
+              <div class="border-section" contentEditable=false data-text="Agent City State and Zipcode"><span class="fa fa-building fa-fw"></span> <?php echo $AgentAddress['city']; ?>, <?php echo $AgentAddress['state']; ?> <?php echo $AgentAddress['zip_code']; ?></div>
             </div>  
             </div>
-            <div class="row">
-            <div class="col-md-3">
-              <div class="border-section"><?php echo $AgentAddress['state']; ?></div>
+            <!-- <div class="col-md-3">
+              <div class="border-section"></div>
             </div>
             <div class="col-md-3">
-              <div class="border-section"><?php echo $AgentAddress['zip_code']; ?></div>
-            </div>
-            </div>
+              <div class="border-section"></div>
+            </div> -->
             </address>
           </div>
       </div>
     </div>
-		<div class="col-md-12 four-boxes">
+		<div class="col-md-4 four-boxes">
         <div class="panel-header">
           <div class="panel-title"><span class="panel-icon fa-map-marker"></span><span>Forwarding Address</span></div>
         </div>
@@ -112,15 +117,17 @@
           <div class="panel-body">
             <address>
               <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-12">
                   <div class="border-section">
+                    <span class="fa fa-map-marker fa-fw"></span>
                   <?php echo $entity->shipping_street; ?>
                   <?php echo $entity->shipping_city; ?>, <?php echo $entity->shipping_state; ?> <?php echo $entity->shipping_code; ?>
                   </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-12">
                   <div class="border-section">
-                  <abbr title="Phone">E:</abbr> <?php echo $entity->shipping_email; ?>
+                    <span class="fa fa-envelope fa-fw"></span>
+                  <!--<abbr title="Phone">E:</abbr>--> <?php echo $entity->notification_email; ?>
                   </div>
                 </div>
               </div>
@@ -366,14 +373,84 @@
                 <p id="inputContactFirstNameReq" class="errorMsg"></p>
                 
                 <label>Contact Type <span class="require">*</span></label>
-                <input type="text" class="form-control" id="inputContactType" name="inputContactType" placeholder="Contact Type" value="" tabindex="3">
+                <!-- <input type="text" class="form-control" id="inputContactType" name="inputContactType" placeholder="Contact Type" value="" tabindex="3"> -->
+                <select class="form-control" id="inputContactType" name="inputContactType">
+                  <option selected>-- Select Type --</option>
+                  <option value="ceo">CEO</option>
+                  <option value="cfo">CFO</option>
+                  <option value="director">Director</option>
+                  <option value="manager">Manager</option>
+                  <option value="member">Member</option>
+                  <option value="officer">Officer</option>
+                  <option value="partner">Partner</option>
+                  <option value="president">President</option>
+                  <option value="secretary">Secretary</option>
+                  <option value="shareholder">Shareholder</option>
+                  <option value="tax">Tax</option>
+                </select>
+                
                 <p id="inputContactTypeReq" class="errorMsg"></p>
                 
                 <label>Address <span class="require">*</span></label>
                 <input type="text" class="form-control" id="inputContactStreet" name="inputContactStreet" placeholder="Street Address" value="" tabindex="5">
                 <p id="inputContactStreetReq" class="errorMsg"></p>
                 <label>State <span class="require">*</span></label>
-                <input type="text" class="form-control" id="inputContactState" name="inputContactState" placeholder="State/Region/Province" value="" tabindex="7">
+                <!-- <input type="text" class="form-control" id="inputContactState" name="inputContactState" placeholder="State/Region/Province" value="" tabindex="7"> -->
+                <select class="form-control" id="inputContactState" name="inputContactState">
+                  <option selected>-- Select State --</option>
+                  <option value="AL">Alabama</option>
+                  <option value="AK">Alaska</option>
+                  <option value="AZ">Arizona</option>
+                  <option value="AR">Arkansas</option>
+                  <option value="CA">California</option>
+                  <option value="CO">Colorado</option>
+                  <option value="CT">Connecticut</option>
+                  <option value="DE">Delaware</option>
+                  <option value="FL">Florida</option>
+                  <option value="GA">Georgia</option>
+                  <option value="HI">Hawaii</option>
+                  <option value="ID">Idaho</option>
+                  <option value="IL">Illinois</option>
+                  <option value="IN">Indiana</option>
+                  <option value="IA">Iowa</option>
+                  <option value="KS">Kansas</option>
+                  <option value="KY">Kentucky</option>
+                  <option value="LA">Louisiana</option>
+                  <option value="ME">Maine</option>
+                  <option value="MD">Maryland</option>
+                  <option value="MA">Massachusetts</option>
+                  <option value="MI">Michigan</option>
+                  <option value="MN">Minnesota</option>
+                  <option value="MS">Mississippi</option>
+                  <option value="MO">Missouri</option>
+                  <option value="MT">Montana</option>
+                  <option value="NE">Nebraska</option>
+                  <option value="NV">Nevada</option>
+                  <option value="NH">New Hampshire</option>
+                  <option value="NJ">New Jersey</option>
+                  <option value="NM">New Mexico</option>
+                  <option value="NY">New York</option>
+                  <option value="NC">North Carolina</option>
+                  <option value="ND">North Dakota</option>
+                  <option value="OH">Ohio</option>
+                  <option value="OK">Oklahoma</option>
+                  <option value="OR">Oregon</option>
+                  <option value="PA">Pennsylvania</option>
+                  <option value="PR">Puerto Rico</option>
+                  <option value="RI">Rhode Island</option>
+                  <option value="SC">South Carolina</option>
+                  <option value="SD">South Dakota</option>
+                  <option value="TN">Tennessee</option>
+                  <option value="TX">Texas</option>
+                  <option value="UT">Utah</option>
+                  <option value="VT">Vermont</option>
+                  <option value="VA">Virginia</option>
+                  <option value="WA">Washington</option>
+                  <option value="DC">Washington DC</option>
+                  <option value="WV">West Virginia</option>
+                  <option value="WI">Wisconsin</option>
+                  <option value="WY">Wyoming</option>
+                </select>
                 <p id="inputContactStateReq" class="errorMsg"></p>
                 <label>Phone <span class="require">*</span></label>
                 <input type="text" class="form-control" id="inputContactPhone" name="inputContactPhone" placeholder="Phone Number" value="" tabindex="9">
@@ -428,6 +505,7 @@
 <div class="editMessage" id="successEditMessageBox">
   <div class="semessage">Contact have been update successfully!.</div>
 </div>
+
 
 <script src="components/base/jquery-3.4.1.min.js"></script>
 <script src="components/bootstrapswitch/bootstrap-toggle.js"></script>
@@ -516,8 +594,8 @@ setTimeout(() => {
             // $('#contactTableTbody').append(row);
           //console.log("Close modal or reset for new entries");
         } else {
-          console.log("Server not responding, please try again later");
-          console.log(returnedData);
+          //console.log("Server not responding, please try again later");
+          //console.log(returnedData);
         }
 
       }
