@@ -4,18 +4,18 @@
 .input-group-prepend{
     margin-left: -1px;
 }
-/*.address-billing .panel{
-    min-height: 190px;
+.address-billing .panel{
+    min-height: 260px;
 }
- .address-billing .panel .panel-body{
+/* .address-billing .panel .panel-body{
     overflow-x: scroll;
 } */
-/* .entities-data tfoot{
-    display:block;
-} */
-.entities-data tfoot th:nth-child(2) input, .entities-data tfoot th:nth-child(3) input{
+.entities-data tfoot{
     display:none;
 }
+/* .entities-data tfoot th:nth-child(2) input, .entities-data tfoot th:nth-child(3) input{
+    display:none;
+} */
 
 .dl-horizontal dt{
     text-align: left !important;
@@ -24,9 +24,9 @@
 .attachment-table table tfoot{
     display: none;
 }
-.four-boxes{
+/* .four-boxes{
     margin-bottom: 20px;
-}
+} */
 .four-boxes .panel-header, .entity-form .panel-header{
     background: #333;
     padding-left: 15px;
@@ -40,15 +40,29 @@
     
 }
 .four-boxes .panel .dl-horizontal .border-section, .four-boxes .panel .border-section{
-    border-bottom: 1px solid #ccc;
+    border-bottom: 0 solid #ccc;
     display: block;
-    padding-bottom:0
+    padding-bottom:0;
+    margin-bottom: 8px;
 }
+
 .four-boxes .panel .border-section{
-    padding-bottom:15px
+    padding-bottom:5px;
+}
+.four-boxes .panel .border-section span{
+    margin-right: 10px;
+    color: #840cfe;
+    font-size: 1.2em;
+}
+.four-boxes .panel .border-section span.addresstwo{
+    margin-right: 30px;
+    display: inline-block;
 }
 .four-boxes .panel .dl-horizontal dd{
-    line-height:50px
+    line-height:24px
+}
+.four-boxes .panel .dl-horizontal dd, .four-boxes .panel .dl-horizontal dt, .four-boxes .panel .border-section{
+    color: #333;
 }
 dl + dl{
     margin-top: 0px;
@@ -218,10 +232,32 @@ dl + dl{
 .toggle.btn { min-width: 59px; min-height: 34px; }
 .toggle-on.btn { padding-right: 24px; }
 .toggle-off.btn { padding-left: 24px; }
+.dangerparent, .entitysuccessparent, .infoparent{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 999;
+    text-align: center;
+}
+.dangerparent .errormsg, .entitysuccessparent .success, .infoparent .infobox{
+    width: 430px;
+    display: inline-block;
+}
 /* .toggle.ios{
     width: 50px !important;
     height: 34px !important;
 } */
+.btns button{
+    float: right;
+}
+.btns button:last-child{
+    margin-right: 10px;
+}
+[contentEditable=false]:empty:not(:focus):after{
+    content:attr(data-text);
+    color: #000;
+}
 
 @media (max-width:768px){
     .four-boxes .panel .border-section{
