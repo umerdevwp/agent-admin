@@ -85,19 +85,23 @@ class Entity extends CI_Controller {
         
         if($data['contacts'])
         {
-            $data['contacts'][] = $this->fetchTempDataOf($iEntityId,$this->Tempmeta_model->slugNewContact);
+            $aDataContact = $this->fetchTempDataOf($iEntityId,$this->Tempmeta_model->slugNewContact);
+            if($aDataContact) $data['contacts'] = array_merge($data['contacts'],$aDataContact);
         } else {
             $aDataContact = $this->fetchTempDataOf($iEntityId,$this->Tempmeta_model->slugNewContact);
-            $data['contacts'] = $aDataContact?[$aDataContact]:false;
+            $data['contacts'] = $aDataContact?[$aDataContact]:[];
         }
-
+        
         $data['attachments'] = $this->Attachments_model->getAllFromEntityId($id);
         if($data['attachments'])
         {
-            $data['attachments'][] = $this->fetchTempDataOf($iEntityId,$this->Tempmeta_model->slugNewAttachment);
+            $aDataAttachment = $this->fetchTempDataOf($iEntityId,$this->Tempmeta_model->slugNewAttachment);
+            if($aDataAttachment) $data['attachments'] = array_merge($data['attachments'],$aDataAttachment);
         } else {
             $aDataAttachment = $this->fetchTempDataOf($iEntityId,$this->Tempmeta_model->slugNewAttachment);
-            $data['attachments'] = $aDataAttachment?[$aDataAttachment]:false;
+            //var_dump($aDataAttachment);
+        //die;
+            $data['attachments'] = $aDataAttachment?[$aDataAttachment]:[];
         }
         
         // if session is parent then get entity ID from url
