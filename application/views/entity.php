@@ -172,12 +172,17 @@
                 for($i = 0; $i < count($tasks); $i++)
                 { 
                   $bInCompletedTasks = false;
+                  // TODO: move this code to controller function
                   if($tasks[$i]->status=="Completed") $bInCompletedTasks = true;
                   foreach($tasks_completed as $v)
                   {
-                    if($v->status==1 && $v->id==$tasks[$i]->id)
-                    {
-                      $bInCompletedTasks = true;
+                    if($v->id==$tasks[$i]->id){
+                      if($v->status==1)
+                      {
+                        $bInCompletedTasks = true;
+                      } else if($v->status==0){
+                        $bInCompletedTasks = false;
+                      }
                     }
                   }
 

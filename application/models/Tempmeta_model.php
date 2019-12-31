@@ -4,9 +4,13 @@ class Tempmeta_model extends CI_Model
 
     private $table = "tempmeta";
 
-    public $slugContactNew = "new_contacts";
+    public $slugNewContact = "new_contacts";
 
     public $slugTasksComplete = "tasks_complete";
+
+    public $slugNewEntity = "new_entities";
+
+    public $slugNewAttachment = "new_attachments";
 
     public function __construct()
     {
@@ -90,7 +94,7 @@ class Tempmeta_model extends CI_Model
     public function update($iUserid,$sSlugname,$sJsonEncoded)
     {
         $aData = [
-            "json"  =>  $sJsonEncoded
+            "json_data"  =>  $sJsonEncoded
         ];
         $aWhere = [
             "userid"    =>  $iUserid,
@@ -173,7 +177,7 @@ HC;
 
         if($aResult['type']=='ok' && !is_null($aResult['results']))
         {
-            $aTempData = json_decode($aResult['results']->json);
+            $aTempData = json_decode($aResult['results']->json_data);
 
             if(count($aTempData)){
                 foreach($aTempData as $k=>$v)
@@ -206,7 +210,7 @@ HC;
 
         if($aResult['type']=='ok')
         {
-            $aTempData = json_decode($aResult['results']->json);
+            $aTempData = json_decode($aResult['results']->json_data);
             foreach($aTempData as $k=>$v)
             {
                 if($v==$aData)
@@ -222,32 +226,13 @@ HC;
 
     }
 
-    public function checkRowExist($aData)
+    public function checkRowExistInJson($aData)
     {
-        $aNewData = [];
+        $aData = $this->getOneInJson($aData,true);
+        $row = null;
 
-        $strWhere = " WHERE 1=1";
-        foreach($aData as $k=>$v)
-        {
-            $iJsonPos = strpos($k,"json_");
-            
-            if($iJsonPos!==false)
-            {
-                //$strWhere .= ' AND json_data->\'$.'.substr($k,5).'\'=\''.$v.'\'';
-                $strWhere .= ' AND !ISNULL(JSON_SEARCH(json, "one", "'.$v.'"))';
-            } else {
-                
-                $strWhere .= " AND $k='".$v."'";
-                
-            }
-        }
-
-        $sQuery = "SELECT id FROM " . $this->table . $strWhere;
-
-        $oQuery = $this->db->query($sQuery);
-        $row = $oQuery->row();
-        //echo $this->db->last_query();
-        //var_dump($row);die;
+        if($aData['type']=='ok') $row = $aData['results'];
+        
         $bResult = false;
 
         if($row)
@@ -257,6 +242,51 @@ HC;
 
         return $bResult;
 
+    }
+
+    public function getOneInJson($aData,$bCheckExistOnly=false)
+    {
+        $aNewData = [];
+
+        $strWhere = " WHERE 1=1";
+        $strJsonSearch = "";
+        foreach($aData as $k=>$v)
+        {
+            $iJsonPos = strpos($k,"json_");
+            if($iJsonPos!==false)
+            {
+                //$strWhere .= ' AND json_data->\'$.'.substr($k,5).'\'=\''.$v.'\'';
+                // "one" means reaturn index of data
+                $strWhere .= ' AND !ISNULL(JSON_SEARCH(json_data, "one", "'.$v.'"))';
+
+                $strJsonSearch = 'JSON_SEARCH(json_data, "one", "'.$v.'")';
+            } else {
+                
+                $strWhere .= " AND $k='".$v."'";
+                
+            }
+        }
+
+        $sQuery = 'SELECT ' . $strJsonSearch . ' as at_index,json_data FROM ' . $this->table . $strWhere;
+
+        $oQuery = $this->db->query($sQuery);
+        $row = $oQuery->row();
+
+        if($row)
+        {
+            // return table row
+            if($bCheckExistOnly) return ['type'=>'ok','results'=>$row];
+
+            // return json column indexed row
+            $aData = json_decode($row->json_data);
+            
+            $iIndex = substr($row->at_index,3,1);
+            $oRow = $aData[$iIndex];
+
+            return ['type'=>'ok','results'=>$oRow];
+        }
+        
+        return ['type'=>'error','message'=>'Data not found'];
     }
 
 

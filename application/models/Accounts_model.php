@@ -23,10 +23,10 @@ class Accounts_model extends CI_Model
 
         if (! $result) {
             
-            return ['msg'=>'Account id not found','msg_type'=>'error'];
+            return ['message'=>'Account id not found','type'=>'error'];
         }
 
-        return $result;
+        return ['type'=>'ok','results'=>$result];
     }
 
     public function getAgentAddress($id)
@@ -76,10 +76,10 @@ class Accounts_model extends CI_Model
         
         if(!is_array($result))
         {
-            return ['msg'=>'Entities not found.','msg_type'=>'error'];
+            return ['message'=>'Entities not found.','type'=>'error'];
         }
 
-        return $result;
+        return ['type'=>'ok','results'=>$result];
     }
 
     public function hasEntities($id)
