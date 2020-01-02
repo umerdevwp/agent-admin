@@ -35,7 +35,7 @@
               </div>
               <div class="row">
                 <div class="col-sm-12">
-                  <table class="table table-striped table-hover data-table dataTable" data-page-length="5" data-table-mode="multi-filter" id="DataTables_Table_3" role="grid" aria-describedby="DataTables_Table_3_info">
+                  <table class="table table-striped table-hover data-table dataTable" data-page-length="5" data-table-searching="true" id="DataTables_Table_3" role="grid" aria-describedby="DataTables_Table_3_info">
                     <thead>
                       <tr role="row">
                         <th class="sorting_disabled" data-column-index="0" rowspan="1" colspan="1" style="width: 241.2px;">File Name</th>
