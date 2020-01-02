@@ -27,14 +27,38 @@ class Entity extends CI_Controller {
 		$this->load->model('Attachments_model');
         $this->load->model("Tempmeta_model");
 
+        // use login entity id
+        $iEntityId = $this->session->user['zohoId'];
+
 		// fetch data from zoho api
         //$this->ZoHo_Account->LoadAccount($id);
         //$this->ZoHo_Account->dumpAll();
 		//$data['account'] = $this->ZoHo_Account;
 		
 		// fetch data from DB
-        $data['entity'] = $this->Accounts_model->loadAccount($id);
-        
+        $aDataEntity = $this->Accounts_model->loadAccount($id);
+
+        if($aDataEntity['type']=='error' && $this->session->user['child'])
+        {
+            $aDataTempEntity = $this->Tempmeta_model->getOneInJson([
+                'userid'=>$iEntityId,
+                'json_id'=>$id,
+                'slug'=>$this->Tempmeta_model->slugNewEntity
+            ]);
+            if($aDataTempEntity['type']=='ok')
+            {
+                $data['entity'] = $aDataTempEntity['results'];
+                $this->session->set_flashdata("info","Please note: missing fields will be updated shortly.");
+            } else {
+                $this->session->set_flashdata("error","No such entity exist.");
+            }
+            
+        } else if($aDataEntity['type']=='ok'){
+            $data['entity'] = $aDataEntity['results'];
+        } else {
+            $this->session->set_flashdata("error","No such entity exist.");
+        }
+
         $oAgetAddress = $this->Accounts_model->getAgentAddress($id);
         
         if(is_object($oAgetAddress)){
@@ -51,24 +75,35 @@ class Entity extends CI_Controller {
         $data['tasks'] = $this->Tasks_model->getAll($id);
 
         $aTasksCompleted = $this->Tempmeta_model->getOne($id,$this->Tempmeta_model->slugTasksComplete);
-        if(!is_null($aTasksCompleted['results']))
-            $data['tasks_completed'] = json_decode($aTasksCompleted['results']->json);
+        
+        if(is_object($aTasksCompleted['results']))
+            $data['tasks_completed'] = json_decode($aTasksCompleted['results']->json_data);
         else 
             $data['tasks_completed'] = [];
-        
+                
         $data['contacts'] = $this->Contacts_model->getAllFromEntityId($id);
         
-        $aTempRows = $this->Tempmeta_model->getAll($id,$this->model->slugNewContact,false);
-
-        if($aTempRows['type']=='ok' && count($aTempRows['results']))
+        if($data['contacts'])
         {
-            $data['contacts'] = array_merge($data['contacts'],json_decode($aTempRows['results'][0]->json));
+            $aDataContact = $this->fetchTempDataOf($iEntityId,$this->Tempmeta_model->slugNewContact);
+            if($aDataContact) $data['contacts'] = array_merge($data['contacts'],$aDataContact);
+        } else {
+            $aDataContact = $this->fetchTempDataOf($iEntityId,$this->Tempmeta_model->slugNewContact);
+            $data['contacts'] = $aDataContact?[$aDataContact]:[];
         }
-		$data['attachments'] = $this->Attachments_model->getAllFromEntityId($id);
-		
-        // use login entity id
-        $iEntityId = $this->session->user['zohoId'];
-
+        
+        $data['attachments'] = $this->Attachments_model->getAllFromEntityId($id);
+        if($data['attachments'])
+        {
+            $aDataAttachment = $this->fetchTempDataOf($iEntityId,$this->Tempmeta_model->slugNewAttachment);
+            if($aDataAttachment) $data['attachments'] = array_merge($data['attachments'],$aDataAttachment);
+        } else {
+            $aDataAttachment = $this->fetchTempDataOf($iEntityId,$this->Tempmeta_model->slugNewAttachment);
+            //var_dump($aDataAttachment);
+        //die;
+            $data['attachments'] = $aDataAttachment?[$aDataAttachment]:[];
+        }
+        
         // if session is parent then get entity ID from url
         if($this->session->user['child'])
             $iEntityId = $id;
@@ -80,6 +115,18 @@ class Entity extends CI_Controller {
 		$this->load->view('footer');
     }
     
+    private function fetchTempDataOf($iEntityId,$sSlug)
+    {
+        $aTempRows = $this->Tempmeta_model->getOne($iEntityId,$sSlug);
+        $aData = [];
+        if($aTempRows['type']=='ok')
+        {
+            $aData = json_decode($aTempRows['results']->json_data)[0];
+        }
+
+        return $aData;
+    }
+
     public function form($id=0)
     {
         if(!isSessionValid("Entity_Add")) redirectSession();
@@ -100,7 +147,7 @@ class Entity extends CI_Controller {
     public function add()
     {
         if(!isSessionValid("Entity_Add")) redirectSession();
-
+        
         $bTagSmartyValidated = true;
         $arError = [];
         $this->load->helper("custom");
@@ -212,7 +259,7 @@ class Entity extends CI_Controller {
 
     private function redirectAfterAdd()
     {
-        if(!empty($this->input->post('btnSaveClose')))
+        if(empty($this->input->post('btnSaveNew')))
             redirect("portal");
         else
             redirect("entity/form");
@@ -295,7 +342,7 @@ class Entity extends CI_Controller {
         
         if($oResponse["id"]>0)
         {
-
+            $this->addEntityToTemp($oResponse["id"]);
             // setting 2, so error only reports attachment issue
             $iErrorType = 2;
             
@@ -304,11 +351,13 @@ class Entity extends CI_Controller {
             // if file is give for attachment
             if($_FILES['inputFiling']["name"]!="")
             {
+                $sFilename = time() . "-" . $_FILES['inputFiling']['name'];
+                $_POST['attachment'] = $sFilename;
                 // move uploaded file to local
-                if(move_uploaded_file($_FILES['inputFiling']['tmp_name'],getenv("UPLOAD_PATH").$_FILES['inputFiling']['name']))
+                if(move_uploaded_file($_FILES['inputFiling']['tmp_name'],getenv("UPLOAD_PATH").$sFilename))
                 {
                     try {
-                        $oAttachment = $oApi->uploadAttachment($_SERVER['DOCUMENT_ROOT'] . "/" . getenv("UPLOAD_PATH").$_FILES['inputFiling']['name']); // $filePath - absolute path of the attachment to be uploaded.
+                        $oAttachment = $oApi->uploadAttachment($_SERVER['DOCUMENT_ROOT'] . "/" . getenv("UPLOAD_PATH").$sFilename); // $filePath - absolute path of the attachment to be uploaded.
                         //$oAttachmentResponse = $oAttachment->getDetails();
                     } catch(Exception $e) {
                         $arError[] = "code: " . $e->getCode() . ", error: Api: " . $e->getMessage();
@@ -379,6 +428,50 @@ class Entity extends CI_Controller {
         }
 
         return ['ok'=>"Entity created successfully."];
+    }
+
+    private function addEntityToTemp(int $iEntityId)
+    {
+        $this->load->model("Tempmeta_model");
+        $today = date("Y-m-d");
+        $aDataEntity = [
+            "id"                =>  $iEntityId,
+            "entity_name"       =>  $this->input->post("inputName"),
+            "entity_structure"  =>  $this->input->post("inputFillingStructure"),
+            "filing_state"      =>  $this->input->post("inputFillingState"),
+            "formation_date"    =>  $today,
+            "shipping_street"           =>  $this->input->post("inputNotificationAddress"),
+            "shipping_city"              =>  $this->input->post("inputNotificationCity"),
+            "shipping_state"             =>  $this->input->post("inputNotificationState"),
+            "shipping_code"          =>  $this->input->post("inputNotificationZip"),
+            "notification_email"    =>  $this->input->post("inputNotificationEmail"),
+        ];
+        $this->Tempmeta_model->appendRow($iEntityId,$this->Tempmeta_model->slugNewEntity,$aDataEntity);
+
+        $aDataAttachments = [
+            "file_name"=>$this->input->post("attachment"),
+            "size"=>filesize(getenv("UPLOAD_PATH").$this->input->post("attachment")),
+            "create_time"=>$today,
+            "link_url"=>getenv("UPLOAD_PATH").$this->input->post("attachment"),// it helps user to download file from temp path
+        ];
+        $this->Tempmeta_model->appendRow($iEntityId,$this->Tempmeta_model->slugNewAttachment,$aDataAttachments);
+
+        $aDataContacts = [
+            "first_name"    =>  $this->input->post("inputFirstName"),
+            "last_name"    =>  $this->input->post("inputLastName"),
+
+            "email"    =>  $this->input->post("inputNotificationEmail"),
+            "phone"    =>  $this->input->post("inputNotificationPhone"),
+            "title"    =>  "",
+
+            "mailing_street"    =>  $this->input->post("inputNotificationAddress"),
+            "mailing_city"    =>  $this->input->post("inputNotificationCity"),
+            "mailing_state"    =>  $this->input->post("inputNotificationState"),
+            "mailing_zip"    =>  $this->input->post("inputNotificationZip"),
+        ];
+
+        $this->Tempmeta_model->appendRow($iEntityId,$this->Tempmeta_model->slugNewContact,$aDataContacts);
+
     }
 
 }

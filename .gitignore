@@ -5,3 +5,12 @@ docs/*
 .vs/*
 vendor/*
 composer.lock
+.idea/.gitignore
+.gitignore
+ZCRMClientLibrary.log
+.idea/vcs.xml
+.idea/agentadmin.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/php.xml
+.htaccess

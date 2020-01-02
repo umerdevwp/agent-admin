@@ -172,12 +172,17 @@
                 for($i = 0; $i < count($tasks); $i++)
                 { 
                   $bInCompletedTasks = false;
+                  // TODO: move this code to controller function
                   if($tasks[$i]->status=="Completed") $bInCompletedTasks = true;
                   foreach($tasks_completed as $v)
                   {
-                    if($v->status==1 && $v->id==$tasks[$i]->id)
-                    {
-                      $bInCompletedTasks = true;
+                    if($v->id==$tasks[$i]->id){
+                      if($v->status==1)
+                      {
+                        $bInCompletedTasks = true;
+                      } else if($v->status==0){
+                        $bInCompletedTasks = false;
+                      }
                     }
                   }
 
@@ -376,7 +381,7 @@
                 
                 <label>Contact Type <span class="require">*</span></label>
                 <!-- <input type="text" class="form-control" id="inputContactType" name="inputContactType" placeholder="Contact Type" value="" tabindex="3"> -->
-                <select class="form-control" id="inputContactType" name="inputContactType">
+                <select class="form-control" id="inputContactType" name="inputContactType" tabindex="3">
                   <option selected>-- Select Type --</option>
                   <option value="ceo">CEO</option>
                   <option value="cfo">CFO</option>
@@ -398,7 +403,7 @@
                 <p id="inputContactStreetReq" class="errorMsg"></p>
                 <label>State <span class="require">*</span></label>
                 <!-- <input type="text" class="form-control" id="inputContactState" name="inputContactState" placeholder="State/Region/Province" value="" tabindex="7"> -->
-                <select class="form-control" id="inputContactState" name="inputContactState">
+                <select class="form-control" id="inputContactState" name="inputContactState" tabindex="7">
                   <option selected>-- Select State --</option>
                   <option value="AL">Alabama</option>
                   <option value="AK">Alaska</option>

@@ -103,7 +103,7 @@ class Contacts extends CI_Controller
 
         $aData = ['email'=>$strEmail,'entity_name'=>$this->input->post('entityId')];
 
-        $bContactRow = $this->Contacts_model->checkRowExist($aData);
+        $bContactRow = $this->Contacts_model->checkRowExistInJson($aData);
         // check in zoho contacts list
         if($bContactRow)
         {
@@ -114,7 +114,7 @@ class Contacts extends CI_Controller
         // if not in zoho then check in temp table
         if($bDontExist){
             $aData = ['json_email'=>$strEmail,'userid'=>$this->input->post('entityId')];
-            $bTempmetaRow = $this->Tempmeta_model->checkRowExist($aData);
+            $bTempmetaRow = $this->Tempmeta_model->checkRowExistInJson($aData);
             
             if($bTempmetaRow)
             {

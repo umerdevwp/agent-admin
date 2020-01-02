@@ -25,9 +25,9 @@ class Portal extends CI_Controller {
 	{
 		$this->load->library(["session"]);
 		$this->load->helper(["email"]);
-
+    
 		// has no child, show entity page
-		if($this->session->user["child"]==0)
+		if($this->session->user["child"]==0 and $this->session->user['zohoId'] != getenv("SUPER_USER"))
 		{
 			redirect("/entity/".$this->session->user["zohoId"]);
 		}
@@ -51,6 +51,7 @@ class Portal extends CI_Controller {
         //$this->ZoHo_Account->dumpAll();
 		//$data['account'] = $this->ZoHo_Account;
 		
+<<<<<<< HEAD
 		if ($this->session->user['zohoId'] == getenv("SUPER_USER")) {
             $data['entity'] = $this->Accounts_model->loadAccount($this->session->user['zohoId']);
             $data['arChildEntity'] = $this->Accounts_model->getAll();
@@ -58,6 +59,47 @@ class Portal extends CI_Controller {
             $data['entity'] = $this->Accounts_model->loadAccount($this->session->user['zohoId']);
             $data['arChildEntity'] = $this->Accounts_model->loadChildAccounts($this->session->user['zohoId']);
         }
+=======
+		$this->load->model('Accounts_model');
+		$this->load->model('Tempmeta_model');
+		$data['entity'] = false;		
+		
+		// user is administrator
+		if($this->session->user['zohoId'] == getenv("SUPER_USER")){
+			$data['entity'] = $this->Accounts_model->loadAccount($this->session->user['zohoId']);
+            $data['arChildEntity'] = $this->Accounts_model->getAll();
+		// users from zoho
+		} else {
+			$aDataEntity = $this->Accounts_model->loadAccount($this->session->user['zohoId']);
+			$data['entity'] = false;
+			if($aDataEntity['type']=='ok') $data['entity'] = $aDataEntity['results'];
+		
+			$aDataChild = $this->Accounts_model->loadChildAccounts($this->session->user['zohoId']);
+			if($aDataChild['type']=='ok')
+			{
+				$aDataTemp = $this->Tempmeta_model->getOne(
+					$this->session->user['zohoId'],
+					$this->Tempmeta_model->slugNewEntity
+				);
+
+				if($aDataTemp['type']=='ok')
+				{
+				
+					$data['arChildEntity'] = array_merge(
+												$aDataChild['results'],
+												json_decode($aDataTemp['results']->json_data)
+											);
+				} else {
+					$data['arChildEntity'] = $aDataChild['results'];
+				}
+			} else {
+				$data['arChildEntity'] = $this->Tempmeta_model->getOne(
+					$this->session->user['zohoId'],
+					$this->Tempmeta_model->slugNewEntity
+				);
+			}
+		}
+>>>>>>> bd4b31201468e7a213da656e51552319fb8a02a0
 
 		//var_dump($data['account']);die;
         $this->load->view('header');
@@ -81,7 +123,10 @@ class Portal extends CI_Controller {
 		//$data['account'] = $this->ZoHo_Account;
 		
 		// fetch data from DB
-		$data['entity'] = $this->Accounts_model->loadAccount($id);
+		$aDataEntity = $this->Accounts_model->loadAccount($id);
+		$data['entity'] = false;
+		if($aDataEntity['type']=='ok') $data['entity'] = $aDataEntity['results'];
+
 		$data['tasks'] = $this->Tasks_model->getAll($id);
 		$data['contacts'] = $this->Contacts_model->getAllFromEntityId($id);
 		//$data['attachments'] = $this->ZoHo_Account->arAttachments;
