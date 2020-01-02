@@ -117,4 +117,15 @@ class Accounts_model extends CI_Model
 
         return $result;
     }
+	
+	  public function getAll()
+    {
+        $query = $this->db->get('zoho_accounts');
+        $result = $query->result_object();
+        if (!$result) {
+            return ['msg' => 'No such account found', 'msg_type' => 'error'];
+        }
+
+        return $result;
+    }
 }

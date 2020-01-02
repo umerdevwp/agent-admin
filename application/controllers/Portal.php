@@ -51,9 +51,13 @@ class Portal extends CI_Controller {
         //$this->ZoHo_Account->dumpAll();
 		//$data['account'] = $this->ZoHo_Account;
 		
-		$this->load->model('Accounts_model');
-		$data['entity'] = $this->Accounts_model->loadAccount($this->session->user['zohoId']);
-		$data['arChildEntity'] = $this->Accounts_model->loadChildAccounts($this->session->user['zohoId']);
+		if ($this->session->user['zohoId'] == getenv("SUPER_USER")) {
+            $data['entity'] = $this->Accounts_model->loadAccount($this->session->user['zohoId']);
+            $data['arChildEntity'] = $this->Accounts_model->getAll();
+        } else {
+            $data['entity'] = $this->Accounts_model->loadAccount($this->session->user['zohoId']);
+            $data['arChildEntity'] = $this->Accounts_model->loadChildAccounts($this->session->user['zohoId']);
+        }
 
 		//var_dump($data['account']);die;
         $this->load->view('header');
