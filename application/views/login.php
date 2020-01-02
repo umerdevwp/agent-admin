@@ -141,6 +141,9 @@ var signIn = new OktaSignIn(
 		issuer: '<?=getenv("OKTA_BASE_URL");?>oauth2/default',
     responseType: ['id_token', 'token']
 	},
+	idps: [
+            {type: 'google', id: '0oa2d6hm9qeSSv62N357'},
+            ],
 	logo: '',
 	language: 'en',
 	i18n: {

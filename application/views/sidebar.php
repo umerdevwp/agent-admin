@@ -5,7 +5,7 @@
   <div class="rd-navbar-title"><span class="rd-navbar-title-icon"><span class="fa-ellipsis-h"></span></span><span class="rd-navbar-title-text">Menu</span></div>
 </li>
 <li class="rd-navbar-nav-item"><a class="rd-navbar-link" href="<?php
-if($this->session->user["child"]):
+if($this->session->user["child"] or getenv("SUPER_USER") == intval($this->session->user['zohoId'])):
    echo "portal";
 else:
   echo "entity/".$this->session->user["zohoId"];
