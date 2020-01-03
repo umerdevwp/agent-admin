@@ -37,7 +37,7 @@ class Entity extends CI_Controller {
 		
 		// fetch data from DB
         $aDataEntity = $this->Accounts_model->loadAccount($id);
-
+        $oTempAgetAddress = null;
         if($aDataEntity['type']=='error' && $this->session->user['child'])
         {
             $aDataTempEntity = $this->Tempmeta_model->getOneInJson([
@@ -48,6 +48,8 @@ class Entity extends CI_Controller {
             if($aDataTempEntity['type']=='ok')
             {
                 $data['entity'] = $aDataTempEntity['results'];
+                $oTempAgetAddress = $data['entity']->agent;
+                
                 $this->session->set_flashdata("info","Please note: missing fields will be updated shortly.");
             } else {
                 $this->session->set_flashdata("error","No such entity exist.");
@@ -62,12 +64,9 @@ class Entity extends CI_Controller {
         $oAgetAddress = $this->Accounts_model->getAgentAddress($id);
         
         if(is_object($oAgetAddress)){
-            $data['AgentAddress']['file_as'] = $oAgetAddress->file_as;
-            $data['AgentAddress']['address'] = $oAgetAddress->address;
-            $data['AgentAddress']['address2'] = $oAgetAddress->address2;
-            $data['AgentAddress']['city'] = $oAgetAddress->city;
-            $data['AgentAddress']['state'] = $oAgetAddress->state;
-            $data['AgentAddress']['zip_code'] = $oAgetAddress->zip_code;
+            $data['AgentAddress'] = (array)$oAgetAddress;
+        } else if(is_object($oTempAgetAddress)){
+            $data['AgentAddress'] = (array)$oTempAgetAddress;
         } else {
             $data['AgentAddress'] = false;
         }
@@ -85,20 +84,20 @@ class Entity extends CI_Controller {
         
         if($data['contacts'])
         {
-            $aDataContact = $this->fetchTempDataOf($iEntityId,$this->Tempmeta_model->slugNewContact);
+            $aDataContact = $this->fetchTempDataOf($id,$this->Tempmeta_model->slugNewContact);
             if($aDataContact) $data['contacts'] = array_merge($data['contacts'],$aDataContact);
         } else {
-            $aDataContact = $this->fetchTempDataOf($iEntityId,$this->Tempmeta_model->slugNewContact);
+            $aDataContact = $this->fetchTempDataOf($id,$this->Tempmeta_model->slugNewContact);
             $data['contacts'] = $aDataContact?[$aDataContact]:[];
         }
         
         $data['attachments'] = $this->Attachments_model->getAllFromEntityId($id);
         if($data['attachments'])
         {
-            $aDataAttachment = $this->fetchTempDataOf($iEntityId,$this->Tempmeta_model->slugNewAttachment);
+            $aDataAttachment = $this->fetchTempDataOf($id,$this->Tempmeta_model->slugNewAttachment);
             if($aDataAttachment) $data['attachments'] = array_merge($data['attachments'],$aDataAttachment);
         } else {
-            $aDataAttachment = $this->fetchTempDataOf($iEntityId,$this->Tempmeta_model->slugNewAttachment);
+            $aDataAttachment = $this->fetchTempDataOf($id,$this->Tempmeta_model->slugNewAttachment);
             //var_dump($aDataAttachment);
         //die;
             $data['attachments'] = $aDataAttachment?[$aDataAttachment]:[];
@@ -342,10 +341,9 @@ class Entity extends CI_Controller {
         
         if($oResponse["id"]>0)
         {
-            $this->addEntityToTemp($oResponse["id"]);
             // setting 2, so error only reports attachment issue
             $iErrorType = 2;
-            
+            $bAttachmentDone = $bContactDone = false;
             $oAttachment = null;
             
             // if file is give for attachment
@@ -359,9 +357,12 @@ class Entity extends CI_Controller {
                     try {
                         $oAttachment = $oApi->uploadAttachment($_SERVER['DOCUMENT_ROOT'] . "/" . getenv("UPLOAD_PATH").$sFilename); // $filePath - absolute path of the attachment to be uploaded.
                         //$oAttachmentResponse = $oAttachment->getDetails();
+                        $bAttachmentDone = true;
                     } catch(Exception $e) {
                         $arError[] = "code: " . $e->getCode() . ", error: Api: " . $e->getMessage();
+                        $bAttachmentDone = false;
                     }
+
                     // TODO: remove uploaded file from directory getenv("UPLOAD_PATH")
                 } else {
                     $arError[] = "User created successfully, Internal Server Error: file upload failed.";
@@ -392,10 +393,11 @@ class Entity extends CI_Controller {
             if($aResponse['type']=='error'){
                 if(count($arError)>0) $arError[0] .= ", contacts failed.";
                 else $arError[] = "User created successfully, contacts failed.";
-            }
+            } else $bContactDone = true;
+
+            $this->addEntityToTemp($oResponse["id"],$bContactDone,$bAttachmentDone);
 
             // add tags
-            
             $oApi = $this->ZoHo_Account->getInstance("Accounts",$oResponse["id"]);
             
             try {
@@ -430,48 +432,60 @@ class Entity extends CI_Controller {
         return ['ok'=>"Entity created successfully."];
     }
 
-    private function addEntityToTemp(int $iEntityId)
+    private function addEntityToTemp($iEntityId,$bContactDone=true,$bAttachmentDone=true)
     {
         $this->load->model("Tempmeta_model");
         $today = date("Y-m-d");
         $aDataEntity = [
-            "id"                =>  $iEntityId,
+            "id"                =>  (string)$iEntityId,
             "entity_name"       =>  $this->input->post("inputName"),
             "entity_structure"  =>  $this->input->post("inputFillingStructure"),
             "filing_state"      =>  $this->input->post("inputFillingState"),
-            "formation_date"    =>  $today,
+            "formation_date"    => $this->input->post("inputFormationDate"),
             "shipping_street"           =>  $this->input->post("inputNotificationAddress"),
             "shipping_city"              =>  $this->input->post("inputNotificationCity"),
             "shipping_state"             =>  $this->input->post("inputNotificationState"),
             "shipping_code"          =>  $this->input->post("inputNotificationZip"),
             "notification_email"    =>  $this->input->post("inputNotificationEmail"),
+            "agent"=>[
+                        "file_as"=>"United Agent Services LLC",
+                        "address"=>"1729 W. Tilghman Street",
+                        "address2"=>"Suite 2",
+                        "city"=>"Allentown",
+                        "state"=>"PA",
+                        "zip_code"=>"18104"
+                    ],
         ];
-        $this->Tempmeta_model->appendRow($iEntityId,$this->Tempmeta_model->slugNewEntity,$aDataEntity);
+        $this->Tempmeta_model->appendRow($this->session->user['zohoId'],$this->Tempmeta_model->slugNewEntity,$aDataEntity);
+        
+        if($bAttachmentDone){
+            $aDataAttachments = [
+                "file_name"=>$this->input->post("attachment"),
+                "size"=>filesize(getenv("UPLOAD_PATH").$this->input->post("attachment")),
+                "create_time"=>$today,
+                "link_url"=>getenv("UPLOAD_PATH").$this->input->post("attachment"),// it helps user to download file from temp path
+            ];
+            $this->Tempmeta_model->appendRow($iEntityId,$this->Tempmeta_model->slugNewAttachment,$aDataAttachments);
+        }
 
-        $aDataAttachments = [
-            "file_name"=>$this->input->post("attachment"),
-            "size"=>filesize(getenv("UPLOAD_PATH").$this->input->post("attachment")),
-            "create_time"=>$today,
-            "link_url"=>getenv("UPLOAD_PATH").$this->input->post("attachment"),// it helps user to download file from temp path
-        ];
-        $this->Tempmeta_model->appendRow($iEntityId,$this->Tempmeta_model->slugNewAttachment,$aDataAttachments);
+        if($bContactDone)
+        {
+            $aDataContacts = [
+                "first_name"    =>  $this->input->post("inputFirstName"),
+                "last_name"    =>  $this->input->post("inputLastName"),
 
-        $aDataContacts = [
-            "first_name"    =>  $this->input->post("inputFirstName"),
-            "last_name"    =>  $this->input->post("inputLastName"),
+                "email"    =>  $this->input->post("inputNotificationEmail"),
+                "phone"    =>  $this->input->post("inputNotificationPhone"),
+                "title"    =>  "",
 
-            "email"    =>  $this->input->post("inputNotificationEmail"),
-            "phone"    =>  $this->input->post("inputNotificationPhone"),
-            "title"    =>  "",
+                "mailing_street"    =>  $this->input->post("inputNotificationAddress"),
+                "mailing_city"    =>  $this->input->post("inputNotificationCity"),
+                "mailing_state"    =>  $this->input->post("inputNotificationState"),
+                "mailing_zip"    =>  $this->input->post("inputNotificationZip"),
+            ];
 
-            "mailing_street"    =>  $this->input->post("inputNotificationAddress"),
-            "mailing_city"    =>  $this->input->post("inputNotificationCity"),
-            "mailing_state"    =>  $this->input->post("inputNotificationState"),
-            "mailing_zip"    =>  $this->input->post("inputNotificationZip"),
-        ];
-
-        $this->Tempmeta_model->appendRow($iEntityId,$this->Tempmeta_model->slugNewContact,$aDataContacts);
-
+            $this->Tempmeta_model->appendRow($iEntityId,$this->Tempmeta_model->slugNewContact,$aDataContacts);
+        }
     }
 
 }

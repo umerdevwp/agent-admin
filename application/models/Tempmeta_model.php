@@ -180,17 +180,21 @@ HC;
             $aTempData = json_decode($aResult['results']->json_data);
 
             if(count($aTempData)){
+                $bDataFound = false;
                 foreach($aTempData as $k=>$v)
                 {
                     $aRow = (array)$v;
                     // replace the complete row if exists
                     if($aRow[$sRowKey]==$aData[$sRowKey])
                     {
+                        $bDataFound = true;
                         $aNewData[] = $aData;
                     } else { // add the row in the list
                         $aNewData[] = $v;
                     }
                 }
+                // if data doesn't exist already, add new data after previous temp entity records
+                if(!$bDataFound) $aNewData[] = $aData;
             } else { // add the row when list was blank
                 $aNewData[] = $aData;
             }
