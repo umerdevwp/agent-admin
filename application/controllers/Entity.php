@@ -84,23 +84,32 @@ class Entity extends CI_Controller {
         
         if($data['contacts'])
         {
-            $aDataContact = $this->fetchTempDataOf($id,$this->Tempmeta_model->slugNewContact);
-            if($aDataContact) $data['contacts'] = array_merge($data['contacts'],$aDataContact);
+            $aDataContact = $this->Tempmeta_model->getOne($id,$this->Tempmeta_model->slugNewContact);
+            if($aDataContact['type']=='ok') $data['contacts'] = array_merge($data['contacts'],json_decode($aDataContact['results']->json_data));
+
         } else {
-            $aDataContact = $this->fetchTempDataOf($id,$this->Tempmeta_model->slugNewContact);
-            $data['contacts'] = $aDataContact?[$aDataContact]:[];
+            $aDataContact = $this->Tempmeta_model->getOne($id,$this->Tempmeta_model->slugNewContact);
+            if($aDataContact['type']=='ok')
+            {
+                $data['contacts'] = json_decode($aDataContact['results']->json_data);
+            } else {
+                $data['contacts'] = [];
+            }
         }
         
         $data['attachments'] = $this->Attachments_model->getAllFromEntityId($id);
         if($data['attachments'])
         {
-            $aDataAttachment = $this->fetchTempDataOf($id,$this->Tempmeta_model->slugNewAttachment);
-            if($aDataAttachment) $data['attachments'] = array_merge($data['attachments'],$aDataAttachment);
+            $aDataAttachment = $this->Tempmeta_model->getOne($id,$this->Tempmeta_model->slugNewAttachment);
+            if($aDataAttachment) $data['attachments'] = array_merge($data['attachments'],json_decode($aDataAttachment['results']->json_data));
         } else {
-            $aDataAttachment = $this->fetchTempDataOf($id,$this->Tempmeta_model->slugNewAttachment);
-            //var_dump($aDataAttachment);
-        //die;
-            $data['attachments'] = $aDataAttachment?[$aDataAttachment]:[];
+            $aDataAttachment = $this->Tempmeta_model->getOne($id,$this->Tempmeta_model->slugNewAttachment);
+            if($aDataAttachment['type']=='ok')
+            {
+                $data['attachments'] = json_decode($aDataAttachment['results']->json_data);
+            } else {
+                $data['attachments'] = [];
+            }
         }
         
         // if session is parent then get entity ID from url
