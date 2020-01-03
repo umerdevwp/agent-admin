@@ -620,7 +620,7 @@ $('#saveAddNew').on('click', function(){
   var state = $('#inputContactState').val();
   var zipcode = $('#inputContactZipcode').val();
   var phone = $('#inputContactPhone').val();
-  var markup = "<tr><td>" + fname.lname + "</td><td>" + ctype + "</td><td>" + email + "</td><td>" + street.city.state.zipcode + "</td><td>" + phone + "</td>";
+  var markup = "<tr><td>" + fname + lname + "</td><td>" + ctype + "</td><td>" + email + "</td><td>" + street + city + state + zipcode + "</td><td>" + phone + "</td>";
   $('table#DataTables_Table_3 tbody').append(markup);
 });
 </script> -->

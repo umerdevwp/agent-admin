@@ -39,7 +39,7 @@ class Portal extends CI_Controller {
 		}
 
 		// if organization field in okta is empty
-		if(empty($this->session->user['zohoId'])) die("Org is blank");
+		if(empty($this->session->user['zohoId'])) redirect("/support");
 		//var_dump($this->session->user['zohoId']);die;
 		// set zoho id from okta
 		$this->account = $this->session->user['zohoId'];
@@ -51,15 +51,6 @@ class Portal extends CI_Controller {
         //$this->ZoHo_Account->dumpAll();
 		//$data['account'] = $this->ZoHo_Account;
 		
-<<<<<<< HEAD
-		if ($this->session->user['zohoId'] == getenv("SUPER_USER")) {
-            $data['entity'] = $this->Accounts_model->loadAccount($this->session->user['zohoId']);
-            $data['arChildEntity'] = $this->Accounts_model->getAll();
-        } else {
-            $data['entity'] = $this->Accounts_model->loadAccount($this->session->user['zohoId']);
-            $data['arChildEntity'] = $this->Accounts_model->loadChildAccounts($this->session->user['zohoId']);
-        }
-=======
 		$this->load->model('Accounts_model');
 		$this->load->model('Tempmeta_model');
 		$data['entity'] = false;		
@@ -99,7 +90,6 @@ class Portal extends CI_Controller {
 				);
 			}
 		}
->>>>>>> bd4b31201468e7a213da656e51552319fb8a02a0
 
 		//var_dump($data['account']);die;
         $this->load->view('header');
