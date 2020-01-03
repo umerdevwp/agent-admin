@@ -52,6 +52,18 @@ class Tempmeta_model extends CI_Model
         return $result;
     }
 
+    private function resetTempmeta()
+    {
+        if($this->isDbSynched())
+        {
+            $result = $this->deleteAll();
+            if(!$result)
+            {
+                log_message("error","Unable to delete tempmeta");
+            }
+        }
+    }
+
     private function deleteAll()
     {
         $query = "DELETE FROM {$this->table}";
@@ -171,6 +183,9 @@ HC;
 
     public function appendRow($iId,$sSlug,$aData,$sRowKey="id")
     {
+        // reset Tempmeta table for schedule synchs done by zoho
+        $this->resetTempmeta();
+
         $aResult = $this->getOne($iId,$sSlug);
 
         $aTempData = $aNewData = array();
