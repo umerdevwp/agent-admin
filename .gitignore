@@ -4,4 +4,6 @@ application/logs/*
 docs/*
 .vs/*
 vendor/*
+zohoauth/*
+.htaccess
 composer.lock
