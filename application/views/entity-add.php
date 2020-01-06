@@ -54,7 +54,7 @@
     </div>
     <div class="form-group col-md-4">
       <label for="inputFillingState">Filling State <span class="steric">*</span></label>
-      <select onchange="handleChange()" id="inputFillingState" class="form-control" name="inputFillingState">
+      <select id="inputFillingState" class="form-control" name="inputFillingState">
 
         <option selected="true" value="-Select-">-Select-</option>
         <option value="AK" formula_val="">AK</option>
@@ -114,7 +114,7 @@
     </div>
     <div class="form-group col-md-4">
       <label for="inputFillingStructure">Filling Structure <span class="steric">*</span></label>
-      <select onchange='handleChange_Filling_Structure()' id="inputFillingStructure" class="form-control" name="inputFillingStructure">
+      <select id="inputFillingStructure" class="form-control" name="inputFillingStructure">
         <option selected="true" value="-Select-">-Select-</option>
         <option value="Corporation" formula_val="">Corporation</option>
         <option value="LLC" formula_val="">LLC</option>
@@ -244,24 +244,13 @@
 
 
 </section>
+<script src="/components/base/jquery-3.4.1.min.js"></script>
+
 <script>
-window.onload = setValue_inputFillingState;
-function setValue_inputFillingState() {
-  if (window.location.href.indexOf("entity") > -1 && window.location.href.indexOf("add") > -1) {
-    localStorage.getItem("filling_state_selection") !== null ? 
-    document.getElementById('inputFillingState').value = localStorage.getItem("filling_state_selection") : '';
-    localStorage.getItem("filling_structure_selection") !== null ? 
-    document.getElementById('inputFillingStructure').value = localStorage.getItem("filling_structure_selection") : '';
-  }
-}
-handleChange = () => {
-  var x = document.getElementById("inputFillingState").value;
-  localStorage.setItem("filling_state_selection", x);
-}
-handleChange_Filling_Structure = () => {
-  var x = document.getElementById("inputFillingStructure").value;
-  localStorage.setItem("filling_structure_selection", x);
-}
+   jQuery(function($){
+       $('#inputFillingState').val('<?php print !empty($this->input->post("inputFillingState")) ? $this->input->post("inputFillingState") : '-Select-'; ?>');
+       $('#inputFillingStructure').val('<?php print !empty($this->input->post("inputFillingStructure")) ? $this->input->post("inputFillingStructure") : '-Select-' ?>');
+    });
 </script>
 <script>
 
