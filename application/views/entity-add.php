@@ -246,6 +246,13 @@
 </section>
 
 <script>
+   jQuery(function($){
+       $('#inputFillingState').val('<?php print !empty($this->input->post("inputFillingState")) ? $this->input->post("inputFillingState") : '-Select-'; ?>');
+       $('#inputFillingStructure').val('<?php print !empty($this->input->post("inputFillingStructure")) ? $this->input->post("inputFillingStructure") : '-Select-' ?>');
+    });
+    
+</script>
+<script>
 
 var iTaskId = 0;
 function setTaskId(id)
