@@ -245,7 +245,10 @@
 
 </section>
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> development
 <script>
    jQuery(function($){
        $('#inputFillingState').val('<?php print !empty($this->input->post("inputFillingState")) ? $this->input->post("inputFillingState") : '-Select-'; ?>');

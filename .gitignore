@@ -4,6 +4,7 @@ application/logs/*
 docs/*
 .vs/*
 vendor/*
+<<<<<<< HEAD
 composer.lock
 .idea/.gitignore
 .gitignore
@@ -14,3 +15,8 @@ ZCRMClientLibrary.log
 .idea/modules.xml
 .idea/php.xml
 .htaccess
+=======
+zohoauth/*
+.htaccess
+composer.lock
+>>>>>>> development

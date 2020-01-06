@@ -38,9 +38,14 @@ class Portal extends CI_Controller {
 			redirect("");
 		}
 
+<<<<<<< HEAD
 		
 		// if organization field in okta is empty
 		if(empty($this->session->user['zohoId'])) redirect("/support");
+=======
+		// if organization field in okta is empty
+		if(empty($this->session->user['zohoId'])) die("Org is blank");
+>>>>>>> development
 		//var_dump($this->session->user['zohoId']);die;
 		// set zoho id from okta
 		$this->account = $this->session->user['zohoId'];
