@@ -41,10 +41,6 @@ TrustLogo("https://www.positivessl.com/images/seals/positivessl_trust_seal_sm_12
 </div>
 </body>
 </html>
-<script src="components/base/script.js"></script>
-<script src="components/base/jquery-3.4.1.min.js"></script>
-<script src="components/base/moment.min.js"></script>
-<script src="components/datepicker/bootstrap-datepicker.js"></script>
 <script>
 $(document).ready(function(){
   $('.template-panel-switch').on('click', function(){

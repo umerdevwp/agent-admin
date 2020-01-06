@@ -614,7 +614,7 @@ $('#saveAddNew').on('click', function(){
   var fname = $('#inputContactFirstName').val();
   var lname = $('#inputContactLastName').val();
   var ctype = $('#inputContactType').val();
-  var email = $('#inputContactEmail').val();
+  var email = $('#inputContactEmail').val();javas
   var street = $('#inputContactStreet').val();
   var city = $('#inputContactCity').val();
   var state = $('#inputContactState').val();
@@ -623,4 +623,5 @@ $('#saveAddNew').on('click', function(){
   var markup = "<tr><td>" + fname + lname + "</td><td>" + ctype + "</td><td>" + email + "</td><td>" + street + city + state + zipcode + "</td><td>" + phone + "</td>";
   $('table#DataTables_Table_3 tbody').append(markup);
 });
+
 </script> -->

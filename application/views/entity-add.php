@@ -244,13 +244,14 @@
 
 
 </section>
-<script src="/components/base/jquery-3.4.1.min.js"></script>
+
 
 <script>
    jQuery(function($){
        $('#inputFillingState').val('<?php print !empty($this->input->post("inputFillingState")) ? $this->input->post("inputFillingState") : '-Select-'; ?>');
        $('#inputFillingStructure').val('<?php print !empty($this->input->post("inputFillingStructure")) ? $this->input->post("inputFillingStructure") : '-Select-' ?>');
     });
+    
 </script>
 <script>
 
