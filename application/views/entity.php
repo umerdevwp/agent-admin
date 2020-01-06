@@ -514,7 +514,7 @@
 </div>
 
 
-<script src="components/base/jquery-3.4.1.min.js"></script>
+<!-- <script src="components/base/jquery-3.4.1.min.js"></script> -->
 <script src="components/bootstrapswitch/bootstrap-toggle.js"></script>
 <script>
 
@@ -553,7 +553,15 @@ setTimeout(() => {
     // empty all error messages to send form again
     $(".errorMsg").text("");
     $('#contactLoader').show();
-
+    var fname = $('#inputContactFirstName').val();
+    var lname = $('#inputContactLastName').val();
+    var ctype = $('#inputContactType').val();
+    var email = $('#inputContactEmail').val();
+    var street = $('#inputContactStreet').val();
+    var city = $('#inputContactCity').val();
+    var state = $('#inputContactState').val();
+    var zipcode = $('#inputContactZipcode').val();
+    var phone = $('#inputContactPhone').val();
     $.ajax({
       type:"POST",
       url:"ajax/contact/save/",
@@ -585,6 +593,8 @@ setTimeout(() => {
           $('#formContactMultiple')[0].reset();
           $('#validateAddress').hide();
           $('#successMessageBox').show().delay(10000).fadeOut();
+          var markup = "<tr><td>" + fname + lname + "</td><td>" + ctype + "</td><td>" + email + "</td><td>" + street + city + state + zipcode + "</td><td>" + phone + "</td>";
+          $('table#DataTables_Table_3 tbody').append(markup);
           if($(ev.target).attr("id")=='saveClose'){
             $('#addMultiple').modal('hide');
           } else{
