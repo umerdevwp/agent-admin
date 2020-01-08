@@ -15,7 +15,9 @@
 	
 <section class="Jumbotron"><!--Company Summary Info-->
 <div class="container">
-	
+<div class="row">
+  <div class="col"></div>
+</div>
 <div class="row">
 	<div class="col-md-9 col-lg-12">
       <div class="panel">
