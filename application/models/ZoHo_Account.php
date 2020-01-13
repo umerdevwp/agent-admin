@@ -3,7 +3,7 @@
 use zcrmsdk\crm\setup\restclient\ZCRMRestClient;
 use zcrmsdk\crm\crud\ZCRMModule;
 use zcrmsdk\crm\crud\ZCRMRecord;
-
+use zcrmsdk\crm\crud\ZCRMNote;
 
 /**
  * ZoHo_Account class contains all logic to pull data from ZoHo
@@ -577,11 +577,42 @@ class ZoHo_Account extends CI_Model
         $oApi->setFieldValue("Mailing_Zip",$Mailing_Zip);
         
         try {
-            $oApi->create();
+            $response = $oApi->create();
+            $object = $response->getDetails();
+            $arError = ['type'=>'ok','results'=> $object['id'] ];
         } catch(Exception $e){
-            $arError = ['type'=>'error','results'=>"Server failed to add contact."];
+            $arError = ['type'=>'error','results'=>"Server failed to add contact.",'message'=>$e->getMessage()];
         }
 
         return $arError;
+    }
+
+    /**
+     * Add note to zoho records entity/contact
+     * 
+     * @param $sNoteFor String can be Accounts/Contacts
+     * @param $iRelatedTo Integer record id, the note will be attached to
+     */
+    public function newZohoNote($sNoteFor,$iRlateToId,$sNoteTitle,$sNoteContent)
+    {
+            
+            $record = $this->getInstance($sNoteFor,$iRlateToId);
+            
+            $noteIns = ZCRMNote::getInstance($record, NULL); // to get the note instance
+            
+            $noteIns->setTitle($sNoteTitle); // to set the note title
+            $noteIns->setContent($sNoteContent); // to set the note content
+            $aError = [];
+            try {
+                $response=$record->addNote($noteIns);
+                $result = $response->getDetails();
+
+                $aError = ['type'=>'ok','result'=>$result['id']];
+
+            } catch(Exception $e){
+                $aError = ['type'=>'error','message'=>$e->getMessage()];
+            }
+           
+           return $aError;
     }
 }
