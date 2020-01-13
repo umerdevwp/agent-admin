@@ -577,7 +577,9 @@ class ZoHo_Account extends CI_Model
         $oApi->setFieldValue("Mailing_Zip",$Mailing_Zip);
         
         try {
-            $oApi->create();
+            $response = $oApi->create();
+            $object = $response->getDetails();
+            $arError = ['type'=>'ok', 'id'=> $object['id'] ];
         } catch(Exception $e){
             $arError = ['type'=>'error','results'=>"Server failed to add contact."];
         }

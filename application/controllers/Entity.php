@@ -3,11 +3,15 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Entity extends CI_Controller {
-
+    private $url = '';
+    private $easy_ofac_test = '';
+    private $auth_key = '';
     public function __construct()
     {
         parent::__construct();
-        
+        $this->url = !empty(getenv('EASY_OFAC_URL')) ? getenv('EASY_OFAC_URL') : '';
+        $this->easy_ofac_test = !empty(getenv('EASY_OFAC_TEST')) ? getenv('EASY_OFAC_TEST') : '';
+        $this->auth_key = !empty(getenv("EASY_OFAC_KEY")) ? getenv('EASY_OFAC_KEY') : '';
         $this->load->helper("custom");
 
     }
@@ -95,6 +99,10 @@ class Entity extends CI_Controller {
             } else {
                 $data['contacts'] = [];
             }
+        }
+
+        if(count($data['contacts']) != 0){
+            $data['contacts'] = $this->objectAterForOFAC($data['contacts']);
         }
         
         $data['attachments'] = $this->Attachments_model->getAllFromEntityId($id);
@@ -496,5 +504,48 @@ class Entity extends CI_Controller {
             $this->Tempmeta_model->appendRow($iEntityId,$this->Tempmeta_model->slugNewContact,$aDataContacts);
         }
     }
+
+    public function objectAterForOFAC($value = ''){
+        if(!empty($value)){
+           $ObjectCount = count((array)$value);
+           for($i=0; $i < $ObjectCount; $i++){
+                if($value[$i]->id){
+                    $OFACObject = $this->getContactOfac($value[$i]->id);
+                    $value[$i]->OFAC_status = $OFACObject->customer_status;
+                }
+           }
+        }
+        return $value;
+    }
+
+
+    public function getContactOfac($id){
+        //Key and url from .env
+     if(empty($this->url) or empty($this->auth_key) or empty($this->easy_ofac_test)){
+        log_message('error', 'OFAC settings are missing.');
+        return $data['error'] = "OFAC settings are missing.";
+     }
+     //Test variables
+
+
+     $finalurl = $this->url."inspectCustomer?api_key=".$this->auth_key."&id=".$id;
+     $cSession = curl_init();
+     if (!$cSession) {
+        log_message('error', "Couldn't initialize a cURL handle");
+         return $data['error'] = "Couldn't initialize a cURL handle";
+     }
+     // Step 2
+     curl_setopt($cSession,CURLOPT_URL,$finalurl);
+     curl_setopt($cSession,CURLOPT_RETURNTRANSFER,true);
+     curl_setopt($cSession,CURLOPT_HEADER, false); 
+     // Step 3
+     $result=curl_exec($cSession);
+     // Step 4
+     curl_close($cSession);
+     // Step 5
+     $json = json_decode($result);
+     return $json;
+
+ }
 
 }

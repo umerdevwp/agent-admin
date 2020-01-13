@@ -5,6 +5,18 @@ use Src\Services\OktaApiService as Okta;
 
 class Contacts extends CI_Controller
 {
+    private $url = '';
+    private $easy_ofac_test = '';
+    private $auth_key = '';
+    public function __construct()
+    {
+        parent::__construct();
+        
+       $this->url = !empty(getenv('EASY_OFAC_URL')) ? getenv('EASY_OFAC_URL') : '';
+       $this->easy_ofac_test = !empty(getenv('EASY_OFAC_TEST')) ? getenv('EASY_OFAC_TEST') : '';
+       $this->auth_key = !empty(getenv("EASY_OFAC_KEY")) ? getenv('EASY_OFAC_KEY') : '';
+
+    }
     public function index()
     {
         if(!isSessionValid("Contacts")) redirectSession();
@@ -162,9 +174,15 @@ $aResponse = $this->ZoHo_Account->newZohoContact(
 if($aResponse['type']=='error'){
     $arError[] = $aResponse['results'];
 } else {
+
+    //add contact to OFAC $aResponse["id"];
+    $this->addContactOfac($aResponse["id"],$this->input->post("inputContactFirstName"),$this->input->post("inputContactLastName"));
+
+
     $this->load->model("Tempmeta_model");
 
     $data = [
+                "id" => $aResponse["id"],
                 "first_name"    =>  $this->input->post("inputContactFirstName"),
                 "last_name"    =>  $this->input->post("inputContactLastName"),
 
@@ -189,4 +207,35 @@ if($aResponse['type']=='error'){
         }
         
     }
+
+    //Function for adding the contacts to the easyOFAC
+    //This function has the dependence of ZohoID, First Name and Last Name and KYC(Know your customer) which is set to 0 at the moment moreover it can be edited directly from easyOFAC
+    public function addContactOfac($id, $first_name, $last_name){
+
+        //Key and url from .env
+     if(empty($this->url) or empty($this->auth_key) or empty($this->easy_ofac_test)){
+        return "OFAC settings are missing.";
+     }
+     //Test variables
+     // $first_name = "Lorem";
+     // $last_name = "Lorem";
+     // $id = "12345678901234567890";
+
+     $finalurl = $this->url."addCustomer?api_key=".$this->auth_key."&id=".$id."&first_name=".$first_name."&last_name=".$last_name."&test=".$this->easy_ofac_test."&kyc=0";
+     $cSession = curl_init();
+     if (!$cSession) {
+         return "Couldn't initialize a cURL handle";
+     }
+     // Step 2
+     curl_setopt($cSession,CURLOPT_URL,$finalurl);
+     curl_setopt($cSession,CURLOPT_RETURNTRANSFER,true);
+     curl_setopt($cSession,CURLOPT_HEADER, false); 
+     // Step 3
+     $result=curl_exec($cSession);
+     // Step 4
+     curl_close($cSession);
+     // Step 5
+     $json = json_decode($result);
+     return $json;
+ }
 }

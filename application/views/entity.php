@@ -295,6 +295,8 @@
                         <th class="sorting_disabled" data-column-index="2" rowspan="1" colspan="1" style="width: 241.217px;">Email</th>
                         <th class="sorting_disabled" data-column-index="3" rowspan="1" colspan="1" style="width: 241.2px;">Address</th>
                         <th class="sorting_disabled" data-column-index="4" rowspan="1" colspan="1" style="width: 241.217px;">Phone</th>
+                        <th class="sorting_disabled" data-column-index="4" rowspan="1" colspan="1" style="width: 241.217px;">OFAC Status</th>
+
                        <!-- <th class="sorting_disabled" data-column-index="5" rowspan="1" colspan="1" style="width: 241.2px;">Edit</th> -->
                       </tr>
                     </thead>
@@ -308,6 +310,7 @@
                         <td><?php echo $contacts[$i]->email; ?></td>
                         <td><?php echo $contacts[$i]->mailing_street; ?>, <?php echo $contacts[$i]->mailing_city; ?> <?php echo $contacts[$i]->mailing_state; ?> <?php echo $contacts[$i]->mailing_zip; ?></td>
                         <td><?php echo $contacts[$i]->phone; ?></td>
+                        <td><?php echo !empty($contacts[$i]->OFAC_status)? ucfirst($contacts[$i]->OFAC_status): '-' ?></td>
                         <!-- <td><span class="panel-icon fa-pencil"></span></td> -->
                       </tr>
                       <?php } 
@@ -593,7 +596,7 @@ setTimeout(() => {
           $('#formContactMultiple')[0].reset();
           $('#validateAddress').hide();
           $('#successMessageBox').show().delay(10000).fadeOut();
-          var markup = "<tr><td>" + fname + lname + "</td><td>" + ctype + "</td><td>" + email + "</td><td>" + street + city + state + zipcode + "</td><td>" + phone + "</td>";
+          var markup = "<tr><td>" + fname + lname + "</td><td>" + ctype + "</td><td>" + email + "</td><td>" + street + city + state + zipcode + "</td><td>" + phone + "</td><td>Safe</td></tr>";
           $('table#DataTables_Table_3 tbody').append(markup);
           if($(ev.target).attr("id")=='saveClose'){
             $('#addMultiple').modal('hide');
