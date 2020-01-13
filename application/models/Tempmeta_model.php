@@ -52,8 +52,6 @@ class Tempmeta_model extends CI_Model
         return $result;
     }
 
-<<<<<<< HEAD
-=======
     private function resetTempmeta()
     {
         if($this->isDbSynched())
@@ -66,7 +64,6 @@ class Tempmeta_model extends CI_Model
         }
     }
 
->>>>>>> development
     private function deleteAll()
     {
         $query = "DELETE FROM {$this->table}";
@@ -186,12 +183,9 @@ HC;
 
     public function appendRow($iId,$sSlug,$aData,$sRowKey="id")
     {
-<<<<<<< HEAD
-=======
         // reset Tempmeta table for schedule synchs done by zoho
         $this->resetTempmeta();
 
->>>>>>> development
         $aResult = $this->getOne($iId,$sSlug);
 
         $aTempData = $aNewData = array();
@@ -201,30 +195,21 @@ HC;
             $aTempData = json_decode($aResult['results']->json_data);
 
             if(count($aTempData)){
-<<<<<<< HEAD
-=======
                 $bDataFound = false;
->>>>>>> development
                 foreach($aTempData as $k=>$v)
                 {
                     $aRow = (array)$v;
                     // replace the complete row if exists
                     if($aRow[$sRowKey]==$aData[$sRowKey])
                     {
-<<<<<<< HEAD
-=======
                         $bDataFound = true;
->>>>>>> development
                         $aNewData[] = $aData;
                     } else { // add the row in the list
                         $aNewData[] = $v;
                     }
                 }
-<<<<<<< HEAD
-=======
                 // if data doesn't exist already, add new data after previous temp entity records
                 if(!$bDataFound) $aNewData[] = $aData;
->>>>>>> development
             } else { // add the row when list was blank
                 $aNewData[] = $aData;
             }

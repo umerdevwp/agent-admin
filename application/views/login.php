@@ -124,10 +124,10 @@ TrustLogo("https://www.positivessl.com/images/seals/positivessl_trust_seal_sm_12
   </body>
 
 <script type="text/javascript">
-<!--
-function redirectTo(sUrl) {
-window.location = sUrl
-}
+//<!--
+//function redirectTo(sUrl) {
+//window.location = sUrl
+//}
 //-->
 </script>
 

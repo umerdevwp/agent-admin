@@ -103,11 +103,7 @@ class Contacts extends CI_Controller
 
         $aData = ['email'=>$strEmail,'entity_name'=>$this->input->post('entityId')];
 
-<<<<<<< HEAD
-        $bContactRow = $this->Contacts_model->checkRowExistInJson($aData);
-=======
         $bContactRow = $this->Contacts_model->checkRowExist($aData);
->>>>>>> development
         // check in zoho contacts list
         if($bContactRow)
         {
@@ -182,11 +178,7 @@ if($aResponse['type']=='error'){
                 "mailing_zip"    =>  $this->input->post("inputContactZipcode"),
     ];
 
-<<<<<<< HEAD
-    $this->Tempmeta_model->appendRow($iLoginId,"Contacts",$data,"email");
-=======
     $this->Tempmeta_model->appendRow($iLoginId,$this->Tempmeta_model->slugNewContact,$data,"email");
->>>>>>> development
 }
 
         if(count($arError))

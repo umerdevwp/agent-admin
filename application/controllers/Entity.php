@@ -37,11 +37,7 @@ class Entity extends CI_Controller {
 		
 		// fetch data from DB
         $aDataEntity = $this->Accounts_model->loadAccount($id);
-<<<<<<< HEAD
-
-=======
         $oTempAgetAddress = null;
->>>>>>> development
         if($aDataEntity['type']=='error' && $this->session->user['child'])
         {
             $aDataTempEntity = $this->Tempmeta_model->getOneInJson([
@@ -52,11 +48,8 @@ class Entity extends CI_Controller {
             if($aDataTempEntity['type']=='ok')
             {
                 $data['entity'] = $aDataTempEntity['results'];
-<<<<<<< HEAD
-=======
                 $oTempAgetAddress = $data['entity']->agent;
                 
->>>>>>> development
                 $this->session->set_flashdata("info","Please note: missing fields will be updated shortly.");
             } else {
                 $this->session->set_flashdata("error","No such entity exist.");
@@ -71,18 +64,9 @@ class Entity extends CI_Controller {
         $oAgetAddress = $this->Accounts_model->getAgentAddress($id);
         
         if(is_object($oAgetAddress)){
-<<<<<<< HEAD
-            $data['AgentAddress']['file_as'] = $oAgetAddress->file_as;
-            $data['AgentAddress']['address'] = $oAgetAddress->address;
-            $data['AgentAddress']['address2'] = $oAgetAddress->address2;
-            $data['AgentAddress']['city'] = $oAgetAddress->city;
-            $data['AgentAddress']['state'] = $oAgetAddress->state;
-            $data['AgentAddress']['zip_code'] = $oAgetAddress->zip_code;
-=======
             $data['AgentAddress'] = (array)$oAgetAddress;
         } else if(is_object($oTempAgetAddress)){
             $data['AgentAddress'] = (array)$oTempAgetAddress;
->>>>>>> development
         } else {
             $data['AgentAddress'] = false;
         }
