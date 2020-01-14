@@ -55,7 +55,7 @@
       <label for="inputFillingState">Filling State <span class="steric">*</span></label>
       <select id="inputFillingState" class="form-control" name="inputFillingState">
 
-        <option selected="true" value="-Select-">-- Select --</option>
+        <option selected="true" value="">-- Select --</option>
         <option value="AK" >Alaska - AK</option>
         <option value="AL" >Alabama - AL</option>
         <option value="AR" >Arkansas - AR</option>
@@ -115,7 +115,7 @@
     <div class="form-group col-md-4">
       <label for="inputFillingStructure">Filling Structure <span class="steric">*</span></label>
       <select id="inputFillingStructure" class="form-control" name="inputFillingStructure">
-        <option selected="true" value="-Select-">-Select-</option>
+        <option selected="true" value="">-Select-</option>
         <option value="Corporation" >Corporation</option>
         <option value="LLC" >LLC</option>
         <option value="Non-Profit Corporation" >Non-Profit Corporation</option>
@@ -163,9 +163,9 @@
     <?php echo form_error('inputNotificationAddress'); ?>
   </div>
   <div class="form-group col-md-4">
-    <label for="inputNotificationContactType">Contact Type <span class="steric">*</span></label>
+    <label for="inputNotificationContactType">Contact Type </label>
     <select class="form-control" id="inputNotificationContactType" name="inputNotificationContactType">
-      <option selected="true" value="-Select-">-- Select --</option>
+      <option selected="true" value="">-- Select --</option>
       <option value="CEO">CEO</option>
       <option value="CFO">CFO</option>
       <option value="Director">Director</option>
@@ -187,7 +187,7 @@
     <div class="form-group col-md-4">
     <label for="inputNotificationState">State/Region/Province <span class="steric">*</span></label>
     <select class="form-control" id="inputNotificationState" name="inputNotificationState">
-      <option selected="ture" value="-Select-">-- Select --</option>
+      <option selected="ture" value="">-- Select --</option>
       <option value="AK">Alaska - AK</option>
       <option value="AL">Alabama - AL</option>
       <option value="AZ">Arizona - AZ</option>
@@ -263,8 +263,8 @@
   </div>
   <div class="form-group col-md-12">
     <label for="inputBusinessPurpose">Business Purpose</label>
-    <?php echo form_error('inputBusinessPurpose'); ?>
     <textarea class="form-control" id="inputBusinessPurpose" name="inputBusinessPurpose" rows="3"><?=$this->input->post("inputBusinessPurpose");?></textarea>
+    <?php echo form_error('inputBusinessPurpose'); ?>
   </div>
   
 
