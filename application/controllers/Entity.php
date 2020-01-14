@@ -177,6 +177,9 @@ class Entity extends CI_Controller {
         }
 
         $this->form_validation->set_rules('inputName', 'Account Name', 'required|regex_match[/[a-zA-Z\s]+/]',["regex_match"=>"Only alphabets and spaces allowed."]);
+        //$this->form_validation->set_rules('inputFirstName', 'First Name', 'required|regex_match[/[a-zA-Z\s]+/]',["regex_match"=>"Only alphabets and spaces allowed."]);
+        
+        $this->form_validation->set_rules('inputNotificationContactType', 'Contact Type', 'required|alpha');
         $this->form_validation->set_rules('inputFillingState', 'Filing State', 'required|alpha');
         $this->form_validation->set_rules('inputFillingStructure', 'Entity Type', 'required|regex_match[/[A-Z\-]+/]');
         $this->form_validation->set_rules('inputFormationDate', 'Formation Date', 'required|regex_match[/[0-9]{4,}\-[0-9]{2,}\-[0-9]{2,}/]',["regex_match"=>"Allowed %s format: 2019-01-01"]);
@@ -194,7 +197,7 @@ class Entity extends CI_Controller {
             $this->input->post("inputNotificationAddress"),
             $this->input->post("inputNotificationCity"),
             $this->input->post("inputNotificationState"),
-            $this->input->post("inputBusinessPurpose")
+            $this->input->post("inputNotificationZip")
         );
         // to hold smarty address corrections
         $sSmartyAddress = "";
@@ -402,7 +405,7 @@ HC;
 
                     "Email"         =>$this->input->post("inputNotificationEmail"),
                     "Phone"         =>$this->input->post("inputNotificationPhone"),
-                    "Contact_Type"  =>"",
+                    "Contact_Type"  =>$this->input->post("inputNotificationContactType"),
 
                     "Mailing_Street"=>$this->input->post("inputNotificationAddress"),
                     "Mailing_City"  =>$this->input->post("inputNotificationCity"),
@@ -497,7 +500,7 @@ HC;
 
                 "email"    =>  $this->input->post("inputNotificationEmail"),
                 "phone"    =>  $this->input->post("inputNotificationPhone"),
-                "title"    =>  "",
+                "title"    =>  $this->input->post("inputNotificationContactType"),
 
                 "mailing_street"    =>  $this->input->post("inputNotificationAddress"),
                 "mailing_city"    =>  $this->input->post("inputNotificationCity"),
