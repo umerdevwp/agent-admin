@@ -62,7 +62,7 @@ $route['entity/add']['post'] = 'entity/add';
 $route['entity/(:num)'] = 'entity/index/$1';
 $route['contacts'] = 'contacts/index';
 $route['attachments'] = 'attachments/index';
-$route['agents'] = 'registeragents/index';
+$route['agents'] = 'RegisterAgents/index';
 
 // actions
 $route['zoho'] = 'tasks/getZohoCode';
