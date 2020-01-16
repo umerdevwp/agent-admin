@@ -497,7 +497,7 @@
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="closeModalBtn">Close</button>
         <button type="button" class="btn btn-success save" id="saveClose" >Save &amp; Close</button>
         <button type="button" class="btn btn-primary addnew" id="saveAddNew" >Save &amp; Add New</button>
         
@@ -617,6 +617,13 @@ setTimeout(() => {
 
       }
     });
+  });
+  $("#closeModalBtn").on('click', function(){
+    if(confirm("Are you sure to discard the data?")){
+      location.replace("portal");
+    }else{
+      return false;
+    }
   });
 </script>
 <!-- <script>

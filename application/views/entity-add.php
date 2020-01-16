@@ -279,6 +279,7 @@
 
 
   <button type="submit" class="btn btn-primary">Create New Entity</button>
+  <input type="button" class="btn btn-secondary" id="cancelBtn" value="Cancel">
 </form>
 </div>
 
@@ -323,6 +324,15 @@
        $('#inputFillingStructure').val('<?php print !empty($this->input->post("inputFillingStructure")) ? $this->input->post("inputFillingStructure") : '-Select-' ?>');
        $('#inputNotificationContactType').val('<?php print !empty($this->input->post("inputNotificationContactType")) ? $this->input->post("inputNotificationContactType") : '-Select-' ?>');
        $('#inputNotificationState').val('<?php print !empty($this->input->post("inputNotificationState")) ? $this->input->post("inputNotificationState") : '-Select-' ?>');
+    });
+    jQuery('input#cancelBtn').on('click', function($){
+      if(confirm("Are you sure to discard the data?")){
+        //alert("this is portal page");
+        location.replace("portal");
+      }else{
+        return false;
+      }
+
     });
     
 </script>
