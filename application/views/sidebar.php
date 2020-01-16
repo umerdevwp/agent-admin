@@ -23,3 +23,4 @@ endif;?>"><span class="rd-navbar-icon fa-home"></span><span class="rd-navbar-lin
 </li>-->
 <li class="rd-navbar-nav-item"><a class="rd-navbar-link" href="/contacts"><span class="rd-navbar-icon fa-list-alt"></span><span class="rd-navbar-link-text">Contacts List</span></a> </li>
 <li class="rd-navbar-nav-item"><a class="rd-navbar-link" href="/attachments"><span class="rd-navbar-icon fa-file-text"></span><span class="rd-navbar-link-text">Attachments List</span></a> </li>
+<li class="rd-navbar-nav-item"><a class="rd-navbar-link" href="/agents"><span class="rd-navbar-icon fa-map-marker"></span><span class="rd-navbar-link-text">Registered Addresses</span></a> </li>
