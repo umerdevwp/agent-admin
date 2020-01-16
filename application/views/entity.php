@@ -221,11 +221,7 @@
               </div>
               <div class="row">
                 <div class="col-sm-12 attachment-table">
-<<<<<<< HEAD
-                  <table class="table table-striped table-hover data-table dataTable" data-page-length="5" data-table-mode="multi-filter" id="DataTables_Table_2" role="grid" aria-describedby="DataTables_Table_3_info">
-=======
                   <table class="table table-striped table-hover data-table dataTable" data-page-length="5" data-table-mode="multi-filter" id="DataTables_Table_2" role="grid" aria-describedby="DataTables_Table_2_info">
->>>>>>> 23886201fbf4d3abfc95e2018ea271767c804833
                     <thead>
                       <tr role="row">
                         <th class="sorting_disabled" data-column-index="0" rowspan="1" colspan="1" style="width: 241.2px;">File Name</th>
