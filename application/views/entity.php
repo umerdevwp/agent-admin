@@ -356,6 +356,7 @@
 </div>
 
 
+
 <!-- Modal For Add Multiple Contacts-->
 <div class="modal fade" id="addMultiple" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" >
   <div class="modal-dialog modal-xl" role="document">
@@ -506,6 +507,7 @@
   </div>
 </div>
 </section>
+
 <div class="successMessage" id="successMessageBox">
   <div class="smessage">Contact have been saved successfully!.</div>
 </div>
@@ -618,27 +620,11 @@ setTimeout(() => {
       }
     });
   });
-  $("#closeModalBtn").on('click', function(){
+  $("#closeModalBtn, #addMultiple button.close").on('click', function(){
     if(confirm("Are you sure to discard the data?")){
-      location.replace("portal");
+      $("#addMultiple").modal('hide');
     }else{
       return false;
     }
   });
 </script>
-<!-- <script>
-$('#saveAddNew').on('click', function(){
-  var fname = $('#inputContactFirstName').val();
-  var lname = $('#inputContactLastName').val();
-  var ctype = $('#inputContactType').val();
-  var email = $('#inputContactEmail').val();javas
-  var street = $('#inputContactStreet').val();
-  var city = $('#inputContactCity').val();
-  var state = $('#inputContactState').val();
-  var zipcode = $('#inputContactZipcode').val();
-  var phone = $('#inputContactPhone').val();
-  var markup = "<tr><td>" + fname.lname + "</td><td>" + ctype + "</td><td>" + email + "</td><td>" + street.city.state.zipcode + "</td><td>" + phone + "</td>";
-  $('table#DataTables_Table_3 tbody').append(markup);
-});
-
-</script> -->
