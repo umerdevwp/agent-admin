@@ -128,6 +128,17 @@ function getClassMethods($class)
     }
 }
 
+function isDeveloperIp()
+{
+    if(
+        $_SERVER['REMOTE_ADDR']=='180.92.132.234' ||
+        $_SERVER['REMOTE_ADDR']=='192.168.0.187' ||
+        $_SERVER['REMOTE_ADDR']=='58.65.211.74'
+    ) return true;
+    else return false;
+}
+
+
 /**
  * Debug class or object or array, print_r optional debug class methods
  * @param $var Dynamic variable 
@@ -135,11 +146,7 @@ function getClassMethods($class)
  */
 function debug($var,$bFindMethod=false)
 {
-    if(
-        $_SERVER['REMOTE_ADDR']=='180.92.132.234' || 
-        $_SERVER['REMOTE_ADDR']=='192.168.0.187' || 
-        $_SERVER['REMOTE_ADDR']=='58.65.211.74'
-    ){
+    if(isDeveloperIp()){
         if($bFindMethod) getClassMethods($var);
         echo "<pre>";
         print_r($var);

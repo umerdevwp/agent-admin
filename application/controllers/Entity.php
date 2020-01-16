@@ -177,7 +177,10 @@ class Entity extends CI_Controller {
         }
 
         $this->form_validation->set_rules('inputName', 'Account Name', 'required|regex_match[/[a-zA-Z\s]+/]',["regex_match"=>"Only alphabets and spaces allowed."]);
-        //$this->form_validation->set_rules('inputFirstName', 'First Name', 'required|regex_match[/[a-zA-Z\s]+/]',["regex_match"=>"Only alphabets and spaces allowed."]);
+        
+        $this->form_validation->set_rules('inputFirstName', 'First Name', 'required|regex_match[/[a-zA-Z\s]+/]',["regex_match"=>"Only alphabets and spaces allowed."]);
+        $this->form_validation->set_rules('inputLastName', 'Last Name', 'required|regex_match[/[a-zA-Z\s]+/]',["regex_match"=>"Only alphabets and spaces allowed."]);
+
         
         $this->form_validation->set_rules('inputNotificationContactType', 'Contact Type', 'required|alpha');
         $this->form_validation->set_rules('inputFillingState', 'Filing State', 'required|alpha');
