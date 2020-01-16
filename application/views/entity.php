@@ -221,7 +221,7 @@
               </div>
               <div class="row">
                 <div class="col-sm-12 attachment-table">
-                  <table class="table table-striped table-hover data-table dataTable" data-page-length="5" data-table-mode="multi-filter" id="DataTables_Table_3" role="grid" aria-describedby="DataTables_Table_3_info">
+                  <table class="table table-striped table-hover data-table dataTable" data-page-length="5" data-table-mode="multi-filter" id="DataTables_Table_2" role="grid" aria-describedby="DataTables_Table_3_info">
                     <thead>
                       <tr role="row">
                         <th class="sorting_disabled" data-column-index="0" rowspan="1" colspan="1" style="width: 241.2px;">File Name</th>
@@ -596,7 +596,8 @@ setTimeout(() => {
           $('#formContactMultiple')[0].reset();
           $('#validateAddress').hide();
           $('#successMessageBox').show().delay(10000).fadeOut();
-          var markup = "<tr><td>" + fname + lname + "</td><td>" + ctype + "</td><td>" + email + "</td><td>" + street + city + state + zipcode + "</td><td>" + phone + "</td><td>Safe</td></tr>";
+          $( "table#DataTables_Table_3 tbody tr td.dataTables_empty" ).remove();
+          var markup = "<tr role='row' class='odd'><td class='sorting_1'>" + fname + lname + "</td><td>" + ctype + "</td><td>" + email + "</td><td>" + street + city + state + zipcode + "</td><td>" + phone + "</td><td>Safe</td></tr>";
           $('table#DataTables_Table_3 tbody').append(markup);
           if($(ev.target).attr("id")=='saveClose'){
             $('#addMultiple').modal('hide');

@@ -63,7 +63,11 @@ class Login extends CI_Controller
         {
             redirect("/portal");
         } else {
+           if($this->session->user['zohoId'] == getenv("SUPER_USER")){
+            redirect("/portal");
+           } else{
             redirect("/entity/" . $this->session->user["zohoId"]);
+           }
         }
     }
 
