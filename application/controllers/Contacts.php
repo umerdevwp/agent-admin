@@ -83,22 +83,27 @@ class Contacts extends CI_Controller
             //echo "<pre>";
             //print_r($aResponse);
             //echo json_encode($aResponse[0]);die;
+            $sSmartyAddress = "";
             if($aResponse['type']=='ok')
             {
+                // store previous user input for contact note purpose
+                $sSmartyAddress =<<<HC
+Street: {$this->input->post('inputContactStreet')}
+City: {$this->input->post('inputContactCity')}
+State: {$this->input->post('inputContactState')}
+Zipcode: {$this->input->post('inputContactZipcode')}
+HC;
+                // update the user input with smarty response data
                 $_POST['inputContactStreet'] = $aResponse['results'][0]->getDeliveryLine1();
                 $_POST['inputContactCity'] = $aResponse['results'][0]->getComponents()->getCityName();
                 $_POST['inputContactState'] = $aResponse['results'][0]->getComponents()->getStateAbbreviation();
                 $_POST['inputContactZipcode'] = $aResponse['results'][0]->getComponents()->getZIPCode();
-                //var_dump($_POST);
-                //echo "<pre>";
-                //print_r($aResponse['results'][0]->getComponents()->zipcode);
-                //getClassMethods($aResponse['results'][0]);
-                //die;
-                $aResponse = $this->addZoho();
+                
+                $aResponse = $this->addZoho($sSmartyAddress);
 
             } else if($this->input->post('acceptInvalidAddress'))
             {
-                $aResponse = $this->addZoho();
+                $aResponse = $this->addZoho($sSmartyAddress);
             }
             
             echo json_encode($aResponse);
@@ -138,7 +143,7 @@ class Contacts extends CI_Controller
         return $bDontExist;
     }
 
-    private function addZoho()
+    private function addZoho($sSmartyAddress='')
     {
         $this->load->model("ZoHo_Account");
         $this->load->model("Accounts_model");
@@ -172,17 +177,17 @@ $aResponse = $this->ZoHo_Account->newZohoContact(
 );
 
 if($aResponse['type']=='error'){
-    $arError[] = $aResponse['results'];
+    $arError[] = $aResponse['message'];
 } else {
 
     //add contact to OFAC $aResponse["id"];
-    $this->addContactOfac($aResponse["id"],$this->input->post("inputContactFirstName"),$this->input->post("inputContactLastName"));
+    $this->addContactOfac($aResponse["results"],$this->input->post("inputContactFirstName"),$this->input->post("inputContactLastName"));
 
 
     $this->load->model("Tempmeta_model");
-
+    $iContactId = $aResponse['results'];
     $data = [
-                "id" => $aResponse["id"],
+                "id" => $aResponse["results"],
                 "first_name"    =>  $this->input->post("inputContactFirstName"),
                 "last_name"    =>  $this->input->post("inputContactLastName"),
 
@@ -197,6 +202,8 @@ if($aResponse['type']=='error'){
     ];
 
     $this->Tempmeta_model->appendRow($iLoginId,$this->Tempmeta_model->slugNewContact,$data,"email");
+    // add a note if smarty validated address successfuly
+    if($sSmartyAddress!='') $response = $this->ZoHo_Account->newZohoNote("Contacts",$iContactId,"Smartystreet has replaced following",$sSmartyAddress);
 }
 
         if(count($arError))

@@ -185,6 +185,9 @@ class Entity extends CI_Controller {
         }
 
         $this->form_validation->set_rules('inputName', 'Account Name', 'required|regex_match[/[a-zA-Z\s]+/]',["regex_match"=>"Only alphabets and spaces allowed."]);
+        //$this->form_validation->set_rules('inputFirstName', 'First Name', 'required|regex_match[/[a-zA-Z\s]+/]',["regex_match"=>"Only alphabets and spaces allowed."]);
+        
+        $this->form_validation->set_rules('inputNotificationContactType', 'Contact Type', 'required|alpha');
         $this->form_validation->set_rules('inputFillingState', 'Filing State', 'required|alpha');
         $this->form_validation->set_rules('inputFillingStructure', 'Entity Type', 'required|regex_match[/[A-Z\-]+/]');
         $this->form_validation->set_rules('inputFormationDate', 'Formation Date', 'required|regex_match[/[0-9]{4,}\-[0-9]{2,}\-[0-9]{2,}/]',["regex_match"=>"Allowed %s format: 2019-01-01"]);
@@ -202,9 +205,10 @@ class Entity extends CI_Controller {
             $this->input->post("inputNotificationAddress"),
             $this->input->post("inputNotificationCity"),
             $this->input->post("inputNotificationState"),
-            $this->input->post("inputBusinessPurpose")
+            $this->input->post("inputNotificationZip")
         );
-
+        // to hold smarty address corrections
+        $sSmartyAddress = "";
         // check wether invalid address entered the 1st time
         if($oSmartyStreetResponse['type']=='error' && !$this->session->invalid_address_count)
         {
@@ -218,6 +222,13 @@ class Entity extends CI_Controller {
 
         // replace user address with validated smartystreet address
         } else {
+            // store previous user input for entity note purpose
+            $sSmartyAddress =<<<HC
+Street: {$this->input->post('inputNotificationAddress')}
+City: {$this->input->post('inputNotificationCity')}
+State: {$this->input->post('inputNotificationState')}
+Zipcode: {$this->input->post('inputNotificationZip')}
+HC;
             $_POST['inputNotificationAddress'] = $oSmartyStreetResponse['results'][0]->getDeliveryLine1();
             $_POST['inputNotificationCity'] = $oSmartyStreetResponse['results'][0]->getComponents()->getCityName();
             $_POST['inputNotificationState'] = $oSmartyStreetResponse['results'][0]->getComponents()->getStateAbbreviation();
@@ -257,9 +268,13 @@ class Entity extends CI_Controller {
 
             $response = $this->zohoCreateEntity($this->session->user['zohoId'],$bTagSmartyValidated);
             // succcess redirect to dashboard
-            if(isset($response["ok"]))
+            if($response["type"]=='ok')
             {
-                $this->session->set_flashdata("ok",$response["ok"]);
+                $this->session->set_flashdata("ok",$response["message"]);
+                // add a note if smarty validated address successfuly
+                if($sSmartyAddress!=''){
+                    $response = $this->ZoHo_Account->newZohoNote("Accounts",$response['data']['id'],"Smartystreet has replaced following",$sSmartyAddress);
+                }
                 $this->redirectAfterAdd();
             // redirect to form, show error
             } else if($response["error_code"]==2){
@@ -398,7 +413,7 @@ class Entity extends CI_Controller {
 
                     "Email"         =>$this->input->post("inputNotificationEmail"),
                     "Phone"         =>$this->input->post("inputNotificationPhone"),
-                    "Contact_Type"  =>"",
+                    "Contact_Type"  =>$this->input->post("inputNotificationContactType"),
 
                     "Mailing_Street"=>$this->input->post("inputNotificationAddress"),
                     "Mailing_City"  =>$this->input->post("inputNotificationCity"),
@@ -446,7 +461,7 @@ class Entity extends CI_Controller {
             return ['error'=>$arError[0],'error_code'=>$iErrorType];
         }
 
-        return ['ok'=>"Entity created successfully."];
+        return ['type'=>'ok','message'=>"Entity created successfully.","data"=>['id'=>$oResponse['id']]];
     }
 
     private function addEntityToTemp($iEntityId,$bContactDone=true,$bAttachmentDone=true)
@@ -493,7 +508,7 @@ class Entity extends CI_Controller {
 
                 "email"    =>  $this->input->post("inputNotificationEmail"),
                 "phone"    =>  $this->input->post("inputNotificationPhone"),
-                "title"    =>  "",
+                "title"    =>  $this->input->post("inputNotificationContactType"),
 
                 "mailing_street"    =>  $this->input->post("inputNotificationAddress"),
                 "mailing_city"    =>  $this->input->post("inputNotificationCity"),

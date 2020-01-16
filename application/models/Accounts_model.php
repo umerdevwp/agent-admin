@@ -31,7 +31,6 @@ class Accounts_model extends CI_Model
 
     public function getAgentAddress($id)
     {
-        $query = $this->db->get_where("zoho_registered_agents",['id'=>$id]);
 
         $this->db->limit(1);
         $this->db->select("ra.*");
@@ -39,10 +38,9 @@ class Accounts_model extends CI_Model
         $this->db->join("zoho_registered_agents ra","a.ra=ra.id");
         $this->db->where(["a.id"=>$id]);
         $query = $this->db->get();
-        
+
         $result = $query->row();
-        //echo $this->db->last_query();
-//var_dump($result);die;
+
         if(!$result)
         {
             return false;

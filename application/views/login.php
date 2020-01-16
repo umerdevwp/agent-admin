@@ -13,7 +13,6 @@
     
     <link rel="stylesheet" href="components/base/base.css">
     <link rel="stylesheet" href="assets/css/style.css">
-
     <script src="components/base/script.js"></script>
 
 	<!-- Latest CDN production Javascript and CSS -->
@@ -60,7 +59,7 @@
                         <li>Federal Notices</li>
                         <li>State Notices</li>
                         <li>Service of Process</li>
-						  <li>Commercial Mail</li>
+						            <li>Commercial Mail</li>
                       </ul>
                     </div>
                     
@@ -99,26 +98,7 @@ TrustLogo("https://www.positivessl.com/images/seals/positivessl_trust_seal_sm_12
           
         </div>
       </section>
-      <div class="template-panel">
-        <div class="template-panel-heading">Template Panel
-          <button class="template-panel-switch fa-cog" data-multi-switch='{"targets":".template-panel","scope":".template-panel","isolate":"[data-multi-switch]"}'></button>
-        </div>
-        <div class="template-panel-body">
-          <div class="template-panel-group">
-            <button class="theme-switch fa-check active" title="Navbar Theme" style="border-color: #b5b5b5 #b5b5b5 #4b4a4a #4b4a4a; color: white;" data-theme-switch="concrete-navbar-default" data-theme='{"navbar-color":"#fff","navbar-bg":"#3d3c3c","navbar-hover-color":"#fff","navbar-hover-bg":"#fff","navbar-title-color":"#adb5bd","navbar-panel-bg":"#b5b5b5","navbar-brand-invert":"0%"}'></button>
-            <button class="theme-switch fa-check" title="Navbar Theme" style="border-color: #29d999 #29d999 #1a1f21 #1a1f21; color: white;" data-theme-switch="concrete-navbar-success" data-theme='{"navbar-color":"#fff","navbar-bg":"#1a1f21","navbar-hover-color":"#fff","navbar-hover-bg":"#ededed","navbar-title-color":"#adb5bd","navbar-panel-bg":"#29d999","navbar-brand-invert":"0%"}'></button>
-            <button class="theme-switch fa-check" title="Navbar Theme" style="border-color: #3e84d7 #3e84d7 #1a1f21 #1a1f21; color: white;" data-theme-switch="concrete-navbar-primary" data-theme='{"navbar-color":"#fff","navbar-bg":"#1a1f21","navbar-hover-color":"#fff","navbar-hover-bg":"#ededed","navbar-title-color":"#adb5bd","navbar-panel-bg":"#3e84d7","navbar-brand-invert":"0%"}'></button>
-            <button class="theme-switch fa-check" title="Navbar Theme" style="border-color: #fff #fff #666 #666; color: black;" data-theme-switch="concrete-navbar-light" data-theme='{"navbar-color":"#666","navbar-bg":"#efefef","navbar-hover-color":"#333","navbar-hover-bg":"#333","navbar-title-color":"#333","navbar-panel-bg":"#eee","navbar-brand-invert":"100%"}'></button>
-          </div>
-          <ul class="template-panel-list">
-            <ul class="template-panel-item"><a class="template-panel-link" href="../admindex/index.html">Admindex<span class="template-panel-popup"><img class="template-panel-preview" src="images/templates/template-01-400x174.png"></span></a></ul>
-            <ul class="template-panel-item"><a class="template-panel-link" href="../adminifix/index.html">Adminifix<span class="template-panel-popup"><img class="template-panel-preview" src="images/templates/template-02-400x174.png"></span></a></ul>
-            <ul class="template-panel-item"><a class="template-panel-link" href="../emerald/index.html">Emerald<span class="template-panel-popup"><img class="template-panel-preview" src="images/templates/template-03-400x174.png"></span></a></ul>
-            <ul class="template-panel-item"><a class="template-panel-link" href="../iodashboard/index.html">IoDashboard<span class="template-panel-popup"><img class="template-panel-preview" src="images/templates/template-04-400x174.png"></span></a></ul>
-            <ul class="template-panel-item"><a class="template-panel-link active" href="../concrete/index.html">Concrete<span class="template-panel-popup"><img class="template-panel-preview" src="images/templates/template-05-400x174.png"></span></a></ul>
-          </ul>
-        </div>
-      </div>
+      
     </div>
     
   </body>

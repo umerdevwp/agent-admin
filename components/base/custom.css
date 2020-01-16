@@ -258,7 +258,14 @@ dl + dl{
     content:attr(data-text);
     color: #000;
 }
-
+.loginmsg{
+    display: block;
+    border:2px solid #ccc;
+    padding: 10px;
+    color: #666;
+    margin-top: 50px;
+    text-align: center;
+}
 @media (max-width:768px){
     .four-boxes .panel .border-section{
         margin-bottom:15px

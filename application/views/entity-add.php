@@ -38,8 +38,7 @@
                 <div class="col-sm-12 col-md-6 pr-3"> </div>
               </div>
               <div class="row">
-                <div class="col-sm-12 client-form">
-                  
+                  <div class="col-sm-12 client-form">
                 <form method="post" action="/entity/add" enctype="multipart/form-data" name="formAdd" id="formAdd">
   <div class="form-row">
     <div class="form-group col-md-6">
@@ -56,57 +55,58 @@
       <label for="inputFillingState">Filling State <span class="steric">*</span></label>
       <select id="inputFillingState" class="form-control" name="inputFillingState">
 
-        <option selected="true" value="-Select-">-Select-</option>
-        <option value="AK" formula_val="">AK</option>
-        <option value="AL" formula_val="">AL</option>
-        <option value="AR" formula_val="">AR</option>
-        <option value="AZ" formula_val="">AZ</option>
-        <option value="CA" formula_val="">CA</option>
-        <option value="CO" formula_val="">CO</option>
-        <option value="CT" formula_val="">CT</option>
-        <option value="DE" formula_val="">DE</option>
-        <option value="FL" formula_val="">FL</option>
-        <option value="GA" formula_val="">GA</option>
-        <option value="HI" formula_val="">HI</option>
-        <option value="IA" formula_val="">IA</option>
-        <option value="ID" formula_val="">ID</option>
-        <option value="IL" formula_val="">IL</option>
-        <option value="IN" formula_val="">IN</option>
-        <option value="KS" formula_val="">KS</option>
-        <option value="KY" formula_val="">KY</option>
-        <option value="LA" formula_val="">LA</option>
-        <option value="MA" formula_val="">MA</option>
-        <option value="MD" formula_val="">MD</option>
-        <option value="ME" formula_val="">ME</option>
-        <option value="MI" formula_val="">MI</option>
-        <option value="MN" formula_val="">MN</option>
-        <option value="MO" formula_val="">MO</option>
-        <option value="MS" formula_val="">MS</option>
-        <option value="MT" formula_val="">MT</option>
-        <option value="NC" formula_val="">NC</option>
-        <option value="ND" formula_val="">ND</option>
-        <option value="NE" formula_val="">NE</option>
-        <option value="NH" formula_val="">NH</option>
-        <option value="NJ" formula_val="">NJ</option>
-        <option value="NM" formula_val="">NM</option>
-        <option value="NV" formula_val="">NV</option>
-        <option value="NY" formula_val="">NY</option>
-        <option value="OH" formula_val="">OH</option>
-        <option value="OK" formula_val="">OK</option>
-        <option value="OR" formula_val="">OR</option>
-        <option value="PA" formula_val="">PA</option>
-        <option value="RI" formula_val="">RI</option>
-        <option value="SC" formula_val="">SC</option>
-        <option value="SD" formula_val="">SD</option>
-        <option value="TN" formula_val="">TN</option>
-        <option value="TX" formula_val="">TX</option>
-        <option value="UT" formula_val="">UT</option>
-        <option value="VA" formula_val="">VA</option>
-        <option value="VT" formula_val="">VT</option>
-        <option value="WA" formula_val="">WA</option>
-        <option value="WI" formula_val="">WI</option>
-        <option value="WV" formula_val="">WV</option>
-        <option value="WY" formula_val="">WY</option>
+        <option selected="true" value="">-- Select --</option>
+        <option value="AK" >Alaska - AK</option>
+        <option value="AL" >Alabama - AL</option>
+        <option value="AR" >Arkansas - AR</option>
+        <option value="AZ" >Arizona - AZ</option>
+        <option value="CA" >California - CA</option>
+        <option value="CO" >Colorado - CO</option>
+        <option value="CT" >Connecticut - CT</option>
+        <option value="DE" >Delaware - DE</option>
+        <option value="FL" >Florida - FL</option>
+        <option value="GA" >Georgia - GA</option>
+        <option value="HI" >Hawaii - HI</option>
+        <option value="IA" >Iowa - IA</option>
+        <option value="ID" >Idaho - ID</option>
+        <option value="IL" >Illinois - IL</option>
+        <option value="IN" >Indiana - IN</option>
+        <option value="KS" >Kansas - KS</option>
+        <option value="KY" >Kentucky - KY</option>
+        <option value="LA" >Louisiana - LA</option>
+        <option value="MA" >Massachusetts - MA</option>
+        <option value="MD" >Maryland - MD</option>
+        <option value="ME" >Maine - ME</option>
+        <option value="MI" >Michigan - MI</option>
+        <option value="MN" >Minnesota - MN</option>
+        <option value="MO" >Missouri - MO</option>
+        <option value="MS" >Mississippi - MS</option>
+        <option value="MT" >Montana - MT</option>
+        <option value="NC" >North Carolina - NC</option>
+        <option value="ND" >North Dakota - ND</option>
+        <option value="NE" >Nebraska - NE</option>
+        <option value="NH" >New Hampshire - NH</option>
+        <option value="NJ" >New Jersey - NJ</option>
+        <option value="NM" >New Mexico - NM</option>
+        <option value="NV" >Nevada - NV</option>
+        <option value="NY" >New York - NY</option>
+        <option value="OH" >Ohio - OH</option>
+        <option value="OK" >Oklahoma - OK</option>
+        <option value="OR" >Oregon - OR</option>
+        <option value="PA" >Pennsylvania - PA</option>
+        <option value="RI" >Rhode Island - RI</option>
+        <option value="SC" >South Carolina - SC</option>
+        <option value="SD" >South Dakota - SD</option>
+        <option value="TN" >Tennessee - TN</option>
+        <option value="TX" >Texas - TX</option>
+        <option value="UT" >Utah - UT</option>
+        <option value="VA" >Virginia - VA</option>
+        <option value="VT" >Vermont - VT</option>
+        <option value="WA" >Washington WA - WA</option>
+        <option value="DC" >Washington DC - DC</option>
+        <option value="WI" >Wisconsin - WI</option>
+        <option value="WV" >West Virginia - WV</option>
+        <option value="WY" >Wyoming - WY</option>
 
       </select>
       <?php echo form_error('inputFillingState'); ?>
@@ -115,12 +115,12 @@
     <div class="form-group col-md-4">
       <label for="inputFillingStructure">Filling Structure <span class="steric">*</span></label>
       <select id="inputFillingStructure" class="form-control" name="inputFillingStructure">
-        <option selected="true" value="-Select-">-Select-</option>
-        <option value="Corporation" formula_val="">Corporation</option>
-        <option value="LLC" formula_val="">LLC</option>
-        <option value="Non-Profit Corporation" formula_val="">Non-Profit Corporation</option>
-        <option value="Limited Partnership" formula_val="">Limited Partnership</option>
-        <option value="LLP" formula_val="">LLP</option>
+        <option selected="true" value="">-Select-</option>
+        <option value="Corporation" >Corporation</option>
+        <option value="LLC" >LLC</option>
+        <option value="Non-Profit Corporation" >Non-Profit Corporation</option>
+        <option value="Limited Partnership" >Limited Partnership</option>
+        <option value="LLP" >LLP</option>
       </select>
       <?php echo form_error('inputFillingStructure'); ?>
       
@@ -162,14 +162,85 @@
     <input type="text" class="form-control" id="inputNotificationAddress" name="inputNotificationAddress" placeholder="Street Address" value="<?=$this->input->post("inputNotificationAddress");?>">
     <?php echo form_error('inputNotificationAddress'); ?>
   </div>
-  <div class="form-group col-md-6">
+  <div class="form-group col-md-4">
+    <label for="inputNotificationContactType">Contact Type </label>
+    <select class="form-control" id="inputNotificationContactType" name="inputNotificationContactType">
+      <option selected="true" value="">-- Select --</option>
+      <option value="CEO">CEO</option>
+      <option value="CFO">CFO</option>
+      <option value="Director">Director</option>
+      <option value="Manager">Manager</option>
+      <option value="Member">Member</option>
+      <option value="Officer">Officer</option>
+      <option value="Partner">Partner</option>
+      <option value="President">President</option>
+      <option value="Secretary">Secretary</option>
+      <option value="Shareholder">Shareholder</option>
+      <option value="Tax">Tax</option>
+    </select>
+  </div>
+  <div class="form-group col-md-4">
     <label for="inputNotificationCity">City <span class="steric">*</span></label>
     <input type="text" class="form-control" id="inputNotificationCity" name="inputNotificationCity" placeholder="City" value="<?=$this->input->post("inputNotificationCity");?>">
     <?php echo form_error('inputNotificationCity'); ?>
   </div>
-    <div class="form-group col-md-6">
+    <div class="form-group col-md-4">
     <label for="inputNotificationState">State/Region/Province <span class="steric">*</span></label>
-    <input type="text" class="form-control" id="inputNotificationState" name="inputNotificationState" placeholder="State/Region/Province" value="<?=$this->input->post("inputNotificationState");?>">
+    <select class="form-control" id="inputNotificationState" name="inputNotificationState">
+      <option selected="ture" value="">-- Select --</option>
+      <option value="AK">Alaska - AK</option>
+      <option value="AL">Alabama - AL</option>
+      <option value="AZ">Arizona - AZ</option>
+      <option value="AR">Arkansas - AR</option>
+      <option value="CA">California - CA</option>
+      <option value="CO">Colorado - CO</option>
+      <option value="CT">Connecticut - CT</option>
+      <option value="DE">Delaware - DE</option>
+      <option value="FL">Florida - FL</option>
+      <option value="GA">Georgia - GA</option>
+      <option value="HI">Hawaii - HI</option>
+      <option value="ID">Idaho - ID</option>
+      <option value="IL">Illinois - IL</option>
+      <option value="IN">Indiana - IN</option>
+      <option value="IA">Iowa - IA</option>
+      <option value="KS">Kansas - KS</option>
+      <option value="KY">Kentucky - KY</option>
+      <option value="LA">Louisiana - LA</option>
+      <option value="ME">Maine - ME</option>
+      <option value="MD">Maryland - MD</option>
+      <option value="MA">Massachusetts - MA</option>
+      <option value="MI">Michigan - MI</option>
+      <option value="MN">Minnesota - MN</option>
+      <option value="MS">Mississippi - MS</option>
+      <option value="MO">Missouri - MO</option>
+      <option value="MT">Montana - MT</option>
+      <option value="NE">Nebraska - NE</option>
+      <option value="NV">Nevada - NV</option>
+      <option value="NH">New Hampshire - NH</option>
+      <option value="NJ">New Jersey - NJ</option>
+      <option value="NM">New Mexico - NM</option>
+      <option value="NY">New York - NY</option>
+      <option value="NC">North Carolina - NC</option>
+      <option value="ND">North Dakota - ND</option>
+      <option value="OH">Ohio - OH</option>
+      <option value="OK">Oklahoma - OK</option>
+      <option value="OR">Oregon - OR</option>
+      <option value="PA">Pennsylvania - PA</option>
+      <option value="PR">Puerto Rico - PR</option>
+      <option value="RI">Rhode Island - RI</option>
+      <option value="SC">South Carolina - SC</option>
+      <option value="SD">South Dakota - SD</option>
+      <option value="TN">Tennessee - TN</option>
+      <option value="TX">Texas - TX</option>
+      <option value="UT">Utah - UT</option>
+      <option value="VT">Vermont - VT</option>
+      <option value="VA">Virginia - VA</option>
+      <option value="WA">Washington WA - WA</option>
+      <option value="DC">Washington DC - DC</option>
+      <option value="WV">West Virginia - WV</option>
+      <option value="WI">Wisconsin - WI</option>
+      <option value="WY">Wyoming - WY</option>
+    </select>
     <?php echo form_error('inputNotificationState'); ?>
   </div>
   <div class="form-group col-md-6">
@@ -192,8 +263,8 @@
   </div>
   <div class="form-group col-md-12">
     <label for="inputBusinessPurpose">Business Purpose</label>
-    <?php echo form_error('inputBusinessPurpose'); ?>
     <textarea class="form-control" id="inputBusinessPurpose" name="inputBusinessPurpose" rows="3"><?=$this->input->post("inputBusinessPurpose");?></textarea>
+    <?php echo form_error('inputBusinessPurpose'); ?>
   </div>
   
 
@@ -209,6 +280,7 @@
 
   <button type="submit" class="btn btn-primary">Create New Entity</button>
 </form>
+</div>
 
                 </div>
               </div>
@@ -249,6 +321,8 @@
    jQuery(function($){
        $('#inputFillingState').val('<?php print !empty($this->input->post("inputFillingState")) ? $this->input->post("inputFillingState") : '-Select-'; ?>');
        $('#inputFillingStructure').val('<?php print !empty($this->input->post("inputFillingStructure")) ? $this->input->post("inputFillingStructure") : '-Select-' ?>');
+       $('#inputNotificationContactType').val('<?php print !empty($this->input->post("inputNotificationContactType")) ? $this->input->post("inputNotificationContactType") : '-Select-' ?>');
+       $('#inputNotificationState').val('<?php print !empty($this->input->post("inputNotificationState")) ? $this->input->post("inputNotificationState") : '-Select-' ?>');
     });
     
 </script>
