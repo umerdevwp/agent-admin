@@ -609,8 +609,9 @@ setTimeout(() => {
           $('#formContactMultiple')[0].reset();
           $('#validateAddress').hide();
           $('#successMessageBox').show().delay(10000).fadeOut();
-          var markup = "<tr><td>" + fname + " " + lname + "</td><td>" + ctype + "</td><td>" + email + "</td><td>" + street + ", " + city + " " + state + ", " + zipcode + "</td><td>" + phone + "</td>";
-          $('table tbody#contactTableTbody').append(markup);
+          $( "table#DataTables_Table_3 tbody tr td.dataTables_empty" ).remove();
+          var markup = "<tr role='row' class='odd'><td class='sorting_1'>" + fname + lname + "</td><td>" + ctype + "</td><td>" + email + "</td><td>" + street + city + state + zipcode + "</td><td>" + phone + "</td><td>Safe</td></tr>";
+          $('table#DataTables_Table_3 tbody').append(markup);
           if($(ev.target).attr("id")=='saveClose'){
             $('#addMultiple').modal('hide');
           } else{
