@@ -294,7 +294,7 @@ HC;
         $iErrorType = 1;// 1 means user creation failed, 2 means only attachment failed
         $this->load->model('ZoHo_Account');
         $this->load->model("Accounts_model");
-        $this->load->model("RegisterAgent_model");
+        $this->load->model("RegisterAgents_model");
         
         $oApi = $this->ZoHo_Account->getInstance()->getRecordInstance("Accounts",null);
         
@@ -339,7 +339,7 @@ HC;
 
         // fetch RA (registered agent) id from DB
         $strFilingState = $this->input->post("inputFillingState");
-        $row = $this->RegisterAgent_model->find(["registered_agent_name"=>$strFilingState." - UAS"]);
+        $row = $this->RegisterAgents_model->find(["registered_agent_name"=>$strFilingState." - UAS"]);
         $iRAId = "";
         if($row->id>0)
         {
