@@ -317,12 +317,29 @@ HC;
         $oApi->setFieldValue("Shipping_Code",$this->input->post("inputNotificationZip"));
         $oApi->setFieldValue("Business_purpose",$this->input->post("inputBusinessPurpose"));
 
-        $oApi->setFieldValue("Parent_Account",$iParentZohoId);
-
+        
+        // fetch RA (registered agent) id from DB
+        $strFilingState = $this->input->post("inputFillingState");
+        $row = $this->RegisterAgents_model->find(["registered_agent_name"=>$strFilingState." - UAS"]);
+        $iRAId = "";
+        if($row->id>0)
+        {
+            $iRAId = $row->id;
+        }
+        
         // additional detail as default values for new entity
         // tag call needs account id instance, added below after attachments
+        if(isDev()){
+            $oApi->setFieldValue("RA","");
+            $oApi->setFieldValue("Parent_Account","3743841000000633019");
+            $oApi->setFieldValue("Layout","3743841000000579479");// for customer layout id = Customer
+        } else {
+            // push the RA id data to zoho
+            $oApi->setFieldValue("RA",$iRAId);
+            $oApi->setFieldValue("Parent_Account",$iParentZohoId);
+            $oApi->setFieldValue("Layout","4071993000001376034");// for customer layout id = Customer
+        }
         $oApi->setFieldValue("Account_Type","Distributor");
-        $oApi->setFieldValue("Layout","4071993000001376034");// for customer layout id = Customer
         $oApi->setFieldValue("status","InProcess");
 
         $oLoginUser = $this->Accounts_model->getOne($this->session->user["zohoId"]);
@@ -340,17 +357,7 @@ HC;
             $arError[] = "Billing addresses failed";
         }
 
-        // fetch RA (registered agent) id from DB
-        $strFilingState = $this->input->post("inputFillingState");
-        $row = $this->RegisterAgents_model->find(["registered_agent_name"=>$strFilingState." - UAS"]);
-        $iRAId = "";
-        if($row->id>0)
-        {
-            $iRAId = $row->id;
-        }
-
-        // push the id to zoho
-        $oApi->setFieldValue("RA",$iRAId);
+        
 
         $trigger=array();//triggers to include
         $lar_id="";//lead assignment rule id

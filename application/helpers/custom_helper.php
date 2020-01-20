@@ -128,6 +128,12 @@ function getClassMethods($class)
     }
 }
 
+function isDev()
+{
+    if(getenv("ENVIRONMENT")=="development") return true;
+    else return false;
+}
+
 function isDeveloperIp()
 {
     if(
