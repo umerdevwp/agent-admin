@@ -303,7 +303,7 @@ dl + dl{
 .btn_area input#cancelBtn, .btn_area input#cancel_Btn{
     float: right;
 }
-
+ 
 
 @media (max-width:768px){
     .four-boxes .panel .border-section{

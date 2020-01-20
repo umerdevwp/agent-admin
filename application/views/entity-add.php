@@ -325,7 +325,7 @@
         <input type="submit" class="btn btn-success" value="Ok" id="okBtn">
       </div>
 	</div>
-</div>
+</div> 
 </section>
 
 </section>
@@ -347,8 +347,6 @@
     jQuery("#cancel_Btn").on('click', function($){
       jQuery("#modalpopup").fadeOut();
     });
-    
-    
 </script>
 <script>
 

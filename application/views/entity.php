@@ -642,6 +642,6 @@ setTimeout(() => {
     $('#addMultiple').modal('hide');
   });
   $("#cancelBtn").on('click', function(){
-    $('#modalpopup').fadeOut();
+    $('#modalpopup').fadeOut(); 
   });
 </script>
