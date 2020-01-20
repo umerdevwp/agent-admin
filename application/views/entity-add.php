@@ -337,6 +337,15 @@
        $('#inputNotificationContactType').val('<?php print !empty($this->input->post("inputNotificationContactType")) ? $this->input->post("inputNotificationContactType") : '-Select-' ?>');
        $('#inputNotificationState').val('<?php print !empty($this->input->post("inputNotificationState")) ? $this->input->post("inputNotificationState") : '-Select-' ?>');
     });
+    jQuery("input#cancelBtn").on('click', function($){
+      jQuery('#modalpopup').fadeIn();
+    });
+    jQuery("#okBtn").on('click', function($){
+      jQuery('#modalpopup').fadeOut();
+      location.replace("portal");
+    });
+    jQuery("#cancel_Btn").on('click', function($){
+      jQuery("#modalpopup").fadeOut(); 
     });
 </script>
 <script>

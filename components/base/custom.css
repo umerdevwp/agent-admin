@@ -266,8 +266,6 @@ dl + dl{
     margin-top: 50px;
     text-align: center;
 }
-<<<<<<< HEAD
-=======
 #modalpopup {
     position: fixed;
     z-index: 999;
@@ -307,7 +305,6 @@ dl + dl{
 }
  
 
->>>>>>> 634e4b5... Changes in entity page and add entity page
 @media (max-width:768px){
     .four-boxes .panel .border-section{
         margin-bottom:15px
