@@ -345,7 +345,7 @@
       location.replace("portal");
     });
     jQuery("#cancel_Btn").on('click', function($){
-      jQuery("#modalpopup").fadeOut();
+      jQuery("#modalpopup").fadeOut(); 
     });
 </script>
 <script>
