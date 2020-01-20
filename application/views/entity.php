@@ -363,7 +363,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2 class="modal-title" id="exampleModalLabel"> Add Contact</h2>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -498,7 +498,7 @@
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="closeModalBtn">Close</button>
+        <button type="button" class="btn btn-secondary" id="closeModalBtn">Close</button>
         <button type="button" class="btn btn-success save" id="saveClose" >Save &amp; Close</button>
         <button type="button" class="btn btn-primary addnew" id="saveAddNew" >Save &amp; Add New</button>
         
@@ -507,6 +507,20 @@
   </div>
 </div>
 </section>
+
+<!-- Modal for popup box -->
+<div class="modal_wrapper" id="modalpopup">
+	<div class="popup_modal_body">
+      <div class="popup_body">
+        Are you sure to discard the data?
+      </div>
+      <div class="btn_area">
+        <input type="submit" class="btn btn-secondary" value="Cancel" id="cancelBtn">
+        <input type="submit" class="btn btn-success" value="Ok" id="okBtn">
+      </div>
+	</div>
+</div>
+
 
 <div class="successMessage" id="successMessageBox">
   <div class="smessage">Contact have been saved successfully!.</div>
@@ -621,10 +635,13 @@ setTimeout(() => {
     });
   });
   $("#closeModalBtn, #addMultiple button.close").on('click', function(){
-    if(confirm("Are you sure to discard the data?")){
-      $("#addMultiple").modal('hide');
-    }else{
-      return false;
-    }
+    $('#modalpopup').fadeIn();
+  });
+  $("#okBtn").on('click', function(){
+    $('#modalpopup').fadeOut();
+    $('#addMultiple').modal('hide');
+  });
+  $("#cancelBtn").on('click', function(){
+    $('#modalpopup').fadeOut();
   });
 </script>
