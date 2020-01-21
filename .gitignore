@@ -4,6 +4,11 @@ application/logs/*
 docs/*
 .vs/*
 vendor/*
+composer.lock
+.idea/.gitignore
+.gitignore
+ZCRMClientLibrary.log
+.idea/*
 zohoauth/*
 .htaccess
 composer.lock

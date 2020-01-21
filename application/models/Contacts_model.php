@@ -3,6 +3,7 @@ class Contacts_model extends CI_Model
 {
 
     private $table = "zoho_contacts";
+    private $contact_meta = "contactmeta";
 
     public function __construct()
     {
@@ -12,14 +13,29 @@ class Contacts_model extends CI_Model
     public function getAllFromEntityId($id)
     {
         // TODO: remove fake id
-        $data = [
-            'entity_name' => $id,
-            //'contact_owner'    =>  '4071993000000244001', // fake id
-        ];
+     
 
+        $this->db->select('*');
+        $this->db->from('contactmeta');
+        $this->db->join('zoho_contacts','zoho_contacts.id=contactmeta.contact_id');
+        $this->db->where(["zoho_contacts.entity_name"=>$id]);
+        $query = $this->db->get();
+    
+        if ( $query->num_rows() > 0 )
+        {
+            $result = $query->result_object();
+        }
+        else
+        {
+        $data = [
+                    'entity_name' => $id,
+                    //'contact_owner'    =>  '4071993000000244001', // fake id
+                ];
         $query = $this->db->get_where($this->table, $data);
         $result = $query->result_object();
-        //var_dump($result);die;
+
+        }
+           
         if (! is_array($result)) {
             return ['msg'=>'No contacts available','msg_type'=>'error'];
         }
