@@ -35,10 +35,9 @@ class ZoHo_Account extends CI_Model
 			"currentUserEmail"=> "cboyce@unitedagentservices.com",
 			"token_persistence_path" => "zohoauth",
 			"accounts_url" => getenv("ZOHO_ACCOUNTS_URL"),
-
-		];
-
-
+            "sandbox"=>(isDev()?"true":"false"),
+        ];
+        
         ZCRMRestClient::initialize($configuration);
     }
 
