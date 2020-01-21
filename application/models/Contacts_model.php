@@ -164,7 +164,6 @@ class Contacts_model extends CI_Model
         $insert_id = $this->db->insert_id();
         return  $insert_id;
     }
-
     
     public function ofac_cron_job_update(){
         $this->db->set('updated', 'NOW()', FALSE);
