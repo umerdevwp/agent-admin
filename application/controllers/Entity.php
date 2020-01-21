@@ -86,24 +86,24 @@ class Entity extends CI_Controller {
                 
         $data['contacts'] = $this->Contacts_model->getAllFromEntityId($id);
         
-        // if($data['contacts'])
-        // {
-        //     $aDataContact = $this->Tempmeta_model->getOne($id,$this->Tempmeta_model->slugNewContact);
-        //     if($aDataContact['type']=='ok') $data['contacts'] = array_merge($data['contacts'],json_decode($aDataContact['results']->json_data));
+        if($data['contacts'])
+        {
+            $aDataContact = $this->Tempmeta_model->getOne($id,$this->Tempmeta_model->slugNewContact);
+            if($aDataContact['type']=='ok') $data['contacts'] = array_merge($data['contacts'],json_decode($aDataContact['results']->json_data));
 
-        // } else {
-        //     $aDataContact = $this->Tempmeta_model->getOne($id,$this->Tempmeta_model->slugNewContact);
-        //     if($aDataContact['type']=='ok')
-        //     {
-        //         $data['contacts'] = json_decode($aDataContact['results']->json_data);
-        //     } else {
-        //         $data['contacts'] = [];
-        //     }
-        // }
+        } else {
+            $aDataContact = $this->Tempmeta_model->getOne($id,$this->Tempmeta_model->slugNewContact);
+            if($aDataContact['type']=='ok')
+            {
+                $data['contacts'] = json_decode($aDataContact['results']->json_data);
+            } else {
+                $data['contacts'] = [];
+            }
+        }
 
-        // if(count($data['contacts']) != 0){
-        //     $data['contacts'] = $this->objectAterForOFAC($data['contacts']);
-        // }
+        if(count($data['contacts']) != 0){
+            $data['contacts'] = $this->objectAterForOFAC($data['contacts']);
+        }
         
         $data['attachments'] = $this->Attachments_model->getAllFromEntityId($id);
         if($data['attachments'])
@@ -519,4 +519,48 @@ HC;
             $this->Tempmeta_model->appendRow($iEntityId,$this->Tempmeta_model->slugNewContact,$aDataContacts);
         }
     }
+
+    public function objectAterForOFAC($value = ''){
+        if(!empty($value)){
+           $ObjectCount = count((array)$value);
+           for($i=0; $i < $ObjectCount; $i++){
+                if($value[$i]->id){
+                    $OFACObject = $this->getContactOfac($value[$i]->id);
+                    $value[$i]->OFAC_status = $OFACObject->customer_status;
+                }
+           }
+        }
+        return $value;
+    }
+
+
+    public function getContactOfac($id){
+        //Key and url from .env
+     if(empty($this->url) or empty($this->auth_key) or empty($this->easy_ofac_test)){
+        log_message('error', 'OFAC settings are missing.');
+        return $data['error'] = "OFAC settings are missing.";
+     }
+     //Test variables
+
+
+     $finalurl = $this->url."inspectCustomer?api_key=".$this->auth_key."&id=".$id;
+     $cSession = curl_init();
+     if (!$cSession) {
+        log_message('error', "Couldn't initialize a cURL handle");
+         return $data['error'] = "Couldn't initialize a cURL handle";
+     }
+     // Step 2
+     curl_setopt($cSession,CURLOPT_URL,$finalurl);
+     curl_setopt($cSession,CURLOPT_RETURNTRANSFER,true);
+     curl_setopt($cSession,CURLOPT_HEADER, false); 
+     // Step 3
+     $result=curl_exec($cSession);
+     // Step 4
+     curl_close($cSession);
+     // Step 5
+     $json = json_decode($result);
+     return $json;
+
+ }
+
 }
