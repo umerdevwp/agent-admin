@@ -85,26 +85,7 @@ class Entity extends CI_Controller {
             $data['tasks_completed'] = [];
                 
         $data['contacts'] = $this->Contacts_model->getAllFromEntityId($id);
-        
-        if($data['contacts'])
-        {
-            $aDataContact = $this->Tempmeta_model->getOne($id,$this->Tempmeta_model->slugNewContact);
-            if($aDataContact['type']=='ok') $data['contacts'] = array_merge($data['contacts'],json_decode($aDataContact['results']->json_data));
-
-        } else {
-            $aDataContact = $this->Tempmeta_model->getOne($id,$this->Tempmeta_model->slugNewContact);
-            if($aDataContact['type']=='ok')
-            {
-                $data['contacts'] = json_decode($aDataContact['results']->json_data);
-            } else {
-                $data['contacts'] = [];
-            }
-        }
-
-        if(count($data['contacts']) != 0){
-            $data['contacts'] = $this->objectAterForOFAC($data['contacts']);
-        }
-        
+                
         $data['attachments'] = $this->Attachments_model->getAllFromEntityId($id);
         if($data['attachments'])
         {
@@ -185,7 +166,10 @@ class Entity extends CI_Controller {
         }
 
         $this->form_validation->set_rules('inputName', 'Account Name', 'required|regex_match[/[a-zA-Z\s]+/]',["regex_match"=>"Only alphabets and spaces allowed."]);
-        //$this->form_validation->set_rules('inputFirstName', 'First Name', 'required|regex_match[/[a-zA-Z\s]+/]',["regex_match"=>"Only alphabets and spaces allowed."]);
+        
+        $this->form_validation->set_rules('inputFirstName', 'First Name', 'required|regex_match[/[a-zA-Z\s]+/]',["regex_match"=>"Only alphabets and spaces allowed."]);
+        $this->form_validation->set_rules('inputLastName', 'Last Name', 'required|regex_match[/[a-zA-Z\s]+/]',["regex_match"=>"Only alphabets and spaces allowed."]);
+
         
         $this->form_validation->set_rules('inputNotificationContactType', 'Contact Type', 'required|alpha');
         $this->form_validation->set_rules('inputFillingState', 'Filing State', 'required|alpha');
@@ -302,7 +286,7 @@ HC;
         $iErrorType = 1;// 1 means user creation failed, 2 means only attachment failed
         $this->load->model('ZoHo_Account');
         $this->load->model("Accounts_model");
-        $this->load->model("RegisterAgent_model");
+        $this->load->model("RegisterAgents_model");
         
         $oApi = $this->ZoHo_Account->getInstance()->getRecordInstance("Accounts",null);
         
@@ -322,12 +306,29 @@ HC;
         $oApi->setFieldValue("Shipping_Code",$this->input->post("inputNotificationZip"));
         $oApi->setFieldValue("Business_purpose",$this->input->post("inputBusinessPurpose"));
 
-        $oApi->setFieldValue("Parent_Account",$iParentZohoId);
-
+        
+        // fetch RA (registered agent) id from DB
+        $strFilingState = $this->input->post("inputFillingState");
+        $row = $this->RegisterAgents_model->find(["registered_agent_name"=>$strFilingState." - UAS"]);
+        $iRAId = "";
+        if($row->id>0)
+        {
+            $iRAId = $row->id;
+        }
+        
         // additional detail as default values for new entity
         // tag call needs account id instance, added below after attachments
+        if(isDev()){
+            $oApi->setFieldValue("RA","");
+            $oApi->setFieldValue("Parent_Account","3743841000000633019");
+            $oApi->setFieldValue("Layout","3743841000000579479");// for customer layout id = Customer
+        } else {
+            // push the RA id data to zoho
+            $oApi->setFieldValue("RA",$iRAId);
+            $oApi->setFieldValue("Parent_Account",$iParentZohoId);
+            $oApi->setFieldValue("Layout","4071993000001376034");// for customer layout id = Customer
+        }
         $oApi->setFieldValue("Account_Type","Distributor");
-        $oApi->setFieldValue("Layout","4071993000001376034");// for customer layout id = Customer
         $oApi->setFieldValue("status","InProcess");
 
         $oLoginUser = $this->Accounts_model->getOne($this->session->user["zohoId"]);
@@ -345,17 +346,7 @@ HC;
             $arError[] = "Billing addresses failed";
         }
 
-        // fetch RA (registered agent) id from DB
-        $strFilingState = $this->input->post("inputFillingState");
-        $row = $this->RegisterAgent_model->find(["registered_agent_name"=>$strFilingState." - UAS"]);
-        $iRAId = "";
-        if($row->id>0)
-        {
-            $iRAId = $row->id;
-        }
-
-        // push the id to zoho
-        $oApi->setFieldValue("RA",$iRAId);
+        
 
         $trigger=array();//triggers to include
         $lar_id="";//lead assignment rule id
@@ -519,48 +510,5 @@ HC;
             $this->Tempmeta_model->appendRow($iEntityId,$this->Tempmeta_model->slugNewContact,$aDataContacts);
         }
     }
-
-    public function objectAterForOFAC($value = ''){
-        if(!empty($value)){
-           $ObjectCount = count((array)$value);
-           for($i=0; $i < $ObjectCount; $i++){
-                if($value[$i]->id){
-                    $OFACObject = $this->getContactOfac($value[$i]->id);
-                    $value[$i]->OFAC_status = $OFACObject->customer_status;
-                }
-           }
-        }
-        return $value;
-    }
-
-
-    public function getContactOfac($id){
-        //Key and url from .env
-     if(empty($this->url) or empty($this->auth_key) or empty($this->easy_ofac_test)){
-        log_message('error', 'OFAC settings are missing.');
-        return $data['error'] = "OFAC settings are missing.";
-     }
-     //Test variables
-
-
-     $finalurl = $this->url."inspectCustomer?api_key=".$this->auth_key."&id=".$id;
-     $cSession = curl_init();
-     if (!$cSession) {
-        log_message('error', "Couldn't initialize a cURL handle");
-         return $data['error'] = "Couldn't initialize a cURL handle";
-     }
-     // Step 2
-     curl_setopt($cSession,CURLOPT_URL,$finalurl);
-     curl_setopt($cSession,CURLOPT_RETURNTRANSFER,true);
-     curl_setopt($cSession,CURLOPT_HEADER, false); 
-     // Step 3
-     $result=curl_exec($cSession);
-     // Step 4
-     curl_close($cSession);
-     // Step 5
-     $json = json_decode($result);
-     return $json;
-
- }
 
 }

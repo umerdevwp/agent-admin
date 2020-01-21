@@ -279,6 +279,7 @@
 
 
   <button type="submit" class="btn btn-primary">Create New Entity</button>
+  <input type="button" class="btn btn-secondary" id="cancelBtn" value="Cancel">
 </form>
 </div>
 
@@ -313,7 +314,19 @@
   </div>
 </div>
 
-
+<!-- Modal for popup box -->
+<div class="modal_wrapper" id="modalpopup">
+	<div class="popup_modal_body">
+      <div class="popup_body">
+        Are you sure to discard the data?
+      </div>
+      <div class="btn_area">
+        <input type="submit" class="btn btn-secondary" value="Cancel" id="cancel_Btn">
+        <input type="submit" class="btn btn-success" value="Ok" id="okBtn">
+      </div>
+	</div>
+</div> 
+</section>
 
 </section>
 
@@ -324,7 +337,16 @@
        $('#inputNotificationContactType').val('<?php print !empty($this->input->post("inputNotificationContactType")) ? $this->input->post("inputNotificationContactType") : '-Select-' ?>');
        $('#inputNotificationState').val('<?php print !empty($this->input->post("inputNotificationState")) ? $this->input->post("inputNotificationState") : '-Select-' ?>');
     });
-    
+    jQuery("input#cancelBtn").on('click', function($){
+      jQuery('#modalpopup').fadeIn();
+    });
+    jQuery("#okBtn").on('click', function($){
+      jQuery('#modalpopup').fadeOut();
+      location.replace("portal");
+    });
+    jQuery("#cancel_Btn").on('click', function($){
+      jQuery("#modalpopup").fadeOut(); 
+    });
 </script>
 <script>
 

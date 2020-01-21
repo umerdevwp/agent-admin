@@ -201,6 +201,8 @@ class Login extends CI_Controller
                             "Contacts",
                             "Contacts_Add",
                             
+                            "RegisterAgents",
+
                             "Attachments",
                             "Task_Update",
                             "Theme_Update",

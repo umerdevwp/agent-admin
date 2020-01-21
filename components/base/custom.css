@@ -266,6 +266,45 @@ dl + dl{
     margin-top: 50px;
     text-align: center;
 }
+#modalpopup {
+    position: fixed;
+    z-index: 999;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: none;
+    margin-top: 20px;
+}
+.popup_modal_body {
+    width: 500px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 3px;
+    box-shadow: 0 0 5px #ccc;
+}
+.popup_body {
+    padding: 20px 15px;
+    display: inline-block;
+    font-size: 14px;
+    color: #333;
+    width:100%
+}
+.btn_area {
+    display: inline-block;
+    width: 100%;
+    padding: 20px 15px 10px;
+    border-top: 0 solid #ccc;
+}
+.btn_area input#okBtn{
+    float: right;
+    padding: 0.5rem 1.2rem;
+    margin-right:10px
+}
+.btn_area input#cancelBtn, .btn_area input#cancel_Btn{
+    float: right;
+}
+ 
+
 @media (max-width:768px){
     .four-boxes .panel .border-section{
         margin-bottom:15px

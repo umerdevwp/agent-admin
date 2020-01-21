@@ -295,7 +295,9 @@
                         <th class="sorting_disabled" data-column-index="2" rowspan="1" colspan="1" style="width: 241.217px;">Email</th>
                         <th class="sorting_disabled" data-column-index="3" rowspan="1" colspan="1" style="width: 241.2px;">Address</th>
                         <th class="sorting_disabled" data-column-index="4" rowspan="1" colspan="1" style="width: 241.217px;">Phone</th>
-                        <th class="sorting_disabled" data-column-index="4" rowspan="1" colspan="1" style="width: 241.217px;">OFAC Status</th>
+                        <?php if($this->session->user['zohoId'] == getenv("SUPER_USER")): ?>
+                            <th class="sorting_disabled" data-column-index="4" rowspan="1" colspan="1" style="width: 241.217px;">OFAC Status</th>
+                        <?php endif; ?> 
 
                        <!-- <th class="sorting_disabled" data-column-index="5" rowspan="1" colspan="1" style="width: 241.2px;">Edit</th> -->
                       </tr>
@@ -310,7 +312,9 @@
                         <td><?php echo $contacts[$i]->email; ?></td>
                         <td><?php echo $contacts[$i]->mailing_street; ?>, <?php echo $contacts[$i]->mailing_city; ?> <?php echo $contacts[$i]->mailing_state; ?> <?php echo $contacts[$i]->mailing_zip; ?></td>
                         <td><?php echo $contacts[$i]->phone; ?></td>
-                        <td><?php echo !empty($contacts[$i]->OFAC_status)? ucfirst($contacts[$i]->OFAC_status): '-' ?></td>
+                        <?php if($this->session->user['zohoId'] == getenv("SUPER_USER")): ?>
+                           <td><?php echo !empty($contacts[$i]->ofac_status)? ucfirst($contacts[$i]->ofac_status): '-' ?></td>
+                        <?php endif; ?> 
                         <!-- <td><span class="panel-icon fa-pencil"></span></td> -->
                       </tr>
                       <?php } 
@@ -359,13 +363,14 @@
 </div>
 
 
+
 <!-- Modal For Add Multiple Contacts-->
 <div class="modal fade" id="addMultiple" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" >
   <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h2 class="modal-title" id="exampleModalLabel"> Add Contact</h2>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -500,7 +505,7 @@
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" id="closeModalBtn">Close</button>
         <button type="button" class="btn btn-success save" id="saveClose" >Save &amp; Close</button>
         <button type="button" class="btn btn-primary addnew" id="saveAddNew" >Save &amp; Add New</button>
         
@@ -509,6 +514,21 @@
   </div>
 </div>
 </section>
+
+<!-- Modal for popup box -->
+<div class="modal_wrapper" id="modalpopup">
+	<div class="popup_modal_body">
+      <div class="popup_body">
+        Are you sure to discard the data?
+      </div>
+      <div class="btn_area">
+        <input type="submit" class="btn btn-secondary" value="Cancel" id="cancelBtn">
+        <input type="submit" class="btn btn-success" value="Ok" id="okBtn">
+      </div>
+	</div>
+</div>
+
+
 <div class="successMessage" id="successMessageBox">
   <div class="smessage">Contact have been saved successfully!.</div>
 </div>
@@ -597,7 +617,7 @@ setTimeout(() => {
           $('#validateAddress').hide();
           $('#successMessageBox').show().delay(10000).fadeOut();
           $( "table tbody#contactTableTbody tr td.dataTables_empty" ).remove();
-          var markup = "<tr role='row' class='odd'><td class='sorting_1'>" + fname + lname + "</td><td>" + ctype + "</td><td>" + email + "</td><td>" + street + city + state + zipcode + "</td><td>" + phone + "</td><td>Safe</td></tr>";
+          var markup = "<tr role='row' class='odd'><td class='sorting_1'>" + fname +' '+ lname + "</td><td>" + ctype + "</td><td>" + email + "</td><td>" + street + city + state + zipcode + "</td><td>" + phone + "</td><td>Safe</td></tr>";
           $('table tbody#contactTableTbody').append(markup);
           if($(ev.target).attr("id")=='saveClose'){
             $('#addMultiple').modal('hide');
@@ -622,20 +642,14 @@ setTimeout(() => {
       }
     });
   });
+  $("#closeModalBtn, #addMultiple button.close").on('click', function(){
+    $('#modalpopup').fadeIn();
+  });
+  $("#okBtn").on('click', function(){
+    $('#modalpopup').fadeOut();
+    $('#addMultiple').modal('hide');
+  });
+  $("#cancelBtn").on('click', function(){
+    $('#modalpopup').fadeOut(); 
+  });
 </script>
-<!-- <script>
-$('#saveAddNew').on('click', function(){
-  var fname = $('#inputContactFirstName').val();
-  var lname = $('#inputContactLastName').val();
-  var ctype = $('#inputContactType').val();
-  var email = $('#inputContactEmail').val();javas
-  var street = $('#inputContactStreet').val();
-  var city = $('#inputContactCity').val();
-  var state = $('#inputContactState').val();
-  var zipcode = $('#inputContactZipcode').val();
-  var phone = $('#inputContactPhone').val();
-  var markup = "<tr><td>" + fname.lname + "</td><td>" + ctype + "</td><td>" + email + "</td><td>" + street.city.state.zipcode + "</td><td>" + phone + "</td>";
-  $('table#DataTables_Table_3 tbody').append(markup);
-});
-
-</script> -->
