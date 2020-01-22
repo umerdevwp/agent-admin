@@ -200,15 +200,15 @@ if($aResponse['type']=='error'){
                 "mailing_state"    =>  $this->input->post("inputContactState"),
                 "mailing_zip"    =>  $this->input->post("inputContactZipcode"),
                 "created_by" => $this->session->user['zohoId'],
-                "created_time" => 'NOW()',
-                "modified_time" => 'NOW()',
-                "last_activity_time" => 'NOW()',
-                "most_recent_vist" => 0,
-                "first_visit" => 0,
-                "number_of_chats"=> 0,
-                "average_time_spent_minutes" => 0.00,
-                "days_visited" => 0,
-                "visitor_score" => 0
+                "created_time" => date('Y-m-d H:i:s'),
+                "modified_time" => date('Y-m-d H:i:s'),
+                "last_activity_time" => date('Y-m-d H:i:s'),
+                "most_recent_visit" => '0',
+                "first_visit" => '0',
+                "number_of_chats"=> '0',
+                "average_time_spent_minutes" => '0.00',
+                "days_visited" => '0',
+                "visitor_score" => '0'
 
 
     ];
@@ -345,5 +345,5 @@ public function getContactOfac($id){
     return $json;
 
     }
-    
+
 }
