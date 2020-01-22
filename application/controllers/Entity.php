@@ -3,11 +3,15 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Entity extends CI_Controller {
-
+    private $url = '';
+    private $easy_ofac_test = '';
+    private $auth_key = '';
     public function __construct()
     {
         parent::__construct();
-        
+        $this->url = !empty(getenv('EASY_OFAC_URL')) ? getenv('EASY_OFAC_URL') : '';
+        $this->easy_ofac_test = !empty(getenv('EASY_OFAC_TEST')) ? getenv('EASY_OFAC_TEST') : '';
+        $this->auth_key = !empty(getenv("EASY_OFAC_KEY")) ? getenv('EASY_OFAC_KEY') : '';
         $this->load->helper("custom");
 
     }
@@ -81,22 +85,7 @@ class Entity extends CI_Controller {
             $data['tasks_completed'] = [];
                 
         $data['contacts'] = $this->Contacts_model->getAllFromEntityId($id);
-        
-        if($data['contacts'])
-        {
-            $aDataContact = $this->Tempmeta_model->getOne($id,$this->Tempmeta_model->slugNewContact);
-            if($aDataContact['type']=='ok') $data['contacts'] = array_merge($data['contacts'],json_decode($aDataContact['results']->json_data));
-
-        } else {
-            $aDataContact = $this->Tempmeta_model->getOne($id,$this->Tempmeta_model->slugNewContact);
-            if($aDataContact['type']=='ok')
-            {
-                $data['contacts'] = json_decode($aDataContact['results']->json_data);
-            } else {
-                $data['contacts'] = [];
-            }
-        }
-        
+                
         $data['attachments'] = $this->Attachments_model->getAllFromEntityId($id);
         if($data['attachments'])
         {
@@ -521,4 +510,5 @@ HC;
             $this->Tempmeta_model->appendRow($iEntityId,$this->Tempmeta_model->slugNewContact,$aDataContacts);
         }
     }
+
 }

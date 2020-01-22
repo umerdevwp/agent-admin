@@ -295,6 +295,11 @@
                         <th class="sorting_disabled" data-column-index="2" rowspan="1" colspan="1" style="width: 241.217px;">Email</th>
                         <th class="sorting_disabled" data-column-index="3" rowspan="1" colspan="1" style="width: 241.2px;">Address</th>
                         <th class="sorting_disabled" data-column-index="4" rowspan="1" colspan="1" style="width: 241.217px;">Phone</th>
+                        <?php if($this->session->user['zohoId'] == getenv("SUPER_USER")): ?>
+                            <th class="sorting_disabled" data-column-index="4" rowspan="1" colspan="1" style="width: 241.217px;">OFAC Status</th>
+                        <?php endif; ?> 
+
+                        
                        <!-- <th class="sorting_disabled" data-column-index="5" rowspan="1" colspan="1" style="width: 241.2px;">Edit</th> -->
                       </tr>
                     </thead>
@@ -308,6 +313,9 @@
                         <td><?php echo $contacts[$i]->email; ?></td>
                         <td><?php echo $contacts[$i]->mailing_street; ?>, <?php echo $contacts[$i]->mailing_city; ?> <?php echo $contacts[$i]->mailing_state; ?> <?php echo $contacts[$i]->mailing_zip; ?></td>
                         <td><?php echo $contacts[$i]->phone; ?></td>
+                        <?php if($this->session->user['zohoId'] == getenv("SUPER_USER")): ?>
+                           <td><?php echo !empty($contacts[$i]->ofac_status)? ucfirst($contacts[$i]->ofac_status): '-' ?></td>
+                        <?php endif; ?> 
                         <!-- <td><span class="panel-icon fa-pencil"></span></td> -->
                       </tr>
                       <?php } 
@@ -609,9 +617,9 @@ setTimeout(() => {
           $('#formContactMultiple')[0].reset();
           $('#validateAddress').hide();
           $('#successMessageBox').show().delay(10000).fadeOut();
-          $( "table#DataTables_Table_3 tbody tr td.dataTables_empty" ).remove();
-          var markup = "<tr role='row' class='odd'><td class='sorting_1'>" + fname + lname + "</td><td>" + ctype + "</td><td>" + email + "</td><td>" + street + city + state + zipcode + "</td><td>" + phone + "</td><td>Safe</td></tr>";
-          $('table#DataTables_Table_3 tbody').append(markup);
+          $( "table tbody#contactTableTbody tr td.dataTables_empty" ).remove();
+          var markup = "<tr role='row' class='odd'><td class='sorting_1'>" + fname +' '+ lname + "</td><td>" + ctype + "</td><td>" + email + "</td><td>" + street + city + state + zipcode + "</td><td>" + phone + "</td><td>Safe</td></tr>";
+          $('table tbody#contactTableTbody').append(markup);
           if($(ev.target).attr("id")=='saveClose'){
             $('#addMultiple').modal('hide');
           } else{
