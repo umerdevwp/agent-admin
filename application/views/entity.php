@@ -352,8 +352,8 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body">
-        Do you want to update the task as complete?
+      <div class="modal-body" id="sureCompleteText">
+        
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-dismiss="modal" id="no">NO</button>
@@ -546,6 +546,13 @@ var iTaskId = 0;
 function setTaskId(id)
 {
   iTaskId = id;
+  var suremodal = $('#sureCompleteText');
+  if($("#taskCheckbox"+iTaskId).is(":checked"))
+  {
+    suremodal.text("Are you sure you want to mark this item as Complete?");
+  } else {
+    suremodal.text("Are you sure you want to mark this item as In-Complete?");
+  }
 }
 function updateTask()
 {
