@@ -59,11 +59,12 @@ class Login extends CI_Controller
 
     private function redirectToDashboard()
     {
+        validAdminCheck();
         if($this->session->user['child'])
         {
             redirect("/portal");
         } else {
-           if($this->session->user['zohoId'] == getenv("SUPER_USER")){
+           if(isset($this->session->user['isAdmin'])){
             redirect("/portal");
            } else{
             redirect("/entity/" . $this->session->user["zohoId"]);
@@ -229,9 +230,7 @@ class Login extends CI_Controller
     private function hasChild()
     {
         $this->load->model("Accounts_model");
-        
         $bParentAccount = $this->Accounts_model->hasEntities($this->session->user["zohoId"]);
-
         return (int)$bParentAccount;
     }
 }

@@ -139,7 +139,9 @@ function isDeveloperIp()
     if(
         $_SERVER['REMOTE_ADDR']=='180.92.132.234' ||
         $_SERVER['REMOTE_ADDR']=='192.168.0.187' ||
-        $_SERVER['REMOTE_ADDR']=='58.65.211.74'
+        $_SERVER['REMOTE_ADDR']=='58.65.211.74'  ||
+        $_SERVER['REMOTE_ADDR']=='10.10.10.159' 
+
     ) return true;
     else return false;
 }
@@ -208,4 +210,49 @@ function addToSessionKey($sKey,$aData)
         $_SESSION[$sThisKey] = $aThisData;
     }
 
+}
+
+
+/**
+ * This function will check if the user is a valid admin or not
+ * If 'yes' then it is going to enter a isAdmin variable in the current session
+ * If user has the zoho_id 999999 and it is not registered in the database it will redirect the user to permission deind page
+ * This function returns boolein.
+ */
+
+function validAdminCheck()
+{
+    $CI = get_instance();
+    if (isset($CI->session->user["isAdmin"])) {
+        return true;
+    } else {
+        $CI->load->model('Admin_model');
+        $checkSuperUser =  $CI->Admin_model->checkAdminExist($CI->session->user["email"]);
+        if (!empty($checkSuperUser)) {
+            addToSessionKey("user", ['isAdmin' => true]);
+            $CI->Admin_model->updateAdmin($CI->session->user["email"]);
+        } else {
+             addToSessionKey("user", ['isAdmin' => false]);
+            if ($CI->session->user['zohoId'] == getenv('SUPER_USER')) {
+                if (isset($CI->session->user['isAdmin'])) {
+                } else {
+                    $CI->session->set_flashdata('error', 'This is my message');
+                        redirect(base_url('/portal'));
+                }
+            }
+            return false;
+        }
+    }
+}
+
+function restrictForAdmin()
+{
+    $CI = get_instance();
+    if (isset($CI->session->user["isAdmin"]) && $CI->session->user["isAdmin"] == true) {
+        return true;
+    } else {
+        $CI->session->set_flashdata('error', 'Permission denied');
+            redirect(base_url('/portal'));
+        
+    }
 }

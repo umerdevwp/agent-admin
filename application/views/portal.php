@@ -1,21 +1,27 @@
-<?php if($this->session->flashdata("error")): ?>
+<?php if (isset($_SESSION['adminPermission'])) : ?>
   <div class="alert alert-danger" role="alert">
-  <?=$this->session->flashdata("error");?>
-</div>
+    <?= $_SESSION['adminPermission']; ?>
+  </div>
 <?php endif; ?>
-<?php if($this->session->flashdata("ok")): ?>
+
+<?php if ($this->session->flashdata("error")) : ?>
+  <div class="alert alert-danger" role="alert">
+    <?= $this->session->flashdata("error"); ?>
+  </div>
+<?php endif; ?>
+<?php if ($this->session->flashdata("ok")) : ?>
   <div class="entitysuccessparent">
-  <div class="alert alert-success success" role="alert">
-  <?=$this->session->flashdata("ok");?>
-  </div>
+    <div class="alert alert-success success" role="alert">
+      <?= $this->session->flashdata("ok"); ?>
+    </div>
   </div>
 <?php endif; ?>
-<section class="topbar"> 
+<section class="topbar">
   <!-- Breadcrumbs-->
   <ul class="breadcrumbs">
     <li class="breadcrumbs-item"><a class="breadcrumbs-link" href="portal"><span class="breadcrumbs-icon fa-home"></span><span>Dashboard</span></a></li>
-    <li class="breadcrumbs-item"><?php echo $entity->entity_name; ?><span style='display:none;' id="tempId"><?=$this->session->user["zohoId"];?></span></li>
-    
+    <li class="breadcrumbs-item"><?php echo $entity->entity_name; ?><span style='display:none;' id="tempId"><?= $this->session->user["zohoId"]; ?></span></li>
+
   </ul>
   <!--<h2>Add Entity</h2>-->
 </section>
@@ -58,20 +64,21 @@
                             <td><?php echo $arChildEntity[$i]->entity_structure; ?></td>
                             <td><?php echo $arChildEntity[$i]->filing_state; ?></td>
                             <td><?php echo $arChildEntity[$i]->formation_date; ?></td>
-                           <!-- <td><?php echo $arChildEntity[$i]->expiration_date; ?></td> -->
+                            <!-- <td><?php echo $arChildEntity[$i]->expiration_date; ?></td> -->
                           </tr>
-                      <?php } ?>
-                    </tbody>
-                    <tfoot>
-                      <tr>
-                        <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Name"></th>
-                        <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Type"></th>
-                        <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search State"></th>
-                        <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Seach Date"></th>
-                        <!-- <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Exp Date"></th>  -->
-                      </tr>
-                    </tfoot>
-                  </table>
+                        <?php } ?>
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                          <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Name"></th>
+                          <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Type"></th>
+                          <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search State"></th>
+                          <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Seach Date"></th>
+                          <!-- <th rowspan="1" colspan="1"><input class="form-control form-control-sm multiple-search" type="text" placeholder="Search Exp Date"></th>  -->
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
@@ -79,29 +86,30 @@
         </div>
       </div>
     </div>
-	  </div></div></div>
+  </div>
+  </div>
 </section>
 <script>
-function callMessagesApi() {
-  var accessToken = oktaSignIn.tokenManager.get("accessToken");
+  function callMessagesApi() {
+    var accessToken = oktaSignIn.tokenManager.get("accessToken");
 
-  if (!accessToken) {
-    return;
-  }
-
-  // Make the request using jQuery
-  $.ajax({
-    url: 'http://localhost:{serverPort}/api/messages',
-    headers: {
-      Authorization : 'Bearer ' + accessToken.accessToken
-    },
-    success: function(response) {
-      // Received messages!
-      console.log('Messages', response);
-    },
-    error: function(response) {
-      console.error(response);
+    if (!accessToken) {
+      return;
     }
-  });
-}
+
+    // Make the request using jQuery
+    $.ajax({
+      url: 'http://localhost:{serverPort}/api/messages',
+      headers: {
+        Authorization: 'Bearer ' + accessToken.accessToken
+      },
+      success: function(response) {
+        // Received messages!
+        console.log('Messages', response);
+      },
+      error: function(response) {
+        console.error(response);
+      }
+    });
+  }
 </script>
