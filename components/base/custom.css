@@ -273,7 +273,7 @@ dl + dl{
     left: 0;
     width: 100%;
     display: none;
-    margin-top: 20px;
+    margin-top: 250px;
 }
 .popup_modal_body {
     width: 500px;
@@ -311,20 +311,76 @@ dl + dl{
     }
 }
 @media (max-width:667px){
-    .four-boxes .panel .border-section{
+    /*.four-boxes .panel .border-section{*/
+    /*    margin-bottom:15px*/
+    /*}*/
+    .template-panel{
+        display: none;
+    }
+    .four-boxes{
         margin-bottom:15px
+    }
+    .four-boxes:last-child{
+        margin-bottom:0
     }
 }
 @media (max-width:480px){
-    .four-boxes .panel .border-section{
+    /*.four-boxes .panel .border-section{*/
+    /*    margin-bottom:15px*/
+    /*}*/
+    .template-panel{
+        display: none;
+    }
+    .four-boxes{
         margin-bottom:15px
+    }
+    .four-boxes:last-child{
+        margin-bottom:0
+    }
+    #modalpopup .popup_modal_body{
+        width:100%;
+    }
+    .btn_area input#okBtn{
+        float: left;
+        width: 46%;
+    }
+    .btn_area input#cancelBtn, .btn_area input#cancel_Btn{
+        width: 46%;
     }
 }
 @media (max-width:320px){
     .four-boxes{
         width: 100%;
     }
-    .four-boxes .panel .border-section{
-        margin-bottom:10px
+    .four-boxes{
+        margin-bottom:15px
+    }
+    .four-boxes:last-child{
+        margin-bottom:0
+    }
+    /*.four-boxes .panel .border-section{*/
+    /*    margin-bottom:10px*/
+    /*}*/
+    .template-panel{
+        display: none;
+    }
+    #modalpopup .popup_modal_body{
+        width:100%;
+    }
+    .btn_area input#okBtn{
+        float: left;
+        width: 46%;
+    }
+    .btn_area input#cancelBtn, .btn_area input#cancel_Btn{
+        width: 46%;
+    }
+    #closeModalBtn, #saveClose, #saveAddNew {
+        font-size: .75rem;
+    }
+    #saveAddNew{
+        float: left;
+    }
+    .breadcrumbs{
+        font-size: 1rem !important;
     }
 }

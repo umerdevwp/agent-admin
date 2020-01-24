@@ -27,7 +27,7 @@
   <div class="col"></div>
 </div>
 <div class="row">
-	<div class="col-md-9 col-lg-12">
+	<div class="col-md-12">
       <div class="panel">
         <div class="panel-header">
           <div class="panel-title"><span class="panel-icon fa-tasks"></span><span>Entities</span> </div>

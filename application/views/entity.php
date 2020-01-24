@@ -206,7 +206,7 @@
 
 <!-- THIS IS FOR ATTACHMENT -->
 <div class="row">
-	<div class="col-md-9 col-lg-12">
+	<div class="col-md-12">
       <div class="panel-header">
         <div class="panel-title"><span class="panel-icon fa-tasks"></span><span>Attachments</span></div>
       </div>
@@ -272,7 +272,7 @@
 
 <!-- THIS IS CONTACT LIST -->
 <div class="row">
-	<div class="col-md-9 col-lg-12">
+	<div class="col-md-12">
       <div class="panel-header">
         <div class="panel-title"><span class="panel-icon fa-tasks"></span><span>Contacts</span> <a href="#"   data-toggle="modal" data-target="#addMultiple" class="pull-right add-contact"><span class="fa-user-plus"></span> Add Contact</a></div>
       </div>
@@ -387,7 +387,13 @@
                 <label>First Name <span class="require">*</span></label>
                 <input type="text" class="form-control" id="inputContactFirstName" name="inputContactFirstName" placeholder="First Name" value="" tabindex="1">
                 <p id="inputContactFirstNameReq" class="errorMsg"></p>
-                
+            </div>
+              <div class="col-md-6">
+                  <label>Last Name <span class="require">*</span></label>
+                  <input type="text" class="form-control" id="inputContactLastName" name="inputContactLastName" placeholder="Last Name" value="" tabindex="2">
+                  <p id="inputContactLastNameReq" class="errorMsg"></p>
+              </div>
+            <div class="col-md-6">
                 <label>Contact Type <span class="require">*</span></label>
                 <!-- <input type="text" class="form-control" id="inputContactType" name="inputContactType" placeholder="Contact Type" value="" tabindex="3"> -->
                 <select class="form-control" id="inputContactType" name="inputContactType" tabindex="3">
@@ -406,10 +412,23 @@
                 </select>
                 
                 <p id="inputContactTypeReq" class="errorMsg"></p>
-                
+            </div>
+              <div class="col-md-6">
+                  <label>Email <span class="require">*</span></label>
+                  <input type="email" class="form-control" id="inputContactEmail" name="inputContactEmail" placeholder="Notification Email" value="" tabindex="4">
+                  <p id="inputContactEmailReq" class="errorMsg"></p>
+              </div>
+            <div class="col-md-6">
                 <label>Address <span class="require">*</span></label>
                 <input type="text" class="form-control" id="inputContactStreet" name="inputContactStreet" placeholder="Street Address" value="" tabindex="5">
                 <p id="inputContactStreetReq" class="errorMsg"></p>
+            </div>
+              <div class="col-md-6">
+                  <label>City <span class="require">*</span></label>
+                  <input type="text" class="form-control" id="inputContactCity" name="inputContactCity" placeholder="City" value="" tabindex="6">
+                  <p id="inputContactCityReq" class="errorMsg"></p>
+              </div>
+            <div class="col-md-6">
                 <label>State <span class="require">*</span></label>
                 <!-- <input type="text" class="form-control" id="inputContactState" name="inputContactState" placeholder="State/Region/Province" value="" tabindex="7"> -->
                 <select class="form-control" id="inputContactState" name="inputContactState" tabindex="7">
@@ -468,26 +487,22 @@
                   <option value="WY">Wyoming - WY</option>
                 </select>
                 <p id="inputContactStateReq" class="errorMsg"></p>
+            </div>
+              <div class="col-md-6">
+                  <label>Zipcode <span class="require">*</span></label>
+                  <input type="text" class="form-control" id="inputContactZipcode" name="inputContactZipcode" placeholder="Postal / Zip Code" value="" tabindex="8">
+                  <p id="inputContactZipcodeReq" class="errorMsg"></p>
+                  <input type="hidden" name="entityId" value="<?=$iEntityId;?>">
+              </div>
+            <div class="col-md-6">
                 <label>Phone <span class="require">*</span></label>
                 <input type="text" class="form-control" id="inputContactPhone" name="inputContactPhone" placeholder="Phone Number" value="" tabindex="9">
                 <p id="inputContactPhoneReq" class="errorMsg"></p>
             </div>
-            <div class="col-md-6">
-                <label>Last Name <span class="require">*</span></label>
-                <input type="text" class="form-control" id="inputContactLastName" name="inputContactLastName" placeholder="Last Name" value="" tabindex="2">
-                <p id="inputContactLastNameReq" class="errorMsg"></p>
-                <label>Email <span class="require">*</span></label>
-                <input type="email" class="form-control" id="inputContactEmail" name="inputContactEmail" placeholder="Notification Email" value="" tabindex="4">
-                <p id="inputContactEmailReq" class="errorMsg"></p>
-                <label>City <span class="require">*</span></label>
-                <input type="text" class="form-control" id="inputContactCity" name="inputContactCity" placeholder="City" value="" tabindex="6">
-                <p id="inputContactCityReq" class="errorMsg"></p>
-                
-                <label>Zipcode <span class="require">*</span></label>
-                <input type="text" class="form-control" id="inputContactZipcode" name="inputContactZipcode" placeholder="Postal / Zip Code" value="" tabindex="8">
-                <p id="inputContactZipcodeReq" class="errorMsg"></p>
-                <input type="hidden" name="entityId" value="<?=$iEntityId;?>">
-            </div>
+
+
+
+
           </div>  
         
           <div id="serverError" class="servererror">
