@@ -11,7 +11,7 @@ class Contacts extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-        
+       validAdminCheck();
        $this->url = !empty(getenv('EASY_OFAC_URL')) ? getenv('EASY_OFAC_URL') : '';
        $this->easy_ofac_test = !empty(getenv('EASY_OFAC_TEST')) ? getenv('EASY_OFAC_TEST') : '';
        $this->auth_key = !empty(getenv("EASY_OFAC_KEY")) ? getenv('EASY_OFAC_KEY') : '';

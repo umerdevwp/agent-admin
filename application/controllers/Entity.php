@@ -3,16 +3,11 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Entity extends CI_Controller {
-    private $url = '';
-    private $easy_ofac_test = '';
-    private $auth_key = '';
     public function __construct()
     {
         parent::__construct();
-        $this->url = !empty(getenv('EASY_OFAC_URL')) ? getenv('EASY_OFAC_URL') : '';
-        $this->easy_ofac_test = !empty(getenv('EASY_OFAC_TEST')) ? getenv('EASY_OFAC_TEST') : '';
-        $this->auth_key = !empty(getenv("EASY_OFAC_KEY")) ? getenv('EASY_OFAC_KEY') : '';
         $this->load->helper("custom");
+        validAdminCheck();
 
     }
 

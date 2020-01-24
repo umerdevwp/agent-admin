@@ -6,6 +6,13 @@ use zcrmsdk\crm\exception\ZCRMException;
 
 class Portal extends CI_Controller {
 	var $account = "";
+
+	public function __construct()
+    {
+        parent::__construct();
+        validAdminCheck();  
+
+    }
 	/**
 	 * Index Page for this controller.
 	 *
@@ -23,9 +30,11 @@ class Portal extends CI_Controller {
 	 */
 	public function index()
 	{
+		
 		$this->load->library(["session"]);
 		$this->load->helper(["email"]);
-    
+
+		
 		// has no child, show entity page
 		if($this->session->user["child"]==0 and $this->session->user['zohoId'] != getenv("SUPER_USER"))
 		{
@@ -39,7 +48,7 @@ class Portal extends CI_Controller {
 		}
 
 		// if organization field in okta is empty
-		if(empty($this->session->user['zohoId'])) die("Org is blank");
+		if(empty($this->session->user['zohoId'])) redirect("support");
 		//var_dump($this->session->user['zohoId']);die;
 		// set zoho id from okta
 		$this->account = $this->session->user['zohoId'];
