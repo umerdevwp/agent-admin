@@ -6,13 +6,13 @@
                 <div class="field">
                     <label class="label">First Name</label>
                     <div class="control">
-                        <input id="name" name="first_name" class="input" type="text" placeholder="Type the First Name">
+                        <input id="first_name" name="first_name" class="input" type="text" placeholder="Type the First Name">
                     </div>
                 </div>
                 <div class="field">
                     <label class="label">Last Name</label>
                     <div class="control">
-                        <input id="name" name="last_name" class="input" type="text" placeholder="Type the Last Name">
+                        <input id="last_name" name="last_name" class="input" type="text" placeholder="Type the Last Name">
                     </div>
                 </div>
                 <div class="field">
@@ -88,12 +88,22 @@
 <script>
     $("#formAdmin").submit(function(event) {
         event.preventDefault();
+        jQuery("input").removeClass('error');
+        $(".errorMessage").remove();
         $.ajax({
             type: "POST",
             url: "<?= base_url('admin/create') ?>",
             data: $(this).serialize(),
             success: function(response) {
                 var returnedData = JSON.parse(response);
+                for (var key in returnedData.results) {
+                    if (returnedData.results.hasOwnProperty(key)) {
+                        $("#" + key).addClass('error');
+                        var error = '<span class="errorMessage">' + returnedData.results[key] + '</span>';
+                        $("#" + key).after(error);
+                    }
+                }
+
                 if (returnedData.response == 'success') {
                     returnedData.markup !== '' ?
                         $("#DataTables_Table_2_admin tbody").append(returnedData.markup) :
