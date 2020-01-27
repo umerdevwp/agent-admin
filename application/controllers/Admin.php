@@ -16,7 +16,6 @@ class Admin extends CI_Controller
     }
     public function index()
     {
-
         $data['title'] = 'Administrator';
         $data['admins'] = $this->Admin_model->getAdmins();
         $this->load->view("header");
@@ -57,9 +56,30 @@ class Admin extends CI_Controller
         }
     }
 
-
-    public function info()
+    public function delete()
     {
-        debug($this->session->user);
+        $check = $this->Admin_model->deleteAdmin($this->input->post("id"));
+        if ($check) {
+            echo json_encode(array('response' => 'success'));
+        }
+    }
+
+    public function update($data = NULL)
+    {
+        $this->load->library('form_validation');
+        $this->form_validation->set_rules('first_name', 'First Name', 'required|regex_match[/[a-zA-Z\s]+/]', ["regex_match" => "Only alphabets and spaces allowed."]);
+        $this->form_validation->set_rules('last_name', 'Last Name', 'required|regex_match[/[a-zA-Z\s]+/]', ["regex_match" => "Only alphabets and spaces allowed."]);
+        if ($this->form_validation->run() == FALSE) {
+            echo json_encode(['response' => 'error', 'results' => $this->form_validation->error_array()]);
+            die();
+        }
+        $data = array(
+            'first_name' => $this->input->post("first_name"),
+            'last_name' => $this->input->post("last_name"),
+        );
+        $check = $this->Admin_model->updateAdminInfo($this->input->post("id"), $data);
+        if ($check) {
+            echo json_encode(array('response' => 'success'));
+        }
     }
 }

@@ -77,7 +77,7 @@ class Admin_model extends CI_Model
     }
 
 
-    function getOneAdmins($id=NULL)
+    function getOneAdmins($id = NULL)
     {
         if ($this->db->table_exists($this->table)) {
             $this->db->select('*');
@@ -92,4 +92,36 @@ class Admin_model extends CI_Model
     }
 
 
+    function deleteAdmin($id = NULL)
+    {
+        if ($this->db->table_exists($this->table)) {
+            $this->db->where('id', $id);
+            return $this->db->delete($this->table);
+        } else {
+            log_message('error', 'Administrators table does not exit');
+            return NULL;
+        }
+    }
+
+
+    public function updateAdminInfo($id = NULL, $data = NULL)
+    {
+        if ($this->db->table_exists($this->table)) {
+            if (!empty($data) and !empty($id)) {
+                $this->db->where('id', $this->input->post("id"));
+                $this->db->update('admins', $data);
+                if ($this->db->affected_rows() > 0) {
+                    return TRUE;
+                } else {
+                    return FALSE;
+                }
+            } else{
+                log_message('error', 'Data or ID is missing');
+                return FALSE;
+            }
+        } else {
+            log_message('error', 'Administrators table does not exit');
+            return NULL;
+        }
+    }
 }

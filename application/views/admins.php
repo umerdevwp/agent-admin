@@ -52,16 +52,23 @@
                                                 <th class="sorting_disabled" data-column-index="1" rowspan="1" colspan="1" style="width: 249.967px;">Last Name</th>
                                                 <th class="sorting_disabled" data-column-index="2" rowspan="1" colspan="1" style="width: 241.217px;">Email</th>
                                                 <th class="sorting_disabled" data-column-index="3" rowspan="1" colspan="1" style="width: 241.2px;">Last Activity</th>
+                                                <th class="sorting_disabled" data-column-index="3" rowspan="1" colspan="1" style="width: 241.2px;">Actions</th>
+
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php if (!empty($admins)) : ?>
                                                 <?php foreach ($admins as $admin) : ?>
-                                                    <tr id="<?php print $admin->id; ?>" role="row" class="odd">
-                                                        <td><?php print $admin->first_name; ?></td>
-                                                        <td><?php print $admin->last_name; ?></td>
+                                                    <tr id="row_<?php print $admin->id; ?>" role="row" class="odd">
+                                                        <td data-name="first_name" class="editable"><?php print $admin->first_name; ?></td>
+                                                        <td data-name="last_name" class="editable"><?php print $admin->last_name; ?></td>
                                                         <td><?php print $admin->email; ?></td>
                                                         <td><?php print $admin->last_logged_time; ?></td>
+                                                        <td>
+                                                            <button style="display: none" class="update_<?php print $admin->id; ?>" onclick="submitHandler('<?php print $admin->id; ?>');">Update</button>
+                                                            <button class="edit_<?php print $admin->id; ?>" onclick="updateHandler('<?php print $admin->id; ?>');">Edit</button>
+                                                            <button style="display: none" class="reset_<?php print $admin->id; ?>" onclick="resetHandler('<?php print $admin->id; ?>');">Reset</button>
+                                                            <button onclick="deleteHandler('<?php print $admin->id; ?>')">Delete</button></td>
                                                     </tr>
                                                 <?php endforeach; ?>
                                             <?php endif; ?>
@@ -86,28 +93,117 @@
 </div>
 
 <script>
+    function updateHandler(id) {
+        $('button.edit_' + id).css('display', 'none');
+        $('button.update_' + id).css('display', 'inherit');
+        $('button.reset_' + id).css('display', 'inherit');
+
+        var perviousData = {};
+
+        $('tr#row_' + id).find('td.editable').each(function() {
+            var html = $(this).html();
+            perviousData[$(this).data('name')] = html
+            var input = $('<input id="' + $(this).data('name') + '_' + id + '" name="' + $(this).data('name') + '" class="editableColumnsStyle" type="text" />');
+            input.val(html);
+            $(this).html(input);
+
+        });
+        localStorage.setItem(id, JSON.stringify(perviousData));
+    }
+
+    function submitHandler(id) {
+        $("tr > input").removeClass('error');
+        $(".tableErrorMessage").remove();
+        var $tr = $('#row_' + id);
+        var data = {},
+            name, value;
+        var datas = $tr.find(':input, select').serialize();
+        datas += '&id=' + id;
+        $.ajax({
+            type: "POST",
+            url: "<?= base_url('admin/update'); ?>",
+            data: datas,
+            success: function(response) {
+                var returnedData = JSON.parse(response);
+                if (returnedData.results !== undefined) {
+                    for (var key in returnedData.results) {
+                        if (returnedData.results.hasOwnProperty(key)) {
+                            $("#" + key + '_' + id).addClass('error');
+                            var error = '<span class="tableErrorMessage">' + returnedData.results[key] + '</span>';
+                            $("#" + key + '_' + id).after(error);
+                        }
+                    }
+                }
+                if (returnedData.response == 'success') {
+                    $tr.find('td.editable').each(function() {
+                        var $td = $(this);
+                        value = $td.find('input').val();
+                        name = $td.data('name');
+                        $td.html(value);
+                    });
+                    $('button.update_' + id).css('display', 'none');
+                    $('button.edit_' + id).css('display', 'inherit');
+                    $('button.reset_' + id).css('display', 'none');
+                }
+            }
+        }); // you have missed this bracket
+    }
+    function deleteHandler(id) {
+        $.ajax({
+            type: "POST",
+            url: "<?= base_url('admin/delete'); ?>",
+            data: {
+                'id': id
+            },
+            success: function(response) {
+                var returnedData = JSON.parse(response);
+                if (returnedData.response == 'success') {
+                    $('tr#row_' + id).remove();
+                }
+            }
+        }); // you have missed this bracket
+
+    }
+    function resetHandler(id) {
+        var parsedData = localStorage.getItem(id);
+        var result = JSON.parse(parsedData);
+        var $tr = $('#row_' + id);
+        $tr.find('td.editable').each(function() {
+            var $td = $(this);
+            value = $td.find('input').val();
+            name = $td.data('name');
+            $td.html(result[name]);
+
+        });
+        $('button.update_' + id).css('display', 'none');
+        $('button.edit_' + id).css('display', 'inherit');
+        $('button.reset_' + id).css('display', 'none');
+        localStorage.removeItem(id);
+    }
     $("#formAdmin").submit(function(event) {
         event.preventDefault();
-        jQuery("input").removeClass('error');
+        $("input").removeClass('error');
         $(".errorMessage").remove();
         $.ajax({
             type: "POST",
-            url: "<?= base_url('admin/create') ?>",
+            url: "<?= base_url('admin/create'); ?>",
             data: $(this).serialize(),
             success: function(response) {
                 var returnedData = JSON.parse(response);
-                for (var key in returnedData.results) {
-                    if (returnedData.results.hasOwnProperty(key)) {
-                        $("#" + key).addClass('error');
-                        var error = '<span class="errorMessage">' + returnedData.results[key] + '</span>';
-                        $("#" + key).after(error);
+                if (returnedData.results !== undefined) {
+                    for (var key in returnedData.results) {
+                        if (returnedData.results.hasOwnProperty(key)) {
+                            $("#" + key).addClass('error');
+                            var error = '<span class="errorMessage">' + returnedData.results[key] + '</span>';
+                            $("#" + key).after(error);
+                        }
                     }
                 }
-
                 if (returnedData.response == 'success') {
                     returnedData.markup !== '' ?
                         $("#DataTables_Table_2_admin tbody").append(returnedData.markup) :
                         console.log(returnedData.response);
+                    document.getElementById("formAdmin").reset();
                 }
             }
         }); // you have missed this bracket
