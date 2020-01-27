@@ -1,41 +1,61 @@
 <div class="container">
     <div class="row">
-        <div class="column">
-            <h2 class="title">Create Contact</h2>
-            <form method="POST" id="formAdmin">
-                <div class="field">
-                    <label class="label">First Name</label>
-                    <div class="control">
-                        <input id="first_name" name="first_name" class="input" type="text" placeholder="Type the First Name">
+        <div class="col-md-12">
+            <input type="submit" class="btn btn-success create-contacts" value="Create New Contacts">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 new-contactspanel">
+            <div class="column">
+                <div class="panel">
+                    <div class="panel-header">
+                       <div class="panel-title">
+                           <span class="panel-icon fa-user"></span>Create Contact
+                       </div>
+                    </div>
+                    <div class="panel-body">
+                        <form method="POST" id="formAdmin">
+                            <div class="row">
+                            <div class="field col-md-4 form-group">
+                                <label class="label">First Name</label>
+                                <div class="control">
+                                    <input id="first_name" name="first_name" class="input" type="text" placeholder="Type the First Name">
+                                </div>
+                            </div>
+                            <div class="field col-md-4 form-group">
+                                <label class="label">Last Name</label>
+                                <div class="control">
+                                    <input id="last_name" name="last_name" class="input" type="text" placeholder="Type the Last Name">
+                                </div>
+                            </div>
+                            <div class="field col-md-4 form-group">
+                                <label class="label">Email</label>
+                                <div class="control">
+                                    <input id="email" name="email" class="input" type="email" placeholder="Type the email address">
+                                </div>
+                            </div>
+                            </div>
+                            <div class="row">
+                            <div class="field is-grouped form-group col-md-12">
+                                <div class="control">
+                                    <button class="button is-link btn btn-primary">Submit</button>
+                                </div>
+                            </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
-                <div class="field">
-                    <label class="label">Last Name</label>
-                    <div class="control">
-                        <input id="last_name" name="last_name" class="input" type="text" placeholder="Type the Last Name">
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label">Email</label>
-                    <div class="control">
-                        <input id="email" name="email" class="input" type="email" placeholder="Type the email address">
-                    </div>
-                </div>
-                <div class="field is-grouped">
-                    <div class="control">
-                        <button class="button is-link">Submit</button>
-                    </div>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
     <div class="row">
         <div class="col-md-9 col-lg-12">
-            <div class="panel-header">
-                <div class="panel-title"><span class="panel-icon fa-tasks"></span><span><?php print isset($title) ? $title : ''  ?></span>
-                </div>
-            </div>
+            
             <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title"><span class="panel-icon fa-tasks"></span><span><?php print isset($title) ? $title : ''  ?></span>
+                    </div>
+                </div>
                 <div class="panel-body p-0">
                     <div class="table-responsive scroller scroller-horizontal py-3">
                         <div id="DataTables_Table_2_wrapper" class="dataTables_wrapper dt-bootstrap4">
@@ -112,5 +132,8 @@
             }
         }); // you have missed this bracket
         return false;
+    });
+    $("input.create-contacts").click(function(){
+        $(".new-contactspanel").toggle('fast');
     });
 </script>
