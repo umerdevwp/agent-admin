@@ -9,38 +9,38 @@
             <div class="column">
                 <div class="panel">
                     <div class="panel-header">
-                       <div class="panel-title">
-                           <span class="panel-icon fa-user"></span>Create Contact
-                       </div>
+                        <div class="panel-title">
+                            <span class="panel-icon fa-user"></span>Create Contact
+                        </div>
                     </div>
                     <div class="panel-body">
                         <form method="POST" id="formAdmin">
                             <div class="row">
-                            <div class="field col-md-4 form-group">
-                                <label class="label">First Name</label>
-                                <div class="control">
-                                    <input id="first_name" name="first_name" class="input" type="text" placeholder="Type the First Name">
+                                <div class="field col-md-4 form-group">
+                                    <label class="label">First Name</label>
+                                    <div class="control">
+                                        <input id="first_name" name="first_name" class="input" type="text" placeholder="Type the First Name">
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="field col-md-4 form-group">
-                                <label class="label">Last Name</label>
-                                <div class="control">
-                                    <input id="last_name" name="last_name" class="input" type="text" placeholder="Type the Last Name">
+                                <div class="field col-md-4 form-group">
+                                    <label class="label">Last Name</label>
+                                    <div class="control">
+                                        <input id="last_name" name="last_name" class="input" type="text" placeholder="Type the Last Name">
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="field col-md-4 form-group">
-                                <label class="label">Email</label>
-                                <div class="control">
-                                    <input id="email" name="email" class="input" type="email" placeholder="Type the email address">
+                                <div class="field col-md-4 form-group">
+                                    <label class="label">Email</label>
+                                    <div class="control">
+                                        <input id="email" name="email" class="input" type="email" placeholder="Type the email address">
+                                    </div>
                                 </div>
-                            </div>
                             </div>
                             <div class="row">
-                            <div class="field is-grouped form-group col-md-12">
-                                <div class="control">
-                                    <button class="button is-link btn btn-primary">Submit</button>
+                                <div class="field is-grouped form-group col-md-12">
+                                    <div class="control">
+                                        <button class="button is-link btn btn-primary">Submit</button>
+                                    </div>
                                 </div>
-                            </div>
                             </div>
                         </form>
                     </div>
@@ -50,7 +50,7 @@
     </div>
     <div class="row">
         <div class="col-md-9 col-lg-12">
-            
+
             <div class="panel">
                 <div class="panel-header">
                     <div class="panel-title"><span class="panel-icon fa-tasks"></span><span><?php print isset($title) ? $title : ''  ?></span>
@@ -65,7 +65,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-sm-12 attachment-table">
-                                    <table class="table table-striped table-hover data-table dataTable" data-page-length="5" data-table-mode="multi-filter" id="DataTables_Table_2_admin" role="grid" aria-describedby="DataTables_Table_2_info">
+                                    <table class="table table-striped table-hover data-table dataTable" data-page-length="5" id="DataTables_Table_2_admin" role="grid" aria-describedby="DataTables_Table_2_info">
                                         <thead>
                                             <tr role="row">
                                                 <th class="sorting_disabled" data-column-index="0" rowspan="1" colspan="1" style="width: 241.2px;">First Name</th>
@@ -88,7 +88,8 @@
                                                             <button style="display: none" class="update_<?php print $admin->id; ?>" onclick="submitHandler('<?php print $admin->id; ?>');">Update</button>
                                                             <button class="edit_<?php print $admin->id; ?>" onclick="updateHandler('<?php print $admin->id; ?>');">Edit</button>
                                                             <button style="display: none" class="reset_<?php print $admin->id; ?>" onclick="resetHandler('<?php print $admin->id; ?>');">Reset</button>
-                                                            <button onclick="deleteHandler('<?php print $admin->id; ?>')">Delete</button></td>
+                                                            <button onclick="deleteHandler('<?php print $admin->id; ?>')">Delete</button>
+                                                        </td>
                                                     </tr>
                                                 <?php endforeach; ?>
                                             <?php endif; ?>
@@ -132,8 +133,8 @@
     }
 
     function submitHandler(id) {
-        $("tr > input").removeClass('error');
-        $(".tableErrorMessage").remove();
+        $('tr#' + id + ' > input').removeClass('error');
+        $('tr#' + id + ' > .tableErrorMessage').remove();
         var $tr = $('#row_' + id);
         var data = {},
             name, value;
@@ -168,6 +169,7 @@
             }
         }); // you have missed this bracket
     }
+
     function deleteHandler(id) {
         $.ajax({
             type: "POST",
@@ -184,6 +186,7 @@
         }); // you have missed this bracket
 
     }
+
     function resetHandler(id) {
         var parsedData = localStorage.getItem(id);
         var result = JSON.parse(parsedData);
@@ -222,14 +225,21 @@
                 if (returnedData.response == 'success') {
                     returnedData.markup !== '' ?
                         $("#DataTables_Table_2_admin tbody").append(returnedData.markup) :
-                        console.log(returnedData.response);
-                    document.getElementById("formAdmin").reset();
+                        document.getElementById("formAdmin").reset();
                 }
             }
         }); // you have missed this bracket
         return false;
     });
-    $("input.create-contacts").click(function(){
-        $(".new-contactspanel").toggle('fast');
+    $("input.create-contacts").click(function() {
+        $(".new-contactspanel").toggle('fast').promise().done(function() {
+            if ($(this).is(':visible')) {
+
+            } else {
+                document.getElementById("formAdmin").reset();
+                $("#formAdmin input").removeClass('error');
+                $("#formAdmin .errorMessage").remove();
+            }
+        });
     });
 </script>
