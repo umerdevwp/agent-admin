@@ -1,6 +1,7 @@
 .scroller {
 	scrollbar-width: thin;
-	scrollbar-color: black rgba(0, 0, 0, 0.1);
+	/*scrollbar-color: black rgba(0, 0, 0, 0.1);*/
+	scrollbar-color: rgba(62, 132, 214, 1);
 }
 
 .scroller::-webkit-scrollbar {
@@ -10,12 +11,13 @@
 }
 
 .scroller::-webkit-scrollbar-thumb {
-	background: rgba(221, 221, 221, 0.5);
+	/*background: rgba(221, 221, 221, 0.5);*/
+	background: rgba(62, 132, 214, 1);
 }
 
 .mobile .scroller::-webkit-scrollbar, .scroller:hover::-webkit-scrollbar {
 	width: 3px;
-	height: 3px;
+	height: 4px;
 }
 
 .scroller.scroller-vertical {

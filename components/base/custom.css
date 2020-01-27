@@ -273,7 +273,7 @@ dl + dl{
     left: 0;
     width: 100%;
     display: none;
-    margin-top: 20px;
+    margin-top: 250px;
 }
 .popup_modal_body {
     width: 500px;
@@ -303,7 +303,47 @@ dl + dl{
 .btn_area input#cancelBtn, .btn_area input#cancel_Btn{
     float: right;
 }
- 
+.column {
+    float: left;
+    background: #fff;
+    width: 100%;
+}
+.field{
+    display: inline-block;
+    margin-top: 0 !important;
+}
+.field label{
+    font-size: 12px;
+    font-weight: 700;
+}
+.field input.input{
+    padding:5px 7px;
+    width: 100%;
+    border:1px solid #ccc;
+}
+.field button.is-link{
+    float: right;
+}
+.field input.input.error{
+    border:1px solid red;
+}
+.field .errorMessage{
+    color: red;
+    padding-top: 5px;
+    display: inline-block;
+    width: 100%;
+}
+.field.is-grouped{
+    display: inline-block;
+    width: 20%;
+}
+.create-contacts{
+    float: right;
+    margin-top: 30px;
+}
+.new-contactspanel{
+    display: none;
+}
 
 @media (max-width:768px){
     .four-boxes .panel .border-section{
@@ -311,20 +351,76 @@ dl + dl{
     }
 }
 @media (max-width:667px){
-    .four-boxes .panel .border-section{
+    /*.four-boxes .panel .border-section{*/
+    /*    margin-bottom:15px*/
+    /*}*/
+    .template-panel{
+        display: none;
+    }
+    .four-boxes{
         margin-bottom:15px
+    }
+    .four-boxes:last-child{
+        margin-bottom:0
     }
 }
 @media (max-width:480px){
-    .four-boxes .panel .border-section{
+    /*.four-boxes .panel .border-section{*/
+    /*    margin-bottom:15px*/
+    /*}*/
+    .template-panel{
+        display: none;
+    }
+    .four-boxes{
         margin-bottom:15px
+    }
+    .four-boxes:last-child{
+        margin-bottom:0
+    }
+    #modalpopup .popup_modal_body{
+        width:100%;
+    }
+    .btn_area input#okBtn{
+        float: left;
+        width: 46%;
+    }
+    .btn_area input#cancelBtn, .btn_area input#cancel_Btn{
+        width: 46%;
     }
 }
 @media (max-width:320px){
     .four-boxes{
         width: 100%;
     }
-    .four-boxes .panel .border-section{
-        margin-bottom:10px
+    .four-boxes{
+        margin-bottom:15px
+    }
+    .four-boxes:last-child{
+        margin-bottom:0
+    }
+    /*.four-boxes .panel .border-section{*/
+    /*    margin-bottom:10px*/
+    /*}*/
+    .template-panel{
+        display: none;
+    }
+    #modalpopup .popup_modal_body{
+        width:100%;
+    }
+    .btn_area input#okBtn{
+        float: left;
+        width: 46%;
+    }
+    .btn_area input#cancelBtn, .btn_area input#cancel_Btn{
+        width: 46%;
+    }
+    #closeModalBtn, #saveClose, #saveAddNew {
+        font-size: .75rem;
+    }
+    #saveAddNew{
+        float: left;
+    }
+    .breadcrumbs{
+        font-size: 1rem !important;
     }
 }

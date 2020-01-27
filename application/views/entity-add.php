@@ -31,7 +31,7 @@
       <div class="panel">
         
         <div class="panel-body p-0">
-          <div class="table-responsive scroller scroller-horizontal py-3">
+          <div class="table-responsive py-3">
             <div id="DataTables_Table_3_wrapper" class="dataTables_wrapper dt-bootstrap4">
               <div class="row row-10">
                 <div class="col-sm-12 col-md-6 pl-3"></div>
