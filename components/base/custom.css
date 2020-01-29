@@ -303,6 +303,8 @@ dl + dl{
 .btn_area input#cancelBtn, .btn_area input#cancel_Btn{
     float: right;
 }
+
+/*  This CSS for Admins Page (ADMINISTRATOR) -- Start Here  */
 .column {
     float: left;
     background: #fff;
@@ -320,6 +322,10 @@ dl + dl{
     padding:5px 7px;
     width: 100%;
     border:1px solid #ccc;
+}
+.field input#email{
+    width: 89%;
+    margin-top: 0;
 }
 .field button.is-link{
     float: right;
@@ -344,6 +350,50 @@ dl + dl{
 .new-contactspanel{
     display: none;
 }
+.edit, .delete, .reset, .update {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+}
+.tableErrorMessage {
+    display: inline-block;
+    padding-top: 5px;
+    color: red;
+}
+.successmsg-wrapper{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 999;
+    display: none;
+}
+.successMesgBox{
+    background: #6fbb47 !important;
+    width: 400px;
+    margin: 10px auto 0;
+    text-align: center;
+}
+.editableColumnsStyle{
+    width: 100%;
+    padding: 3px 7px;
+}
+.loader {
+    float: right;
+    height: 35px;
+    padding: 0 20px;
+    line-height: 35px;
+    display: none;
+}
+.loader img{
+    width: 20px;
+}
+
+
+
+/*  This CSS for Admins Page (ADMINISTRATOR) -- End Here  */
+
+
+/*  This is Media Query CSS for Responsive  */
 
 @media (max-width:768px){
     .four-boxes .panel .border-section{

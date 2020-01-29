@@ -80,6 +80,8 @@ class Admin extends CI_Controller
         $check = $this->Admin_model->updateAdminInfo($this->input->post("id"), $data);
         if ($check) {
             echo json_encode(array('response' => 'success'));
+        } else {
+            echo json_encode(array('response' => 'error'));
         }
     }
 }
