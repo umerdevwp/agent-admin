@@ -100,6 +100,8 @@ class Portal extends CI_Controller {
 			}
 		}
 
+		$data['formStatus'] = $this->statusForForm();
+	
 		//var_dump($data['account']);die;
         $this->load->view('header');
 		$this->load->view('portal', $data);
@@ -219,4 +221,19 @@ class Portal extends CI_Controller {
 
 		header("Location: ". $_SERVER['HTTP_REFERER']);
 	}
+
+    public function statusForForm(){
+		$this->load->model('Entity_model');
+		$results = $this->Entity_model->pullUniqueStatuses();
+		if(!empty($results)){
+			return $results;
+		} else {
+			return FALSE;
+		}
+	}
+
+
+	
+
+
 }

@@ -21,12 +21,11 @@ class Accounts_model extends CI_Model
 
         $result = $query->row();
 
-        if (! $result) {
-            
-            return ['message'=>'Account id not found','type'=>'error'];
+        if (!$result) {
+            return ['message' => 'Account id not found', 'type' => 'error'];
         }
 
-        return ['type'=>'ok','results'=>$result];
+        return ['type' => 'ok', 'results' => $result];
     }
 
     public function getAgentAddress($id)
@@ -35,17 +34,16 @@ class Accounts_model extends CI_Model
         $this->db->limit(1);
         $this->db->select("ra.*");
         $this->db->from("zoho_accounts a");
-        $this->db->join("zoho_registered_agents ra","a.ra=ra.id");
-        $this->db->where(["a.id"=>$id]);
+        $this->db->join("zoho_registered_agents ra", "a.ra=ra.id");
+        $this->db->where(["a.id" => $id]);
         $query = $this->db->get();
 
         $result = $query->row();
 
-        if(!$result)
-        {
+        if (!$result) {
             return false;
         }
-        
+
         return $result;
     }
 
@@ -54,30 +52,28 @@ class Accounts_model extends CI_Model
      * @param Int $id zoho id of logged in session user
      * @param String $columns (optional) comma seprated columns name
      */
-    public function loadChildAccounts($id,$columns="")
+    public function loadChildAccounts($id, $columns = "")
     {
         $data = [
             'parent_entity'    =>  $id
         ];
 
         // select required columns if set
-        if(!empty($columns))
-        {
+        if (!empty($columns)) {
             $this->db->select($columns);
         }
 
-        $query = $this->db->get_where($this->table,$data);
-        
-        
+        $query = $this->db->get_where($this->table, $data);
+
+
 
         $result = $query->result();
-        
-        if(!is_array($result))
-        {
-            return ['message'=>'Entities not found.','type'=>'error'];
+
+        if (!is_array($result)) {
+            return ['message' => 'Entities not found.', 'type' => 'error'];
         }
 
-        return ['type'=>'ok','results'=>$result];
+        return ['type' => 'ok', 'results' => $result];
     }
 
     public function hasEntities($id)
@@ -86,14 +82,13 @@ class Accounts_model extends CI_Model
             "parent_entity" =>  $id
         ];
 
-        $result = $this->db->get_where($this->table,$data,1,1);
+        $result = $this->db->get_where($this->table, $data, 1, 1);
         //echo $this->db->last_query();
-        
+
         $row = $result->row();
         //var_dump($row);
 
-        if($row->id>0)
-        {
+        if ($row->id > 0) {
             return true;
         }
 
@@ -105,25 +100,21 @@ class Accounts_model extends CI_Model
         $data = [
             'id'    =>  $id
         ];
-
         $query = $this->db->get_where($this->table, $data);
         $result = $query->row();
-        
         if (!$result) {
-            return ['msg'=>'No such account found','msg_type'=>'error'];
+            return ['msg' => 'No such account found', 'msg_type' => 'error'];
         }
-
         return $result;
     }
-	
-	  public function getAll()
+
+    public function getAll()
     {
         $query = $this->db->get('zoho_accounts');
         $result = $query->result_object();
         if (!$result) {
             return ['msg' => 'No such account found', 'msg_type' => 'error'];
         }
-
         return $result;
     }
 }
