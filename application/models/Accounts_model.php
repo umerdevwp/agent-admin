@@ -110,11 +110,40 @@ class Accounts_model extends CI_Model
 
     public function getAll()
     {
-        $query = $this->db->get('zoho_accounts');
+        // $query = $this->db->get('zoho_accounts');
+        // $result = $query->result_object();
+        // if (!$result) {
+        //     return ['msg' => 'No such account found', 'msg_type' => 'error'];
+        // }
+        // return $result;
+
+        $this->db->select('zoho_accounts.*, entitymeta.entity_status');
+        $this->db->from('zoho_accounts');
+        $this->db->join('entitymeta','entitymeta.zoho_accounts_id=zoho_accounts.id', 'left');
+        // $this->db->where(["entitymeta.zoho_accounts_id", "zoho_accounts.id"]);
+        $query = $this->db->get();
         $result = $query->result_object();
-        if (!$result) {
-            return ['msg' => 'No such account found', 'msg_type' => 'error'];
+        // if ( $query->num_rows() > 0 )
+        // {
+        //     $result = $query->result_object();
+        // }
+        // else
+        // {
+        // $data = [
+        //             'entity_name' => $id,
+        //             //'contact_owner'    =>  '4071993000000244001', // fake id
+        //         ];
+        // $query = $this->db->get_where($this->table, $data);
+        // $result = $query->result_object();
+
+        // }
+           
+        if (! is_array($result)) {
+            return ['msg'=>'No contacts available','msg_type'=>'error'];
         }
+
         return $result;
+
+
     }
 }

@@ -66,9 +66,15 @@ class Admin extends CI_Controller
 
     public function update($data = NULL)
     {
+        $checkEmail = $this->Admin_model->getOneAdmins($this->input->post("id"));
         $this->load->library('form_validation');
-        $this->form_validation->set_rules('first_name', 'First Name', 'required|regex_match[/[a-zA-Z\s]+/]', ["regex_match" => "Only alphabets and spaces allowed."]);
+        $this->form_validation->set_rules('first_name', 'First Name', "required|regex_match[/[a-zA-Z\s]+/]", ["regex_match" => "Only alphabets and spaces allowed."]);
         $this->form_validation->set_rules('last_name', 'Last Name', 'required|regex_match[/[a-zA-Z\s]+/]', ["regex_match" => "Only alphabets and spaces allowed."]);
+        if ($checkEmail[0]->email != $this->input->post("email")) {
+            $this->form_validation->set_rules('email', 'Email', 'required|valid_email|is_unique[admins.email]');
+            $this->form_validation->set_message('is_unique', "The email is already exist");
+
+        }
         if ($this->form_validation->run() == FALSE) {
             echo json_encode(['response' => 'error', 'results' => $this->form_validation->error_array()]);
             die();
@@ -76,12 +82,13 @@ class Admin extends CI_Controller
         $data = array(
             'first_name' => $this->input->post("first_name"),
             'last_name' => $this->input->post("last_name"),
+            'email' => $this->input->post("email"),
         );
         $check = $this->Admin_model->updateAdminInfo($this->input->post("id"), $data);
         if ($check) {
             echo json_encode(array('response' => 'success'));
         } else {
-            echo json_encode(array('response' => 'error'));
+            echo json_encode(array('response' => 'notchanged'));
         }
     }
 }

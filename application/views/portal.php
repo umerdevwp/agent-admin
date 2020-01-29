@@ -70,7 +70,7 @@
                             <td onclick="window.location = '/entity/<?php echo $arChildEntity[$i]->id; ?>';"><?php echo $arChildEntity[$i]->filing_state; ?></td>
                             <td onclick="window.location = '/entity/<?php echo $arChildEntity[$i]->id; ?>';"><?php echo $arChildEntity[$i]->formation_date; ?></td>
                             <?php if ($this->session->user["isAdmin"]) : ?>
-                              <td data-name="status" class="editable"><?php echo !empty($arChildEntity[$i]->status) ? $arChildEntity[$i]->status : '-' ?></td>
+                              <td data-name="status" class="editable"><?= !empty($arChildEntity[$i]->entity_status) ? $arChildEntity[$i]->entity_status : $arChildEntity[$i]->status; ?></td>
                               <td>
                                 <button class="edit_<?= $arChildEntity[$i]->id; ?>" onclick="updateHandler('<?= $arChildEntity[$i]->id; ?>');">Edit</button>
                                 <button style="display: none" class="update_<?= $arChildEntity[$i]->id; ?>" onclick="submitHandler('<?= $arChildEntity[$i]->id; ?>');">Update</button>
@@ -133,34 +133,34 @@
             name, value;
         var datas = $tr.find(':input, select').serialize();
         datas += '&id=' + id;
-        // $.ajax({
-        //     type: "POST",
-        //     url: "<?= base_url('admin/update'); ?>",
-        //     data: datas,
-        //     success: function(response) {
-        //         var returnedData = JSON.parse(response);
-        //         if (returnedData.results !== undefined) {
-        //             for (var key in returnedData.results) {
-        //                 if (returnedData.results.hasOwnProperty(key)) {
-        //                     $("#" + key + '_' + id).addClass('error');
-        //                     var error = '<span class="tableErrorMessage">' + returnedData.results[key] + '</span>';
-        //                     $("#" + key + '_' + id).after(error);
-        //                 }
-        //             }
-        //         }
-        //         if (returnedData.response == 'success') {
-        //             $tr.find('td.editable').each(function() {
-        //                 var $td = $(this);
-        //                 value = $td.find('input').val();
-        //                 name = $td.data('name');
-        //                 $td.html(value);
-        //             });
-        //             $('button.update_' + id).css('display', 'none');
-        //             $('button.edit_' + id).css('display', 'inherit');
-        //             $('button.reset_' + id).css('display', 'none');
-        //         }
-        //     }
-        // }); // you have missed this bracket
+        $.ajax({
+            type: "POST",
+            url: "<?= base_url('portal/addStatusForEntity'); ?>",
+            data: datas,
+            success: function(response) {
+                var returnedData = JSON.parse(response);
+                if (returnedData.results !== undefined) {
+                    for (var key in returnedData.results) {
+                        if (returnedData.results.hasOwnProperty(key)) {
+                            $("#" + key + '_' + id).addClass('error');
+                            var error = '<span class="tableErrorMessage">' + returnedData.results[key] + '</span>';
+                            $("#" + key + '_' + id).after(error);
+                        }
+                    }
+                }
+                if (returnedData.response == 'success') {
+                    $tr.find('td.editable').each(function() {
+                        var $td = $(this);
+                        value = $td.find('select option:selected').val();
+                        name = $td.data('name');
+                        $td.html(value);
+                    });
+                    $('button.update_' + id).css('display', 'none');
+                    $('button.edit_' + id).css('display', 'inherit');
+                    $('button.reset_' + id).css('display', 'none');
+                }
+            }
+        }); // you have missed this bracket
   }
 
   resetHandler = (id) => {

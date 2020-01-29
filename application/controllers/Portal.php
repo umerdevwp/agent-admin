@@ -67,7 +67,7 @@ class Portal extends CI_Controller {
 		// user is administrator
 		if($this->session->user['zohoId'] == getenv("SUPER_USER")){
 			$data['entity'] = $this->Accounts_model->loadAccount($this->session->user['zohoId']);
-            $data['arChildEntity'] = $this->Accounts_model->getAll();
+			$data['arChildEntity'] = $this->Accounts_model->getAll();
 		// users from zoho
 		} else {
 			$aDataEntity = $this->Accounts_model->loadAccount($this->session->user['zohoId']);
@@ -229,6 +229,34 @@ class Portal extends CI_Controller {
 			return $results;
 		} else {
 			return FALSE;
+		}
+	}
+
+
+
+	public function addStatusForEntity()
+	{
+		$this->load->model('Entity_model');
+		$check = $this->Entity_model->checkIfExists($this->input->post("id"));
+		$data = array(
+			'zoho_accounts_id' => $this->input->post("id"),
+			'entity_status' => $this->input->post("status"),
+		);
+		if (!$check) {
+			$get_object = $this->Entity_model->insertStatus($data);
+			if (!empty($get_object)) {
+				echo json_encode(array('response' => 'success'));
+			} else {
+				echo json_encode(array('response' => 'error'));
+			}
+		} else {
+
+			$check = $this->Entity_model->updateExistingEntityStatus($this->input->post("id"), $data);
+			if ($check) {
+				echo json_encode(array('response' => 'success'));
+			} else {
+				echo json_encode(array('response' => 'error'));
+			}
 		}
 	}
 

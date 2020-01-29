@@ -91,7 +91,7 @@
                                                     <tr id="row_<?php print $admin->id; ?>" role="row" class="odd">
                                                         <td data-name="first_name" class="editable"><?php print $admin->first_name; ?></td>
                                                         <td data-name="last_name" class="editable"><?php print $admin->last_name; ?></td>
-                                                        <td><?php print $admin->email; ?></td>
+                                                        <td data-name="email" class="editable"><?php print $admin->email; ?></td>
                                                         <td><?php print $admin->last_logged_time; ?></td>
                                                         <td>
                                                             <button style="display: none" class="update_<?php print $admin->id; ?> btn btn-success update" onclick="submitHandler('<?php print $admin->id; ?>');">Update</button>
@@ -142,8 +142,8 @@
     }
 
     function submitHandler(id) {
-        $('tr#' + id +' td input').removeClass('error');
-        $('tr#' + id +' td .tableErrorMessage').remove();
+        $('tr#row_' + id +' td input').removeClass('error');
+        $('tr#row_' + id +' td .tableErrorMessage').remove();
         var $tr = $('#row_' + id);
         var data = {},
             name, value;
@@ -154,6 +154,7 @@
             url: "<?= base_url('admin/update'); ?>",
             data: datas,
             success: function(response) {
+                console.log(response);
                 var returnedData = JSON.parse(response);
                 if (returnedData.results !== undefined) {
                     for (var key in returnedData.results) {
@@ -175,17 +176,17 @@
                     $('button.edit_' + id).css('display', 'inherit');
                     $('button.reset_' + id).css('display', 'none');
                 }
-                // if (returnedData.response == 'error') {
-                //     $tr.find('td.editable').each(function() {
-                //         var $td = $(this);
-                //         value = $td.find('input').val();
-                //         name = $td.data('name');
-                //         $td.html(value);
-                //     });
-                //     $('button.update_' + id).css('display', 'none');
-                //     $('button.edit_' + id).css('display', 'inherit');
-                //     $('button.reset_' + id).css('display', 'none');
-                // }
+                if (returnedData.response == 'notchanged') {
+                    $tr.find('td.editable').each(function() {
+                        var $td = $(this);
+                        value = $td.find('input').val();
+                        name = $td.data('name');
+                        $td.html(value);
+                    });
+                    $('button.update_' + id).css('display', 'none');
+                    $('button.edit_' + id).css('display', 'inherit');
+                    $('button.reset_' + id).css('display', 'none');
+                }
             }
         }); // you have missed this bracket
     }

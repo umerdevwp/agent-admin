@@ -226,22 +226,7 @@ function validAdminCheck()
     if (isset($CI->session->user["isAdmin"])) {
         return true;
     } else {
-        $CI->load->model('Admin_model');
-        $checkSuperUser =  $CI->Admin_model->checkAdminExist($CI->session->user["email"]);
-        if (!empty($checkSuperUser)) {
-            addToSessionKey("user", ['isAdmin' => true]);
-            $CI->Admin_model->updateAdmin($CI->session->user["email"]);
-        } else {
-             addToSessionKey("user", ['isAdmin' => false]);
-            if ($CI->session->user['zohoId'] == getenv('SUPER_USER')) {
-                if (isset($CI->session->user['isAdmin'])) {
-                } else {
-                    $CI->session->set_flashdata('error', 'This is my message');
-                        redirect(base_url('/portal'));
-                }
-            }
-            return false;
-        }
+        return false;
     }
 }
 
