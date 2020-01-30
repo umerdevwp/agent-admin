@@ -72,9 +72,9 @@
                             <?php if ($this->session->user["isAdmin"]) : ?>
                               <td data-name="status" class="editable"><?= !empty($arChildEntity[$i]->entity_status) ? $arChildEntity[$i]->entity_status : $arChildEntity[$i]->status; ?></td>
                               <td>
-                                <button class="edit_<?= $arChildEntity[$i]->id; ?>" onclick="updateHandler('<?= $arChildEntity[$i]->id; ?>');">Edit</button>
-                                <button style="display: none" class="update_<?= $arChildEntity[$i]->id; ?>" onclick="submitHandler('<?= $arChildEntity[$i]->id; ?>');">Update</button>
-                                <button style="display: none" class="reset_<?= $arChildEntity[$i]->id; ?>" onclick="resetHandler('<?= $arChildEntity[$i]->id; ?>');">Reset</button>
+                                <button class="edit_<?= $arChildEntity[$i]->id; ?> edit" onclick="updateHandler('<?= $arChildEntity[$i]->id; ?>');"></button>
+                                <button style="display: none" class="update_<?= $arChildEntity[$i]->id; ?> update" onclick="submitHandler('<?= $arChildEntity[$i]->id; ?>');"></button>
+                                <button style="display: none" class="reset_<?= $arChildEntity[$i]->id; ?> reset" onclick="resetHandler('<?= $arChildEntity[$i]->id; ?>');"></button>
                               </td>
 
                             <?php endif; ?>

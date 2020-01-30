@@ -45,6 +45,7 @@ TrustLogo("https://www.positivessl.com/images/seals/positivessl_trust_seal_sm_12
 </html>
 <script>
 $(document).ready(function(){
+    $(".edit, .delete, .reset, .update").tooltip();
   $('.template-panel-switch').on('click', function(){
     $('.template-panel').toggleClass('active');
     

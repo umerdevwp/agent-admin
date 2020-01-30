@@ -94,10 +94,10 @@
                                                         <td data-name="email" class="editable"><?php print $admin->email; ?></td>
                                                         <td><?php print $admin->last_logged_time; ?></td>
                                                         <td>
-                                                            <button style="display: none" class="update_<?php print $admin->id; ?> btn btn-success update" onclick="submitHandler('<?php print $admin->id; ?>');">Update</button>
-                                                            <button class="edit_<?php print $admin->id; ?> btn btn-primary edit" onclick="updateHandler('<?php print $admin->id; ?>');">Edit</button>
-                                                            <button style="display: none" class="reset_<?php print $admin->id; ?> btn btn-secondary reset" onclick="resetHandler('<?php print $admin->id; ?>');">Reset</button>
-                                                            <button onclick="deleteHandler('<?php print $admin->id; ?>')" class="btn btn-danger delete">Delete</button>
+                                                            <button style="display: none" class="update_<?php print $admin->id; ?> update" onclick="submitHandler('<?php print $admin->id; ?>');" data-toggle="tooltip" title="Update"></button>
+                                                            <button class="edit_<?php print $admin->id; ?> edit" onclick="updateHandler('<?php print $admin->id; ?>');" data-toggle="tooltip" title="Edit"></button>
+                                                            <button style="display: none" class="reset_<?php print $admin->id; ?> reset" onclick="resetHandler('<?php print $admin->id; ?>');" data-toggle="tooltip" title="Reset"></button>
+                                                            <button onclick="deleteHandler('<?php print $admin->id; ?>')" class="delete" data-toggle="tooltip" title="Delete"></button>
                                                         </td>
                                                     </tr>
                                                 <?php endforeach; ?>

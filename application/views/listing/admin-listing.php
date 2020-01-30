@@ -6,10 +6,10 @@
             <td><?= $admin->email; ?></td>
             <td><?= $admin->last_logged_time; ?></td>
             <td>
-                <button style="display: none" class="update_<?= $admin->id; ?> btn btn-success update" onclick="submitHandler('<?= $admin->id; ?>');">Update</button>
-                <button class="edit_<?= $admin->id; ?> btn btn-primary edit" onclick="updateHandler('<?= $admin->id; ?>');">Edit</button>
-                <button style="display: none" class="reset_<?= $admin->id; ?>btn btn-secondary reset" onclick="resetHandler('<?= $admin->id; ?>');">Reset</button>
-                <button onclick="deleteHandler('<?= $admin->id; ?>')" class="btn btn-danger delete">Delete</button>
+                <button style="display: none" class="update_<?= $admin->id; ?> update" onclick="submitHandler('<?= $admin->id; ?>');" data-toggle="tooltip" title="Update"></button>
+                <button class="edit_<?= $admin->id; ?> edit" onclick="updateHandler('<?= $admin->id; ?>');" data-toggle="tooltip" title="Edit"></button>
+                <button style="display: none" class="reset_<?= $admin->id; ?> reset" onclick="resetHandler('<?= $admin->id; ?>');" data-toggle="tooltip" title="Reset"></button>
+                <button onclick="deleteHandler('<?= $admin->id; ?>')" class="delete" data-toggle="tooltip" title="Delete"></button>
             </td>
         </tr>
     <?php endforeach; ?>

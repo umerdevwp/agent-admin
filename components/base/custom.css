@@ -355,6 +355,32 @@ dl + dl{
 .edit, .delete, .reset, .update {
     padding-left: 10px !important;
     padding-right: 10px !important;
+    width: 35px;
+    height: 30px;
+    border: none;
+}
+.edit{
+    background: url(../../images/button_sprite.png) top center no-repeat;
+}
+.delete{
+    background: url(../../images/button_sprite.png) center -52px no-repeat;
+}
+.update{
+    background: url(../../images/button_sprite.png) center -105px no-repeat;
+}
+.reset{
+    background: url(../../images/button_sprite.png) center -161px no-repeat;
+}
+.editable select{
+    padding: 3px 5px;
+    width: 100%;
+}
+.dataTables_filter{
+    margin-bottom: 15px;
+}
+.dataTables_filter input[type=search]{
+    border:1px solid #ccc;
+    padding: 3px 7px;
 }
 .tableErrorMessage {
     display: inline-block;
