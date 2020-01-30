@@ -26,8 +26,12 @@ class Contacts extends CI_Controller
         
         $id = $this->session->user['zohoId'];
 
-        // fetch all childrens ids, to later fetch
-        $result = $this->accounts_model->loadChildAccounts($id,"id");
+        if($this->session->user['zohoId'] == getenv("SUPER_USER")){
+            $result = $this->accounts_model->getAll();
+        } else {
+            // fetch all childrens ids, to later fetch
+            $result = $this->accounts_model->loadChildAccounts($id,"id");
+        }
 
         // create comma seprated ids from result
         $arCommaIds = array();
