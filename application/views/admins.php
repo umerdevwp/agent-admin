@@ -22,13 +22,13 @@
                                 <div class="field col-md-4 form-group">
                                     <label class="label">First Name</label>
                                     <div class="control">
-                                        <input id="first_name" name="first_name" class="input" type="text" placeholder="Type the First Name">
+                                        <input id="first_name" name="first_name" class="input" type="text" placeholder="Type the First Name" required>
                                     </div>
                                 </div>
                                 <div class="field col-md-4 form-group">
                                     <label class="label">Last Name</label>
                                     <div class="control">
-                                        <input id="last_name" name="last_name" class="input" type="text" placeholder="Type the Last Name">
+                                        <input id="last_name" name="last_name" class="input" type="text" placeholder="Type the Last Name" required>
                                     </div>
                                 </div>
                                 <div class="field col-md-4 form-group">
@@ -38,7 +38,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="basic-addon1">@</span>
                                             </div>
-                                            <input id="email" name="email" class="input form-group" type="email" placeholder="Type the email address">
+                                            <input id="email" name="email" class="input form-group" type="email" placeholder="Type the email address" required>
                                         </div>
                                     </div>
                                 </div>
@@ -62,7 +62,7 @@
 
             <div class="panel">
                 <div class="panel-header">
-                    <div class="panel-title"><span class="panel-icon fa-tasks"></span><span><?php print isset($title) ? $title : ''  ?></span>
+                    <div class="panel-title"><span class="panel-icon fa-tasks"></span><span><?php print isset($title) ? $title : ''  ?><Button id="addRow">Add</Button></span>
                     </div>
                 </div>
                 <div class="panel-body p-0">
@@ -121,8 +121,31 @@
         </div>
     </div>
 </div>
-
+<script type="text/javascript">
+$(document).ready(function() {
+    var t = $('#DataTables_Table_2_admin').DataTable();
+    var counter = 1;
+ 
+    $('#addRow').on( 'click', function () {
+        t.row.add( [
+            counter +'.1',
+            counter +'.2',
+            counter +'.3',
+            counter +'.4',
+            counter +'.5',
+        ] ).draw( false );
+ 
+        counter++;
+    } );
+ 
+    // Automatically add a first row of data
+} );
+</script>
 <script>
+
+
+
+
     function updateHandler(id) {
         $('button.edit_' + id).css('display', 'none');
         $('button.update_' + id).css('display', 'inherit');

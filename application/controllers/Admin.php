@@ -68,7 +68,7 @@ class Admin extends CI_Controller
     {
         $checkEmail = $this->Admin_model->getOneAdmins($this->input->post("id"));
         $this->load->library('form_validation');
-        $this->form_validation->set_rules('first_name', 'First Name', "required|regex_match[/[a-zA-Z\s]+/]", ["regex_match" => "Only alphabets and spaces allowed."]);
+        $this->form_validation->set_rules('first_name', 'First Name', "required|regex_match[(/[a-z|A-Z|0-9|\s])\w+/g]", ["regex_match" => "Only alphabets and spaces allowed."]);
         $this->form_validation->set_rules('last_name', 'Last Name', 'required|regex_match[/[a-zA-Z\s]+/]', ["regex_match" => "Only alphabets and spaces allowed."]);
         if ($checkEmail[0]->email != $this->input->post("email")) {
             $this->form_validation->set_rules('email', 'Email', 'required|valid_email|is_unique[admins.email]');
