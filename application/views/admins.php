@@ -62,7 +62,7 @@
 
             <div class="panel">
                 <div class="panel-header">
-                    <div class="panel-title"><span class="panel-icon fa-tasks"></span><span><?php print isset($title) ? $title : ''  ?><Button id="addRow">Add</Button></span>
+                    <div class="panel-title"><span class="panel-icon fa-tasks"></span><span><?php print isset($title) ? $title : ''  ?><!--<Button id="addRow">Add</Button>--></span>
                     </div>
                 </div>
                 <div class="panel-body p-0">
@@ -123,6 +123,8 @@
 </div>
 <script type="text/javascript">
 $(document).ready(function() {
+    //$(".edit, .delete, .reset, .update").tooltip();
+
     var t = $('#DataTables_Table_2_admin').DataTable();
     var counter = 1;
  
@@ -142,10 +144,6 @@ $(document).ready(function() {
 } );
 </script>
 <script>
-
-
-
-
     function updateHandler(id) {
         $('button.edit_' + id).css('display', 'none');
         $('button.update_' + id).css('display', 'inherit');

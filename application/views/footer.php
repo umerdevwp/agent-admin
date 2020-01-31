@@ -42,21 +42,12 @@ TrustLogo("https://www.positivessl.com/images/seals/positivessl_trust_seal_sm_12
 </script>
 </div>
 </body>
-<script>
-$(document).ready(function() {
-    var t = $('.data-table').DataTable();
-  });
-</script>
 </html>
 <script>
 $(document).ready(function(){
-
-
-
-    $(".edit, .delete, .reset, .update").tooltip();
+  var t = $(".data-table").DataTable();
   $('.template-panel-switch').on('click', function(){
     $('.template-panel').toggleClass('active');
-    
   });
   $('.add-contact').click(function(){
     $('#addMultiple').modal();
