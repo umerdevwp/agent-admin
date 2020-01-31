@@ -15,9 +15,9 @@ class Contacts_model extends CI_Model
         // TODO: remove fake id
      
 
-        $this->db->select('*');
-        $this->db->from('zoho_contacts');
-        $this->db->join('contactmeta','contactmeta.contact_id=contactmeta.id', 'left');
+        $this->db->select('zoho_contacts.*,contactmeta.*');
+        $this->db->from('contactmeta');
+        $this->db->join('zoho_contacts','zoho_contacts.id=contactmeta.contact_id', 'left');
         $this->db->where(["zoho_contacts.entity_name"=>$id]);
         $query = $this->db->get();
     

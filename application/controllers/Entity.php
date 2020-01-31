@@ -85,6 +85,7 @@ class Entity extends CI_Controller {
             $data['tasks_completed'] = [];
                 
         $contact_data = $this->Contacts_model->getAllFromEntityId($id);
+       
         if($contact_data['msg_type'] == 'error'){    
         } else {
           $data['contacts'] = $this->Contacts_model->getAllFromEntityId($id);
