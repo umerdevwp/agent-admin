@@ -187,7 +187,7 @@ if($aResponse['type']=='error'){
     // $iContactId = $aResponse['results'];
     $data = [
                 "id" => $iContactId,
-                "contact_owner" => $this->input->post("zohoId"),
+                "contact_owner" => $this->session->user['zohoId'],
                 "first_name"    =>  $this->input->post("inputContactFirstName"),
                 "last_name"    =>  $this->input->post("inputContactLastName"),
                 "full_name" => $this->input->post("inputContactFirstName").' '.$this->input->post("inputContactLastName"),
