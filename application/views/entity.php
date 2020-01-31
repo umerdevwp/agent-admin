@@ -305,7 +305,10 @@
                     </thead>
                     <tbody id="contactTableTbody">
                       <?php 
-                        if(count($contacts)>0) {
+
+                        
+
+                        if(!empty($contacts)) {
                             for($i = 0; $i < count($contacts); $i++){ ?>
                       <tr role="row" class="odd">
                         <td><?php echo $contacts[$i]->first_name . ' ' . $contacts[$i]->last_name; ?></td>

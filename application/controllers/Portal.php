@@ -101,7 +101,6 @@ class Portal extends CI_Controller {
 		}
 
 		$data['formStatus'] = $this->statusForForm();
-	
 		//var_dump($data['account']);die;
         $this->load->view('header');
 		$this->load->view('portal', $data);

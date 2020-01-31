@@ -239,6 +239,7 @@ class Login extends CI_Controller
         $this->load->model('Admin_model');
         $checkSuperUser =  $this->Admin_model->checkAdminExist($this->session->user["email"]);
         if (!empty($checkSuperUser)) {
+            addToSessionKey("user", ['isAdminId' => $checkSuperUser[0]->id]);
             addToSessionKey("user", ['isAdmin' => true]);
             $this->Admin_model->updateAdmin($this->session->user["email"]);
         } else {

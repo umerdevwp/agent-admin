@@ -79,8 +79,13 @@ class Entity extends CI_Controller {
         else 
             $data['tasks_completed'] = [];
                 
-        $data['contacts'] = $this->Contacts_model->getAllFromEntityId($id);
-                
+        $contact_data = $this->Contacts_model->getAllFromEntityId($id);
+        if($contact_data['msg_type'] == 'error'){
+            $data['contacts'] = '';
+        } else {
+            $data['contacts'] = $contact_data;
+        }
+   
         $data['attachments'] = $this->Attachments_model->getAllFromEntityId($id);
         if($data['attachments'])
         {
@@ -97,7 +102,7 @@ class Entity extends CI_Controller {
         }
         
         // if session is parent then get entity ID from url
-        if($this->session->user['child'])
+        if($this->session->user['child'] or $this->session->user["isAdmin"])
             $iEntityId = $id;
 
         $data['iEntityId'] = $iEntityId;

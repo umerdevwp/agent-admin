@@ -156,8 +156,8 @@ HC;
         $oAccountRow = $this->Accounts_model->getOne($iLoginId);
         $sAccountName = $oAccountRow->entity_name;
         //$sAccountName = "Najm Test Comliance";
-//var_dump($oAccountRow);
-//die;
+        //var_dump($oAccountRow);
+        //die;
         
 $aResponse = $this->ZoHo_Account->newZohoContact(
     $sAccountName,
@@ -187,11 +187,11 @@ if($aResponse['type']=='error'){
     // $iContactId = $aResponse['results'];
     $data = [
                 "id" => $iContactId,
-                "contact_owner" => $this->session->user['zohoId'],
+                "contact_owner" => $this->input->post("entityId"),
                 "first_name"    =>  $this->input->post("inputContactFirstName"),
                 "last_name"    =>  $this->input->post("inputContactLastName"),
                 "full_name" => $this->input->post("inputContactFirstName").' '.$this->input->post("inputContactLastName"),
-                "entity_name" => $iLoginId,
+                "entity_name" => $this->session->user["isAdmin"] ?  $this->input->post("entityId") : $this->input->post("entityId"),
                 "email"    =>  $this->input->post("inputContactEmail"),
                 "phone"    =>  $this->input->post("inputContactPhone"),
                 "title"    =>  $this->input->post("inputContactType"),
@@ -199,7 +199,7 @@ if($aResponse['type']=='error'){
                 "mailing_city"    =>  $this->input->post("inputContactCity"),
                 "mailing_state"    =>  $this->input->post("inputContactState"),
                 "mailing_zip"    =>  $this->input->post("inputContactZipcode"),
-                "created_by" => $this->session->user['zohoId'],
+                "created_by" => $this->session->user["isAdmin"] ? $this->session->user["isAdminId"] : $this->session->user['zohoId'],
                 "created_time" => date('Y-m-d H:i:s'),
                 "modified_time" => date('Y-m-d H:i:s'),
                 "last_activity_time" => date('Y-m-d H:i:s'),
