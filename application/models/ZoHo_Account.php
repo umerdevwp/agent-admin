@@ -4,7 +4,7 @@ use zcrmsdk\crm\setup\restclient\ZCRMRestClient;
 use zcrmsdk\crm\crud\ZCRMModule;
 use zcrmsdk\crm\crud\ZCRMRecord;
 use zcrmsdk\crm\crud\ZCRMNote;
-
+use zcrmsdk\oauth\ZohoOAuth;
 /**
  * ZoHo_Account class contains all logic to pull data from ZoHo
  */
@@ -39,6 +39,21 @@ class ZoHo_Account extends CI_Model
         ];
         
         ZCRMRestClient::initialize($configuration);
+
+        $sGrantToken = getenv("ZOHO_GRANT_TOKEN");
+        if(!empty($sGrantToken))
+        {
+            $oAuthClient = ZohoOAuth::getClientInstance();
+        
+            try {
+                $oAuthTokens = $oAuthClient->generateAccessToken($sGrantToken);
+            } catch(Exception $e)
+            {
+                //var_dump($e);
+                echo "Access Failed: " . $e->getMessage();
+            }
+        }
+        
     }
 
 
