@@ -486,7 +486,7 @@
                 <label>Zipcode <span class="require">*</span></label>
                 <input type="text" class="form-control" id="inputContactZipcode" name="inputContactZipcode" placeholder="Postal / Zip Code" value="" tabindex="8">
                 <p id="inputContactZipcodeReq" class="errorMsg"></p>
-                <input type="hidden" name="entityId" value="<?=$iEntityId;?>">
+                <input type="text" name="entityId" value="<?=$iEntityId;?>">
             </div>
           </div>  
         
@@ -625,7 +625,11 @@ setTimeout(() => {
           $('#validateAddress').hide();
           $('#successMessageBox').show().delay(10000).fadeOut();
           $( "table tbody#contactTableTbody tr td.dataTables_empty" ).remove();
-          var markup = "<tr role='row' class='odd'><td class='sorting_1'>" + fname +' '+ lname + "</td><td>" + ctype + "</td><td>" + email + "</td><td>" + street + city + state + zipcode + "</td><td>" + phone + "</td><td>Safe</td></tr>";
+          <?php if($this->session->user['zohoId'] == getenv("SUPER_USER")): ?>
+              var markup = "<tr role='row' class='odd'><td class='sorting_1'>" + fname +' '+ lname + "</td><td>" + ctype + "</td><td>" + email + "</td><td>" + street + city + state + zipcode + "</td><td>" + phone + "</td><td>Safe</td></tr>";
+          <?php else: ?>
+              var markup = "<tr role='row' class='odd'><td class='sorting_1'>" + fname +' '+ lname + "</td><td>" + ctype + "</td><td>" + email + "</td><td>" + street + city + state + zipcode + "</td><td>" + phone + "</td></tr>";
+          <?php endif ?>
           $('table tbody#contactTableTbody').append(markup);
           if($(ev.target).attr("id")=='saveClose'){
             $('#addMultiple').modal('hide');
