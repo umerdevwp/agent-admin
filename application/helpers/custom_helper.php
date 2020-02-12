@@ -134,6 +134,11 @@ function isDev()
     else return false;
 }
 
+/**
+ * Identify the site access from developer or client based on machine ips
+ * 
+ * @return Bool true/false
+ */
 function isDeveloperIp()
 {
     if(
@@ -142,6 +147,19 @@ function isDeveloperIp()
         $_SERVER['REMOTE_ADDR']=='58.65.211.74'
     ) return true;
     else return false;
+}
+
+/**
+ * Identify loged in session is admin or not, by tracking super user id
+ * 
+ * @return Bool true/false
+ */
+function isAdmin()
+{
+    if($this->session->user['ZohoId']==getenv("SUPER_USER")){
+        return true;
+    }
+    return false;
 }
 
 
@@ -208,4 +226,50 @@ function addToSessionKey($sKey,$aData)
         $_SESSION[$sThisKey] = $aThisData;
     }
 
+}
+/**
+ * Convert user input date to MySQL YYYY-MM-DD format
+ * 
+ * @param String $strDate date in string format
+ * @return String formated date / empty string
+ */
+function convToMySqlDate($strDate)
+{
+    $strNewDate = "";
+    // try to correct user date format, then validate
+    if($strDate!="")
+    {
+        $strFormationDate = str_replace("  "," ",$strDate);
+        $posColons = strpos($strFormationDate,":");
+        if($posColons>0)
+        {
+            // find space before colons
+            $strTillColon = substr($strFormationDate,0,$posColons);
+            $strFormationDate = substr($strTillColon,0,strrpos($strTillColon," "));
+        }
+        $strFormationDate = str_replace(" ","-",$strFormationDate);
+        $strFormationDate = date("Y-m-d",strtotime($strFormationDate));
+
+        if($strFormationDate!="1970-01-01")
+        {
+            $strNewDate = $strFormationDate;
+        }
+    }
+
+    return $strNewDate;
+}
+
+/**
+ * Get login id of user else the login admin id instead of super user id
+ * 
+ * @return Integer User Id
+ */
+function userLoginId()
+{
+    if($_SESSION['user']['zohoId']==getenv("SUPER_USER"))
+    {
+        return $_SESSION['user']['AdminId'];
+    }
+
+    return $_SESSION['user']['zohoId'];
 }

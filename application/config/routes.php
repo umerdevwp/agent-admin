@@ -63,14 +63,20 @@ $route['entity/(:num)'] = 'entity/index/$1';
 $route['contacts'] = 'contacts/index';
 $route['attachments'] = 'attachments/index';
 $route['agents'] = 'RegisterAgents/index';
+$route['notification/form'] = 'notifications/form';
+$route['notification/cron'] = 'notifications/setRules';
 
 // actions
 $route['zoho'] = 'tasks/getZohoCode';
 $route['task/update/(:num)'] = 'tasks/completeTaskInZoho/$1';
+$route['task/add']['post'] = 'tasks/add';
 $route['ajax/theme/save']['post'] = 'user/saveThemeAjax/$1';
 $route['ajax/theme/(:any)']['get'] = 'user/getThemeAjax/$1';
 $route['ajax/contact/save']['post'] = 'contacts/addAjax';
+$route['synch'] = 'synch';
+
+// automate
+$route['notify'] = 'notifications/notify';
 
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
-
