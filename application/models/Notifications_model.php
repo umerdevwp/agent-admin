@@ -40,12 +40,16 @@ class Notifications_model extends CI_Model
         $this->db->from($this->table_rule . " r");
         $this->db->join($this->table_states. " rs","rs.rule_id = r.id");
         $result = null;
+        
         if($sState!="")
-        {
             $this->db->where('state',$sState);
+            
+        if($sEntityType!="")
             $this->db->where('entity_type',$sEntityType);
+        
+        if($sOrigin!="")
             $this->db->where("origin_type",$sOrigin);
-        }
+
         // remove this line, only for testing
         //$this->db->where("r.custom_condition!=",'');
 

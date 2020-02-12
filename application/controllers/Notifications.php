@@ -179,94 +179,109 @@ class Notifications extends CI_Controller
     {
         
     }
-
+    /**
+     * Set calendar for upcoming due dates of notification for entity state and type
+     * 
+     */
     public function setRules()
     {
         $this->load->model("Notifications_model");
+        $this->load->library('form_validation');
 
-        //$result = $this->Notifications_model->findRule("HI","LLC");
-        $result = $this->Notifications_model->findRule();
+        $state = $this->input->post("state");
+        $type = $this->input->post("type");
+
+        $result = $this->Notifications_model->findRule(($state?:""),($type?:""));
+        //$result = $this->Notifications_model->findRule();
 
         // sample dates for testing
-        $aSampleDate = ["1/1/2017","1/1/2018","5/7/19","1/7/20","1/26/20"];
-        foreach($result as $oRow)
+        $sFormationDate = convToMySqlDate($this->input->post("formation"));// ["1/1/2017","1/1/2018","5/7/19","1/7/20","1/26/20"];
+        $now = convToMySqlDate($this->input->post("now"));
+
+        $this->form_validation->set_rules('formation', 'Formation Date', 'required');
+
+        if($this->form_validation->run() !== FALSE)
         {
-            var_dump($oRow);
-            // reset me with actual entity date
-            $sFormationDate=$aSampleDate[2];
-            
-            $oDate = $this->getNotificationDate($oRow,$sFormationDate);
-            
-            $oDateFormation = new DateTime("$sFormationDate");
-            $oDateNow = new DateTime("now");
-            $bCondition = false;
-            // TODO: performance bug identified as 
-            // TODO: if $sDate is in past, generate new sDate: take day and month of formation instead in current year
-            while( ($oDate<$oDateNow && $oRow->period_type=='recurring') || !$bCondition)
+
+            foreach($result as $oRow)
             {
-                // date is less then next/current date
-                // next date based on generated date
-                // 
-                echo "<br>";
                 
-                /*$iTempDayDiff = 0;
-                // if date changed due to day diff
-                // return back it close to formation_date
-                if($oRow->day_diff<0){
-                    $iTempDayDiff = $oRow->day_diff*-1;
-                    $oTempDate = new DateTime($oDate->format("Y-m-d")." +{$iTempDayDiff} days");
-                }
-                // if date changed due to month diff
-                // return back it close to formation_date
-                if($oRow->month_diff<0){
-                    $iTempMonthDiff = $oRow->month_diff*-1;
-                    $oTempDate = new DateTime($oDate->format("Y-m-d")." +{$iTempMonthDiff} months");
-                }
+                // reset me with actual entity date
+                //$sFormationDate=$aSampleDate;
+                
+                $oDate = $this->getNotificationDate($oRow,$sFormationDate);
+                
+                $oDateFormation = new DateTime("$sFormationDate");
+                $oDateNow = new DateTime(($now?:"now"));
+                $bCondition = false;
+                //var_dump($oRow);//var_dump($sFormationDate);
 
-                $oDate->setDate($oTempDate->format("Y"),$oTempDate->format("m"),$oTempDate->format("d"));
-                */
-                // fiscal year requires month or day differences, therefore revert them back to fiscal date
-                // of the year + 1, because the date generated exist in past time
-                if($oRow->base_type=='fiscal'){
-                    $oDate->setDate($oDate->format("Y")+1,$oDateFormation->format("m"),$oDateFormation->format("d"));
-                }
-                // try to find the date after today
-                if($oDate<$oDateNow)
+                // TODO: performance bug identified as 
+                // TODO: if $sDate is in past, generate new sDate: take day and month of formation instead in current year
+                while( ($oDate<$oDateNow && $oRow->period_type=='recurring') || (!$bCondition && $oRow->period_type=='recurring'))
                 {
-                    echo "Date was past: -- ";
-                    echo $oDate = $this->getNotificationDate($oRow,$oDate->format("Y-m-d"));
-                } else if($oRow->custom_condition!="")  // solve any custom condition that exist
+                    $b1 = ($oDate<$oDateNow && $oRow->period_type=='recurring');
+                    $b2 = (!$bCondition && $oRow->period_type=='recurring');
+                    // date is less then next/current date
+                    // next date based on generated date
+                    // 
+                    //echo "<br>";
+                    
+                    
+                    // fiscal year requires month or day differences, therefore revert them back to fiscal date
+                    // of the year + 1, because the date generated exist in past time
+                    if($oRow->base_type=='fiscal'){
+                        $oDate->setDate($oDate->format("Y")+1,$oDateFormation->format("m"),$oDateFormation->format("d"));
+                    }
+                    // try to find the date after today
+                    if($oDate<$oDateNow)
+                    {
+                        //echo "Date was past: -- " . $oDate->format("Y-m-d");
+                        $oDate = $this->getNotificationDate($oRow,$oDate->format("Y-m-d"));
+                    } else if($oRow->custom_condition!="")  // solve any custom condition that exist
+                    {
+                        //echo "solving custom: ";
+                        //echo $oDate->format("Y-m-d");
+                        $oDate->setDate($oDate->format("Y"),$oDateFormation->format("m"),$oDateFormation->format("d"));
+                        $bCondition = $this->customCondition($oDate,$oRow,$oDateFormation);
+                    } else {    // set custom condition solved when dont exist
+                        $bCondition = true;
+                    }
+
+                    // set specific month/days
+                    if(is_numeric(substr($oRow->day_diff,0,1)) && $oRow->day_diff!=null) $oDate->setDate($oDate->format("Y"),$oDate->format("m"),$oRow->day_diff);
+                    if(is_numeric(substr($oRow->month_diff,0,1)) && $oRow->month_diff!=null) $oDate->setDate($oDate->format("Y"),$oRow->month_diff,$oDate->format("d"));
+                }
+                // reset date based on subtract condition of days for e.g. -1 mean last day of month, 1 mean 1st day of month
+                if($oRow->day_diff<0)
                 {
-                    echo "solving custom: ";
-                    echo $oDate->format("Y-m-d");
-                    $oDate->setDate($oDate->format("Y"),$oDateFormation->format("m"),$oDateFormation->format("d"));
-                    $bCondition = $this->customCondition($oDate,$oRow,$oDateFormation);
-                } else {    // set custom condition solved when dont exist
-                    $bCondition = true;
+                    $oDate->setDate($oDate->format("Y"),$oDate->format("m"),1);
+                    $oDate = new DateTime($oDate->format("Y-m-d"). " {$oRow->day_diff} days");
                 }
 
-                // set specific month/days
-                if(is_numeric(substr($oRow->day_diff,0,1)) && $oRow->day_diff!=null) $oDate->setDate($oDate->format("Y"),$oDate->format("m"),$oRow->day_diff);
-                if(is_numeric(substr($oRow->month_diff,0,1)) && $oRow->month_diff!=null) $oDate->setDate($oDate->format("Y"),$oRow->month_diff,$oDate->format("d"));
-            }
-            // reset date based on subtract condition of days for e.g. -1 mean last day of month, 1 mean 1st day of month
-            if($oRow->day_diff<0)
-            {
-                $oDate->setDate($oDate->format("Y"),$oDate->format("m"),1);
-                $oDate = new DateTime($oDate->format("Y-m-d"). " {$oRow->day_diff} days");
-            }
+                $sDate = $oDate->format("Y-m-d");
 
-            $sDate = $oDate->format("Y-m-d");
-
-            $sRow =<<<HT
-            <br><br>
-            Formation: {$sFormationDate} <br>
-            Condition: {$oRow->state},    {$oRow->entity_type},  {$oRow->description},  {$sDate} <br>
-            Result: {$sDate}<br>
+                $sRow =<<<HT
+                <br><br>
+                Formation: {$sFormationDate} <br>
+                Condition: {$oRow->state},    {$oRow->entity_type},  {$oRow->description},  {$sDate} <br>
+                Result: {$sDate}<br>
 HT;
-            echo $sRow;
+                //echo $sRow;
+                $data['aNotification'][] = (object)[
+                    "formation" =>  $sFormationDate,
+                    "state" =>  $oRow->state,
+                    "type"   =>  $oRow->entity_type,
+                    "duedate"   => $sDate,
+                    "period"    =>  $oRow->period_type,
+                    "description"   =>  $oRow->description,
+                ];
+            }
         }
-        
+
+        $this->load->view('header');
+        $this->load->view("test-notification",$data);
+        $this->load->view('footer');
     }
 
     private function getNotificationDate($oRow,$sFormationDate)
@@ -303,34 +318,12 @@ HT;
                 if(strpos($iYearDiff,"+")!==false) $sDateInterval .= " {$iYearDiff} year";
                 if(strpos($iMonthDiff,"+")!==false) $sDateInterval .= " {$iMonthDiff} months";
                 if(strpos($iDayDiff,"+")!==false) $sDateInterval .= " {$iDayDiff} days";
-                echo $sDateInterval;
+                $sDateInterval;
 
-                echo "<br>";
+                //echo "<br>";
                 // select today
                 $oDateTime = new DateTime($sDateInterval);
-
-
-
-/*
-                echo "<br>";
-                // return date
-                echo $sDate = $oDateTime->format("Y-m-d");
-                if($iYearDiff && $iMonthDiff && $iDayDiff)
-                {
-                    echo " --> to specific --> ";
-                    // make date
-                    $oDateTime->setDate(
-                        $this->getOperatorOrNumber($iYearDiff,$oDateTime->format("Y")),
-                        $this->getOperatorOrNumber($iMonthDiff,$oDateTime->format("m")),
-                        $this->getOperatorOrNumber($iDayDiff,$oDateTime->format("d"))
-                    );
-                    // return date
-                    echo $sDate = $oDateTime->format("Y-m-d");
-                }*/
-                
-
             break;
-            
         }
 
         return $oDateTime;
