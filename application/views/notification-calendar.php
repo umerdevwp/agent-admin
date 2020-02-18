@@ -38,7 +38,7 @@
                   <div class="col-sm-12">
 
                 <div class="form-row">
-                    <div class="col-md-6">
+                    <div class="col-md-3">
           
           <label for="type">Corp. Type <span class="steric">*</span></label>
       <select id="type" class="form-control" name="type">
@@ -56,7 +56,7 @@
       </select>
       <?php echo form_error('type'); ?>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-3">
 
                 <label for="state">State <span class="steric">*</span></label>
                 <!-- <input type="text" class="form-control" id="inputContactState" name="inputContactState" placeholder="State/Region/Province" value="" tabindex="7"> -->
@@ -118,7 +118,7 @@
                 <?php echo form_error('state'); ?>
                     </div>
 
-                    <div class="form-group col-md-6">
+                    <div class="col-md-3">
 
                 <label for="inputFormationDate">Formation Date <span class="steric">*</span></label>
         <div class="input-group" id="datetime">
@@ -130,10 +130,10 @@
         </div>
                     </div>
                     
-                    <div class="form-group col-md-6">
+                    <div class="col-md-3">
 
         <label for="inputFiscal">Fiscal Date <span class="steric">*</span></label>
-        <div class="input-group" id="datetime">
+        <div class="input-group" id="datetime2">
               <div class="input-group-prepend">
                 <label class="input-group-text" for="inputFiscal"><span class="fa-calendar"></span></label>
               </div>
@@ -141,6 +141,62 @@
               <?php echo form_error('fiscal'); ?>
         </div>
                     </div>
+
+
+                   
+
+                    <div class="form-group col-md-3">
+
+                <label for="inputintervaldays">Interval Days <span class="steric">*</span></label>
+        <div class="input-group">
+              <div class="input-group-prepend">
+                <label class="input-group-text" for="inputintervaldays"><span class="fa-signal"></span></label>
+              </div>
+              <input type="number" class="form-control ui-spinner-input" name="intervaldays" id="intervaldays" value="<?=$this->input->post("intervaldays")?:1;?>" placeholder="Interval Days" value="5" aria-valuemin="0" aria-valuenow="8" autocomplete="off" role="spinbutton" />
+              <?php echo form_error('intervaldays'); ?>
+        </div>
+                    </div>
+
+                    <div class="form-group col-md-3">
+
+                <label for="inputintervalmonths">Interval Months <span class="steric">*</span></label>
+        <div class="input-group">
+              <div class="input-group-prepend">
+                <label class="input-group-text" for="inputintervalmonths"><span class="fa-signal"></span></label>
+              </div>
+              <input type="number" class="form-control ui-spinner-input" name="intervalmonths" id="intervalmonths" value="<?=$this->input->post("intervalmonths")?:1;?>" placeholder="Before Days" value="5" aria-valuemin="0" aria-valuenow="8" autocomplete="off" role="spinbutton" />
+              <?php echo form_error('intervalmonths'); ?>
+        </div>
+                    </div>
+
+                     <div class="form-group col-md-3">
+
+                <label for="inputbeforedays">Before Days <span class="steric">*</span></label>
+        <div class="input-group">
+              <div class="input-group-prepend">
+                <label class="input-group-text" for="inputbeforedays"><span class="fa-signal"></span></label>
+              </div>
+              <input type="number" class="form-control ui-spinner-input" name="beforedays" id="beforedays" value="<?=$this->input->post("beforedays")?:1;?>" placeholder="Before Days" value="5" aria-valuemin="0" aria-valuenow="8" autocomplete="off" role="spinbutton" />
+              <?php echo form_error('beforedays'); ?>
+        </div>
+                    </div>
+
+                    <div class="form-group col-md-3">
+
+                <label for="inputbeforemonths">Before Months <span class="steric">*</span></label>
+        <div class="input-group">
+              <div class="input-group-prepend">
+                <label class="input-group-text" for="inputbeforemonths"><span class="fa-signal"></span></label>
+              </div>
+              <input type="number" class="form-control ui-spinner-input" name="beforemonths" id="beforemonths" value="<?=$this->input->post("beforemonths")?:1;?>" placeholder="Before Months" value="5" aria-valuemin="0" aria-valuenow="8" autocomplete="off" role="spinbutton" />
+              <?php echo form_error('beforemonths'); ?>
+        </div>
+                    </div>
+
+                    
+
+
+                    
                 <div class="form-group col-md-12">
                     <label for="daterange">Build Calendar</label>
                       <div class="input-group">
@@ -171,11 +227,15 @@
                 <div class="col-sm-12">
                 <div class="tabs tabs-vertical-top tabs-border">
                 <ul class="nav nav-tabs justify-content-md-end scroller scroller-horizontal" role="tablist">
-                  <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#panelTab5-1" role="tab" aria-selected="true">Table</a></li>
-                  <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#panelTab5-2" role="tab" aria-selected="false"><span class="fa-bolt"></span> Calendar</a></li>
+                  <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#panelTab5-1" role="tab" aria-selected="true"><span class="fa-bolt"></span>Calendar</a></li>
+                  <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#panelTab5-2" role="tab" aria-selected="false">Table</a></li>
                 </ul>
                 <div class="tab-content">
                   <div class="tab-pane fade show active" id="panelTab5-1" role="tabpanel">
+                  
+                  <div class="fullcalendar" data-fullcalendar-event='<?=$sCalendarEvents;?>'></div>
+                  </div>
+                  <div class="tab-pane fade" id="panelTab5-2" role="tabpanel">
                   <table class="table table-striped table-hover data-table dataTable" data-page-length="5" data-table-mode="multi-filter" id="DataTables_Table_3" role="grid" aria-describedby="DataTables_Table_3_info">
                     <thead>
                       <tr role="row">
@@ -203,9 +263,6 @@
                         } ?>
                     </tbody>
                   </table>
-                  </div>
-                  <div class="tab-pane fade" id="panelTab5-2" role="tabpanel">
-                    <div class="fullcalendar" data-fullcalendar-event='<?=$sCalendarEvents;?>'></div>
                   </div>
                 </div>
               </div>

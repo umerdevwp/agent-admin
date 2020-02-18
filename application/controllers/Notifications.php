@@ -213,8 +213,7 @@ class Notifications extends CI_Controller
      * 
      * @return Array of dates of notification from start till end date
      */
-    //public function planCalendar($iEntityId="3743841000000633009",$sStartDate="2020-01-01",$sEndDate="2020-06-01")
-    public function planCalendar($iEntityId="3743841000000633009",$sStartDate="2020-01-01",$sEndDate="2020-06-01"){
+    public function planCalendar(){
         $this->load->model("Notifications_model");
         $this->load->library('form_validation');
 
@@ -225,8 +224,13 @@ class Notifications extends CI_Controller
 
         $this->form_validation->set_rules("state","State","required");
         $this->form_validation->set_rules("type","Type","required");
-        $this->form_validation->set_rules("formation","formation","required");
-        $this->form_validation->set_rules("fiscal","fiscal","required");
+        $this->form_validation->set_rules("formation","Formation date","required");
+        $this->form_validation->set_rules("fiscal","Fiscal date","required");
+
+        $this->form_validation->set_rules("beforedays","Before days","required");
+        $this->form_validation->set_rules("beforemonths","Before months","required");
+        $this->form_validation->set_rules("intervaldays","Interval days","required");
+        $this->form_validation->set_rules("intervalmonths","Interval months","required");
 
         $this->form_validation->set_rules("daterange","Start-End Date","required");
 
@@ -239,22 +243,33 @@ class Notifications extends CI_Controller
                 $this->input->post("formation"),
                 $this->input->post("fiscal")
             );
+
+ 
+            $aExplodRange = explode("-",$this->input->post("daterange"));
+            $sStartDate = $aExplodRange[0];
+            $sEndDate = $aExplodRange[1];
+
+            $oStartDate = new DateTime($sStartDate);
+            $oEndDate = new DateTime($sEndDate);
             
             if($aData['subscription']['type']=='ok')
                 $oSubs = $aData['subscription']['results'][0];
+
+                $oSubs = (object)[
+                    "start_date"=>$sStartDate,
+                    "end_date"=>$sEndDate,
+                    "interval_months"=>$this->input->post('intervalmonths'),
+                    "interval_days"=>$this->input->post('intervaldays'),
+                    "before_months"=>$this->input->post('beforemonths'),
+                    "before_days"=>$this->input->post('beforedays'),
+                ];
             
             if($oSubs)
             {
-                
-                $aExplodRange = explode("-",$this->input->post("daterange"));
-                $sStartDate = $aExplodRange[0];
-                $sEndDate = $aExplodRange[1];
-
-                $oStartDate = new DateTime($sStartDate);
-                $oEndDate = new DateTime($sEndDate);
-
                 $oSubsStartDate = new DateTime($oSubs->start_date);
                 $oSubsEndDate = new DateTime($oSubs->end_date);
+                $oNowDate = new DateTime(date("Y-m-d"));
+                $oDueDate = new DateTime($oRule->duedate);
                 if($oStartDate<$oSubsStartDate)
                 {
                     $oStartDate = $oSubsStartDate;
@@ -263,11 +278,20 @@ class Notifications extends CI_Controller
                 {
                     $oEndDate = $oSubsEndDate;
                 }
+                if($oDueDate<$oEndDate)
+                {
+                    $oEndDate = $oDueDate;
+                }
+                
                 // check the difference of dates b/w start and end date
-                $oDateDiff = $oStartDate->diff($oEndDate);
+                $oDateDiff = $oNowDate->diff($oEndDate);
                 $sStartDate = $oStartDate->format("Y-m-d");
+                // subscription start is past then start notifying from now
+                if($oStartDate<$oNowDate)
+                    $sStartDate = $oNowDate->format("Y-m-d");
 
-                $sCalendarEvents .= '{' . '"title":"SUBSCRIPTION START DATE","start":"' . $sStartDate . '"},';
+
+                $sCalendarEvents .= '{' . '"title":"SUBSCRIPTION START DATE","start":"' . $oStartDate->format("Y-m-d") . '"},';
 
                 for($i=0;$i<=$oDateDiff->days;$i++)
                 {
@@ -309,29 +333,28 @@ class Notifications extends CI_Controller
         // setup now, due and subscripiton date objects
         $oDueDate = new DateTime($oRule->duedate);
         $oDateNow = new DateTime($sDateNow);
-        $oDiffDue = $oDueDate->diff($oDateNow);
+        $oDiffDue = $oDueDate->diff($oDateNow,true);
         $oDiffSubs = $oDateNow->diff(new DateTime($oSubscription->start_date));
         $aResult = null;
 
-        // calculate month intervals
-        $iMonthIntervalRemaining = $oDiffSubs->m%$oSubscription->interval_months;
-        $iDayToday = $oDateNow->format("d");
-        // and today is 1st of month then shoot
-        if($iMonthIntervalRemaining==0 && $iDayToday==1)
+        if($oSubscription->interval_months>0)
         {
-            $aResult = ['type'=>'interval-months','date'=>$oDateNow->format("Y-m-d")];
-            return $aResult;
-        }
-
-        // calculate month remaining
-        if($oDiffDue->m==$oSubscription->before_months)
-        {
-            // subtract 1 coz, difference is 0 when day is last of month
-            $iLastDayMonth = date("t",strtotime($oDateNow->format("Y-m-d")))-1;
-            if($oDiffDue->d == $iLastDayMonth){
-                $aResult = ['type'=>'before-months','date'=>$oDateNow->format("Y-m-d")];
+            // calculate month intervals
+            $iMonthIntervalRemaining = $oDiffSubs->m%$oSubscription->interval_months;
+            $iDayToday = $oDateNow->format("d");
+            // and today is 1st of month then shoot
+            if($iMonthIntervalRemaining==0 && $iDayToday==1)
+            {
+                $aResult = ['type'=>'interval-months','date'=>$oDateNow->format("Y-m-d")];
                 return $aResult;
             }
+        }
+
+        // calculate month remaining, difference is 0 when day is last of month
+        if($oDiffDue->m==$oSubscription->before_months && $oDiffDue->d==0)
+        {
+            $aResult = ['type'=>'before-months','date'=>$oDateNow->format("Y-m-d")];
+            return $aResult;
         }
 
         // calculate days remaining
@@ -341,12 +364,15 @@ class Notifications extends CI_Controller
             return $aResult;
         }
 
-        // calculate day intervals 
-        $iDayIntervalRemaining = $oDiffSubs->days%$oSubscription->interval_days;
-        if($iDayIntervalRemaining==0)
+        if($oSubscription->interval_days>0)
         {
-            $aResult = ['type'=>'interval-days','date'=>$oDateNow->format("Y-m-d")];
-            return $aResult;
+            // calculate day intervals 
+            $iDayIntervalRemaining = $oDiffSubs->days%$oSubscription->interval_days;
+            if($iDayIntervalRemaining==0)
+            {
+                $aResult = ['type'=>'interval-days','date'=>$oDateNow->format("Y-m-d")];
+                return $aResult;
+            }
         }
 
         return $aResult;
