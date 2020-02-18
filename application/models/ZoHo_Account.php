@@ -39,18 +39,22 @@ class ZoHo_Account extends CI_Model
         ];
         
         ZCRMRestClient::initialize($configuration);
-
+        // to generate new token just provide grant token
+        // scopes: ZohoCRM.modules.ALL,aaaserver.profile.READ
         $sGrantToken = getenv("ZOHO_GRANT_TOKEN");
         if(!empty($sGrantToken))
         {
+            echo "Token exist::-- ";
             $oAuthClient = ZohoOAuth::getClientInstance();
         
             try {
+                echo "Generating token::-- ";
                 $oAuthTokens = $oAuthClient->generateAccessToken($sGrantToken);
             } catch(Exception $e)
             {
                 //var_dump($e);
-                echo "Access Failed: " . $e->getMessage();
+                echo "CRM denied site access: " . $e->getMessage();
+                die;
             }
         }
         
