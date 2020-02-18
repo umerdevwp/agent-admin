@@ -2,9 +2,12 @@
 class Notifications_model extends CI_Model
 {
 
-    private $table = "notifications";
+    private $table = "notification_subscriptions";
     private $table_rule = "rules";
     private $table_states = "rule_states";
+    private $table_entity_states = "entity_states";
+    private $table_zoho_accounts = "zoho_accounts";
+    private $table_entitymeta = "usersmeta";
 
     public function __construct()
     {
@@ -60,4 +63,33 @@ class Notifications_model extends CI_Model
         
         return $result;
     }
+
+    public function getSubscriptions($iEntityId=0)
+    {
+        
+        $sQueryEntity =<<<HC
+SELECT za.filing_state,za.entity_structure,za.formation_date,ns.* 
+FROM {$this->table} ns
+INNER JOIN {$this->table_entity_states} es ON ns.entity_id=es.entity_id
+INNER JOIN {$this->table_zoho_accounts} za ON ns.entity_id=za.id
+LEFT JOIN {$this->table_entitymeta} em ON ns.entity_id=em.id
+WHERE (ISNULL(em.account_status) OR em.account_status='active')
+AND ns.status='active'
+HC;
+
+        if($iEntityId>0) $sQueryEntity .= " AND ns.entity_id={$iEntityId}";
+
+        $oQuery = $this->db->query($sQueryEntity);
+        //echo $this->db->last_query();die;
+        $result = $oQuery->result_object();
+
+        if(!$result)
+        {
+            return ['type'=>'error','message'=>"No data found"];
+        }
+
+        return ['type'=>'ok','results'=>$result];
+    }
+
+
 }

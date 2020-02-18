@@ -156,7 +156,7 @@ class Notifications extends CI_Controller
         $this->Tasks_model->add($aData);
     }
 
-    public function notify()
+    public function notify1()
     {
         $this->load->model("Tasks_model");
         
@@ -167,75 +167,290 @@ class Notifications extends CI_Controller
             foreach($aResult as $v)
             {
                 // check today is the day to shoot mail to particular entity
-                if($this->checkTodayShootDay($v->due_date,$v->start_date,$v->status))
+                //if($this->checkTodayShootDay($v->due_date,$v->start_date,$v->status))
                 {
                     // shoot email and continue to next user
                 }
             }
         }
     }
+    // TODO: set cron to update entity_states table for a new zoho_account is synched to zoho_accounts
+    // REPLACE INTO entity_states SELECT za.id,s.id,NOW(),NOW() FROM zoho_accounts za, states s WHERE za.filing_state=s.code;
 
-    private function checkTodayShootDay($sDueDate,$sStartDate,$sStatus)
+    public function notify()
+    {
+        // step 1
+        // pick up all the entities that have subscribed for notifications
+
+        // step 2
+        // create a join with state rules
+
+        // step 3
+        // 
+        $this->load->model("Notifications_model");
+        
+        $aData["subscription"] = $this->Notifications_model->getSubscriptions();
+        
+        foreach($aData['subscription']['results'] as $oSubs)
+        {
+            $oRule = $this->getRules(
+                $oSubs->filing_state,
+                $oSubs->entity_structure,
+                $oSubs->formation_date,
+                $oSubs->fiscal_date
+            );
+            $aResult = $this->getNotifyDate($oSubs,$oRule,date("Y-m-d"));
+            var_dump($aResult);
+        }
+    }
+    /**
+     * Plan calendar of notifications based on supplied start and end dates
+     * for particular entity
+     * 
+     * @param $iEntityId Numeric id of existing entity
+     * @param $sStartDate String of start date
+     * @param $sEndDate String of end date
+     * 
+     * @return Array of dates of notification from start till end date
+     */
+    //public function planCalendar($iEntityId="3743841000000633009",$sStartDate="2020-01-01",$sEndDate="2020-06-01")
+    public function planCalendar($iEntityId="3743841000000633009",$sStartDate="2020-01-01",$sEndDate="2020-06-01"){
+        $this->load->model("Notifications_model");
+        $this->load->library('form_validation');
+
+        $aData["subscription"] = $this->Notifications_model->getSubscriptions();
+        $aCalendar = null;
+        $oSubs = null;
+        $sCalendarEvents = "";
+
+        $this->form_validation->set_rules("state","State","required");
+        $this->form_validation->set_rules("type","Type","required");
+        $this->form_validation->set_rules("formation","formation","required");
+        $this->form_validation->set_rules("fiscal","fiscal","required");
+
+        $this->form_validation->set_rules("daterange","Start-End Date","required");
+
+        
+        if($this->form_validation->run()!==FALSE){
+
+            $oRule = $this->getRules(
+                $this->input->post("state"),
+                $this->input->post("type"),
+                $this->input->post("formation"),
+                $this->input->post("fiscal")
+            );
+            
+            if($aData['subscription']['type']=='ok')
+                $oSubs = $aData['subscription']['results'][0];
+            
+            if($oSubs)
+            {
+                
+                $aExplodRange = explode("-",$this->input->post("daterange"));
+                $sStartDate = $aExplodRange[0];
+                $sEndDate = $aExplodRange[1];
+
+                $oStartDate = new DateTime($sStartDate);
+                $oEndDate = new DateTime($sEndDate);
+
+                $oSubsStartDate = new DateTime($oSubs->start_date);
+                $oSubsEndDate = new DateTime($oSubs->end_date);
+                if($oStartDate<$oSubsStartDate)
+                {
+                    $oStartDate = $oSubsStartDate;
+                }
+                if($oEndDate>$oSubsEndDate)
+                {
+                    $oEndDate = $oSubsEndDate;
+                }
+                // check the difference of dates b/w start and end date
+                $oDateDiff = $oStartDate->diff($oEndDate);
+                $sStartDate = $oStartDate->format("Y-m-d");
+
+                $sCalendarEvents .= '{' . '"title":"SUBSCRIPTION START DATE","start":"' . $sStartDate . '"},';
+
+                for($i=0;$i<=$oDateDiff->days;$i++)
+                {
+                    $sDateNow = date("Y-m-d",strtotime($sStartDate . " +{$i} days"));
+                    $aDate = $this->getNotifyDate($oSubs,$oRule,$sDateNow);
+                    if(is_array($aDate)){
+                        $aCalendar[$sDateNow] = $aDate;
+
+                        $sCalendarEvents .= '{' . '"title":"' . $aDate['type'] . '","start":"' . $aDate['date'] . '"';
+                        if($aDate['type']=='interval-days') $sCalendarEvents .= ',"className":"fc-event-success"';
+                        else if($aDate['type']=='interval-months') $sCalendarEvents .= ',"className":"fc-event-primary"';
+                        else if($aDate['type']=='before-days') $sCalendarEvents .= ',"className":"fc-event-danger"';
+                        else if($aDate['type']=='before-months') $sCalendarEvents .= ',"className":"fc-event-warning"';
+                        $sCalendarEvents .= '},';
+
+                    }
+                    
+                    if($sDateNow==$oEndDate->format("Y-m-d")){
+                        $sCalendarEvents .= '{' . '"title":"SUBSCRIPTION END DATE","start":"' . $sDateNow . '"},';
+                        break;
+                    }
+
+
+                }
+            }
+            $sCalendarEvents .= '{' . '"title":"FINAL DATE","start":"' . $oRule->duedate . '","className":"fc-event-danger"},';
+            $sCalendarEvents = "[".substr($sCalendarEvents,0,-1)."]";
+        }
+        //[{"title":"Sony Meeting","start":"2019-08-06","className":"fc-event-success"},{"title":"Conference","start":"2019-08-14","end":"2019-08-16","className":"fc-event-warning"},{"title":"System Testing","start":"2019-08-26","end":"2019-08-28","className":"fc-event-primary"},{"title":"Sony Meeting","start":"2019-09-05","className":"fc-event-success"},{"title":"Conference","start":"2019-09-11","end":"2019-09-12","className":"fc-event-warning"},{"title":"System Testing","start":"2019-09-26","end":"2019-09-28","className":"fc-event-primary"},{"title":"Sony Meeting","start":"2019-10-06","className":"fc-event-success"},{"title":"Conference","start":"2019-10-14","end":"2019-10-16","className":"fc-event-warning"},{"title":"System Testing","start":"2019-10-26","end":"2019-10-28","className":"fc-event-primary"},{"title":"Sony Meeting","start":"2019-11-09","className":"fc-event-success"},{"title":"Conference","start":"2019-11-17","end":"2019-11-18","className":"fc-event-warning"},{"title":"System Testing","start":"2019-11-26","end":"2019-11-28","className":"fc-event-primary"},{"title":"Sony Meeting","start":"2019-12-06","className":"fc-event-success"},{"title":"Conference","start":"2019-12-14","end":"2019-12-16","className":"fc-event-warning"},{"title":"System Testing","start":"2019-12-26","end":"2019-12-27","className":"fc-event-primary"},{"title":"Sony Meeting","start":"2020-01-09","className":"fc-event-success"},{"title":"Conference","start":"2020-01-17","end":"2020-01-18","className":"fc-event-warning"},{"title":"System Testing","start":"2020-01-26","end":"2020-01-28","className":"fc-event-primary"}]
+        $this->load->view("header");
+        $this->load->view("notification-calendar",['aCalendar'=>$aCalendar,'sCalendarEvents'=>$sCalendarEvents,'aNotification'=>[$oRule]]);
+        $this->load->view("footer");
+    }
+
+
+    private function getNotifyDate($oSubscription,$oRule,$sDateNow)
     {
         
+        // setup now, due and subscripiton date objects
+        $oDueDate = new DateTime($oRule->duedate);
+        $oDateNow = new DateTime($sDateNow);
+        $oDiffDue = $oDueDate->diff($oDateNow);
+        $oDiffSubs = $oDateNow->diff(new DateTime($oSubscription->start_date));
+        $aResult = null;
+
+        // calculate month intervals
+        $iMonthIntervalRemaining = $oDiffSubs->m%$oSubscription->interval_months;
+        $iDayToday = $oDateNow->format("d");
+        // and today is 1st of month then shoot
+        if($iMonthIntervalRemaining==0 && $iDayToday==1)
+        {
+            $aResult = ['type'=>'interval-months','date'=>$oDateNow->format("Y-m-d")];
+            return $aResult;
+        }
+
+        // calculate month remaining
+        if($oDiffDue->m==$oSubscription->before_months)
+        {
+            // subtract 1 coz, difference is 0 when day is last of month
+            $iLastDayMonth = date("t",strtotime($oDateNow->format("Y-m-d")))-1;
+            if($oDiffDue->d == $iLastDayMonth){
+                $aResult = ['type'=>'before-months','date'=>$oDateNow->format("Y-m-d")];
+                return $aResult;
+            }
+        }
+
+        // calculate days remaining
+        if($oDiffDue->days==$oSubscription->before_days)
+        {
+            $aResult = ['type'=>'before-days','date'=>$oDateNow->format("Y-m-d")];
+            return $aResult;
+        }
+
+        // calculate day intervals 
+        $iDayIntervalRemaining = $oDiffSubs->days%$oSubscription->interval_days;
+        if($iDayIntervalRemaining==0)
+        {
+            $aResult = ['type'=>'interval-days','date'=>$oDateNow->format("Y-m-d")];
+            return $aResult;
+        }
+
+        return $aResult;
     }
+
+    public function showRules()
+    {
+        $this->load->library('form_validation');
+
+        $data['aNotification'] = $this->getRules(
+            $this->input->post("state"),
+            $this->input->post("type"),
+            convToMySqlDate($this->input->post("formation")),
+            convToMySqlDate($this->input->post("fiscal")),
+            convToMySqlDate($this->input->post("now")),
+            false
+        );
+
+        $this->load->view('header');
+        $this->load->view("test-notification",$data);
+        $this->load->view('footer');
+    }
+
     /**
      * Set calendar for upcoming due dates of notification for entity state and type
      * 
      */
-    public function setRules()
+    private function getRules($sEntityState,$sEntityType,$sFormationDate,$sFiscalDate="",$sNow="",$bReturnSingle=true)
     {
         $this->load->model("Notifications_model");
-        $this->load->library('form_validation');
+        
 
-        $state = $this->input->post("state");
-        $type = $this->input->post("type");
+        //$state = $this->input->post("state");
+        //$type = $this->input->post("type");
 
-        $result = $this->Notifications_model->findRule(($state?:""),($type?:""));
+        $result = $this->Notifications_model->findRule(($sEntityState?:""),($sEntityType?:""));
+        //var_dump($result);
         //$result = $this->Notifications_model->findRule();
 
+        $sFiscalDate = convToMySqlDate($sFiscalDate)?:date("2017-12-31");
         // sample dates for testing
-        $sFormationDate = convToMySqlDate($this->input->post("formation"));// ["1/1/2017","1/1/2018","5/7/19","1/7/20","1/26/20"];
-        $now = convToMySqlDate($this->input->post("now"));
-
-        $this->form_validation->set_rules('formation', 'Formation Date', 'required');
-
-        if($this->form_validation->run() !== FALSE)
-        {
+        //$sFormationDate = convToMySqlDate($this->input->post("formation"));// ["1/1/2017","1/1/2018","5/7/19","1/7/20","1/26/20"];
 
             foreach($result as $oRow)
             {
                 
                 // reset me with actual entity date
                 //$sFormationDate=$aSampleDate;
-                
-                $oDate = $this->getNotificationDate($oRow,$sFormationDate);
-                
-                $oDateFormation = new DateTime("$sFormationDate");
-                $oDateNow = new DateTime(($now?:"now"));
                 $bCondition = false;
+                $oDateNow = new DateTime(($sNow?:"now"));
+                
+                if($oRow->base_type=="fiscal")
+                {
+                    $oDate = $this->getNotificationDate($oRow,$sFiscalDate);
+                    $oDateFormation = new DateTime("$sFiscalDate");
+                    
+                } else {
+                    $oDate = $this->getNotificationDate($oRow,$sFormationDate);
+                    $oDateFormation = new DateTime("$sFormationDate");
+                }
+                // set specific month day on date
+                $this->setFixedMonthDay($oRow,$oDate);
+
+                // return initial date by stopping loop
+                // if initial not expired
+                if($oRow->period_type=="initial")
+                {
+                    if($oDateNow<$oDate)
+                    {
+                        //echo $sRow;
+                        $data = (object)[
+                            "formation" =>  $sFormationDate,
+                            "fiscal" =>  $sFiscalDate,
+                            "state" =>  $oRow->state,
+                            "type"   =>  $oRow->entity_type,
+                            "duedate"   => $oDate->format("Y-m-d"),
+                            "period"    =>  $oRow->period_type,
+                            "description"   =>  $oRow->description,
+                        ];
+                         break;
+                    }
+                }
+                
                 //var_dump($oRow);//var_dump($sFormationDate);
 
                 // TODO: performance bug identified as 
                 // TODO: if $sDate is in past, generate new sDate: take day and month of formation instead in current year
-                while( ($oDate<$oDateNow && $oRow->period_type=='recurring') || (!$bCondition && $oRow->period_type=='recurring'))
+                while(($oDate<$oDateNow && $oRow->period_type=='recurring') || (!$bCondition && $oRow->custom_condition!=""))
                 {
-                    $b1 = ($oDate<$oDateNow && $oRow->period_type=='recurring');
-                    $b2 = (!$bCondition && $oRow->period_type=='recurring');
+                    //$b1 = ($oDate<$oDateNow && $oRow->period_type=='recurring');
+                    //$b2 = (!$bCondition && $oRow->period_type=='recurring');
                     // date is less then next/current date
                     // next date based on generated date
                     // 
                     //echo "<br>";
                     
-                    
-                    // fiscal year requires month or day differences, therefore revert them back to fiscal date
-                    // of the year + 1, because the date generated exist in past time
-                    if($oRow->base_type=='fiscal'){
-                        $oDate->setDate($oDate->format("Y")+1,$oDateFormation->format("m"),$oDateFormation->format("d"));
-                    }
                     // try to find the date after today
                     if($oDate<$oDateNow)
                     {
+                        // fiscal year requires month or day differences, therefore revert them back to fiscal date
+                        // of the year + 1, because the date generated exist in past time
+                        if($oRow->base_type=='fiscal'){
+                            $this->resetFiscalDate($oRow,$oDate,$oDateFormation);
+                        }
                         //echo "Date was past: -- " . $oDate->format("Y-m-d");
                         $oDate = $this->getNotificationDate($oRow,$oDate->format("Y-m-d"));
                     } else if($oRow->custom_condition!="")  // solve any custom condition that exist
@@ -248,9 +463,7 @@ class Notifications extends CI_Controller
                         $bCondition = true;
                     }
 
-                    // set specific month/days
-                    if(is_numeric(substr($oRow->day_diff,0,1)) && $oRow->day_diff!=null) $oDate->setDate($oDate->format("Y"),$oDate->format("m"),$oRow->day_diff);
-                    if(is_numeric(substr($oRow->month_diff,0,1)) && $oRow->month_diff!=null) $oDate->setDate($oDate->format("Y"),$oRow->month_diff,$oDate->format("d"));
+                    $this->setFixedMonthDay($oRow,$oDate);
                 }
                 // reset date based on subtract condition of days for e.g. -1 mean last day of month, 1 mean 1st day of month
                 if($oRow->day_diff<0)
@@ -258,30 +471,51 @@ class Notifications extends CI_Controller
                     $oDate->setDate($oDate->format("Y"),$oDate->format("m"),1);
                     $oDate = new DateTime($oDate->format("Y-m-d"). " {$oRow->day_diff} days");
                 }
-
-                $sDate = $oDate->format("Y-m-d");
-
-                $sRow =<<<HT
-                <br><br>
-                Formation: {$sFormationDate} <br>
-                Condition: {$oRow->state},    {$oRow->entity_type},  {$oRow->description},  {$sDate} <br>
-                Result: {$sDate}<br>
-HT;
-                //echo $sRow;
-                $data['aNotification'][] = (object)[
-                    "formation" =>  $sFormationDate,
-                    "state" =>  $oRow->state,
-                    "type"   =>  $oRow->entity_type,
-                    "duedate"   => $sDate,
-                    "period"    =>  $oRow->period_type,
-                    "description"   =>  $oRow->description,
-                ];
+                if($bReturnSingle)
+                {
+                    //echo $sRow;
+                    $data = (object)[
+                        "formation" =>  $sFormationDate,
+                        "fiscal" =>  $sFiscalDate,
+                        "state" =>  $oRow->state,
+                        "type"   =>  $oRow->entity_type,
+                        "duedate"   => $oDate->format("Y-m-d"),
+                        "period"    =>  $oRow->period_type,
+                        "description"   =>  $oRow->description,
+                        "nowdate"   =>  $oDateNow->format("Y-m-d")
+                    ];
+                    break;
+                } else {
+                    $data[] = (object)[
+                        "formation" =>  $sFormationDate,
+                        "fiscal" =>  $sFiscalDate,
+                        "state" =>  $oRow->state,
+                        "type"   =>  $oRow->entity_type,
+                        "duedate"   => $oDate->format("Y-m-d"),
+                        "period"    =>  $oRow->period_type,
+                        "description"   =>  $oRow->description,
+                        "nowdate"   =>  $oDateNow->format("Y-m-d")
+                    ];
+                }
+                
             }
-        }
 
-        $this->load->view('header');
-        $this->load->view("test-notification",$data);
-        $this->load->view('footer');
+        return $data;
+
+
+    }
+
+    private function resetFiscalDate($oRow,$oDate,$oDateFormation)
+    {
+        $iFiscalYearDiff = (int)($oRow->year_diff?:1);
+        $oDate->setDate($oDate->format("Y")+$iFiscalYearDiff,$oDateFormation->format("m"),$oDateFormation->format("d"));
+    }
+
+    private function setFixedMonthDay($oRow,$oDate)
+    {        
+        // set specific month/days
+        if(is_numeric(substr($oRow->day_diff,0,1)) && $oRow->day_diff!=null) $oDate->setDate($oDate->format("Y"),$oDate->format("m"),$oRow->day_diff);
+        if(is_numeric(substr($oRow->month_diff,0,1)) && $oRow->month_diff!=null) $oDate->setDate($oDate->format("Y"),$oRow->month_diff,$oDate->format("d"));
     }
 
     private function getNotificationDate($oRow,$sFormationDate)
@@ -298,27 +532,18 @@ HT;
 
         switch($oRow->base_type)
         {
-            case "date":
-                // select today
-                $oDateTime = new DateTime("now");
-                $oDateNow = new DateTime("now");
-                $iTempYearDiff = $oDateTime->format('Y');
-                // make date
-                $oDateTime->setDate($iTempYearDiff,$iMonthDiff,$iDayDiff);
-                // is date in past, move to next year
-                if($oDateTime<$oDateNow){
-                    // set for annually critearea
-                    $iTempYearDiff += 1;
-                }
-                // make date
-                $oDateTime->setDate($iTempYearDiff,$iMonthDiff,$iDayDiff);
-            break;
             case ("formation"||"fiscal"):
                 $sDateInterval = $sFormationDate;
-                if(strpos($iYearDiff,"+")!==false) $sDateInterval .= " {$iYearDiff} year";
+                
+                if($oRow->base_type=="fiscal")
+                {
+                    if((int)$iYearDiff>1) 
+                        $sDateInterval .= " {$iYearDiff} year";
+                } else if(strpos($iYearDiff,"+")!==false) $sDateInterval .= " {$iYearDiff} year";
+
                 if(strpos($iMonthDiff,"+")!==false) $sDateInterval .= " {$iMonthDiff} months";
                 if(strpos($iDayDiff,"+")!==false) $sDateInterval .= " {$iDayDiff} days";
-                $sDateInterval;
+                //$sDateInterval;
 
                 //echo "<br>";
                 // select today

@@ -23,7 +23,7 @@
 	<div class="col-md-9 col-lg-12">
       <div class="panel">
         <div class="panel-header">
-          <div class="panel-title"><span class="panel-icon fa-tasks"></span><span>Test Notification:</span> 
+          <div class="panel-title"><span class="panel-icon fa-tasks"></span><span>Notification Calendar:</span> 
         </div>
         </div>
 
@@ -33,14 +33,14 @@
             
 
 
-            <form method="post" action="/notification/cron" enctype="multipart/form-data" name="formTestNotification" id="formTestNotification">
+            <form method="post" action="/notification/calendar" enctype="multipart/form-data" name="formTestNotification" id="formTestNotification">
             <div class="row">
                   <div class="col-sm-12">
 
                 <div class="form-row">
                     <div class="col-md-6">
           
-          <label for="type">Corp. Type</label>
+          <label for="type">Corp. Type <span class="steric">*</span></label>
       <select id="type" class="form-control" name="type">
               <option selected="true" value="">-Select-</option>
               <option value="INC">Corporation</option>
@@ -54,10 +54,11 @@
               <option value="PLLC">Professional Limited Liability Company</option>
               <option value="SCORP">S Corporation</option>
       </select>
+      <?php echo form_error('type'); ?>
                     </div>
                     <div class="col-md-6">
 
-                <label for="state">State </label>
+                <label for="state">State <span class="steric">*</span></label>
                 <!-- <input type="text" class="form-control" id="inputContactState" name="inputContactState" placeholder="State/Region/Province" value="" tabindex="7"> -->
                 <select class="form-control" id="state" name="state" tabindex="7">
                   <option selected value="">-- Select State --</option>
@@ -114,6 +115,7 @@
                   <option value="WI">Wisconsin - WI</option>
                   <option value="WY">Wyoming - WY</option>
                 </select>
+                <?php echo form_error('state'); ?>
                     </div>
 
                     <div class="form-group col-md-6">
@@ -127,6 +129,7 @@
               <?php echo form_error('formation'); ?>
         </div>
                     </div>
+                    
                     <div class="form-group col-md-6">
 
         <label for="inputFiscal">Fiscal Date <span class="steric">*</span></label>
@@ -138,18 +141,18 @@
               <?php echo form_error('fiscal'); ?>
         </div>
                     </div>
+                <div class="form-group col-md-12">
+                    <label for="daterange">Build Calendar</label>
+                      <div class="input-group">
+                        <input class="form-control" id="daterange" type="text" name="daterange"  value="<?=$this->input->post("daterange");?>">
+                        <div class="input-group-append">
+                          <label class="input-group-text" for="daterange"><span class="fa fa-calendar"></span></label>
+                        </div>
+                      </div>
 
-
-                    <div class="form-group col-md-6">
-
-        <label for="inputDueDate">Set Today</label>
-        <div class="input-group" id="datetime">
-              <div class="input-group-prepend">
-                <label class="input-group-text" for="inputDueDate"><span class="fa-calendar"></span></label>
-              </div>
-              <input type="text" class="form-control" name="now" id="inputDueDate" value="<?=$this->input->post("now");?>" placeholder="Optional" data-datetimepicker="" />
-        </div>
                     </div>
+
+                    
 
                     <div class="form-group col-md-6">
         <button type="submit" class="btn btn-primary">View Due Date</button>
@@ -159,16 +162,20 @@
     </div><!-- col end -->
 </div><!-- row end -->
 </form>
-<div class="alert alert-info alert-lighter mt-2" role="alert">
-                <span class="alert-icon fa-info"></span>
-                <span>Leave <b>Corp. Type</b> and <b>State</b> blank to view all available ruled states.</span>
-            </div>
+
               <div class="row row-10">
                 <div class="col-sm-12 col-md-6 pl-3"></div>
                 <div class="col-sm-12 col-md-6 pr-3"> </div>
               </div>
               <div class="row">
                 <div class="col-sm-12">
+                <div class="tabs tabs-vertical-top tabs-border">
+                <ul class="nav nav-tabs justify-content-md-end scroller scroller-horizontal" role="tablist">
+                  <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#panelTab5-1" role="tab" aria-selected="true">Table</a></li>
+                  <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#panelTab5-2" role="tab" aria-selected="false"><span class="fa-bolt"></span> Calendar</a></li>
+                </ul>
+                <div class="tab-content">
+                  <div class="tab-pane fade show active" id="panelTab5-1" role="tabpanel">
                   <table class="table table-striped table-hover data-table dataTable" data-page-length="5" data-table-mode="multi-filter" id="DataTables_Table_3" role="grid" aria-describedby="DataTables_Table_3_info">
                     <thead>
                       <tr role="row">
@@ -196,6 +203,14 @@
                         } ?>
                     </tbody>
                   </table>
+                  </div>
+                  <div class="tab-pane fade" id="panelTab5-2" role="tabpanel">
+                    <div class="fullcalendar" data-fullcalendar-event='<?=$sCalendarEvents;?>'></div>
+                  </div>
+                </div>
+              </div>
+                
+                  
                   
                 </div>
               </div>

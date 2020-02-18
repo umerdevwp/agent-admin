@@ -64,7 +64,10 @@ $route['contacts'] = 'contacts/index';
 $route['attachments'] = 'attachments/index';
 $route['agents'] = 'RegisterAgents/index';
 $route['notification/form'] = 'notifications/form';
-$route['notification/cron'] = 'notifications/setRules';
+$route['notification/notify'] = 'notifications/notify';
+$route['notification/cron'] = 'notifications/showRules';
+$route['notification/calendar'] = 'notifications/planCalendar';
+
 
 // actions
 $route['zoho'] = 'tasks/getZohoCode';
