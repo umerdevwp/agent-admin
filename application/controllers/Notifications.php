@@ -452,8 +452,11 @@ class Notifications extends CI_Controller
                             "period"    =>  $oRow->period_type,
                             "description"   =>  $oRow->description,
                         ];
+                        // select this date for due as initial not filed yet
                          break;
                     }
+                    // go to next rule if available as initial
+                    continue;
                 }
                 
                 //var_dump($oRow);//var_dump($sFormationDate);
