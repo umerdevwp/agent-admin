@@ -251,15 +251,16 @@
                       <?php 
                         if(count($aNotification)>0) {
                             for($i = 0; $i < count($aNotification); $i++){ ?>
-                      <tr role="row" class="odd">
-                        <td><?php echo $aNotification[$i]->formation; ?></td>
-                        <td><?php echo $aNotification[$i]->state; ?></td>
-                        <td><?php echo $aNotification[$i]->type; ?></td>
-                        <td><?php echo $aNotification[$i]->duedate; ?></td>
-                        <td><?php echo $aNotification[$i]->period; ?></td>
-                        <td><?php echo $aNotification[$i]->description; ?></td>
-                      </tr>
-                      <?php } 
+                        <tr role="row" class="odd">
+                          <td><?php echo $aNotification[$i]->formation; ?></td>
+                          <td><?php echo $aNotification[$i]->state; ?></td>
+                          <td><?php echo $aNotification[$i]->type; ?></td>
+                          <td><?php echo $aNotification[$i]->duedate; ?></td>
+                          <td><?php echo $aNotification[$i]->period; ?></td>
+                          <td><?php echo $aNotification[$i]->description; ?></td>
+                        </tr>
+                        <?php 
+                            } 
                         } ?>
                     </tbody>
                   </table>
