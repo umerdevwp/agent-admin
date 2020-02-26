@@ -3,7 +3,8 @@
         "zohocrm/php-sdk": "^2.0",
         "vlucas/phpdotenv": "^3.6",
         "okta/sdk": "^1.1.0",
-        "smartystreets/phpsdk": "4.7.1"
+        "smartystreets/phpsdk": "4.7.1",
+        "sendgrid/sendgrid": "~7"
     },
 	"autoload": {
         "psr-4": {"Src\\Services\\": "application/services"}

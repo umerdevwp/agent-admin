@@ -1,6 +1,8 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
+use SendGrid\Mail\Mail;
+
 class Notifications extends CI_Controller
 {
     public function form()
@@ -179,15 +181,8 @@ class Notifications extends CI_Controller
 
     public function notify()
     {
-        // step 1
-        // pick up all the entities that have subscribed for notifications
-
-        // step 2
-        // create a join with state rules
-
-        // step 3
-        // 
         $this->load->model("Notifications_model");
+        $this->load->model("Accounts_model");
         
         $aData["subscription"] = $this->Notifications_model->getSubscriptions();
         
@@ -200,9 +195,74 @@ class Notifications extends CI_Controller
                 $oSubs->fiscal_date
             );
             $aResult = $this->getNotifyDate($oSubs,$oRule,date("Y-m-d"));
-            var_dump($aResult);
+            if(isset($aResult['date']))
+            {
+                $oEntity = $this->Accounts_model->getOne($oSubs->entity_id);
+                if($oEntity->id>0)
+                {
+                    $this->sendMail($oEntity->notification_email,$oEntity->entity_name,$oEntity->filing_state,$oEntity->entity_structure,$oRule->duedate,$oRule->period);
+                }
+                
+            }
+            // var_dump($oRule);
+            // var_dump($oEntity);
+            // var_dump($aResult);
+            // var_dump($oSubs);
+
+            //
+
         }
     }
+
+    /**
+     * Send mail using sendgrid API
+     * 
+     */
+    private function sendMail($sEmail,$sName,$sState,$sEntityType,$sDate,$sPurpose="recurring")
+    {
+        
+        switch($sPurpose)
+        {
+            case "initial":
+                $sSubject = "Reminder: Upcoming Initial filing Due";
+                $sContent =<<<HC
+<br />
+Dear <strong>{$sName}</strong>, <br /><br />
+It is a reminder for upcoming initial filing for your state: <strong>{$sState}</strong> and structure: <strong>{$sEntityType}</strong> on date: <strong>{$sDate}</strong> <br />
+Regards, <br /><br />
+Your Agent Services Support <br />
+HC;
+            break;
+
+            default:
+            $sSubject = "Reminder: Upcoming Recurring filing Due";
+            $sContent =<<<HC
+<br />
+Dear <strong>{$sName}</strong>, <br /><br />
+It is a reminder for upcoming recurring filing for your state: <strong>{$sState}</strong> and structure: <strong>{$sEntityType}</strong> on date: <strong>{$sDate}</strong> <br />
+Regards, <br /><br />
+Your Agent Services Support <br />
+HC;
+        }
+
+        $oEmail = new Mail();
+        $oEmail->setFrom("agentadmin@youragentservices.com", "Your Agent Services Support");
+        $oEmail->addTo($sEmail, $sName);
+        $oEmail->setSubject($sSubject);
+        $oEmail->addContent("text/html", $sContent);
+
+        $oSendgrid = new SendGrid(getenv('SENDGRID_API_KEY'));
+        try {
+            $response = $oSendgrid->send($oEmail);
+            // print $response->statusCode() . "\n";
+            // print_r($response->headers());
+            // print $response->body() . "\n";
+        } catch (Exception $e) {
+            $sMessage = 'Caught exception: '. $e->getMessage() ."\n";
+            error_log($sMessage);
+        }
+    }
+
     /**
      * Plan calendar of notifications based on supplied start and end dates
      * for particular entity
