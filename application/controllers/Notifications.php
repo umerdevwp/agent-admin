@@ -397,7 +397,7 @@ HC;
         $oDiffSubs = $oDateNow->diff(new DateTime($oSubscription->start_date));
         $aResult = null;
 
-        if($oSubscription->interval_months>0)
+        if($oSubscription->interval_months>0 && $oDiffSubs->m>0)
         {
             // calculate month intervals
             $iMonthIntervalRemaining = $oDiffSubs->m%$oSubscription->interval_months;
@@ -424,7 +424,7 @@ HC;
             return $aResult;
         }
 
-        if($oSubscription->interval_days>0)
+        if($oSubscription->interval_days>0 && $oDiffSubs->days>0)
         {
             // calculate day intervals 
             $iDayIntervalRemaining = $oDiffSubs->days%$oSubscription->interval_days;

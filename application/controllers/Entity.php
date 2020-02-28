@@ -298,8 +298,8 @@ HC;
         $oApi->setFieldValue("Filing_State", $this->input->post("inputFillingState")); // Account Name can be given for a new account, account_id is not mandatory in that case
         $oApi->setFieldValue("Entity_Type", $this->input->post("inputFillingStructure")); // Account Name can be given for a new account, account_id is not mandatory in that case
         
-        $oApi->setFieldValue("Formation_Date",date("Y-m-d",$this->input->post("inputFormationDate")));
-        //$oApi->setFieldValue("Fiscal_Date",date("Y-m-d",$this->input->post("inputFiscalDate")));
+        $oApi->setFieldValue("Formation_Date",date("Y-m-d",strtotime($this->input->post("inputFormationDate"))));
+        //$oApi->setFieldValue("Fiscal_Date",date("Y-m-d",strtotime($this->input->post("inputFiscalDate"))));
 
         // firstName, lastName fields going under contacts
         
