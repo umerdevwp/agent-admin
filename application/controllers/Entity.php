@@ -166,7 +166,7 @@ class Entity extends CI_Controller {
                 $_POST["inputFiscalDate"] = "";
             }
         }
-
+        
         $this->form_validation->set_rules('inputName', 'Account Name', 'required|regex_match[/[a-zA-Z\s]+/]',["regex_match"=>"Only alphabets and spaces allowed."]);
         
         $this->form_validation->set_rules('inputFirstName', 'First Name', 'required|regex_match[/[a-zA-Z\s]+/]',["regex_match"=>"Only alphabets and spaces allowed."]);
@@ -252,6 +252,8 @@ HC;
             return false;
 
         } else {
+            $_POST['inputFormationDate'] = date("Y-m-d",strtotime($this->input->post("inputFormationDate")));
+            $_POST['inputFiscalDate'] = date("Y-m-d",strtotime($this->input->post("inputFiscalDate")));
 
             $response = $this->zohoCreateEntity($this->session->user['zohoId'],$bTagSmartyValidated);
             // succcess redirect to dashboard
@@ -298,8 +300,8 @@ HC;
         $oApi->setFieldValue("Filing_State", $this->input->post("inputFillingState")); // Account Name can be given for a new account, account_id is not mandatory in that case
         $oApi->setFieldValue("Entity_Type", $this->input->post("inputFillingStructure")); // Account Name can be given for a new account, account_id is not mandatory in that case
         
-        $oApi->setFieldValue("Formation_Date",date("Y-m-d",strtotime($this->input->post("inputFormationDate"))));
-        //$oApi->setFieldValue("Fiscal_Date",date("Y-m-d",strtotime($this->input->post("inputFiscalDate"))));
+        $oApi->setFieldValue("Formation_Date",$this->input->post("inputFormationDate"));
+        //$oApi->setFieldValue("Fiscal_Date",$this->input->post("inputFiscalDate"));
 
         // firstName, lastName fields going under contacts
         
@@ -475,7 +477,6 @@ HC;
             }
         }
 
-        //var_dump($arError);die;
         if(count($arError)>0)
         {
             return ['error'=>$arError[0],'error_code'=>$iErrorType];
@@ -494,8 +495,8 @@ HC;
         $oRule = $this->Notifications_model->getRules(
             $this->input->post("inputFillingState"),
             $this->input->post("inputFillingStructure"),
-            date("Y-m-d",$this->input->post("inputFormationDate")),
-            date("Y-m-d",$this->input->post("inputFiscalDate"))
+            $this->input->post("inputFormationDate"),
+            $this->input->post("inputFiscalDate")
         );
 
         $aData = [
@@ -534,8 +535,8 @@ HC;
             "entity_name"       =>  $this->input->post("inputName"),
             "entity_structure"  =>  $this->input->post("inputFillingStructure"),
             "filing_state"      =>  $this->input->post("inputFillingState"),
-            "formation_date"    => date("Y-m-d",strtotime($this->input->post("inputFormationDate"))),
-            "fiscal_date"    => date("Y-m-d",strtotime($this->input->post("inputFiscalDate"))),
+            "formation_date"    =>  $this->input->post("inputFormationDate"),
+            "fiscal_date"       =>  $this->input->post("inputFiscalDate"),
             "shipping_street"           =>  $this->input->post("inputNotificationAddress"),
             "shipping_city"              =>  $this->input->post("inputNotificationCity"),
             "shipping_state"             =>  $this->input->post("inputNotificationState"),

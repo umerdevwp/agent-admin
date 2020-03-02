@@ -186,6 +186,7 @@ class Notifications extends CI_Controller
         
         $aData["subscription"] = $this->Notifications_model->getSubscriptions();
         
+        
         foreach($aData['subscription']['results'] as $oSubs)
         {
             $oRule = $this->Notifications_model->getRules(
@@ -205,10 +206,10 @@ class Notifications extends CI_Controller
                 
             }
             // var_dump($oRule);
-            // var_dump($oEntity);
             // var_dump($aResult);
             // var_dump($oSubs);
-
+            // var_dump($oEntity);
+             
             //
 
         }
@@ -259,6 +260,7 @@ HC;
             // print $response->body() . "\n";
         } catch (Exception $e) {
             $sMessage = 'Caught exception: '. $e->getMessage() ."\n";
+            //debug($e);
             error_log($sMessage);
         }
     }
