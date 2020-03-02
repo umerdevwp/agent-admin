@@ -5,10 +5,24 @@ use SendGrid\Mail\Mail;
 
 class Notifications extends CI_Controller
 {
-    public function form()
+    public function form($id=0)
     {
         $this->load->library('form_validation');
         $this->load->model("Accounts_model");
+
+        if((int)$id>0)
+        {
+            $oEntity = $this->Accounts_model->getOne($id);
+            
+            if(empty($oEntity->id))
+            {
+                $data['oEntity'] = $oEntity;
+            } else {
+                set_flashdata("error","Entity doesn't exist or expired.");
+            }
+        } else {
+            set_flashdata("error","Entity doesn't exist");
+        }
         
         if($this->session->user['zohoId']==getenv("SUPER_USER"))
         {
@@ -16,7 +30,7 @@ class Notifications extends CI_Controller
         } else {
             $aResult = $this->Accounts_model->loadChildAccounts($this->session->user['zohoId']);
         }
-        
+
         $data['aEntity'] = [];
         if(count($aResult['results']))
         {

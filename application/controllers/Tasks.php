@@ -1,8 +1,6 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-use Src\Services\OktaApiService as Okta;
-
 class Tasks extends CI_Controller
 {
     /**
@@ -91,5 +89,6 @@ class Tasks extends CI_Controller
             redirect($_SERVER["HTTP_REFERER"]);
         }
     }
+
 
 }

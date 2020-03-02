@@ -55,8 +55,8 @@ date_default_timezone_set("Asia/Kolkata");
  *
  * NOTE: If you change these, also change the error_reporting() code below
  */
-define('ENVIRONMENT', 'testing');//(isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development'));
-
+$aServers = ['devtest.youragentservices.com','192.168.0.187'];
+define('ENVIRONMENT', (in_array($_SERVER['SERVER_NAME'],$aServers)?"development":"production"));//(isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development'));
 /*
  * ---------------------------------------------------------------
  * ERROR REPORTING
@@ -67,7 +67,7 @@ define('ENVIRONMENT', 'testing');//(isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV
  */
 switch (ENVIRONMENT) {
     case 'development':
-        error_reporting(-1);
+        error_reporting(E_STRICT);
         ini_set('display_errors', 1);
         break;
 

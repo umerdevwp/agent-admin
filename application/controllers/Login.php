@@ -64,6 +64,7 @@ class Login extends CI_Controller
             redirect("/portal");
         } else {
            if($this->session->user['zohoId'] == getenv("SUPER_USER")){
+               addToSessionKey("user",["AdminId"=>123]);
             redirect("/portal");
            } else{
             redirect("/entity/" . $this->session->user["zohoId"]);
@@ -180,8 +181,12 @@ class Login extends CI_Controller
                 "firstName"=>$response->profile->firstName,
                 "lastName"=>$response->profile->lastName,
             );
+
             // set child bit
-            addToSessionKey("user",['child'=>$this->hasChild()]);
+            if($_SESSION['user']['zohoId']==getenv("SUPER_USER"))
+                addToSessionKey("user",['child'=>1]);
+            else
+                addToSessionKey("user",['child'=>$this->hasChild()]);
 
             // add permission based on child
             addToSessionKey('user',['permissions'=>$this->getPermissions($this->session->user['child'])]);
