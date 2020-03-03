@@ -12,11 +12,9 @@
 <link rel="stylesheet" href="components/base/base.css">
 <link rel="stylesheet" href="components/base/custom.css">
 <link rel="stylesheet" href="components/dropdown/dropdown.css">
-<link rel="stylesheet" href="components/datepicker/datepicker.css">
 <script src="components/base/script.js"></script>
 <script src="components/base/jquery-3.4.1.min.js"></script>
 <script src="components/base/moment.min.js"></script>
-<script src="components/datepicker/bootstrap-datepicker.js"></script>
 </head>
 	
 <body>
