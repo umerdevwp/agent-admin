@@ -3,5 +3,7 @@ application/storage/*
 application/logs/*
 docs/*
 .vs/*
+zohoauth/*
 vendor/*
+temp786/
 composer.lock

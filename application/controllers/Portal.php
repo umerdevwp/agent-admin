@@ -25,7 +25,7 @@ class Portal extends CI_Controller {
 	{
 		$this->load->library(["session"]);
 		$this->load->helper(["email"]);
-    
+
 		// has no child, show entity page
 		if($this->session->user["child"]==0 and $this->session->user['zohoId'] != getenv("SUPER_USER"))
 		{
@@ -51,28 +51,27 @@ class Portal extends CI_Controller {
         //$this->ZoHo_Account->dumpAll();
 		//$data['account'] = $this->ZoHo_Account;
 		
-		$this->load->model('Accounts_model');
+		$this->load->model('entity_model');
 		$this->load->model('Tempmeta_model');
 		$data['entity'] = false;		
 		
 		// user is administrator
 		if($this->session->user['zohoId'] == getenv("SUPER_USER")){
-			$data['entity'] = $this->Accounts_model->loadAccount($this->session->user['zohoId']);
-            $data['arChildEntity'] = $this->Accounts_model->getAll();
+			$data['entity'] = $this->entity_model->loadAccount($this->session->user['zohoId']);
+            $data['arChildEntity'] = $this->entity_model->getAll();
 		// users from zoho
 		} else {
-			$aDataEntity = $this->Accounts_model->loadAccount($this->session->user['zohoId']);
+			$aDataEntity = $this->entity_model->loadAccount($this->session->user['zohoId']);
 			$data['entity'] = false;
 			if($aDataEntity['type']=='ok') $data['entity'] = $aDataEntity['results'];
 		
-			$aDataChild = $this->Accounts_model->loadChildAccounts($this->session->user['zohoId']);
+			$aDataChild = $this->entity_model->loadChildAccounts($this->session->user['zohoId']);
 			if($aDataChild['type']=='ok')
 			{
 				$aDataTemp = $this->Tempmeta_model->getOne(
 					$this->session->user['zohoId'],
 					$this->Tempmeta_model->slugNewEntity
 				);
-
 				if($aDataTemp['type']=='ok')
 				{
 				
@@ -100,7 +99,7 @@ class Portal extends CI_Controller {
     public function entity($id)
     {
 		//$this->load->model('ZoHo_Account');
-		$this->load->model('Accounts_model');
+		$this->load->model('entity_model');
 		$this->load->model('Tasks_model');
 		$this->load->model('Contacts_model');
 		$this->load->model('Attachments_model');
@@ -113,7 +112,7 @@ class Portal extends CI_Controller {
 		//$data['account'] = $this->ZoHo_Account;
 		
 		// fetch data from DB
-		$aDataEntity = $this->Accounts_model->loadAccount($id);
+		$aDataEntity = $this->entity_model->loadAccount($id);
 		$data['entity'] = false;
 		if($aDataEntity['type']=='ok') $data['entity'] = $aDataEntity['results'];
 

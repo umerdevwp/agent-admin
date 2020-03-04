@@ -1,6 +1,12 @@
 <?php
-class Accounts_model extends CI_Model
+class Entity_model extends CI_Model
 {
+    public static $entity_name = "account_name";
+    public static $entity_type = "account_type";
+    public static $entity_structure = "entity_type";
+    public static $parent_entity = "parent_account";
+    public static $entity_owner = "owner";
+    public static $entity_number = "account_number";
 
     private $table = "zoho_accounts";
 
@@ -59,7 +65,7 @@ class Accounts_model extends CI_Model
     public function loadChildAccounts($id,$columns="")
     {
         $data = [
-            'parent_entity'    =>  $id
+            Entity_model::$parent_entity    =>  $id
         ];
 
         // select required columns if set
@@ -70,8 +76,6 @@ class Accounts_model extends CI_Model
 
         $query = $this->db->get_where($this->table,$data);
         
-        
-
         $result = $query->result();
         
         if(!is_array($result))
@@ -85,11 +89,10 @@ class Accounts_model extends CI_Model
     public function hasEntities($id)
     {
         $data = [
-            "parent_entity" =>  $id
+            Entity_model::$parent_entity =>  $id
         ];
 
         $result = $this->db->get_where($this->table,$data,1,1);
-        //echo $this->db->last_query();
         
         $row = $result->row();
         //var_dump($row);

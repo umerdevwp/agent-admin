@@ -3,7 +3,6 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Entity extends CI_Controller {
-
     public function __construct()
     {
         parent::__construct();
@@ -15,13 +14,14 @@ class Entity extends CI_Controller {
 	public function index($id="")
 	{
         if(!isSessionValid("Entity")) redirectSession();
-
+        
         if(empty($id)){
             $this->session->set_flashdata("error","Invalid entity id");
             redirectSession();
         }
+        
         //$this->load->model('ZoHo_Account');
-		$this->load->model('Accounts_model');
+		$this->load->model('entity_model');
 		$this->load->model('Tasks_model');
 		$this->load->model('Contacts_model');
 		$this->load->model('Attachments_model');
@@ -36,7 +36,8 @@ class Entity extends CI_Controller {
 		//$data['account'] = $this->ZoHo_Account;
 		
 		// fetch data from DB
-        $aDataEntity = $this->Accounts_model->loadAccount($id);
+        $aDataEntity = $this->entity_model->loadAccount($id);
+        
         $oTempAgetAddress = null;
         if($aDataEntity['type']=='error' && $this->session->user['child'])
         {
@@ -61,7 +62,7 @@ class Entity extends CI_Controller {
             $this->session->set_flashdata("error","No such entity exist.");
         }
 
-        $oAgetAddress = $this->Accounts_model->getAgentAddress($id);
+        $oAgetAddress = $this->entity_model->getAgentAddress($id);
         
         if(is_object($oAgetAddress)){
             $data['AgentAddress'] = (array)$oAgetAddress;
@@ -140,7 +141,7 @@ class Entity extends CI_Controller {
         if(!isSessionValid("Entity_Add")) redirectSession();
 
         $this->load->library('form_validation');
-        $this->load->model("Accounts_model");
+        $this->load->model("entity_model");
 
         if($id>0)
         {
@@ -278,7 +279,7 @@ class Entity extends CI_Controller {
         $arError = array();
         $iErrorType = 1;// 1 means user creation failed, 2 means only attachment failed
         $this->load->model('ZoHo_Account');
-        $this->load->model("Accounts_model");
+        $this->load->model("entity_model");
         $this->load->model("RegisterAgent_model");
         
         $oApi = $this->ZoHo_Account->getInstance()->getRecordInstance("Accounts",null);
@@ -307,7 +308,7 @@ class Entity extends CI_Controller {
         $oApi->setFieldValue("Layout","4071993000001376034");// for customer layout id = Customer
         $oApi->setFieldValue("status","InProcess");
 
-        $oLoginUser = $this->Accounts_model->getOne($this->session->user["zohoId"]);
+        $oLoginUser = $this->entity_model->getOne($this->session->user["zohoId"]);
         
         if($oLoginUser->id)
         {
@@ -324,7 +325,7 @@ class Entity extends CI_Controller {
 
         // fetch RA (registered agent) id from DB
         $strFilingState = $this->input->post("inputFillingState");
-        $row = $this->RegisterAgent_model->find(["registered_agent_name"=>$strFilingState." - UAS"]);
+        $row = $this->RegisterAgent_model->find(["name"=>$strFilingState." - UAS"]);
         $iRAId = "";
         if($row->id>0)
         {
@@ -447,8 +448,8 @@ class Entity extends CI_Controller {
         $today = date("Y-m-d");
         $aDataEntity = [
             "id"                =>  (string)$iEntityId,
-            "entity_name"       =>  $this->input->post("inputName"),
-            "entity_structure"  =>  $this->input->post("inputFillingStructure"),
+            "account_name"       =>  $this->input->post("inputName"),
+            "entity_type"  =>  $this->input->post("inputFillingStructure"),
             "filing_state"      =>  $this->input->post("inputFillingState"),
             "formation_date"    => $this->input->post("inputFormationDate"),
             "shipping_street"           =>  $this->input->post("inputNotificationAddress"),

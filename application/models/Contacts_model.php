@@ -13,7 +13,7 @@ class Contacts_model extends CI_Model
     {
         // TODO: remove fake id
         $data = [
-            'entity_name' => $id,
+            'account_name' => $id,
             //'contact_owner'    =>  '4071993000000244001', // fake id
         ];
 
@@ -30,7 +30,7 @@ class Contacts_model extends CI_Model
     public function getAllFromEntityList($arCommaIds)
     {
         $this->db->from($this->table);
-        $this->db->where_in('entity_name',$arCommaIds);
+        $this->db->where_in('account_name',$arCommaIds);
         $query = $this->db->get();
         $result = $query->result_object();
         //echo $this->db->last_query();

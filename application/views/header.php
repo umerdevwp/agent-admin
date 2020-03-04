@@ -142,7 +142,7 @@
         </div>
         <div class="panel-body p-0 scroller scroller-vertical">
           <div class="list-group">
-            <a class="list-group-item rounded-0" href="#">
+            <a class="list-group-item rounded-0" href="/entity/<?=$this->session->user['zohoId'];?>">
             <div class="media align-items-center">
               <div class="pr-2"><span class="fa-user"></span></div>
               <div class="media-body">

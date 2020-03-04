@@ -10,12 +10,12 @@ class Attachments extends CI_Controller
         if(!isSessionValid("Attachments")) redirectSession();
 
         $this->load->model("attachments_model");
-        $this->load->model("accounts_model");
+        $this->load->model("entity_model");
         
         $id = $this->session->user['zohoId'];
 
         // fetch all childrens ids, to later fetch
-        $result = $this->accounts_model->loadChildAccounts($id,"id");
+        $result = $this->entity_model->loadChildAccounts($id,"id");
 
         // create comma seprated ids from result
         $arCommaIds = array();

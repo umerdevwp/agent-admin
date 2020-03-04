@@ -8,7 +8,7 @@
   <ul class="breadcrumbs">
     <li class="breadcrumbs-item"><a class="breadcrumbs-link" href="/portal"><span class="breadcrumbs-icon fa-home"></span><span>Dashboard</span></a></li>
     <li class="breadcrumbs-item"><a class="breadcrumbs-link" href="/contacts">Contacts List</a> </li>
-    <li class="breadcrumbs-item"><?php echo $entity->entity_name; ?><span style="display:none;"><?php echo $entity->id; ?></style></li>
+    <li class="breadcrumbs-item"><?php echo $entity->account_name; ?><span style="display:none;"><?php echo $entity->id; ?></style></li>
   </ul>
 </section>
 	
