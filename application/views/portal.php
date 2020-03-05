@@ -14,7 +14,7 @@
   <!-- Breadcrumbs-->
   <ul class="breadcrumbs">
     <li class="breadcrumbs-item"><a class="breadcrumbs-link" href="portal"><span class="breadcrumbs-icon fa-home"></span><span>Dashboard</span></a></li>
-    <li class="breadcrumbs-item"><?php echo $entity->entity_name; ?><span style='display:none;' id="tempId"><?=$this->session->user["zohoId"];?></span></li>
+    <li class="breadcrumbs-item"><?php echo $entity->account_name; ?><span style='display:none;' id="tempId"><?=$this->session->user["zohoId"];?></span></li>
     
   </ul>
   <!--<h2>Add Entity</h2>-->
@@ -54,8 +54,8 @@
                     <tbody>
                       <?php for($i = 0; $i < count($arChildEntity); $i++) { ?>
                           <tr role="row" class="odd" onclick="window.location = '/entity/<?php echo $arChildEntity[$i]->id; ?>';">
-                            <td><?php echo $arChildEntity[$i]->entity_name ?></td>
-                            <td><?php echo $arChildEntity[$i]->entity_structure; ?></td>
+                            <td><?php echo $arChildEntity[$i]->account_name; ?></td>
+                            <td><?php echo $arChildEntity[$i]->entity_type; ?></td>
                             <td><?php echo $arChildEntity[$i]->filing_state; ?></td>
                             <td><?php echo $arChildEntity[$i]->formation_date; ?></td>
                            <!-- <td><?php echo $arChildEntity[$i]->expiration_date; ?></td> -->

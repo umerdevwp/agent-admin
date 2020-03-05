@@ -22,12 +22,12 @@ class Contacts extends CI_Controller
         if(!isSessionValid("Contacts")) redirectSession();
 
         $this->load->model("contacts_model");
-        $this->load->model("accounts_model");
+        $this->load->model("entity_model");
         
         $id = $this->session->user['zohoId'];
 
         // fetch all childrens ids, to later fetch
-        $result = $this->accounts_model->loadChildAccounts($id,"id");
+        $result = $this->entity_model->loadChildAccounts($id,"id");
 
         // create comma seprated ids from result
         $arCommaIds = array();
@@ -118,7 +118,7 @@ HC;
         $this->load->model("Contacts_model");
         $this->load->model("Tempmeta_model");
 
-        $aData = ['email'=>$strEmail,'entity_name'=>$this->input->post('entityId')];
+        $aData = ['email'=>$strEmail,'account_name'=>$this->input->post('entityId')];
 
         $bContactRow = $this->Contacts_model->checkRowExist($aData);
         // check in zoho contacts list
@@ -146,15 +146,15 @@ HC;
     private function addZoho($sSmartyAddress='')
     {
         $this->load->model("ZoHo_Account");
-        $this->load->model("Accounts_model");
+        $this->load->model("entity_model");
 
         $arError = [];
         //$iLoginId = $this->session->user['zohoId'];
         $iLoginId = $this->input->post("entityId");
         //$iLoginId = 4071993000000411118;
         // TODO: validate user is the child entity of login parent
-        $oAccountRow = $this->Accounts_model->getOne($iLoginId);
-        $sAccountName = $oAccountRow->entity_name;
+        $oAccountRow = $this->entity_model->getOne($iLoginId);
+        $sAccountName = $oAccountRow->account_name;
         //$sAccountName = "Najm Test Comliance";
 //var_dump($oAccountRow);
 //die;

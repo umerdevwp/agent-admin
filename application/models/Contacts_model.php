@@ -13,7 +13,10 @@ class Contacts_model extends CI_Model
     public function getAllFromEntityId($id)
     {
         // TODO: remove fake id
-     
+        $data = [
+            'account_name' => $id,
+            //'contact_owner'    =>  '4071993000000244001', // fake id
+        ];
 
         $this->db->select('zoho_contacts.*,contactmeta.*');
         $this->db->from('contactmeta');
@@ -36,7 +39,7 @@ class Contacts_model extends CI_Model
     public function getAllFromEntityList($arCommaIds)
     {
         $this->db->from($this->table);
-        $this->db->where_in('entity_name',$arCommaIds);
+        $this->db->where_in('account_name',$arCommaIds);
         $query = $this->db->get();
         $result = $query->result_object();
         //echo $this->db->last_query();

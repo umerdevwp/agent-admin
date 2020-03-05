@@ -228,9 +228,9 @@ class Login extends CI_Controller
 
     private function hasChild()
     {
-        $this->load->model("Accounts_model");
+        $this->load->model("entity_model");
         
-        $bParentAccount = $this->Accounts_model->hasEntities($this->session->user["zohoId"]);
+        $bParentAccount = $this->entity_model->hasEntities($this->session->user["zohoId"]);
 
         return (int)$bParentAccount;
     }

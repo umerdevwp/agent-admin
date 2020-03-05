@@ -20,7 +20,7 @@
   <ul class="breadcrumbs">
     <li class="breadcrumbs-item"><a class="breadcrumbs-link" href="/portal"><span class="breadcrumbs-icon fa-home"></span><span>Dashboard</span></a></li>
     <li class="breadcrumbs-item"><a class="breadcrumbs-link" href="/portal">Entities</a> </li>
-    <li class="breadcrumbs-item"><?php echo $entity->entity_name; ?><span style="display:none;"><?php echo $entity->id; ?></style></li>
+    <li class="breadcrumbs-item"><?php echo $entity->account_name; ?><span style="display:none;"><?php echo $entity->id; ?></style></li>
   </ul>
 </section>
 	
@@ -30,8 +30,8 @@
   <!-- THIS IS THE HEADING FOR ENTITY -->
 	<div class="row">
 	<div class="col"> 
-	<h2><?php echo $entity->entity_name; ?><br>
-      <span class="badge badge-primary"><?php echo $entity->entity_structure; ?></span> <span class="badge badge-secondary"><?php echo $entity->filing_state; ?></span></h2>
+	<h2><?php echo $entity->account_name; ?><br>
+      <span class="badge badge-primary"><?php echo $entity->entity_type; ?></span> <span class="badge badge-secondary"><?php echo $entity->filing_state; ?></span></h2>
     </div></div>
     
   <!-- THIS IS FOR ADDRESS AND BILLING DETAIL BOXES -->
@@ -48,7 +48,7 @@
               <dl class="dl-horizontal col-md-12">
                 <div class="border-section">
                 <dt>State ID</dt>
-                <dd><?php echo $entity->entity_number; ?></dd>
+                <dd><?php echo $entity->account_number; ?></dd>
                 </div>
               </dl>
               <dl class="dl-horizontal col-md-12">
