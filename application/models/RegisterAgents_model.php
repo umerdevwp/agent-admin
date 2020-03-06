@@ -29,7 +29,7 @@ class RegisterAgents_model extends CI_Model
     {
         $sQuery = "SELECT file_as, address, address2, state, city, zip_code "
                 . "FROM {$this->table} "
-                . "WHERE right(registered_agent_name, 3) = 'UAS' ORDER BY state";
+                . "WHERE right(name, 3) = 'UAS' ORDER BY state";
 
         $oResult = $this->db->query($sQuery);
         $result = $oResult->result_object();

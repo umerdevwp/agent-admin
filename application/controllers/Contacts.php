@@ -187,11 +187,11 @@ if($aResponse['type']=='error'){
     // $iContactId = $aResponse['results'];
     $data = [
                 "id" => $iContactId,
-                "contact_owner" => $this->session->user['zohoId'],
+                "owner" => $this->session->user['zohoId'],
                 "first_name"    =>  $this->input->post("inputContactFirstName"),
                 "last_name"    =>  $this->input->post("inputContactLastName"),
                 "full_name" => $this->input->post("inputContactFirstName").' '.$this->input->post("inputContactLastName"),
-                "entity_name" => $this->input->post("entityId"),
+                "account_name" => $this->input->post("entityId"),
                 "email"    =>  $this->input->post("inputContactEmail"),
                 "phone"    =>  $this->input->post("inputContactPhone"),
                 "title"    =>  $this->input->post("inputContactType"),
@@ -203,8 +203,6 @@ if($aResponse['type']=='error'){
                 "created_time" => date('Y-m-d H:i:s'),
                 "modified_time" => date('Y-m-d H:i:s'),
                 "last_activity_time" => date('Y-m-d H:i:s'),
-                "most_recent_visit" => '0',
-                "first_visit" => '0',
                 "number_of_chats"=> '0',
                 "average_time_spent_minutes" => '0.00',
                 "days_visited" => '0',

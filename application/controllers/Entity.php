@@ -316,7 +316,7 @@ HC;
         
         // fetch RA (registered agent) id from DB
         $strFilingState = $this->input->post("inputFillingState");
-        $row = $this->RegisterAgents_model->find(["registered_agent_name"=>$strFilingState." - UAS"]);
+        $row = $this->RegisterAgents_model->find(["name"=>$strFilingState." - UAS"]);
         $iRAId = "";
         if($row->id>0)
         {

@@ -21,7 +21,7 @@ class Contacts_model extends CI_Model
         $this->db->select('zoho_contacts.*,contactmeta.*');
         $this->db->from('contactmeta');
         $this->db->join('zoho_contacts','zoho_contacts.id=contactmeta.contact_id', 'left');
-        $this->db->where(["zoho_contacts.entity_name"=>$id]);
+        $this->db->where(["zoho_contacts.account_name"=>$id]);
         $query = $this->db->get();
     
         if ( $query->num_rows() > 0 )
