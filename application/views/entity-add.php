@@ -46,12 +46,27 @@
       <input type="text" class="form-control"  name="inputName" id="inputName" value="<?=$this->input->post("inputName");?>" placeholder="Entity Name">
       <?php echo form_error('inputName'); ?>
     </div>
-    <div class="form-group col-md-6 compliance">
-    <label for="inputComplianceOnly">Compliance Only:</label>
-    <input type="checkbox" class="form-control" id="inputComplianceOnly" name="inputComplianceOnly" value="1" <?=($this->input->post("inputComplianceOnly")?'checked':'');?>>
+    <div class="form-group col-md-3 compliance">
+      
+    <label for="inputComplianceOnly"></label>
+        <div class="custom-control custom-checkbox">
+          <input class="custom-control-input" type="checkbox" id="inputComplianceOnly" name="inputComplianceOnly" value="1">
+          <label class="custom-control-label" for="inputComplianceOnly">Compliance Only?
+          </label>
+        </div>
     <?php echo form_error('inputComplianceOnly'); ?>
     </div>
-    <div class="form-group col-md-4">
+    <div class="col-md-3 domestic">
+      
+    <label for="inputForeign"></label>
+        <div class="custom-control custom-checkbox">
+          <input class="custom-control-input" type="checkbox" id="inputForeign" name="inputForeign" value="1">
+          <label class="custom-control-label" for="inputForeign"> Foreign?
+          </label>
+        </div>
+    <?php echo form_error('inputForeign'); ?>
+    </div>
+    <div class="form-group col-md-6">
       <label for="inputFillingState">Filling State <span class="steric">*</span></label>
       <select id="inputFillingState" class="form-control" name="inputFillingState">
 
@@ -112,29 +127,52 @@
       <?php echo form_error('inputFillingState'); ?>
       
     </div>
-    <div class="form-group col-md-4">
+    <div class="form-group col-md-6">
       <label for="inputFillingStructure">Filling Structure <span class="steric">*</span></label>
       <select id="inputFillingStructure" class="form-control" name="inputFillingStructure">
-        <option selected="true" value="">-Select-</option>
-        <option value="Corporation" >Corporation</option>
-        <option value="LLC" >LLC</option>
-        <option value="Non-Profit Corporation" >Non-Profit Corporation</option>
-        <option value="Limited Partnership" >Limited Partnership</option>
-        <option value="LLP" >LLP</option>
+          <option selected="true" value="">-Select-</option>
+          <option value="INC">Corporation</option>
+          <option value="CCORP">C Corporation</option>
+          <option value="LLC">Limited Liability Corp</option>
+          <option value="LP">Limited Partnership</option>
+          <option value="LLP">Limited Liability Partnerships</option>
+          <option value="LLLP">Limited Liability Limited Partnership</option>
+          <option value="NON">Non-Profit Corporation</option>
+          <option value="PRO">Professional Corporation</option>
+          <option value="PLLC">Professional Limited Liability Company</option>
+          <option value="SCORP">S Corporation</option>
       </select>
       <?php echo form_error('inputFillingStructure'); ?>
       
     </div>
-    <div class="form-group col-md-4">
+    <div class="form-group col-md-6">
       <label for="inputFormationDate">Formation Date <span class="steric">*</span></label>
         
         <div class="input-group" id="datetime">
-            <input type="text" class="form-control" name="inputFormationDate" id="inputFormationDate" value="<?=$this->input->post("inputFormationDate");?>" placeholder="Formation Date" />
+            <div class="input-group-prepend">
+              <label class="input-group-text" for="inputFormationDate"><span class="fa-calendar"></span></label>
+            </div>
+            <input type="text" class="form-control" name="inputFormationDate" id="inputFormationDate" value="<?=$this->input->post("inputFormationDate");?>" placeholder="Formation Date" data-datetimepicker="" />
             <!-- <span class="input-group-addon" for="datetime">
                 <span class="input-group-text"><span class="fa fa-calendar"></span></span>
             </span> -->
         </div>
         <?php echo form_error('inputFormationDate'); ?>
+      
+    </div>
+    <div class="form-group col-md-6">
+      <label for="inputFiscalDate">Fiscal Year<span class="steric">*</span></label>
+        
+        <div class="input-group" id="datetimefiscal">
+            <div class="input-group-prepend">
+              <label class="input-group-text" for="inputFiscalDate"><span class="fa-calendar"></span></label>
+            </div>
+            <input type="text" class="form-control" name="inputFiscalDate" id="inputFiscalDate" value="<?=($this->input->post("inputFiscalDate")?:date("12/31/Y"));?>" placeholder="Fiscal Date" data-datetimepicker="" />
+            <!-- <span class="input-group-addon" for="datetime">
+                <span class="input-group-text"><span class="fa fa-calendar"></span></span>
+            </span> -->
+        </div>
+        <?php echo form_error('inputFiscalDate'); ?>
       
     </div>
     <div class="form-group col-md-6">

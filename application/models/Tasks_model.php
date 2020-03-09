@@ -65,4 +65,22 @@ class Tasks_model extends CI_Model
 
         return $result;
     }
+
+    
+
+    public function getAllNotifications()
+    {
+        $aWhere = [
+            'status'    =>  'pending'
+        ];
+
+        $query = $this->db->get_where("notification_subscriptions",$aWhere);
+        $result = $query->result_object();
+        
+        if (! is_array($result)) {
+            return ['message'=>'No tasks available','type'=>'error'];
+        }
+
+        return ['type'=>'ok','results'=>$result];
+    }
 }

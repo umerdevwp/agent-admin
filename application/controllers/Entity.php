@@ -165,18 +165,20 @@ class Entity extends CI_Controller {
         // try to correct user date format, then validate
         if($this->input->post("inputFormationDate")!="")
         {
-            $strFormationDate = str_replace("  "," ",$this->input->post("inputFormationDate"));
-            $strFormationDate = str_replace(" ","-",$strFormationDate);
-            $strFormationDate = date("Y-m-d",strtotime($strFormationDate));
-            
+            $strFormationDate = date("Y-m-d",strtotime($this->input->post("inputFormationDate")));
+            $strFiscalDate = date("Y-m-d",strtotime($this->input->post("inputFiscalDate")));
+            // empty date when date is not valid
             if($strFormationDate=="1970-01-01")
             {
-                //$_POST["inputFormationDate"] = "0000 00 00";
-            } else {
-                $_POST["inputFormationDate"] = $strFormationDate;
+                $_POST["inputFormationDate"] = "";
+            }
+            // empty date when date is not valid
+            if($strFiscalDate=="1970-01-01")
+            {
+                $_POST["inputFiscalDate"] = "";
             }
         }
-
+        
         $this->form_validation->set_rules('inputName', 'Account Name', 'required|regex_match[/[a-zA-Z\s]+/]',["regex_match"=>"Only alphabets and spaces allowed."]);
         
         $this->form_validation->set_rules('inputFirstName', 'First Name', 'required|regex_match[/[a-zA-Z\s]+/]',["regex_match"=>"Only alphabets and spaces allowed."]);
@@ -186,7 +188,8 @@ class Entity extends CI_Controller {
         $this->form_validation->set_rules('inputNotificationContactType', 'Contact Type', 'required|alpha');
         $this->form_validation->set_rules('inputFillingState', 'Filing State', 'required|alpha');
         $this->form_validation->set_rules('inputFillingStructure', 'Entity Type', 'required|regex_match[/[A-Z\-]+/]');
-        $this->form_validation->set_rules('inputFormationDate', 'Formation Date', 'required|regex_match[/[0-9]{4,}\-[0-9]{2,}\-[0-9]{2,}/]',["regex_match"=>"Allowed %s format: 2019-01-01"]);
+        $this->form_validation->set_rules('inputFormationDate', 'Formation Date', 'required|regex_match[/[0-9]{2,}\/[0-9]{2,}\/[0-9]{4,}/]',["regex_match"=>"Allowed %s format: 01/01/2020"]);
+        $this->form_validation->set_rules('inputFiscalDate', 'Fiscal Date', 'required|regex_match[/[0-9]{2,}\/[0-9]{2,}\/[0-9]{4,}/]',["regex_match"=>"Allowed %s format: 01/01/2020"]);
         $this->form_validation->set_rules('inputNotificationEmail', 'Notification Email', 'required|valid_email');
         $this->form_validation->set_rules('inputNotificationPhone', 'Phone', 'required|regex_match[/[\+\s\-0-9]+/]');
         $this->form_validation->set_rules('inputNotificationAddress', 'Shipping Street', 'required');
@@ -194,7 +197,7 @@ class Entity extends CI_Controller {
         $this->form_validation->set_rules('inputNotificationState', 'Shipping State', 'required');
         $this->form_validation->set_rules('inputNotificationZip', 'Shipping Code', 'required');
         $this->form_validation->set_rules('inputBusinessPurpose', 'Business purpose', 'required');
-
+        
         $this->load->model("Smartystreets_model");
         
         $oSmartyStreetResponse = $this->Smartystreets_model->find(
@@ -261,6 +264,8 @@ HC;
             return false;
 
         } else {
+            $_POST['inputFormationDate'] = date("Y-m-d",strtotime($this->input->post("inputFormationDate")));
+            $_POST['inputFiscalDate'] = date("Y-m-d",strtotime($this->input->post("inputFiscalDate")));
 
             $response = $this->zohoCreateEntity($this->session->user['zohoId'],$bTagSmartyValidated);
             // succcess redirect to dashboard
@@ -294,6 +299,7 @@ HC;
 
     private function zohoCreateEntity($iParentZohoId,$bTagSmartyValidated)
     {
+        
         $arError = array();
         $iErrorType = 1;// 1 means user creation failed, 2 means only attachment failed
         $this->load->model('ZoHo_Account');
@@ -307,6 +313,7 @@ HC;
         $oApi->setFieldValue("Entity_Type", $this->input->post("inputFillingStructure")); // Account Name can be given for a new account, account_id is not mandatory in that case
         
         $oApi->setFieldValue("Formation_Date",$this->input->post("inputFormationDate"));
+        //$oApi->setFieldValue("Fiscal_Date",$this->input->post("inputFiscalDate"));
 
         // firstName, lastName fields going under contacts
         
@@ -343,8 +350,8 @@ HC;
         $oApi->setFieldValue("Account_Type","Distributor");
         $oApi->setFieldValue("status","InProcess");
 
-        $oLoginUser = $this->entity_model->getOne($this->session->user["zohoId"]);
-        
+        $oLoginUser = $this->Accounts_model->getOne(getenv("SUPER_ZOHO_ID"));
+
         if($oLoginUser->id)
         {
             // billing info using entity profile
@@ -376,9 +383,24 @@ HC;
             $responseIns = $oApi->create();//$trigger , $larid optional
 
             $oResponse = $responseIns->getDetails();
-        } catch(Exception $e) {
+        } catch(Exception  $e) {
+            /*stdClass Object([data] => Array([0] => stdClass Object(
+                    [code] => INVALID_DATA
+                    [details] => stdClass Object
+                        (
+                            [expected_data_type] => date
+                            [api_name] => Formation_Date
+                        )
+
+                    [message] => invalid data
+                    [status] => error)))*/
+            $sObjectString = serialize($e);
+            $sObjectString = substr($sObjectString,strpos($sObjectString,'{"data"'));
+            $sObjectString = substr($sObjectString,0,strpos($sObjectString,'}]}')+3);
+            $oError = json_decode($sObjectString);
+
             // message
-            $arError[] = "code: " . $e->getCode() . ", error: Api: " . $e->getMessage();
+            $arError[] = "code: " . $oError->data[0]->code . ", error: Api: " . $oError->data[0]->details->expected_data_type . ", " . $oError->data[0]->details->api_name . ", message: " . $e->getMessage();
         }
         
         if($oResponse["id"]>0)
@@ -438,12 +460,15 @@ HC;
             } else $bContactDone = true;
 
             $this->addEntityToTemp($oResponse["id"],$bContactDone,$bAttachmentDone);
+            // add row to subscription
+            $this->addSubscription($oResponse['id']);
 
             // add tags
             $oApi = $this->ZoHo_Account->getInstance("Accounts",$oResponse["id"]);
             
             try {
                 $sComplianceOnly = ($this->input->post("inputComplianceOnly")??0);
+                $sForeignOnly = ($this->input->post("inputForeign")??0);
     
                 $aTags = ["name"=>"OnBoard"];
                 
@@ -456,6 +481,11 @@ HC;
                 {
                     $aTags["InvalidatedAddress"] = "Invalidated Address";
                 }
+
+                if($sForeignOnly)
+                {
+                    $aTags["Foreign"] = "Foreign";
+                }
     
                 $oResponseTags = $oApi->addTags($aTags);
                 
@@ -465,13 +495,54 @@ HC;
                 else $arError[] = "User created successfully, tags failed.";
             }
         }
-        //var_dump($arError);die;
+
         if(count($arError)>0)
         {
             return ['error'=>$arError[0],'error_code'=>$iErrorType];
         }
 
+
         return ['type'=>'ok','message'=>"Entity created successfully.","data"=>['id'=>$oResponse['id']]];
+    }
+
+    private function addSubscription($iEntityId)
+    {
+        $this->load->model("Notifications_model");
+        
+        $this->load->library('session');
+        
+        $oRule = $this->Notifications_model->getRules(
+            $this->input->post("inputFillingState"),
+            $this->input->post("inputFillingStructure"),
+            $this->input->post("inputFormationDate"),
+            $this->input->post("inputFiscalDate")
+        );
+
+        $aData = [
+            "created_by"    =>  userLoginId(),
+            "entity_id"     =>  $iEntityId,
+            "due_date"      =>  $oRule->duedate,
+            "description"   =>  "Starting subscription from registeration page",
+            "start_date"    =>  date("Y-m-d"),
+            "type"          =>  "email",
+            "end_date" =>   date("Y-m-d",strtotime("+1 year")),
+            "before_days" => 7,
+            "before_months" =>  1,
+            "interval_days" => 0,
+            "interval_months"=> 2,
+            "limit_notification"=>0,
+            "status"    =>  "active",
+        ];
+
+        $id = $this->Notifications_model->add($aData);
+        
+        if(!is_numeric($id))
+        {
+            error_log("Subscription failed to insert new entity record");
+        }
+
+        return $id;
+
     }
 
     private function addEntityToTemp($iEntityId,$bContactDone=true,$bAttachmentDone=true)
@@ -483,7 +554,8 @@ HC;
             "account_name"       =>  $this->input->post("inputName"),
             "entity_type"  =>  $this->input->post("inputFillingStructure"),
             "filing_state"      =>  $this->input->post("inputFillingState"),
-            "formation_date"    => $this->input->post("inputFormationDate"),
+            "formation_date"    =>  $this->input->post("inputFormationDate"),
+            "fiscal_date"       =>  $this->input->post("inputFiscalDate"),
             "shipping_street"           =>  $this->input->post("inputNotificationAddress"),
             "shipping_city"              =>  $this->input->post("inputNotificationCity"),
             "shipping_state"             =>  $this->input->post("inputNotificationState"),
@@ -498,6 +570,7 @@ HC;
                         "zip_code"=>"18104"
                     ],
         ];
+        // TODO: add created_by column to store who created the entity
         $this->Tempmeta_model->appendRow($this->session->user['zohoId'],$this->Tempmeta_model->slugNewEntity,$aDataEntity);
         
         if($bAttachmentDone){

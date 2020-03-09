@@ -106,10 +106,19 @@ class Entity_model extends CI_Model
     public function getOne($id)
     {
         $data = [
-            'id'    =>  $id
+            'a.id'    =>  $id
         ];
 
-        $query = $this->db->get_where($this->table, $data);
+        //$this->db->from($this->table." a");
+        $this->db->select("a.*,um.account_status");
+        $this->db->join("usersmeta um","um.id=a.id",'left');
+        //$this->db->where('um.account_status',null,false);
+        $this->db->where("(um.account_status IS NULL OR um.account_status='active')");
+        //$this->db->or_where(["um.account_status"=>"active"]);
+
+        $query = $this->db->get_where($this->table . " a", $data);
+        //echo $this->db->last_query();
+        //die;
         $result = $query->row();
         
         if (!$result) {
@@ -119,14 +128,19 @@ class Entity_model extends CI_Model
         return $result;
     }
 	
-	  public function getAll()
+	public function getAll($aColumns=[])
     {
-        $query = $this->db->get('zoho_accounts');
-        $result = $query->result_object();
-        if (!$result) {
-            return ['msg' => 'No such account found', 'msg_type' => 'error'];
+        if(count($aColumns))
+        {
+            $this->db->select($aColumns);
         }
 
-        return $result;
+        $query = $this->db->get('zoho_accounts');
+        $result = $query->result_object();
+        if (!$result){
+            return ['message' => 'No such account found', 'type' => 'error'];
+        }
+
+        return ['type'=>'ok','results'=>$result];
     }
 }

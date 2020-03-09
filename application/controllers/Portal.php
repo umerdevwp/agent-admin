@@ -57,8 +57,11 @@ class Portal extends CI_Controller {
 		
 		// user is administrator
 		if($this->session->user['zohoId'] == getenv("SUPER_USER")){
-			$data['entity'] = $this->entity_model->loadAccount($this->session->user['zohoId']);
-            $data['arChildEntity'] = $this->entity_model->getAll();
+			$data['entity'] = $this->Accounts_model->loadAccount($this->session->user['zohoId']);
+			$aDataChildAccounts = $this->Accounts_model->getAll();
+			$data['arChildEntity'] = [];
+			// if childs found
+            if($aDataChildAccounts['type']=='ok') $data['arChildEntity'] = $aDataChildAccounts['results'];
 		// users from zoho
 		} else {
 			$aDataEntity = $this->entity_model->loadAccount($this->session->user['zohoId']);
