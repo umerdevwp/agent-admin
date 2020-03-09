@@ -87,12 +87,17 @@ class Entity extends CI_Controller {
             $data['tasks_completed'] = [];
                 
         $contact_data = $this->Contacts_model->getAllFromEntityId($id);
-       
+        $aContactMeta = $this->Tempmeta_model->getOne($id,$this->Tempmeta_model->slugNewContact);
+        
+        $data['contacts'] = [];
         if($contact_data['msg_type'] == 'error'){    
+            if($aContactMeta['type']=='ok') 
+            $data['contacts'] = json_decode($aContactMeta['results']->json_data);
         } else {
-          $data['contacts'] = $this->Contacts_model->getAllFromEntityId($id);
+          $data['contacts'] = $contact_data;
+          if($aContactMeta) $data['contacts'] = array_merge($data['contacts'],json_decode($aContactMeta['results']->json_data));
         }
-                
+
         $data['attachments'] = $this->Attachments_model->getAllFromEntityId($id);
         if($data['attachments'])
         {
@@ -355,7 +360,7 @@ HC;
 
         // fetch RA (registered agent) id from DB
         $strFilingState = $this->input->post("inputFillingState");
-        $row = $this->RegisterAgent_model->find(["name"=>$strFilingState." - UAS"]);
+        $row = $this->RegisterAgents_model->find(["name"=>$strFilingState." - UAS"]);
         $iRAId = "";
         if($row->id>0)
         {
