@@ -71,7 +71,7 @@ class Notifications_model extends CI_Model
     {
         
         $sQueryEntity =<<<HC
-SELECT za.filing_state,za.entity_structure,za.formation_date,ns.* 
+SELECT za.filing_state,za.entity_type,za.formation_date,ns.* 
 FROM {$this->table} ns
 INNER JOIN {$this->table_zoho_accounts} za ON ns.entity_id=za.id
 WHERE ns.status='active'

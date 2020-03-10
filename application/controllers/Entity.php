@@ -350,7 +350,7 @@ HC;
         $oApi->setFieldValue("Account_Type","Distributor");
         $oApi->setFieldValue("status","InProcess");
 
-        $oLoginUser = $this->Accounts_model->getOne(getenv("SUPER_ZOHO_ID"));
+        $oLoginUser = $this->entity_model->getOne(getenv("SUPER_ZOHO_ID"));
 
         if($oLoginUser->id)
         {

@@ -8,11 +8,11 @@ class Notifications extends CI_Controller
     public function form($id=0)
     {
         $this->load->library('form_validation');
-        $this->load->model("Accounts_model");
+        $this->load->model("entity_model");
 
         if((int)$id>0)
         {
-            $oEntity = $this->Accounts_model->getOne($id);
+            $oEntity = $this->entity_model->getOne($id);
             
             if(empty($oEntity->id))
             {
@@ -26,9 +26,9 @@ class Notifications extends CI_Controller
         
         if($this->session->user['zohoId']==getenv("SUPER_USER"))
         {
-            $aResult = $this->Accounts_model->getAll(["id","entity_name"]);
+            $aResult = $this->entity_model->getAll(["id","entity_name"]);
         } else {
-            $aResult = $this->Accounts_model->loadChildAccounts($this->session->user['zohoId']);
+            $aResult = $this->entity_model->loadChildAccounts($this->session->user['zohoId']);
         }
 
         $data['aEntity'] = [];
@@ -196,7 +196,7 @@ class Notifications extends CI_Controller
     public function notify()
     {
         $this->load->model("Notifications_model");
-        $this->load->model("Accounts_model");
+        $this->load->model("entity_model");
         
         $aData["subscription"] = $this->Notifications_model->getSubscriptions();
         
@@ -212,7 +212,7 @@ class Notifications extends CI_Controller
             $aResult = $this->getNotifyDate($oSubs,$oRule,date("Y-m-d"));
             if(isset($aResult['date']))
             {
-                $oEntity = $this->Accounts_model->getOne($oSubs->entity_id);
+                $oEntity = $this->entity_model->getOne($oSubs->entity_id);
                 if($oEntity->id>0)
                 {
                     $this->sendMail($oEntity->notification_email,$oEntity->entity_name,$oEntity->filing_state,$oEntity->entity_structure,$oRule->duedate,$oRule->period);
