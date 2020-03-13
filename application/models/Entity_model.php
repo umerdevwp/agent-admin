@@ -74,4 +74,17 @@ class Entity_model extends CI_Model
             return NULL;
         }
     }
+
+
+    public function ownerValidity($parent, $entity){
+     //make sure the entity belongs to right parent or not.
+        $this->db->select('*');
+        $this->db->from($this->table_Zoho_Zccounts);
+        $this->db->where('id', $entity);
+        $this->db->where('parent_entity', $parent);
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+
 }

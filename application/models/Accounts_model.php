@@ -123,21 +123,8 @@ class Accounts_model extends CI_Model
         // $this->db->where(["entitymeta.zoho_accounts_id", "zoho_accounts.id"]);
         $query = $this->db->get();
         $result = $query->result_object();
-        // if ( $query->num_rows() > 0 )
-        // {
-        //     $result = $query->result_object();
-        // }
-        // else
-        // {
-        // $data = [
-        //             'entity_name' => $id,
-        //             //'contact_owner'    =>  '4071993000000244001', // fake id
-        //         ];
-        // $query = $this->db->get_where($this->table, $data);
-        // $result = $query->result_object();
 
-        // }
-           
+
         if (! is_array($result)) {
             return ['msg'=>'No contacts available','msg_type'=>'error'];
         }

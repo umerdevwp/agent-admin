@@ -71,6 +71,13 @@ $route['ajax/theme/save']['post'] = 'user/saveThemeAjax/$1';
 $route['ajax/theme/(:any)']['get'] = 'user/getThemeAjax/$1';
 $route['ajax/contact/save']['post'] = 'contacts/addAjax';
 
+
+// API
+//$route['api/users/(:num)'] = 'api/users/$1';
+
+
+
+
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
