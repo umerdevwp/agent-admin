@@ -3,6 +3,8 @@ class Notifications_model extends CI_Model
 {
 
     private $table = "notification_subscriptions";
+    private $table_maillog = "email_log";
+
     private $table_rule = "rules";
     private $table_states = "rule_states";
     private $table_entity_states = "entity_states";
@@ -342,4 +344,14 @@ HC;
 
         return false;
     }
+
+    public function addMailLog($data)
+    {
+        
+        $this->db->insert($this->table_maillog,$data);
+
+        return $this->db->insert_id();
+        
+    }
+
 }

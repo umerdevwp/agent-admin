@@ -215,7 +215,7 @@ class Notifications extends CI_Controller
                 $oEntity = $this->entity_model->getOne($oSubs->entity_id);
                 if($oEntity->id>0)
                 {
-                    $this->sendMail($oEntity->notification_email,$oEntity->entity_name,$oEntity->filing_state,$oEntity->entity_structure,$oRule->duedate,$oRule->period);
+                    $this->sendMail($oEntity,$oRule);
                 }
                 
             }
@@ -233,9 +233,15 @@ class Notifications extends CI_Controller
      * Send mail using sendgrid API
      * 
      */
-    private function sendMail($sEmail,$sName,$sState,$sEntityType,$sDate,$sPurpose="recurring")
+    private function sendMail($oEntity,$oRule)//$sEmail,$sName,$sState,$sEntityType,$sDate,$sPurpose="recurring")
     {
-        
+        $sEmail = $oEntity->notification_email;
+        $sName = $oEntity->entity_name;
+        $sState = $oEntity->filing_state;
+        $sEntityType = $oEntity->entity_structure;
+        $sDate = $oRule->duedate;
+        $sPurpose = $oRule->period;
+
         switch($sPurpose)
         {
             case "initial":
@@ -268,10 +274,19 @@ HC;
 
         $oSendgrid = new SendGrid(getenv('SENDGRID_API_KEY'));
         try {
-            $response = $oSendgrid->send($oEmail);
-            // print $response->statusCode() . "\n";
-            // print_r($response->headers());
-            // print $response->body() . "\n";
+             $response = $oSendgrid->send($oEmail);
+             $aHeaders = $response->headers();
+             $iMessageId = "";
+             
+             foreach($aHeaders as $v) 
+                if(strpos($v,"X-Message-Id")!==false) 
+                    $iMessageId = explode(": ",$v)[1];
+            
+            //  print $response->statusCode() . "\n";
+            //  print_r($aHeaders);
+            //  print $response->body() . "\n";
+            
+            $this->logMailResponse($oEntity->id,$iMessageId,$sEmail,$sSubject,$sContent);
         } catch (Exception $e) {
             $sMessage = 'Caught exception: '. $e->getMessage() ."\n";
             //debug($e);
@@ -471,6 +486,38 @@ HC;
         $this->load->view('header');
         $this->load->view("test-notification",$data);
         $this->load->view('footer');
+    }
+
+    public function logMailResponse($iEntityId,$sSgMessageId,$sTo,$sSubject="",$sMessage="")
+    {
+        $this->load->model("Notifications_model");
+        $aData = [
+            "entity_id" => $iEntityId,
+            "send_time" =>  date("Y-m-d H:i:s"),
+            "to"    =>  $sTo,
+            "subject"   =>  $sSubject,
+            "message"   =>  $sMessage,
+            "sg_message_id" =>  $sSgMessageId,
+        ];
+
+        $iInsertId = $this->Notifications_model->addMailLog($aData);
+        if($iInsertId)
+        {
+            // 
+        } else {
+            error_log("Unable to insert mail log",0);
+        }
+    }
+
+    public function logMailStatus()
+    {
+        $oSendgrid = new SendGrid(getenv('SENDGRID_API_KEY'));
+        
+        $query_params = json_decode('{"limit": 1,"to_email":"a"}');
+        $response = $oSendgrid->client->access_settings()->activity()->get(null, $query_params);
+        print $response->statusCode() . "\n";
+        print $response->body() . "\n";
+        print_r($response->headers());
     }
 
 }

@@ -65,7 +65,7 @@ $route['attachments'] = 'attachments/index';
 $route['agents'] = 'RegisterAgents/index';
 $route['notification/form/(:num)'] = 'notifications/form/$1';
 $route['notification/notify'] = 'notifications/notify';
-$route['notification/cron'] = 'notifications/showRules';
+$route['notification/status'] = 'notifications/logMailStatus';
 $route['notification/calendar'] = 'notifications/planCalendar';
 
 
