@@ -6,6 +6,13 @@ use zcrmsdk\crm\exception\ZCRMException;
 
 class Portal extends CI_Controller {
 	var $account = "";
+
+	public function __construct()
+    {
+        parent::__construct();
+        validAdminCheck();  
+
+    }
 	/**
 	 * Index Page for this controller.
 	 *
@@ -23,9 +30,11 @@ class Portal extends CI_Controller {
 	 */
 	public function index()
 	{
+		
 		$this->load->library(["session"]);
 		$this->load->helper(["email"]);
-    
+
+		
 		// has no child, show entity page
 		if($this->session->user["child"]==0 and $this->session->user['zohoId'] != getenv("SUPER_USER"))
 		{
@@ -39,7 +48,7 @@ class Portal extends CI_Controller {
 		}
 
 		// if organization field in okta is empty
-		if(empty($this->session->user['zohoId'])) die("Org is blank");
+		if(empty($this->session->user['zohoId'])) redirect("support");
 		//var_dump($this->session->user['zohoId']);die;
 		// set zoho id from okta
 		$this->account = $this->session->user['zohoId'];
@@ -58,10 +67,7 @@ class Portal extends CI_Controller {
 		// user is administrator
 		if($this->session->user['zohoId'] == getenv("SUPER_USER")){
 			$data['entity'] = $this->Accounts_model->loadAccount($this->session->user['zohoId']);
-			$aDataChildAccounts = $this->Accounts_model->getAll();
-			$data['arChildEntity'] = [];
-			// if childs found
-            if($aDataChildAccounts['type']=='ok') $data['arChildEntity'] = $aDataChildAccounts['results'];
+			$data['arChildEntity'] = $this->Accounts_model->getAll();
 		// users from zoho
 		} else {
 			$aDataEntity = $this->Accounts_model->loadAccount($this->session->user['zohoId']);
@@ -94,6 +100,7 @@ class Portal extends CI_Controller {
 			}
 		}
 
+		$data['formStatus'] = $this->statusForForm();
 		//var_dump($data['account']);die;
         $this->load->view('header');
 		$this->load->view('portal', $data);
@@ -213,4 +220,47 @@ class Portal extends CI_Controller {
 
 		header("Location: ". $_SERVER['HTTP_REFERER']);
 	}
+
+    public function statusForForm(){
+		$this->load->model('Entity_model');
+		$results = $this->Entity_model->pullUniqueStatuses();
+		if(!empty($results)){
+			return $results;
+		} else {
+			return FALSE;
+		}
+	}
+
+
+
+	public function addStatusForEntity()
+	{
+		$this->load->model('Entity_model');
+		$check = $this->Entity_model->checkIfExists($this->input->post("id"));
+		$data = array(
+			'zoho_accounts_id' => $this->input->post("id"),
+			'entity_status' => $this->input->post("status"),
+		);
+		if (!$check) {
+			$get_object = $this->Entity_model->insertStatus($data);
+			if (!empty($get_object)) {
+				echo json_encode(array('response' => 'success'));
+			} else {
+				echo json_encode(array('response' => 'error'));
+			}
+		} else {
+
+			$check = $this->Entity_model->updateExistingEntityStatus($this->input->post("id"), $data);
+			if ($check) {
+				echo json_encode(array('response' => 'success'));
+			} else {
+				echo json_encode(array('response' => 'error'));
+			}
+		}
+	}
+
+
+	
+
+
 }

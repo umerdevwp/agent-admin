@@ -1,7 +1,6 @@
 RewriteEngine on
 
-Header unset Cache-Control
-Header set Cache-Control "max-age=100, private"
+# DISABLE CACHING
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

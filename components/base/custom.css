@@ -273,7 +273,7 @@ dl + dl{
     left: 0;
     width: 100%;
     display: none;
-    margin-top: 20px;
+    margin-top: 250px;
 }
 .popup_modal_body {
     width: 500px;
@@ -303,7 +303,158 @@ dl + dl{
 .btn_area input#cancelBtn, .btn_area input#cancel_Btn{
     float: right;
 }
- 
+
+/*  This CSS for Admins Page (ADMINISTRATOR) -- Start Here  */
+.column {
+    float: left;
+    background: #fff;
+    width: 100%;
+}
+.field{
+    display: inline-block;
+    margin-top: 0 !important;
+}
+.field label{
+    font-size: 12px;
+    font-weight: 700;
+}
+.field input.input{
+    height: 37px;
+    padding:5px 7px;
+    width: 100%;
+    border:1px solid #ccc;
+}
+
+.field input#email{
+    width: 88%;
+    margin-top: 0;
+}
+.field button.is-link{
+    float: right;
+}
+.field input.input.error{
+    border:1px solid red;
+}
+.field .errorMessage{
+    color: red;
+    padding-top: 5px;
+    display: inline-block;
+    width: 100%;
+}
+.field.is-grouped{
+    display: inline-block;
+    width: 20%;
+}
+.create-contacts{
+    float: right;
+    margin-top: 30px;
+}
+.new-contactspanel{
+    display: none;
+}
+.edit, .delete, .reset, .update {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    width: 35px;
+    height: 30px;
+    border: none;
+}
+.edit{
+    background: url(../../images/button_sprite.png) top center no-repeat;
+}
+.delete{
+    background: url(../../images/button_sprite.png) center -52px no-repeat;
+}
+.update{
+    background: url(../../images/button_sprite.png) center -105px no-repeat;
+}
+.reset{
+    background: url(../../images/button_sprite.png) center -161px no-repeat;
+}
+.editable select{
+    padding: 3px 5px;
+    width: 100%;
+}
+.dataTables_filter{
+    margin-bottom: 15px;
+}
+.dataTables_filter input[type=search], .dataTables_length select{
+    border:1px solid #ccc;
+    padding: 3px 7px;
+}
+.dataTables_length select{
+    width: 50%;
+    margin: 0 5px;
+}
+.dataTables_length{
+    width: 17%;
+}
+.dataTables_length label{
+    width: 100%;
+}
+.paging_simple_numbers{
+    border: 1px solid #ccc;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover{
+    background: #6d92b9 !important;
+    border-color: #6d92b9 !important;
+    color: #fff !important;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover{
+    background: #eee !important;
+    border-color: #ddd !important;
+    color: #000 !important;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button, .dataTables_wrapper .dataTables_paginate .paginate_button.current{
+    border-radius: 0;
+}
+.dataTables_wrapper .dataTables_paginate{
+    padding-top: 0;
+}
+#DataTables_Table_2_admin, #DataTables_Table_3{
+    margin-bottom: 20px;
+}
+.tableErrorMessage {
+    display: inline-block;
+    padding-top: 5px;
+    color: red;
+}
+.successmsg-wrapper{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 999;
+    display: none;
+}
+.successMesgBox{
+    background: #6fbb47 !important;
+    width: 400px;
+    margin: 10px auto 0;
+    text-align: center;
+}
+.editableColumnsStyle{
+    width: 100%;
+    padding: 3px 7px;
+}
+.loader {
+    float: right;
+    height: 35px;
+    padding: 0 20px;
+    line-height: 35px;
+    display: none;
+}
+.loader img{
+    width: 20px;
+}
+
+
+
+/*  This CSS for Admins Page (ADMINISTRATOR) -- End Here  */
+
+
+/*  This is Media Query CSS for Responsive  */
 
 @media (max-width:768px){
     .four-boxes .panel .border-section{
@@ -311,20 +462,76 @@ dl + dl{
     }
 }
 @media (max-width:667px){
-    .four-boxes .panel .border-section{
+    /*.four-boxes .panel .border-section{*/
+    /*    margin-bottom:15px*/
+    /*}*/
+    .template-panel{
+        display: none;
+    }
+    .four-boxes{
         margin-bottom:15px
+    }
+    .four-boxes:last-child{
+        margin-bottom:0
     }
 }
 @media (max-width:480px){
-    .four-boxes .panel .border-section{
+    /*.four-boxes .panel .border-section{*/
+    /*    margin-bottom:15px*/
+    /*}*/
+    .template-panel{
+        display: none;
+    }
+    .four-boxes{
         margin-bottom:15px
+    }
+    .four-boxes:last-child{
+        margin-bottom:0
+    }
+    #modalpopup .popup_modal_body{
+        width:100%;
+    }
+    .btn_area input#okBtn{
+        float: left;
+        width: 46%;
+    }
+    .btn_area input#cancelBtn, .btn_area input#cancel_Btn{
+        width: 46%;
     }
 }
 @media (max-width:320px){
     .four-boxes{
         width: 100%;
     }
-    .four-boxes .panel .border-section{
-        margin-bottom:10px
+    .four-boxes{
+        margin-bottom:15px
+    }
+    .four-boxes:last-child{
+        margin-bottom:0
+    }
+    /*.four-boxes .panel .border-section{*/
+    /*    margin-bottom:10px*/
+    /*}*/
+    .template-panel{
+        display: none;
+    }
+    #modalpopup .popup_modal_body{
+        width:100%;
+    }
+    .btn_area input#okBtn{
+        float: left;
+        width: 46%;
+    }
+    .btn_area input#cancelBtn, .btn_area input#cancel_Btn{
+        width: 46%;
+    }
+    #closeModalBtn, #saveClose, #saveAddNew {
+        font-size: .75rem;
+    }
+    #saveAddNew{
+        float: left;
+    }
+    .breadcrumbs{
+        font-size: 1rem !important;
     }
 }

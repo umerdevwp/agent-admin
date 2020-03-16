@@ -3,22 +3,22 @@
   <?=$this->session->flashdata("error");?>
 </div>
 <?php endif; ?>
-<section class="topbar"> 
+<section class="topbar">
   <!-- Breadcrumbs-->
   <ul class="breadcrumbs">
     <li class="breadcrumbs-item"><a class="breadcrumbs-link" href="/portal"><span class="breadcrumbs-icon fa-home"></span><span>Dashboard</span></a></li>
     <li class="breadcrumbs-item"><a class="breadcrumbs-link" href="/portal">Add New Entity</a> </li>
   </ul>
 </section>
-	
-	
+
+
 <section class="Jumbotron"><!--Company Summary Info-->
 <div class="container">
 	<div class="row">
-	    <div class="col"> 
+	    <div class="col">
 
 
-      
+
 
         </div>
     </div>
@@ -29,9 +29,9 @@
         <div class="panel-title"><span class="panel-icon fa-tasks"></span><span>New RA Client</span> </div>
       </div>
       <div class="panel">
-        
+
         <div class="panel-body p-0">
-          <div class="table-responsive scroller scroller-horizontal py-3">
+          <div class="table-responsive py-3">
             <div id="DataTables_Table_3_wrapper" class="dataTables_wrapper dt-bootstrap4">
               <div class="row row-10">
                 <div class="col-sm-12 col-md-6 pl-3"></div>
@@ -125,7 +125,7 @@
 
       </select>
       <?php echo form_error('inputFillingState'); ?>
-      
+
     </div>
     <div class="form-group col-md-6">
       <label for="inputFillingStructure">Filling Structure <span class="steric">*</span></label>
@@ -143,11 +143,11 @@
           <option value="SCORP">S Corporation</option>
       </select>
       <?php echo form_error('inputFillingStructure'); ?>
-      
+
     </div>
     <div class="form-group col-md-6">
       <label for="inputFormationDate">Formation Date <span class="steric">*</span></label>
-        
+
         <div class="input-group" id="datetime">
             <div class="input-group-prepend">
               <label class="input-group-text" for="inputFormationDate"><span class="fa-calendar"></span></label>
@@ -158,7 +158,7 @@
             </span> -->
         </div>
         <?php echo form_error('inputFormationDate'); ?>
-      
+
     </div>
     <div class="form-group col-md-6">
       <label for="inputFiscalDate">Fiscal Year<span class="steric">*</span></label>
@@ -225,7 +225,7 @@
     <div class="form-group col-md-4">
     <label for="inputNotificationState">State/Region/Province <span class="steric">*</span></label>
     <select class="form-control" id="inputNotificationState" name="inputNotificationState">
-      <option selected="ture" value="">-- Select --</option>
+      <option selected="true" value="">-- Select --</option>
       <option value="AK">Alaska - AK</option>
       <option value="AL">Alabama - AL</option>
       <option value="AZ">Arizona - AZ</option>
@@ -286,7 +286,7 @@
     <input type="text" class="form-control" id="inputNotificationZip" name="inputNotificationZip" placeholder="Postal / Zip Code" value="<?=$this->input->post("inputNotificationZip");?>">
     <?php echo form_error('inputNotificationZip'); ?>
   </div>
-  
+
   <div class="input-group col-md-6 form-group">
     <label class="attachment">Attachment <span class="steric">*</span></label>
     <!-- <div class="input-group-prepend">
@@ -297,23 +297,23 @@
       <label class="custom-file-label" for="inputFiling">Choose file</label>
     </div>
     <?php echo form_error('inputFiling'); ?>
-   
+
   </div>
   <div class="form-group col-md-12">
     <label for="inputBusinessPurpose">Business Purpose</label>
     <textarea class="form-control" id="inputBusinessPurpose" name="inputBusinessPurpose" rows="3"><?=$this->input->post("inputBusinessPurpose");?></textarea>
     <?php echo form_error('inputBusinessPurpose'); ?>
   </div>
-  
+
 
 
   </div><!--form row div-->
-  
+
   </div><!-- form col div-->
-    
+
   </div>
-  
-  
+
+
 
 
   <button type="submit" class="btn btn-primary">Create New Entity</button>
@@ -363,7 +363,7 @@
         <input type="submit" class="btn btn-success" value="Ok" id="okBtn">
       </div>
 	</div>
-</div> 
+</div>
 </section>
 
 </section>
@@ -383,7 +383,7 @@
       location.replace("portal");
     });
     jQuery("#cancel_Btn").on('click', function($){
-      jQuery("#modalpopup").fadeOut(); 
+      jQuery("#modalpopup").fadeOut();
     });
 </script>
 <script>
@@ -412,7 +412,7 @@ setTimeout(() => {
 
         //jQuery('#datepicker').datetimepicker();
 }, 5000);
-  
+
 
 </script>
 <style>

@@ -144,7 +144,9 @@ function isDeveloperIp()
     if(
         $_SERVER['REMOTE_ADDR']=='180.92.132.234' ||
         $_SERVER['REMOTE_ADDR']=='192.168.0.187' ||
-        $_SERVER['REMOTE_ADDR']=='58.65.211.74'
+        $_SERVER['REMOTE_ADDR']=='58.65.211.74'  ||
+        $_SERVER['REMOTE_ADDR']=='10.10.10.159' 
+
     ) return true;
     else return false;
 }
@@ -227,49 +229,33 @@ function addToSessionKey($sKey,$aData)
     }
 
 }
+
+
 /**
- * Convert user input date to MySQL YYYY-MM-DD format
- * 
- * @param String $strDate date in string format
- * @return String formated date / empty string
+ * This function will check if the user is a valid admin or not
+ * If 'yes' then it is going to enter a isAdmin variable in the current session
+ * If user has the zoho_id 999999 and it is not registered in the database it will redirect the user to permission deind page
+ * This function returns boolein.
  */
-function convToMySqlDate($strDate)
+
+function validAdminCheck()
 {
-    $strNewDate = "";
-    // try to correct user date format, then validate
-    if($strDate!="")
-    {
-        $strFormationDate = str_replace("  "," ",$strDate);
-        $posColons = strpos($strFormationDate,":");
-        if($posColons>0)
-        {
-            // find space before colons
-            $strTillColon = substr($strFormationDate,0,$posColons);
-            $strFormationDate = substr($strTillColon,0,strrpos($strTillColon," "));
-        }
-        $strFormationDate = str_replace(" ","-",$strFormationDate);
-        $strFormationDate = date("Y-m-d",strtotime($strFormationDate));
-
-        if($strFormationDate!="1970-01-01")
-        {
-            $strNewDate = $strFormationDate;
-        }
+    $CI = get_instance();
+    if (isset($CI->session->user["isAdmin"])) {
+        return true;
+    } else {
+        return false;
     }
-
-    return $strNewDate;
 }
 
-/**
- * Get login id of user else the login admin id instead of super user id
- * 
- * @return Integer User Id
- */
-function userLoginId()
+function restrictForAdmin()
 {
-    if($_SESSION['user']['zohoId']==getenv("SUPER_USER"))
-    {
-        return $_SESSION['user']['AdminId'];
+    $CI = get_instance();
+    if (isset($CI->session->user["isAdmin"]) && $CI->session->user["isAdmin"] == true) {
+        return true;
+    } else {
+        $CI->session->set_flashdata('error', 'Permission denied');
+            redirect(base_url('/portal'));
+        
     }
-
-    return $_SESSION['user']['zohoId'];
 }

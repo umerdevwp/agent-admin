@@ -59,12 +59,12 @@ class Login extends CI_Controller
 
     private function redirectToDashboard()
     {
+        $this->validAdmin();
         if($this->session->user['child'])
         {
             redirect("/portal");
         } else {
-           if($this->session->user['zohoId'] == getenv("SUPER_USER")){
-               addToSessionKey("user",["AdminId"=>123]);
+           if(isset($this->session->user['isAdmin'])){
             redirect("/portal");
            } else{
             redirect("/entity/" . $this->session->user["zohoId"]);
@@ -234,9 +234,28 @@ class Login extends CI_Controller
     private function hasChild()
     {
         $this->load->model("Accounts_model");
-        
         $bParentAccount = $this->Accounts_model->hasEntities($this->session->user["zohoId"]);
-
         return (int)$bParentAccount;
+    }
+
+
+    public function validAdmin(){
+        $this->load->model('Admin_model');
+        $checkSuperUser =  $this->Admin_model->checkAdminExist($this->session->user["email"]);
+        if (!empty($checkSuperUser)) {
+            addToSessionKey("user", ['isAdminId' => $checkSuperUser[0]->id]);
+            addToSessionKey("user", ['isAdmin' => true]);
+            $this->Admin_model->updateAdmin($this->session->user["email"]);
+        } else {
+             addToSessionKey("user", ['isAdmin' => false]);
+            if ($this->session->user['zohoId'] == getenv('SUPER_USER')) {
+                if (isset($this->session->user['isAdmin'])) {
+                } else {
+                    $this->session->set_flashdata('error', 'This is my message');
+                        redirect(base_url('/portal'));
+                }
+            }
+            return false;
+        }
     }
 }

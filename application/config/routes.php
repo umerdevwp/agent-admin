@@ -78,8 +78,15 @@ $route['ajax/theme/(:any)']['get'] = 'user/getThemeAjax/$1';
 $route['ajax/contact/save']['post'] = 'contacts/addAjax';
 $route['synch'] = 'synch';
 
-// automate
-$route['notify'] = 'notifications/notify';
+
+// API
+//$route['api/users/(:num)'] = 'api/users/$1';
+
+
+
+
+$route['404_override'] = '';
+$route['translate_uri_dashes'] = FALSE;
 
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
