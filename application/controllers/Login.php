@@ -213,6 +213,11 @@ class Login extends CI_Controller
                             "Theme_Update",
                             "Theme_View",
                         );
+
+        if($_SESSION['user']['zohoId']==getenv("SUPER_USER")){
+            $aPermission[] = "EmailLogs";
+        }
+
         // if not parent, cut down permissions
         if(!$bParent)
         {   

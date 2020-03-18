@@ -193,13 +193,15 @@ class Notifications extends CI_Controller
     // TODO: set cron to update entity_states table for a new zoho_account is synched to zoho_accounts
     // REPLACE INTO entity_states SELECT za.id,s.id,NOW(),NOW() FROM zoho_accounts za, states s WHERE za.filing_state=s.code;
 
-    public function notify()
+    public function notify($key="")
     {
+        if($key!=getenv("CRON_KEY")) redirectSession();
+
         $this->load->model("Notifications_model");
         $this->load->model("entity_model");
         
         $aData["subscription"] = $this->Notifications_model->getSubscriptions();
-        
+        $iMailsSent = 0;
         
         foreach($aData['subscription']['results'] as $oSubs)
         {
@@ -216,6 +218,7 @@ class Notifications extends CI_Controller
                 if($oEntity->id>0)
                 {
                     $this->sendMail($oEntity,$oRule);
+                    $iMailsSent++;
                 }
                 
             }
@@ -227,6 +230,7 @@ class Notifications extends CI_Controller
             //
 
         }
+        error_log("Notify Mail cron succeed: {$iMailsSent} sent");
     }
 
     /**
@@ -509,15 +513,88 @@ HC;
         }
     }
 
-    public function logMailStatus()
+    public function logMailStatus($key="")
+    {
+        if($key!=getenv("CRON_KEY")) redirectSession();
+
+        $this->load->model("Notifications_model");
+
+        $sDateTime1 = date("Y-m-d",strtotime("-2 days"));//"2020-03-12T00:00:00Z";
+        $sDateTime2 = date("Y-m-d");//"2020-03-12T23:59:59Z";
+        //$sDateTime1 = "2020-03-12";
+        $aData = $this->Notifications_model->getLogDates($sDateTime1,$sDateTime2);
+        
+        $iRecordsUpdated = 0;
+        if($aData)
+        {
+            foreach($aData as $v)
+            {
+                $sMsgId = $v->sg_message_id;//"Ople3WYzQNW9FNyoMB_apA";
+                $sToEmail = $v->to;//"najm.a@allshorestaffing.com";
+
+        //        $sResult = $this->sgGetStatus(['(CONTAINS(msg_id,"Ople3WYzQNW9FNyoMB_apA"))', 'to_email LIKE "najm.a@allshorestaffing.com"','last_event_time BETWEEN TIMESTAMP "'.$sDateTime1.'" AND TIMESTAMP "'.$sDateTime2.'"']);
+                $sResult = $this->sgGetStatus(['msg_id LIKE "'.$sMsgId.'%"', 'to_email LIKE "'.$sToEmail.'"']);
+                $oJson = json_decode($sResult);
+                if(count($oJson->messages)>0)
+                {
+                    $this->Notifications_model->updateMailLog($v->id, $oJson->messages[0]->status,$sResult);
+                    $iRecordsUpdated++;
+                }
+            }
+        }
+
+        error_log("Log Mail status cron succeed: {$iRecordsUpdated} Updated");        
+    }
+
+    public function sgGetStatus($aQueryList)
     {
         $oSendgrid = new SendGrid(getenv('SENDGRID_API_KEY'));
-        
-        $query_params = json_decode('{"limit": 1,"to_email":"a"}');
-        $response = $oSendgrid->client->access_settings()->activity()->get(null, $query_params);
-        print $response->statusCode() . "\n";
-        print $response->body() . "\n";
-        print_r($response->headers());
+        //$sToEmail = "najm.a@allshorestaffing.com";
+        $header = array();
+        $headr[] = 'Content-length: 0';
+        $headr[] = 'Content-type: application/json';
+        $headr[] = 'Authorization: Bearer '.getenv("SENDGRID_API_KEY");
+
+//echo urldecode("query=last_event_time%20BETWEEN%20TIMESTAMP%20%22{start_date}%22%20AND%20TIMESTAMP%20%22{end_date}%22AND%20to_email%3D%22<<email>>%22");die;
+        $sQuery = urlencode(implode(" AND ",$aQueryList));
+
+//        $sArguments = urlencode("to_email=\"{$sToEmail}\"");
+//        echo "Authorization: Bearer ".getenv("SENDGRID_API_KEY");die;
+        $sQuery."<br>";
+        $oCh = curl_init("https://api.sendgrid.com/v3/messages?limit=10&query=".$sQuery);
+        curl_setopt($oCh,CURLOPT_HTTPHEADER,$headr);
+
+        curl_setopt($oCh,CURLOPT_RETURNTRANSFER,true);
+        $sResult = curl_exec($oCh);
+
+        return $sResult;
+    }
+
+    public function showEmailLogs()
+    {
+        if(!isSessionValid("EmailLogs")) redirectSession();
+
+        $this->load->model("Notifications_model");
+        $sDate1 = $this->input->post("date1");
+        $sDate2 = $this->input->post("date2");
+
+        if(!isset($_POST['daterange']))
+        {
+            $sDate1 = date("Y-m-d",strtotime("-1 week"));
+            $sDate2 = date("Y-m-d");    
+            $_POST['daterange'] = date("m/d/Y",strtotime("-1 week")) . " - " . date("m/d/Y");
+        } else {
+            $aDate = explode(" - ",$this->input->post("daterange"));
+            $sDate1 = date("Y-m-d",strtotime($aDate[0]));
+            $sDate2 = date("Y-m-d",strtotime($aDate[1]));
+        }
+
+
+        $aData =$this->Notifications_model->getLogEntityDates($sDate1,$sDate2);
+
+        $this->load->view("header");
+        $this->load->view("log-email",['aEmailLogs'=>$aData]);
+        $this->load->view("footer");
     }
 
 }

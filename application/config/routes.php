@@ -64,8 +64,10 @@ $route['contacts'] = 'contacts/index';
 $route['attachments'] = 'attachments/index';
 $route['agents'] = 'RegisterAgents/index';
 $route['notification/form/(:num)'] = 'notifications/form/$1';
-$route['notification/notify'] = 'notifications/notify';
-$route['notification/status'] = 'notifications/logMailStatus';
+$route['notification/notify/(:any)'] = 'notifications/notify/$1';
+$route['notification/status/(:any)'] = 'notifications/logMailStatus/$1';
+$route['notification/logs'] = 'notifications/showEmailLogs';
+
 $route['notification/calendar'] = 'notifications/planCalendar';
 
 
