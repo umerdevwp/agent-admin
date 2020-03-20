@@ -13,11 +13,9 @@
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.20/datatables.min.css"/>
 <link rel="stylesheet" href="components/base/custom.css">
 <link rel="stylesheet" href="components/dropdown/dropdown.css">
-<link rel="stylesheet" href="components/datepicker/datepicker.css">
 <script src="components/base/script.js"></script>
 <script src="components/base/jquery-3.4.1.min.js"></script>
 <script src="components/base/moment.min.js"></script>
-<script src="components/datepicker/bootstrap-datepicker.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/datatables.min.js"></script>
 </head>
 	
@@ -147,7 +145,8 @@
         </div>
         <div class="panel-body p-0 scroller scroller-vertical">
           <div class="list-group">
-            <a class="list-group-item rounded-0" href="#">
+
+            <a class="list-group-item rounded-0" href="/entity/<?=$this->session->user['zohoId'];?>">
             <div class="media align-items-center">
               <div class="pr-2"><span class="fa-user"></span></div>
               <div class="media-body">

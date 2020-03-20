@@ -7,7 +7,7 @@
   <!-- Breadcrumbs-->
   <ul class="breadcrumbs">
     <li class="breadcrumbs-item"><a class="breadcrumbs-link" href="/portal"><span class="breadcrumbs-icon fa-home"></span><span>Dashboard</span></a></li>
-    <li class="breadcrumbs-item"><a class="breadcrumbs-link" href="/contacts">Contacts List</a> </li>
+    <li class="breadcrumbs-item"><a class="breadcrumbs-link" href="/contacts">Notification Email Log</a> </li>
     <li class="breadcrumbs-item"><?php echo $entity->account_name; ?><span style="display:none;"><?php echo $entity->id; ?></style></li>
   </ul>
 </section>
@@ -22,13 +22,18 @@
 	<div class="col-md-9 col-lg-12">
       <div class="panel">
         <div class="panel-header">
-          <div class="panel-title"><span class="panel-icon fa-tasks"></span><span>Contacts</span> </div>
+          <div class="panel-title"><span class="panel-icon fa-tasks"></span><span>Logs</span> </div>
         </div>
         <div class="panel-body p-0">
           <div class="table-responsive scroller scroller-horizontal py-3">
             <div id="DataTables_Table_3_wrapper" class="dataTables_wrapper dt-bootstrap4">
               <div class="row row-10">
-                <div class="col-sm-12 col-md-6 pl-3"></div>
+                <div class="col-sm-12 col-md-6 pl-3">
+                <form name="frmLogMail" id="frmLogMail" method="post" action="">
+                <input class="form-control" id="daterange" type="text" name="daterange"  value="<?=$this->input->post("daterange");?>">
+                
+                </form>
+                </div>
                 <div class="col-sm-12 col-md-6 pr-3"> </div>
               </div>
               <div class="row">
@@ -36,25 +41,23 @@
                   <table class="table table-striped table-hover data-table dataTable" data-page-length="5" data-table-mode="multi-filter" id="DataTables_Table_3" role="grid" aria-describedby="DataTables_Table_3_info">
                     <thead>
                       <tr role="row">
-                        <th class="sorting_disabled" data-column-index="0" rowspan="1" colspan="1" style="width: 241.2px;">Name</th>
-                        <th class="sorting_disabled" data-column-index="1" rowspan="1" colspan="1" style="width: 249.967px;">Contact Type</th>
-                        <th class="sorting_disabled" data-column-index="2" rowspan="1" colspan="1" style="width: 241.217px;">Email</th>
-                        <th class="sorting_disabled" data-column-index="3" rowspan="1" colspan="1" style="width: 241.2px;">Address</th>
-                        <th class="sorting_disabled" data-column-index="4" rowspan="1" colspan="1" style="width: 241.217px;">Phone</th>
-                       <!-- <th class="sorting_disabled" data-column-index="5" rowspan="1" colspan="1" style="width: 241.2px;">Edit</th> -->
+                        <th class="sorting_disabled" data-column-index="0" rowspan="1" colspan="1" style="width: 241.2px;">Entity Name</th>
+                        <th class="sorting_disabled" data-column-index="1" rowspan="1" colspan="1" style="width: 249.967px;">To Email</th>
+                        <th class="sorting_disabled" data-column-index="2" rowspan="1" colspan="1" style="width: 241.217px;">Subject</th>
+                        <th class="sorting_disabled" data-column-index="3" rowspan="1" colspan="1" style="width: 241.2px;">Status</th>
+                        <th class="sorting_disabled" data-column-index="4" rowspan="1" colspan="1" style="width: 241.217px;">Send Time</th>
                       </tr>
                     </thead>
                     <tbody>
                       <?php 
-                        if(count($contacts)>0) {
-                            for($i = 0; $i < count($contacts); $i++){ ?>
+                        if(count($aEmailLogs)>0) {
+                            for($i = 0; $i < count($aEmailLogs); $i++){ ?>
                       <tr role="row" class="odd">
-                        <td><?php echo $contacts[$i]->full_name; ?></td>
-                        <td><?php echo $contacts[$i]->title; ?></td>
-                        <td><?php echo $contacts[$i]->email; ?></td>
-                        <td><?php echo $contacts[$i]->mailing_street; ?>, <?php echo $contacts[$i]->mailing_city; ?> <?php echo $contacts[$i]->mailing_state; ?> <?php echo $contacts[$i]->mailing_zip; ?></td>
-                        <td><?php echo $contacts[$i]->phone; ?></td>
-                        <!-- <td><span class="panel-icon fa-pencil"></span></td> -->
+                        <td><a href="/entity/<?=$aEmailLogs[$i]->entity_id;?>"><?php echo $aEmailLogs[$i]->entity_name; ?></a></td>
+                        <td><?php echo $aEmailLogs[$i]->to; ?></td>
+                        <td><?php echo $aEmailLogs[$i]->subject; ?></td>
+                        <td><?php echo $aEmailLogs[$i]->status; ?></td>
+                        <td><?php echo $aEmailLogs[$i]->send_time; ?></td>
                       </tr>
                       <?php } 
                         } ?>
@@ -123,6 +126,9 @@ function uncheckTaskId()
 setTimeout(() => {
   jQuery("#no").on("click",uncheckTaskId);
   jQuery("#yes").on("click",updateTask);
+  jQuery(".applyBtn").on('click',function(){
+    setTimeout(()=>{$("#frmLogMail")[0].submit();},500);
+  });
 }, 2000);
   
 

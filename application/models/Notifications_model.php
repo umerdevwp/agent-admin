@@ -3,6 +3,9 @@ class Notifications_model extends CI_Model
 {
 
     private $table = "notification_subscriptions";
+    private $table_maillog = "email_log";
+    private $table_entity = "zoho_accounts";
+
     private $table_rule = "rules";
     private $table_states = "rule_states";
     private $table_entity_states = "entity_states";
@@ -71,7 +74,7 @@ class Notifications_model extends CI_Model
     {
         
         $sQueryEntity =<<<HC
-SELECT za.filing_state,za.entity_structure,za.formation_date,ns.* 
+SELECT za.filing_state,za.entity_type,za.formation_date,ns.* 
 FROM {$this->table} ns
 INNER JOIN {$this->table_zoho_accounts} za ON ns.entity_id=za.id
 WHERE ns.status='active'
@@ -341,5 +344,43 @@ HC;
         }
 
         return false;
+    }
+
+    public function addMailLog($data)
+    {
+        
+        $this->db->insert($this->table_maillog,$data);
+
+        return $this->db->insert_id();
+        
+    }
+
+    public function updateMailLog($iId, $sStatus, $sJson)
+    {
+        $aData = [
+            "status"    =>  $sStatus,
+            "sg_status" =>  $sJson
+        ];
+        $aWhere = [
+            "id" =>  $iId
+        ];
+        $this->db->update($this->table_maillog,$aData, $aWhere);
+    }
+
+    public function getLogDates($sDate1,$sDate2)
+    {
+        $q = "SELECT * FROM {$this->table_maillog} WHERE send_time BETWEEN '{$sDate1}' AND '{$sDate2}'";
+        $oResult = $this->db->query($q);
+        $aData = $oResult->result_object();
+        return $aData;
+    }
+
+    
+    public function getLogEntityDates($sDate1,$sDate2)
+    {
+        $q = "SELECT m.*,e.id as entity_id,e.entity_name FROM {$this->table_maillog} m, {$this->table_entity} e WHERE e.id=m.entity_id AND send_time BETWEEN '{$sDate1}' AND '{$sDate2}' ORDER BY send_time DESC";
+        $oResult = $this->db->query($q);
+        $aData = $oResult->result_object();
+        return $aData;
     }
 }

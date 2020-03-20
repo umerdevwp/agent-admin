@@ -22,15 +22,15 @@ class Contacts extends CI_Controller
         if(!isSessionValid("Contacts")) redirectSession();
 
         $this->load->model("contacts_model");
-        $this->load->model("accounts_model");
+        $this->load->model("entity_model");
         
         $id = $this->session->user['zohoId'];
 
         if($this->session->user['zohoId'] == getenv("SUPER_USER")){
-            $result = $this->accounts_model->getAll();
+            $result = $this->entity_model->getAll();
         } else {
             // fetch all childrens ids, to later fetch
-            $result = $this->accounts_model->loadChildAccounts($id,"id");
+            $result = $this->entity_model->loadChildAccounts($id,"id");
         }
 
         // create comma seprated ids from result
@@ -122,7 +122,7 @@ HC;
         $this->load->model("Contacts_model");
         $this->load->model("Tempmeta_model");
 
-        $aData = ['email'=>$strEmail,'entity_name'=>$this->input->post('entityId')];
+        $aData = ['email'=>$strEmail,'account_name'=>$this->input->post('entityId')];
 
         $bContactRow = $this->Contacts_model->checkRowExist($aData);
         // check in zoho contacts list
@@ -150,15 +150,15 @@ HC;
     private function addZoho($sSmartyAddress='')
     {
         $this->load->model("ZoHo_Account");
-        $this->load->model("Accounts_model");
+        $this->load->model("entity_model");
 
         $arError = [];
         //$iLoginId = $this->session->user['zohoId'];
         $iLoginId = $this->input->post("entityId");
         //$iLoginId = 4071993000000411118;
         // TODO: validate user is the child entity of login parent
-        $oAccountRow = $this->Accounts_model->getOne($iLoginId);
-        $sAccountName = $oAccountRow->entity_name;
+        $oAccountRow = $this->entity_model->getOne($iLoginId);
+        $sAccountName = $oAccountRow->account_name;
         //$sAccountName = "Najm Test Comliance";
         //var_dump($oAccountRow);
         //die;
@@ -191,11 +191,11 @@ if($aResponse['type']=='error'){
     // $iContactId = $aResponse['results'];
     $data = [
                 "id" => $iContactId,
-                "contact_owner" => $this->input->post("entityId"),
+                "owner" => $this->session->user['zohoId'],
                 "first_name"    =>  $this->input->post("inputContactFirstName"),
                 "last_name"    =>  $this->input->post("inputContactLastName"),
                 "full_name" => $this->input->post("inputContactFirstName").' '.$this->input->post("inputContactLastName"),
-                "entity_name" => $this->session->user["isAdmin"] ?  $this->input->post("entityId") : $this->input->post("entityId"),
+                "account_name" => $this->input->post("entityId"),
                 "email"    =>  $this->input->post("inputContactEmail"),
                 "phone"    =>  $this->input->post("inputContactPhone"),
                 "title"    =>  $this->input->post("inputContactType"),
@@ -207,8 +207,6 @@ if($aResponse['type']=='error'){
                 "created_time" => date('Y-m-d H:i:s'),
                 "modified_time" => date('Y-m-d H:i:s'),
                 "last_activity_time" => date('Y-m-d H:i:s'),
-                "most_recent_visit" => '0',
-                "first_visit" => '0',
                 "number_of_chats"=> '0',
                 "average_time_spent_minutes" => '0.00',
                 "days_visited" => '0',
