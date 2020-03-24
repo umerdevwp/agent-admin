@@ -30,12 +30,18 @@ class Portal extends CI_Controller {
 	 */
 	public function index()
 	{
+        if(!isSessionValid("Portal")) redirectSession();
 		
 		$this->load->library(["session"]);
 		$this->load->helper(["email"]);
+		
+		if(isJsonRequest())
+		{
+			responseJson($this->index_api());
+		}
 
 		// has no child, show entity page
-		if($this->session->user["child"]==0 and $this->session->user['zohoId'] != getenv("SUPER_USER"))
+		if(!isParent() && !isAdmin())
 		{
 			redirect("/entity/".$this->session->user["zohoId"]);
 		}
@@ -103,10 +109,10 @@ class Portal extends CI_Controller {
 		}
 
 		$data['formStatus'] = $this->statusForForm();
-		//var_dump($data['account']);die;
-        $this->load->view('header');
+
+		$this->load->view('header');
 		$this->load->view('portal', $data);
-        $this->load->view('footer');
+		$this->load->view('footer');
 	}
 
     public function entity($id)
@@ -261,7 +267,68 @@ class Portal extends CI_Controller {
 		}
 	}
 
+	public function index_api()
+	{
+		$this->load->library(["session"]);
+		$this->load->helper(["email"]);
+		
+		//okta have returned valid login email
+		if(!valid_email($this->input->get("email")))
+		{
+			return ['type'=>'error','message'=>'Please provide valid email address'];
+		}
+		
+		$this->load->model('entity_model');
+		$this->load->model('Tempmeta_model');
 
+		$data['entity'] = false;		
+		
+		$iZohoId = $this->input->get('pid');
+		// user is administrator
+		if($iZohoId == getenv("SUPER_USER")){
+			$data['entity'] = $this->entity_model->loadAccount($iZohoId);
+			$aDataChildAccounts = $this->entity_model->getAll();
+			$data['arChildEntity'] = [];
+			// if childs found
+            if($aDataChildAccounts['type']=='ok') $data['arChildEntity'] = $aDataChildAccounts['results'];
+		// users from zoho
+		} else {
+			$aDataEntity = $this->entity_model->loadAccount($iZohoId);
+			$data['entity'] = false;
+			if($aDataEntity['type']=='ok') $data['entity'] = $aDataEntity['results'];
+		
+			$aDataChild = $this->entity_model->loadChildAccounts($iZohoId);
+			if($aDataChild['type']=='ok')
+			{
+				$aDataTemp = $this->Tempmeta_model->getOne(
+					$iZohoId,
+					$this->Tempmeta_model->slugNewEntity
+				);
+				if($aDataTemp['type']=='ok')
+				{
+				
+					$data['arChildEntity'] = array_merge(
+												$aDataChild['results'],
+												json_decode($aDataTemp['results']->json_data)
+											);
+				} else {
+					$data['arChildEntity'] = $aDataChild['results'];
+				}
+			} else {
+				$data['arChildEntity'] = $this->Tempmeta_model->getOne(
+					$iZohoId,
+					$this->Tempmeta_model->slugNewEntity
+				);
+			}
+		}
+
+		$data['formStatus'] = $this->statusForForm();
+
+		$aData['type'] = 'ok';
+		$aData['data'] = $data;
+
+		return $aData;
+	}
 	
 
 

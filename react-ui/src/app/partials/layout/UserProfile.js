@@ -1,5 +1,6 @@
 /* eslint-disable no-script-url,jsx-a11y/anchor-is-valid */
 import React from "react";
+import axios from "axios";
 import { Link } from "react-router-dom";
 import Dropdown from "react-bootstrap/Dropdown";
 
@@ -12,7 +13,7 @@ import {withAuth} from "@okta/okta-react";
 class UserProfile extends React.Component {
   render() {
     const { user, showHi, showAvatar, showBadge } = this.props;
-
+    
     return (
       <Dropdown className="kt-header__topbar-item kt-header__topbar-item--user" drop="down" alignRight>
         <Dropdown.Toggle
@@ -28,7 +29,7 @@ class UserProfile extends React.Component {
 
             {showHi && (
               <span className="kt-header__topbar-username kt-hidden-mobile">
-               Omer Shafqat
+               Omer Shafqat222
               </span>
             )}
 

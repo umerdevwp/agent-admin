@@ -1,5 +1,5 @@
 {
-  "name": "AgentAdmin",
+  "name": "agentadmin",
   "version": "6.1.5",
   "private": true,
   "homepage": "http://localhost",
@@ -99,5 +99,9 @@
     "webpack-cli": "^3.3.10",
     "webpack-messages": "^2.0.4",
     "webpack-rtl-plugin": "^2.0.0"
-  }
+  },
+  "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
+  "main": "webpack.config.js",
+  "author": "",
+  "license": "ISC"
 }

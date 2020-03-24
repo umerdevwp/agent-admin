@@ -110,10 +110,14 @@ class Entity extends CI_Controller
             $iEntityId = $id;
 
         $data['iEntityId'] = $iEntityId;
-
-        $this->load->view('header');
-        $this->load->view('entity', $data);
-        $this->load->view('footer');
+        if($_SERVER['CONTENT_TYPE'] == 'application/json')
+        {
+            return json_encode($data);
+        } else {
+            $this->load->view('header');
+            $this->load->view('entity', $data);
+            $this->load->view('footer');
+        }
     }
 
     private function fetchTempDataOf($iEntityId, $sSlug)

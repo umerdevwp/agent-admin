@@ -200,6 +200,8 @@ class Login extends CI_Controller
     {
         // if entity is parent, permissions are
         $aPermission = array(
+                            "Portal",
+                            
                             "Entity",
                             "Entity_Add",
                             

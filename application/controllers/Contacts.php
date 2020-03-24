@@ -17,10 +17,18 @@ class Contacts extends CI_Controller
        $this->auth_key = !empty(getenv("EASY_OFAC_KEY")) ? getenv('EASY_OFAC_KEY') : '';
 
     }
+
+
     public function index()
     {
-        if(!isSessionValid("Contacts")) redirectSession();
+        //if(!isSessionValid("Contacts")) redirectSession();
 
+        if(isJsonRequest())
+		{
+            responseJson($this->index_api());
+            exit();
+        }
+        
         $this->load->model("contacts_model");
         $this->load->model("entity_model");
         
@@ -346,6 +354,37 @@ public function getContactOfac($id){
     $json = json_decode($result);
     return $json;
 
+    }
+
+    public function index_api()
+    {        
+        $this->load->model("contacts_model");
+        $this->load->model("entity_model");
+        
+        $iParentId = $this->input->get('pid');
+        
+        // TODO: replace $bAdmin with check through admin table the login user is admin
+        $bAdmin = true;
+
+        if($bAdmin){
+            $result = $this->entity_model->getAll();
+        } else {
+            // fetch all childrens ids, to later fetch
+            $result = $this->entity_model->loadChildAccounts($iParentId,"id");
+        }
+
+        // create comma seprated ids from result
+        $arCommaIds = array();
+        foreach($result as $v)
+        {
+            $arCommaIds[] = $v->id;
+        }
+        // add parent id as well
+        $arCommaIds[] = $iParentId;
+
+        $data['contacts'] = $this->contacts_model->getAllFromEntityList($arCommaIds);
+        
+        return $data;
     }
 
 }

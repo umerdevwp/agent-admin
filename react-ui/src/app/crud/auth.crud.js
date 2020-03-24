@@ -19,6 +19,11 @@ export function requestPassword(email) {
 }
 
 export function getUserByToken() {
+  console.log("I AM RECEIVING DATA FROM LOGIN");
+  var ax = axios.get(ME_URL).then(res => {
+    console.log(res);
+
+  });
   // Authorization head should be fulfilled in interceptor.
-  return axios.get(ME_URL);
+  return ax;
 }
