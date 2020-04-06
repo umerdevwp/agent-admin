@@ -650,14 +650,11 @@ setTimeout(() => {
             var markup = "<tr role='row' class='odd'><td class='sorting_1'>" + fname +' '+ lname + "</td><td>" + ctype + "</td><td>" + email + "</td><td>" + street + city + state + zipcode + "</td><td>" + phone + "</td></tr>";
 
           <?php endif; ?>
-<<<<<<< HEAD
-=======
           <?php if($this->session->user['zohoId'] == getenv("SUPER_USER")): ?>
               var markup = "<tr role='row' class='odd'><td class='sorting_1'>" + fname +' '+ lname + "</td><td>" + ctype + "</td><td>" + email + "</td><td>" + street + city + state + zipcode + "</td><td>" + phone + "</td><td>Safe</td></tr>";
           <?php else: ?>
              var markup = "<tr role='row' class='odd'><td class='sorting_1'>" + fname +' '+ lname + "</td><td>" + ctype + "</td><td>" + email + "</td><td>" + street + city + state + zipcode + "</td><td>" + phone + "</td></tr>";
           <?php endif ?>
->>>>>>> 40dc85a65bed48a728895c7c6526ddf2ef25a7e5
           $('table tbody#contactTableTbody').append(markup);
           if($(ev.target).attr("id")=='saveClose'){
             $('#addMultiple').modal('hide');
