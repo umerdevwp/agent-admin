@@ -63,13 +63,29 @@ $route['entity/(:num)'] = 'entity/index/$1';
 $route['contacts'] = 'contacts/index';
 $route['attachments'] = 'attachments/index';
 $route['agents'] = 'RegisterAgents/index';
+$route['notification/form/(:num)'] = 'notifications/form/$1';
+$route['notification/notify/(:any)'] = 'notifications/notify/$1';
+$route['notification/status/(:any)'] = 'notifications/logMailStatus/$1';
+$route['notification/logs'] = 'notifications/showEmailLogs';
+
+$route['notification/calendar'] = 'notifications/planCalendar';
+
 
 // actions
 $route['zoho'] = 'tasks/getZohoCode';
 $route['task/update/(:num)'] = 'tasks/completeTaskInZoho/$1';
+$route['task/add']['post'] = 'tasks/add';
 $route['ajax/theme/save']['post'] = 'user/saveThemeAjax/$1';
 $route['ajax/theme/(:any)']['get'] = 'user/getThemeAjax/$1';
 $route['ajax/contact/save']['post'] = 'contacts/addAjax';
+$route['synch'] = 'synch';
+
+
+// API
+//$route['api/users/(:num)'] = 'api/users/$1';
+
+
+
 
 
 // API
@@ -81,3 +97,5 @@ $route['ajax/contact/save']['post'] = 'contacts/addAjax';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
+$route['404_override'] = '';
+$route['translate_uri_dashes'] = FALSE;

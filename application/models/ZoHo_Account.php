@@ -4,7 +4,7 @@ use zcrmsdk\crm\setup\restclient\ZCRMRestClient;
 use zcrmsdk\crm\crud\ZCRMModule;
 use zcrmsdk\crm\crud\ZCRMRecord;
 use zcrmsdk\crm\crud\ZCRMNote;
-
+use zcrmsdk\oauth\ZohoOAuth;
 /**
  * ZoHo_Account class contains all logic to pull data from ZoHo
  */
@@ -39,6 +39,25 @@ class ZoHo_Account extends CI_Model
         ];
         
         ZCRMRestClient::initialize($configuration);
+        // to generate new token just provide grant token
+        // scopes: ZohoCRM.modules.ALL,aaaserver.profile.READ
+        $sGrantToken = getenv("ZOHO_GRANT_TOKEN");
+        if(!empty($sGrantToken))
+        {
+            echo "Token exist::-- ";
+            $oAuthClient = ZohoOAuth::getClientInstance();
+        
+            try {
+                echo "Generating token::-- ";
+                $oAuthTokens = $oAuthClient->generateAccessToken($sGrantToken);
+            } catch(Exception $e)
+            {
+                //var_dump($e);
+                echo "CRM denied site access: " . $e->getMessage();
+                die;
+            }
+        }
+        
     }
 
 

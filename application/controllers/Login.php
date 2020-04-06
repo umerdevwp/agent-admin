@@ -181,8 +181,12 @@ class Login extends CI_Controller
                 "firstName"=>$response->profile->firstName,
                 "lastName"=>$response->profile->lastName,
             );
+
             // set child bit
-            addToSessionKey("user",['child'=>$this->hasChild()]);
+            if($_SESSION['user']['zohoId']==getenv("SUPER_USER"))
+                addToSessionKey("user",['child'=>1]);
+            else
+                addToSessionKey("user",['child'=>$this->hasChild()]);
 
             // add permission based on child
             addToSessionKey('user',['permissions'=>$this->getPermissions($this->session->user['child'])]);
@@ -196,6 +200,8 @@ class Login extends CI_Controller
     {
         // if entity is parent, permissions are
         $aPermission = array(
+                            "Portal",
+                            
                             "Entity",
                             "Entity_Add",
                             
@@ -209,6 +215,11 @@ class Login extends CI_Controller
                             "Theme_Update",
                             "Theme_View",
                         );
+
+        if($_SESSION['user']['zohoId']==getenv("SUPER_USER")){
+            $aPermission[] = "EmailLogs";
+        }
+
         // if not parent, cut down permissions
         if(!$bParent)
         {   
@@ -229,8 +240,14 @@ class Login extends CI_Controller
 
     private function hasChild()
     {
+<<<<<<< HEAD
         $this->load->model("Accounts_model");
         $bParentAccount = $this->Accounts_model->hasEntities($this->session->user["zohoId"]);
+=======
+        $this->load->model("entity_model");
+
+        $bParentAccount = $this->entity_model->hasEntities($this->session->user["zohoId"]);
+>>>>>>> 40dc85a65bed48a728895c7c6526ddf2ef25a7e5
         return (int)$bParentAccount;
     }
 

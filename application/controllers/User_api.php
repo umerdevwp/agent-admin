@@ -1,16 +1,26 @@
 <?php
 // use Src\Services\OktaApiService as Okta;
-header('Access-Control-Allow-Origin: *');
+//header('Access-Control-Allow-Origin: *');
+//header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method, Authorization");
+//header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+
 
 use chriskacerguis\RestServer\RestController;
 
 class User_api extends RestController
 {
-    public function __construct()
+    public function __construct($config = 'rest')
     {
-        parent::__construct();
+        parent::__construct($config);
         $this->load->model('Admin_model');
         $this->load->model('Accounts_model');
+        header('Access-Control-Allow-Origin: *');
+        header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method, Authorization");
+        header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+        $method = $_SERVER['REQUEST_METHOD'];
+        if ($method == "OPTIONS") {
+            die();
+        }
     }
 
     public function role_get()
@@ -34,6 +44,7 @@ class User_api extends RestController
 
     public function userdata_get()
     {
+
         $email = $this->get('email');
         $zoho_id = $this->get('zoho_id');
         //check if the parameters are not empty
@@ -49,11 +60,7 @@ class User_api extends RestController
         if (!empty($checkSuperUser)) {
             //fetching the list of all entities
             $entity_list = $this->Accounts_model->getAll();
-            $this->response([
-                'isAdmin' => true,
-                'count' => count($entity_list),
-                'result' => $entity_list
-            ], 200);
+            $this->response($entity_list, 200);
         }
 
         //check if zoho account exits in the system
@@ -63,16 +70,13 @@ class User_api extends RestController
             $children = $this->Accounts_model->loadChildAccounts($zoho_id);
 
             if ($children['type'] == 'ok' and !empty($children['results'])) {
-                $this->response([
-                    'count' => count($children['results']),
-                    'result' => $children['results']
-                ], 200);
+                $this->response($children['results'], RESTController::HTTP_OK);
             } else {
                 $this->response([
                     'status' => true,
                     'child_count' => 0,
                     'message' => 'This account does not have any child account'
-                ], 200);
+                ], RESTController::HTTP_OK);
 
             }
         } else {
@@ -82,5 +86,11 @@ class User_api extends RestController
                 'message' => 'Account does not exist'
             ], 404);
         }
+    }
+
+
+
+    public function index_options() {
+        return $this->response(NULL, RESTController::HTTP_OK);
     }
 }

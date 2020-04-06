@@ -6,14 +6,16 @@ class Auth
 {
 //    add a class name here to secure for api
     //private $auth = ['api', 'example_api', 'entity_api'];
-    private $auth = ['api', 'example_api'];
+    private $auth = ['api', 'example_api','portal'];
     public function myFunction()
     {
         $CI =& get_instance();
         if (in_array($CI->router->class, $this->auth)) {
             $token = $CI->input->get_request_header('Authorization');
-            if ($this->hasToken($token)->token) {
-                return $this->hasToken($token)->token;
+            $sToken = $this->hasToken($token)->token;
+
+            if ($sToken) {
+                return $sToken;
             }
 
             try {

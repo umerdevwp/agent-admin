@@ -54,7 +54,7 @@ class Tasks_model extends CI_Model
         $this->db->select("zt.id as id");
         $this->db->from("zoho_accounts za");
         $this->db->join("zoho_tasks zt","za.id=zt.related_to","left");
-        $this->db->where(["za.parent_entity"=>$parentid,"zt.id"=>$id]);
+        $this->db->where(["za." . Entity_model::$parent_entity =>$parentid,"zt.id"=>$id]);
         $query = $this->db->get();
         $result = $query->row();
         //var_dump($result);die;
@@ -64,5 +64,23 @@ class Tasks_model extends CI_Model
         }
 
         return $result;
+    }
+
+    
+
+    public function getAllNotifications()
+    {
+        $aWhere = [
+            'status'    =>  'pending'
+        ];
+
+        $query = $this->db->get_where("notification_subscriptions",$aWhere);
+        $result = $query->result_object();
+        
+        if (! is_array($result)) {
+            return ['message'=>'No tasks available','type'=>'error'];
+        }
+
+        return ['type'=>'ok','results'=>$result];
     }
 }

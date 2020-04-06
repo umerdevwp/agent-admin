@@ -1,8 +1,6 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-use Src\Services\OktaApiService as Okta;
-
 class Tasks extends CI_Controller
 {
     /**
@@ -30,7 +28,7 @@ class Tasks extends CI_Controller
 
         $this->load->model("ZoHo_Account");
         $this->load->model("Tasks_model");
-        $this->load->model("Accounts_model");
+        $this->load->model("entity_model");
         $this->load->model("Tempmeta_model");
         
         $loginId = $this->session->user["zohoId"];
@@ -91,5 +89,6 @@ class Tasks extends CI_Controller
             redirect($_SERVER["HTTP_REFERER"]);
         }
     }
+
 
 }

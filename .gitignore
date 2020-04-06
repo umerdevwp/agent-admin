@@ -3,12 +3,12 @@ application/storage/*
 application/logs/*
 docs/*
 .vs/*
+zohoauth/*
 vendor/*
-composer.lock
+
 .idea/.gitignore
 .gitignore
 ZCRMClientLibrary.log
 .idea/*
 zohoauth/*
 .htaccess
-composer.lock

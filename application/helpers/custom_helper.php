@@ -134,6 +134,11 @@ function isDev()
     else return false;
 }
 
+/**
+ * Identify the site access from developer or client based on machine ips
+ * 
+ * @return Bool true/false
+ */
 function isDeveloperIp()
 {
     if(
@@ -146,6 +151,45 @@ function isDeveloperIp()
     else return false;
 }
 
+/**
+ * Identify loged in session is admin or not, by tracking super user id
+ * 
+ * @return Bool true/false
+ */
+function isAdmin()
+{
+    if($_SESSION['user']['ZohoId']==getenv("SUPER_USER")){
+        return true;
+    }
+    return false;
+}
+
+
+/**
+ * Identify loged in session is parent entity or not, by tracking child flag
+ * 
+ * @return Bool true/false
+ */
+function isParent()
+{
+    if($this->session->user["child"]>0){
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Identify request is for json or not, by tracking SERVER['CONTENT_TYPE']
+ * 
+ * @return Bool true/false
+ */
+function isJsonRequest()
+{
+    if($_SERVER['CONTENT_TYPE'] == 'application/json'){
+        return true;
+    }
+    return false;
+}
 
 /**
  * Debug class or object or array, print_r optional debug class methods
@@ -159,6 +203,16 @@ function debug($var,$bFindMethod=false)
         echo "<pre>";
         print_r($var);
     }
+}
+
+/**
+ * Spit converted data to json response for client api calls
+ * @Param $aData An array of response 
+ */
+function responseJson($aData=['type'=>'error','data'=>'Unable to process request'])
+{
+    header("Content-Type: application/json");
+    echo json_encode($aData);
 }
 
 /**

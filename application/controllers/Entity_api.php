@@ -83,6 +83,25 @@ class Entity_api extends RestController
                 $data['contacts'] = $contact_data;
             }
 
+
+
+
+            $data['attachments'] = $this->Attachments_model->getAllFromEntityId($entityID);
+            if ($data['attachments']) {
+                $aDataAttachment = $this->Tempmeta_model->getOne($entityID, $this->Tempmeta_model->slugNewAttachment);
+                if ($aDataAttachment['type'] == 'ok') $data['attachments'] = array_merge($data['attachments'], json_decode($aDataAttachment['results']->json_data));
+            } else {
+                $aDataAttachment = $this->Tempmeta_model->getOne($entityID, $this->Tempmeta_model->slugNewAttachment);
+                if ($aDataAttachment['type'] == 'ok') {
+                    $data['attachments'] = json_decode($aDataAttachment['results']->json_data);
+                } else {
+                    $data['attachments'] = [];
+                }
+            }
+
+
+
+
             $data['tasks'] = $this->Tasks_model->getAll($entityID);
 
             $aTasksCompleted = $this->Tempmeta_model->getOne($entityID, $this->Tempmeta_model->slugTasksComplete);
