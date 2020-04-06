@@ -12,9 +12,9 @@ export default class OktaSignInWidget extends Component {
                 idpDiscovery: true,
                 showPasswordToggleOnSignInPage: true
             },
-            // idps: [
-            //     {type: process.env.REACT_APP_OKTA_IDPS_TYPE, id: process.env.REACT_APP_OKTA_IDPS_ID},
-            // ],
+            idps: [
+                {type: process.env.REACT_APP_OKTA_IDPS_TYPE, id: process.env.REACT_APP_OKTA_IDPS_ID},
+            ],
             clientId: process.env.REACT_APP_OKTA_CLIENT_ID,
             redirectUri: process.env.REACT_APP_OKTA_REDIRECT_URI,
             authScheme: 'OAUTH2',
