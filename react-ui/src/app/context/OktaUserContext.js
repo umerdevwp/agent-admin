@@ -17,7 +17,7 @@ function OktaUserContextProvider(props) {
     useEffect(() => {
         setTimeout(() => {
             const okta = localStorage.getItem('okta-token-storage');
-            if (okta !== '{}') {
+            if (okta !== '{}' && okta !== null && okta !== undefined) {
                 getUsefullinfo();
             }
         }, 3000)
