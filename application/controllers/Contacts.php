@@ -199,19 +199,11 @@ if($aResponse['type']=='error'){
     // $iContactId = $aResponse['results'];
     $data = [
                 "id" => $iContactId,
-<<<<<<< HEAD
-                "contact_owner" => $this->input->post("entityId"),
-                "first_name"    =>  $this->input->post("inputContactFirstName"),
-                "last_name"    =>  $this->input->post("inputContactLastName"),
-                "full_name" => $this->input->post("inputContactFirstName").' '.$this->input->post("inputContactLastName"),
-                "entity_name" => $this->session->user["isAdmin"] ?  $this->input->post("entityId") : $this->input->post("entityId"),
-=======
                 "owner" => $this->session->user['zohoId'],
                 "first_name"    =>  $this->input->post("inputContactFirstName"),
                 "last_name"    =>  $this->input->post("inputContactLastName"),
                 "full_name" => $this->input->post("inputContactFirstName").' '.$this->input->post("inputContactLastName"),
                 "account_name" => $this->input->post("entityId"),
->>>>>>> 40dc85a65bed48a728895c7c6526ddf2ef25a7e5
                 "email"    =>  $this->input->post("inputContactEmail"),
                 "phone"    =>  $this->input->post("inputContactPhone"),
                 "title"    =>  $this->input->post("inputContactType"),
