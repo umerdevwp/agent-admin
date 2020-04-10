@@ -65,6 +65,7 @@
                             <td><?php echo $arChildEntity[$i]->filing_state; ?></td>
                             <td><?php echo $arChildEntity[$i]->formation_date; ?></td>
                            <!-- <td><?php echo $arChildEntity[$i]->expiration_date; ?></td> -->
+>>>>>>> 40dc85a65bed48a728895c7c6526ddf2ef25a7e5
                           </tr>
                         <?php endfor; ?>
                       </tbody>

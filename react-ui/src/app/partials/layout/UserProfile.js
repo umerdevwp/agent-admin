@@ -1,19 +1,42 @@
 /* eslint-disable no-script-url,jsx-a11y/anchor-is-valid */
-import React from "react";
+import React, {useContext} from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import Dropdown from "react-bootstrap/Dropdown";
-
 import { toAbsoluteUrl } from "../../../_metronic";
 import HeaderDropdownToggle from "../content/CustomDropdowns/HeaderDropdownToggle";
 import {withAuth} from "@okta/okta-react";
-
+import {UserContext} from "../../context/UserContext";
+import {userInfoAPI, fetchUserProfile} from "../../crud/auth.crud";
 
 
 class UserProfile extends React.Component {
+
+  constructor() {
+    super();
+    this.state = {
+      profile: {}
+    }
+
+  }
+
+  componentDidMount() {
+    var okta = JSON.parse(localStorage.getItem('okta-token-storage'));
+    this.setState({profile: okta.idToken.claims})
+  }
+
+
+
+
   render() {
     const { user, showHi, showAvatar, showBadge } = this.props;
-    
+    const name = this.state.profile.name;
+    if(name) {
+      var initials = name.match(/\b\w/g) || [];
+      initials = ((initials.shift() || '') + (initials.pop() || '')).toUpperCase();
+
+    }
+
     return (
       <Dropdown className="kt-header__topbar-item kt-header__topbar-item--user" drop="down" alignRight>
         <Dropdown.Toggle
@@ -29,7 +52,7 @@ class UserProfile extends React.Component {
 
             {showHi && (
               <span className="kt-header__topbar-username kt-hidden-mobile">
-               Omer Shafqat222
+                {this.state.profile.name}
               </span>
             )}
 
@@ -54,10 +77,10 @@ class UserProfile extends React.Component {
             <div className="kt-user-card__avatar">
               <img alt="Pic" className="kt-hidden" src={''} />
               <span className="kt-badge kt-badge--lg kt-badge--rounded kt-badge--bold kt-font-success">
-                OS
+                {initials ? initials: ''}
               </span>
             </div>
-            <div className="kt-user-card__name">{'Omer Shafqat'}</div>
+            <div className="kt-user-card__name">{this.state.profile.name}</div>
             <div className="kt-user-card__badge">
               <span className="btn btn-success btn-sm btn-bold btn-font-md">
                 23 messages

@@ -322,8 +322,7 @@ const AddEntityForm = (props) => {
             setError(true)
         }, 4000)
         setLoading(true);
-        console.log('Info', `Welcome ${inputName.value}`)
-
+        console.log('Info', `Welcome ${inputName.value}`);
     }
 
     return (

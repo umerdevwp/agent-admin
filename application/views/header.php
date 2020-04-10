@@ -17,6 +17,9 @@
 <script src="components/base/jquery-3.4.1.min.js"></script>
 <script src="components/base/moment.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/datatables.min.js"></script>
+=======
+>>>>>>> 40dc85a65bed48a728895c7c6526ddf2ef25a7e5
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/datatables.min.js"></script>
 </head>
 	
 <body>

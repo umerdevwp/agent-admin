@@ -27,3 +27,31 @@ export function getUserByToken() {
   // Authorization head should be fulfilled in interceptor.
   return ax;
 }
+
+export const userInfoAPI = async (token) => {
+  const response = await fetch(process.env.REACT_APP_OKTA_BASE_URL + 'oauth2/default/v1/userinfo', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return Promise.resolve(response.json());
+}
+
+
+export const fetchUserProfile = async (sub) => {
+
+  const response = await fetch(process.env.REACT_APP_OKTA_BASE_URL + `api/v1/users/${sub}`, {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      Accept: 'application/json',
+      Authorization: `SSWS ${process.env.REACT_APP_OKTA_API_TOKEN}`,
+    }
+  });
+  return Promise.resolve(response.json());
+
+
+}
+
+
+
+

@@ -174,6 +174,7 @@
         </div>
         <?php echo form_error('inputFiscalDate'); ?>
       
+>>>>>>> 40dc85a65bed48a728895c7c6526ddf2ef25a7e5
     </div>
     <div class="form-group col-md-6">
       <label for="inputFirstName">First Name <span class="steric">*</span></label>

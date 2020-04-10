@@ -23,17 +23,16 @@ export default withAuth(class OktaAuth extends Component {
         this.checkAuthentication();
 
     }
+    static contextType = OktaUserContext
 
     async checkAuthentication() {
+        const checkifAdmin = this.context
         const authenticated = await this.props.auth.isAuthenticated();
         const token = await this.props.auth.getAccessToken();
 
         if (authenticated !== this.state.authenticated) {
             this.setState({authenticated});
-        }
 
-        if (authenticated) {
-            localStorage.setItem('accessToken', token);
         }
 
     }

@@ -7,7 +7,6 @@ docs/*
 zohoauth/*
 vendor/*
 
-
 .idea/.gitignore
 .gitignore
 ZCRMClientLibrary.log

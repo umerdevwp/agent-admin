@@ -28,49 +28,12 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-function EntityListing(props) {
+function ContactList(props) {
     const {oktaprofile, isAdmin} = useContext(OktaUserContext);
     const [state, setState] = React.useState('');
-    const [entitydata, setEntityData] = React.useState([]);
-    const [loading, setLoading] = React.useState(true);
     const history = useHistory();
     const classes = useStyles();
-
-
-    useEffect(() => {
-            asyncDataFetch();
-    }, [])
-
-    const asyncDataFetch = async () => {
-            await fetchData();
-            setLoading(false);
-    }
-
-    const fetchData = async () => {
-        const data = await entityList(oktaprofile.organization, oktaprofile.email).then(response => {
-            setEntityData(response);
-        })
-    }
-
-    const settingData = {
-        columns: [
-            {
-                render: rowData => <Link
-                    component="button"
-                    variant="body2"
-                    onClick={() => {
-                        history.push(`/dashboard/entity/${rowData.id}`);
-                    }}>
-                    <VisibilityIcon/>
-                </Link>
-            },
-            {title: 'Name', field: 'entity_name'},
-            {title: 'Entity Structure', field: 'entity_structure'},
-            {title: 'Filing State', field: 'filing_state'},
-            {title: 'Formation Date', field: 'created_time'},
-        ],
-        data: entitydata,
-    };
+    const settingData = props.data
 
 
     const handleUpdate = (newData) => {
@@ -82,7 +45,7 @@ function EntityListing(props) {
 
         <Grid item xs={12}>
             <MaterialTable
-                isLoading={loading}
+                isLoading={props.loading}
                 actions={[
                     {
                         icon: 'add',
@@ -98,9 +61,6 @@ function EntityListing(props) {
                 title={props.title !== '' ? props.title : ''}
                 columns={settingData.columns}
                 data={settingData.data}
-                options={{
-                    grouping: true
-                }}
                 editable={isAdmin ? {
                     // onRowAdd: newData =>
                     //     new Promise(resolve => {
@@ -149,4 +109,4 @@ function EntityListing(props) {
 }
 
 
-export default withRouter(EntityListing);
+export default withRouter(ContactList);

@@ -10,9 +10,12 @@ import {useLastLocation} from "react-router-last-location";
 import * as routerHelpers from "../../router/RouterHelpers";
 import {shallowEqual, useSelector} from "react-redux";
 import {withAuth} from '@okta/okta-react';
-
+import {OktaUserContext} from '../../context/OktaUserContext';
 
 const CustomLayoutForAgentAdmin = withRouter(({history}, props) => {
+
+    const [ready, setReady] = React.useState(false);
+    const {loading} = React.useContext(OktaUserContext);
     const lastLocation = useLastLocation();
     routerHelpers.saveLastLocation(lastLocation);
     const {isAuthorized, menuConfig, userLastLocation} = useSelector(
@@ -24,13 +27,19 @@ const CustomLayoutForAgentAdmin = withRouter(({history}, props) => {
         shallowEqual
     );
 
-    return (
-        <LayoutContextProvider history={history} menuConfig={menuConfig}>
-            <Layout>
-                <HomePage props/>
-            </Layout>
-        </LayoutContextProvider>
-    )
+    if(loading === true) {
+        const splashScreen = document.getElementById("splash-screen");
+        splashScreen.classList.remove("hidden");
+    }
+
+    return  loading === false ?
+        (<LayoutContextProvider history={history} menuConfig={menuConfig}>
+                <Layout>
+                    <HomePage props/>
+                </Layout>
+            </LayoutContextProvider>) : (<h1>loading....</h1> )
+
+
 });
 
 

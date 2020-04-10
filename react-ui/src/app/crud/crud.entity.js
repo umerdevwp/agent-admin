@@ -22,3 +22,6 @@ export function getUserByToken() {
     // Authorization head should be fulfilled in interceptor.
     return axios.get(ME_URL);
 }
+
+
+
