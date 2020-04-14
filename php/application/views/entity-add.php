@@ -159,8 +159,6 @@
         </div>
         <?php echo form_error('inputFormationDate'); ?>
 
-<<<<<<< HEAD
-=======
     </div>
     <div class="form-group col-md-6">
       <label for="inputFiscalDate">Fiscal Year<span class="steric">*</span></label>

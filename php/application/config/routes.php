@@ -87,13 +87,6 @@ $route['synch'] = 'synch';
 
 
 
-
-// API
-//$route['api/users/(:num)'] = 'api/users/$1';
-
-
-
-
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 

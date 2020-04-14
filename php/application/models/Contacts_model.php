@@ -14,20 +14,19 @@ class Contacts_model extends CI_Model
     public function getAllFromEntityId($id)
     {
         // TODO: remove fake id
+        $data = [
+            'account_name' => $id,
+            //'contact_owner'    =>  '4071993000000244001', // fake id
+        ];
 
-
-        $this->db->select('zoho_contacts.*, contactmeta.contact_id, contactmeta.ofac_status, contactmeta.last_updated_time');
-        $this->db->from('zoho_contacts');
-        $this->db->join('contactmeta', 'contactmeta.contact_id=zoho_contacts.id', 'left');
-        $this->db->where(["zoho_contacts.entity_name" => $id]);
+        $this->db->select('zoho_contacts.*,contactmeta.*');
+        $this->db->from('contactmeta');
+        $this->db->join('zoho_contacts','zoho_contacts.id=contactmeta.contact_id', 'left');
+        $this->db->where(["zoho_contacts.account_name"=>$id]);
         $query = $this->db->get();
 
         if ($query->num_rows() > 0) {
             $result = $query->result_object();
-        }
-
-        if (!is_array($result)) {
-            return ['msg' => 'No contacts available', 'msg_type' => 'error'];
         }
 
         return $result;

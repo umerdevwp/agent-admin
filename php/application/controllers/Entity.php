@@ -214,8 +214,8 @@ class Entity extends CI_Controller
                 Street: {$this->input->post('inputNotificationAddress')}
                 City: {$this->input->post('inputNotificationCity')}
                 State: {$this->input->post('inputNotificationState')}
-                Zipcode: {$this->input->post('inputNotificationZip')} 
-                HC;
+                Zipcode: {$this->input->post('inputNotificationZip')}
+HC;
             $_POST['inputNotificationAddress'] = $oSmartyStreetResponse['results'][0]->getDeliveryLine1();
             $_POST['inputNotificationCity'] = $oSmartyStreetResponse['results'][0]->getComponents()->getCityName();
             $_POST['inputNotificationState'] = $oSmartyStreetResponse['results'][0]->getComponents()->getStateAbbreviation();

@@ -20,67 +20,6 @@
   <!-- Breadcrumbs-->
   <ul class="breadcrumbs">
     <li class="breadcrumbs-item"><a class="breadcrumbs-link" href="portal"><span class="breadcrumbs-icon fa-home"></span><span>Dashboard</span></a></li>
-<<<<<<< HEAD
-    <li class="breadcrumbs-item"><?php echo $entity->entity_name; ?><span style='display:none;' id="tempId"><?= $this->session->user["zohoId"]; ?></span></li>
-
-  </ul>
-  <!--<h2>Add Entity</h2>-->
-</section>
-
-
-<section class="Jumbotron">
-  <!--Company Summary Info-->
-  <div class="container">
-    <div class="row">
-      <div class="col"></div>
-    </div>
-    <div class="row">
-      <div class="col-md-12">
-        <div class="panel">
-          <div class="panel-header">
-            <div class="panel-title"><span class="panel-icon fa-tasks"></span><span>Entities</span> </div>
-          </div>
-          <div class="panel-body p-0">
-            <div class="table-responsive scroller scroller-horizontal py-3">
-              <div id="DataTables_Table_3_wrapper" class="dataTables_wrapper dt-bootstrap4">
-                <div class="row row-10">
-                  <div class="col-sm-12 col-md-6 pl-3"></div>
-                  <div class="col-sm-12 col-md-6 pr-3"> </div>
-                </div>
-                <div class="row">
-                  <div class="col-sm-12 entities-data">
-                    <table class="table table-striped table-hover data-table dataTable" data-page-length="5" id="DataTables_Table_3" role="grid" data-table-searching="true" aria-describedby="DataTables_Table_3_info">
-                      <thead>
-                        <tr role="row">
-                          <th class="sorting_disabled" data-column-index="0" rowspan="1" colspan="1" style="width: 241.2px;">Name</th>
-                          <th class="sorting_disabled" data-column-index="1" rowspan="1" colspan="1" style="width: 249.967px;">Entity Structure</th>
-                          <th class="sorting_disabled" data-column-index="2" rowspan="1" colspan="1" style="width: 241.217px;">Filing State</th>
-                          <th class="sorting_disabled" data-column-index="3" rowspan="1" colspan="1" style="width: 241.2px;">Formation Date</th>
-                          <?php if ($this->session->user["isAdmin"]) : ?>
-                            <th class="sorting_disabled" data-column-index="3" rowspan="1" colspan="1" style="width: 241.2px;">Status</th>
-                            <th class="sorting_disabled" data-column-index="3" rowspan="1" colspan="1" style="width: 241.2px;">Actions</th>
-                          <?php endif; ?>
-                          <!-- <th class="sorting_disabled" data-column-index="4" rowspan="1" colspan="1" style="width: 241.217px;">Expiration Date</th> -->
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <?php for ($i = 0; $i < count($arChildEntity); $i++) : ?>
-                          <tr role="row" class="odd" id="row_<?= $arChildEntity[$i]->id ?>">
-                            <td onclick="window.location = '/entity/<?php echo $arChildEntity[$i]->id; ?>';"><?php echo $arChildEntity[$i]->entity_name ?></td>
-                            <td onclick="window.location = '/entity/<?php echo $arChildEntity[$i]->id; ?>';"><?php echo $arChildEntity[$i]->entity_structure; ?></td>
-                            <td onclick="window.location = '/entity/<?php echo $arChildEntity[$i]->id; ?>';"><?php echo $arChildEntity[$i]->filing_state; ?></td>
-                            <td onclick="window.location = '/entity/<?php echo $arChildEntity[$i]->id; ?>';"><?php echo $arChildEntity[$i]->formation_date; ?></td>
-                            <?php if ($this->session->user["isAdmin"]) : ?>
-                              <td data-name="status" class="editable"><?= !empty($arChildEntity[$i]->entity_status) ? $arChildEntity[$i]->entity_status : $arChildEntity[$i]->status; ?></td>
-                              <td>
-                                <button class="edit_<?= $arChildEntity[$i]->id; ?> edit" onclick="updateHandler('<?= $arChildEntity[$i]->id; ?>');" data-toggle="tooltip" title="Edit"></button>
-                                <button style="display: none" class="update_<?= $arChildEntity[$i]->id; ?> update" onclick="submitHandler('<?= $arChildEntity[$i]->id; ?>');" data-toggle="tooltip" title="Update"></button>
-                                <button style="display: none" class="reset_<?= $arChildEntity[$i]->id; ?> reset" onclick="resetHandler('<?= $arChildEntity[$i]->id; ?>');" data-toggle="tooltip" title="Reset"></button>
-                              </td>
-
-                            <?php endif; ?>
-                            <!-- <td><?php echo $arChildEntity[$i]->expiration_date; ?></td> -->
-=======
     <li class="breadcrumbs-item"><?php echo $entity->account_name; ?><span style='display:none;' id="tempId"><?=$this->session->user["zohoId"];?></span></li>
     
   </ul>
@@ -167,21 +106,12 @@
       <?php endforeach; ?>
       input.val(html);
       $(this).html(input);
-<<<<<<< HEAD
 
     });
     localStorage.setItem(id, JSON.stringify(perviousData));
 
   }
 
-=======
-
-    });
-    localStorage.setItem(id, JSON.stringify(perviousData));
-
-  }
-
->>>>>>> 40dc85a65bed48a728895c7c6526ddf2ef25a7e5
   submitHandler = (id) => {
     $('tr#' + id + ' > input').removeClass('error');
         $('tr#' + id + ' > .tableErrorMessage').remove();
@@ -218,7 +148,6 @@
                 }
             }
         }); // you have missed this bracket
-<<<<<<< HEAD
   }
 
   resetHandler = (id) => {
@@ -238,27 +167,6 @@
          localStorage.removeItem(id);
   }
 
-=======
-  }
-
-  resetHandler = (id) => {
-    var parsedData = localStorage.getItem(id);
-        var result = JSON.parse(parsedData);
-        var $tr = $('#row_' + id);
-        $tr.find('td.editable').each(function() {
-            var $td = $(this);
-            var value = $td.find('select option:selected').val();
-            name = $td.data('name');
-            $td.html(result[name]);
-
-        });
-        $('button.edit_' + id).css('display', 'inherit');
-        $('button.update_' + id).css('display', 'none');
-        $('button.reset_' + id).css('display', 'none');
-         localStorage.removeItem(id);
-  }
-
->>>>>>> 40dc85a65bed48a728895c7c6526ddf2ef25a7e5
 
   function callMessagesApi() {
     var accessToken = oktaSignIn.tokenManager.get("accessToken");
