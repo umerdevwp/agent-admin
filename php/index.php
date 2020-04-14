@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 
 }
 
-$aServers = ['devtest.youragentservices.com','192.168.0.187','192.168.1.155', '10.10.10.159'];
+$aServers = ['devtest.youragentservices.com','192.168.0.187','192.168.1.155', '10.10.10.159', ' apidev.youragentservices.com'];
 define('ENVIRONMENT', (in_array($_SERVER['SERVER_NAME'],$aServers)?"development":"production"));//(isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development'));
 /*
  * ---------------------------------------------------------------
