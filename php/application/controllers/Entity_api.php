@@ -11,7 +11,6 @@ class Entity_api extends RestController
     {
         parent::__construct();
         $this->load->model('Admin_model');
-        $this->load->model('Accounts_model');
         $this->load->model('Tasks_model');
         $this->load->model('Contacts_model');
         $this->load->model('Attachments_model');
@@ -41,8 +40,10 @@ class Entity_api extends RestController
             $checkSuperUser = $this->Admin_model->checkAdminExist($email);
         }
         $ownerValidity = $this->Entity_model->ownerValidity($zoho_id, $entityID);
+
+
         if (!empty($ownerValidity) or !empty($checkSuperUser)) {
-            $entityData = $this->Accounts_model->loadAccount($entityID);
+            $entityData = $this->Entity_model->loadAccount($entityID);
             $oTempAgetAddress = null;
             if ($entityData['type'] == 'error' && $this->session->user['child']) {
                 $aDataTempEntity = $this->Tempmeta_model->getOneInJson([
@@ -67,7 +68,7 @@ class Entity_api extends RestController
 
 
 //          pull address for RA
-            $oAgetAddress = $this->Accounts_model->getAgentAddress($entityID);
+            $oAgetAddress = $this->Entity_model->getAgentAddress($entityID);
             if (is_object($oAgetAddress)) {
                 $data['AgentAddress'] = (array)$oAgetAddress;
             } else if (is_object($oTempAgetAddress)) {
@@ -84,8 +85,6 @@ class Entity_api extends RestController
             }
 
 
-
-
             $data['attachments'] = $this->Attachments_model->getAllFromEntityId($entityID);
             if ($data['attachments']) {
                 $aDataAttachment = $this->Tempmeta_model->getOne($entityID, $this->Tempmeta_model->slugNewAttachment);
@@ -98,8 +97,6 @@ class Entity_api extends RestController
                     $data['attachments'] = [];
                 }
             }
-
-
 
 
             $data['tasks'] = $this->Tasks_model->getAll($entityID);
@@ -149,26 +146,25 @@ class Entity_api extends RestController
         $this->form_validation->set_rules('inputBusinessPurpose', 'Business purpose', 'required');
 
 
-          $arError = [];
-          // try to correct user date format, then validate
-          if ($this->input->post("inputFormationDate") != "") {
-              $strFormationDate = str_replace("  ", " ", $this->post("inputFormationDate"));
-              $strFormationDate = str_replace(" ", "-", $strFormationDate);
-              $strFormationDate = date("Y-m-d", strtotime($strFormationDate));
+        $arError = [];
+        // try to correct user date format, then validate
+        if ($this->input->post("inputFormationDate") != "") {
+            $strFormationDate = str_replace("  ", " ", $this->post("inputFormationDate"));
+            $strFormationDate = str_replace(" ", "-", $strFormationDate);
+            $strFormationDate = date("Y-m-d", strtotime($strFormationDate));
 
-              if ($strFormationDate == "1970-01-01") {
+            if ($strFormationDate == "1970-01-01") {
 
-              } else {
-                  $_POST["inputFormationDate"] = $strFormationDate;
-              }
-          }
+            } else {
+                $_POST["inputFormationDate"] = $strFormationDate;
+            }
+        }
 
 //
 //        $_POST['inputNotificationAddress'] = $oSmartyStreetResponse['results'][0]->getDeliveryLine1();
 //        $_POST['inputNotificationCity'] = $oSmartyStreetResponse['results'][0]->getComponents()->getCityName();
 //        $_POST['inputNotificationState'] = $oSmartyStreetResponse['results'][0]->getComponents()->getStateAbbreviation();
 //        $_POST['inputNotificationZip'] = $oSmartyStreetResponse['results'][0]->getComponents()->getZIPCode();
-
 
 
         //var_dump($this->session->invalid_address_count);die;

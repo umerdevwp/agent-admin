@@ -15,12 +15,12 @@ class Entity extends CI_Controller
     public function index($id = "")
     {
         if (!isSessionValid("Entity")) redirectSession();
-        
+
         if (empty($id)) {
             $this->session->set_flashdata("error", "Invalid entity id");
             redirectSession();
         }
-        
+
         //$this->load->model('ZoHo_Account');
 		$this->load->model('entity_model');
 		$this->load->model('Tasks_model');
@@ -38,7 +38,7 @@ class Entity extends CI_Controller
 
         // fetch data from DB
         $aDataEntity = $this->entity_model->loadAccount($id);
-        
+
         $oTempAgetAddress = null;
         if ($aDataEntity['type'] == 'error' && $this->session->user['child']) {
             $aDataTempEntity = $this->Tempmeta_model->getOneInJson([
@@ -79,13 +79,13 @@ class Entity extends CI_Controller
             $data['tasks_completed'] = json_decode($aTasksCompleted['results']->json_data);
         else
             $data['tasks_completed'] = [];
-                
+
         $contact_data = $this->Contacts_model->getAllFromEntityId($id);
         $aContactMeta = $this->Tempmeta_model->getOne($id,$this->Tempmeta_model->slugNewContact);
-        
+
         $data['contacts'] = [];
-        if($contact_data['msg_type'] == 'error'){    
-            if($aContactMeta['type']=='ok') 
+        if($contact_data['msg_type'] == 'error'){
+            if($aContactMeta['type']=='ok')
             $data['contacts'] = json_decode($aContactMeta['results']->json_data);
         } else {
           $data['contacts'] = $contact_data;
@@ -139,7 +139,7 @@ class Entity extends CI_Controller
         $this->load->model("entity_model");
 
         if ($id > 0) {
-            $data = $this->Account_model->getOne($id);
+            $data = $this->entity_model->getOne($id);
         }
 
         $this->load->view('header');
@@ -186,7 +186,7 @@ class Entity extends CI_Controller
         $this->form_validation->set_rules('inputNotificationState', 'Shipping State', 'required');
         $this->form_validation->set_rules('inputNotificationZip', 'Shipping Code', 'required');
         $this->form_validation->set_rules('inputBusinessPurpose', 'Business purpose', 'required');
-        
+
         $this->load->model("Smartystreets_model");
 
         $oSmartyStreetResponse = $this->Smartystreets_model->find(
@@ -288,7 +288,7 @@ HC;
 
     private function zohoCreateEntity($iParentZohoId, $bTagSmartyValidated)
     {
-        
+
         $arError = array();
         $iErrorType = 1;// 1 means user creation failed, 2 means only attachment failed
         $this->load->model('ZoHo_Account');

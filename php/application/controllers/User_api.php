@@ -13,7 +13,7 @@ class User_api extends RestController
     {
         parent::__construct($config);
         $this->load->model('Admin_model');
-        $this->load->model('Accounts_model');
+        $this->load->model('Entity_model');
         header('Access-Control-Allow-Origin: *');
         header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method, Authorization");
         header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
@@ -59,15 +59,21 @@ class User_api extends RestController
         $checkSuperUser = $this->Admin_model->checkAdminExist($email);
         if (!empty($checkSuperUser)) {
             //fetching the list of all entities
-            $entity_list = $this->Accounts_model->getAll();
+            $entity_list = $this->Entity_model->getAll();
             $this->response($entity_list, 200);
         }
 
         //check if zoho account exits in the system
-        $zoho_existance_system = $this->Accounts_model->loadAccount($zoho_id);
+        $zoho_existance_system = $this->Entity_model->loadAccount($zoho_id);
+
+        $this->response([
+            'status' => false,
+            'message' => $checkSuperUser
+        ], 200);
+
         if ($zoho_existance_system['type'] == 'ok') {
             //fetch children for the parent zoho id
-            $children = $this->Accounts_model->loadChildAccounts($zoho_id);
+            $children = $this->Entity_model->loadChildAccounts($zoho_id);
 
             if ($children['type'] == 'ok' and !empty($children['results'])) {
                 $this->response($children['results'], RESTController::HTTP_OK);

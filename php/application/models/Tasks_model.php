@@ -13,7 +13,7 @@ class Tasks_model extends CI_Model
     {
         // TODO: remove fake id
         $data = [
-            'related_to' => $id,
+            'who_id' => $id,
             //'task_owner'    =>  '4071993000000224013', // fake id
         ];
 
@@ -40,7 +40,7 @@ class Tasks_model extends CI_Model
 
         $query = $this->db->get_where($this->table, $data);
         $result = $query->row();
-        
+
         if (!$result) {
             return ['msg'=>'No tasks available','msg_type'=>'error'];
         }
@@ -66,7 +66,7 @@ class Tasks_model extends CI_Model
         return $result;
     }
 
-    
+
 
     public function getAllNotifications()
     {
@@ -76,7 +76,7 @@ class Tasks_model extends CI_Model
 
         $query = $this->db->get_where("notification_subscriptions",$aWhere);
         $result = $query->result_object();
-        
+
         if (! is_array($result)) {
             return ['message'=>'No tasks available','type'=>'error'];
         }
