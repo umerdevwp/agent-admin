@@ -82,8 +82,16 @@ $route['synch'] = 'synch';
 
 
 // API
-//$route['api/users/(:num)'] = 'api/users/$1';
-
+$route['api/me/(:num)'] = 'entity/index/$1';// own profile
+$route['api/entity/(:num)'] = 'entity/index/$1';// entity details
+$route['api/entity/parent/(:num)'] = 'entity/getChildAccount/$1';// child entities
+$route['api/agent'] = 'RegisterAgents/index';
+$route['api/attachments'] = 'attachments/index';
+$route['api/contacts'] = 'contacts/index';
+$route['api/entity/add']['post'] = 'entity/add';
+$route['api/entitytype/(:num)'] = 'EntityType/index/$1';
+$route['api/entitytype'] = 'EntityType/index';
+//$route['api/users/(:num)'] = 'users/$1';
 
 
 

@@ -1,12 +1,17 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+include APPPATH.'/libraries/CommonDbTrait.php';
 
 class RegisterAgents extends CI_Controller
 {
+    use CommonDbTrait;
+    
+    private $sModule = "REGISTER_AGENTS";
+
     function index()
     {
-        if(!isSessionValid("RegisterAgents")) redirectSession();
+        $this->checkPermission("VIEW",$this->sModule);
 
         $this->load->model("RegisterAgents_model");
         
@@ -14,8 +19,6 @@ class RegisterAgents extends CI_Controller
         
         $data['aAgents'] = $aResults;
         
-        $this->load->view("header");
-        $this->load->view('register-agent',$data);
-        $this->load->view("footer");
+            responseJson(['data'=>$data]);
     }
 }

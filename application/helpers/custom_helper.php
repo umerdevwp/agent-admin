@@ -84,18 +84,18 @@ function validateFileExt($strFileFullPath,$arAllowedExts)
  * 
  * @param String $action name of method callee 
  */
-function isSessionValid($action)
+function isSessionValid($action,$aData)
 {
-    $CI =& get_instance();
-    if(isset($CI->session->user["zohoId"]))
+    foreach($aData as $k=>$v)
     {
-        if(in_array($action,$CI->session->user["permissions"]))
+        if(strtoupper($k)=="CAN_$action" && $v=="Y")
         {
             return true;
         }
     }
 
-    return false;
+    responseJson(['type'=>'error','message'=>'Access not allowed']);
+    exit();
 }
 
 /**
@@ -172,7 +172,7 @@ function isAdmin()
  */
 function isParent()
 {
-    if($this->session->user["child"]>0){
+    if($_SESSION['user']["child"]>0){
         return true;
     }
     return false;
@@ -186,6 +186,12 @@ function isParent()
 function isJsonRequest()
 {
     if($_SERVER['CONTENT_TYPE'] == 'application/json'){
+        header('Content-Type: application/json; charset=utf-8');
+        if(isOriginAllowed("",explode(",",getenv("ORIGIN_ALLOWED"))))
+        {
+            header("Access-Control-Allow-Origin: ". $_SERVER["HTTP_ORIGIN"]);            
+        }
+        header("Access-Control-Allow-Methods: PUT, GET, POST");
         return true;
     }
     return false;
@@ -209,10 +215,15 @@ function debug($var,$bFindMethod=false)
  * Spit converted data to json response for client api calls
  * @Param $aData An array of response 
  */
-function responseJson($aData=['type'=>'error','data'=>'Unable to process request'])
+function responseJson($aInData=[])
 {
+    // without input it throws this
+    if(count($aInData)==0) $aOutData = ['errors'=>['status'=>'400','message'=>'Unable to proceed request']];
+    else {
+        $aOutData = $aInData;
+    }
     header("Content-Type: application/json");
-    echo json_encode($aData);
+    echo json_encode($aOutData);
 }
 
 /**
@@ -294,4 +305,67 @@ function restrictForAdmin()
             redirect(base_url('/portal'));
         
     }
+}
+
+function arrayKeysExist($aNeedle,$aHaystack)
+{
+    $aMyColumns = [];
+    foreach($aHaystack as $k=>$v)
+    {
+        if(in_array($k,$aNeedle) && !is_numeric($k))
+        {
+            $aMyColumns[$k] = $v;
+        }
+    }
+
+    if(count($aNeedle)!=count($aMyColumns)) return false;
+
+    return $aMyColumns;
+}
+
+/**
+ * Checks weather 
+ */
+function isOriginAllowed($sOrigin="", $aAllowedOrigins)
+{
+    // must have http_origin headers
+    $sOrigin = array_key_exists('HTTP_ORIGIN', $_SERVER) ? $_SERVER['HTTP_ORIGIN'] : NULL;
+    // list of origins allowed
+    $aAllowedOrigins    = $_SERVER['HTTP_HOST'];
+    
+    $bAllow = false;
+    for($i=0;$i<count($aAllowedOrigins);$i++)
+    {
+        // match hosts/domains
+        $pattern = '/^http:\/\/([\w_-]+\.)*' . $aAllowedOrigins[$i] . '$/';
+        // mached true / false
+        $allow = preg_match($pattern, $sOrigin);
+        // not allowed exit
+        if ($sOrigin !== null && isOriginAllowed($sOrigin, $aAllowedOrigins))
+        {
+            // not allowed check with others
+            continue;
+        } else {
+            $bAllow = true;
+            break;
+        }
+    }
+
+    return $bAllow;
+}
+/**
+ * Fetch fields query parameter and return csv input to array
+ * 
+ * @param $sQueryName query string name variable
+ */
+function getInputFields($sQueryName="fields")
+{
+    $CI =& get_instance();
+
+    $aColumns = [];
+    // check column parameter set
+    $csvColumns = $CI->input->get($sQueryName);
+    if(!empty($csvColumns)) $aColumns = explode(",",$csvColumns);
+    
+    return $aColumns;
 }
