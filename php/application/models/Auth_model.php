@@ -22,12 +22,23 @@ class Auth_model extends CI_Model
     {
         $this->db->from($this->table);
         $this->db->where('token', $token);
+		$this->db->where('expired_on >', date('Y-m-d H:i:s'));
+		
         if (!empty($email) and $email != NULL) {
             $this->db->where('email', $email);
         }
         $query = $this->db->get();
-        $result = $query->row();
-        return $result;
+        $sQuery = $this->db->last_query();
+        //$result = $query->row(); remove it
+		if($query->num_rows() > 0){
+			return $query->row();
+		} 
+		else {
+			return null;
+		}
+		
+		//return $result remove it
+        
     }
 
 

@@ -8,6 +8,21 @@ class Attachments_model extends CI_Model
 {
 
     private $table = "zoho_attachments3";
+    private $aColumns = [
+        "file"=>"attachment_id",
+        "id"=>        "id",
+        "oid"=>        "owner",
+        "modified_by"=>        "modified_by",
+        "created_by"=>        "created_by",
+        "created_time"=>        "created_time",
+        "modified_time"=>        "modified_time",
+        "name"=>        "file_name",
+        "size"=>        "size",
+        "parent_id"=>        "parent_id",
+        "document_count"=>        "document_count",
+        "link_url"=>        "link_url",
+        "field_id"=>        "field_id"
+    ];
 
     public function __construct()
     {
@@ -74,13 +89,24 @@ class Attachments_model extends CI_Model
         catch(Exception $e){ }
     }
 
-    public function getAllFromEntityId($id)
+    public function getAllFromEntityId($id,$aColumns=[])
     {
         // TODO: remove fake id
         $data = [
             'parent_id' => $id,
             //'parent_id'    =>  '1000000028468', // fake id
         ];
+        
+        if(count($aColumns)>0)    
+        $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
+    else {
+        $aMyColumns = [
+            "id","name","file","size"
+        ];
+        $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
+    }
+    foreach($aMyColumns as $k=>$v)
+        $this->db->select("$v as `$k`");
 
         $query = $this->db->get_where($this->table, $data);
         $result = $query->result_object();
@@ -92,8 +118,19 @@ class Attachments_model extends CI_Model
         return $result;
     }
 
-    public function getAllFromEntityList($arCommaIds)
+    public function getAllFromEntityList($arCommaIds,$aColumns=[])
     {
+        if(count($aColumns)>0)    
+        $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
+    else {
+        $aMyColumns = [
+            "id","name","file","size"
+        ];
+        $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
+    }
+    foreach($aMyColumns as $k=>$v)
+        $this->db->select("$v as `$k`");
+
         $this->db->from($this->table);
         $this->db->where_in('parent_id',$arCommaIds);
         $query = $this->db->get();

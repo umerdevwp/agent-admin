@@ -4,6 +4,7 @@ use zcrmsdk\crm\setup\restclient\ZCRMRestClient;
 use zcrmsdk\crm\crud\ZCRMModule;
 use zcrmsdk\crm\crud\ZCRMRecord;
 use zcrmsdk\crm\crud\ZCRMNote;
+use zcrmsdk\crm\crud\ZCRMTag;
 use zcrmsdk\oauth\ZohoOAuth;
 /**
  * ZoHo_Account class contains all logic to pull data from ZoHo
@@ -41,6 +42,7 @@ class ZoHo_Account extends CI_Model
         ZCRMRestClient::initialize($configuration);
         // to generate new token just provide grant token
         // scopes: ZohoCRM.modules.ALL,aaaserver.profile.READ
+        // scopes2: ZohoCRM.modules.ALL,aaaserver.profile.READ,ZohoCRM.settings.all
         $sGrantToken = getenv("ZOHO_GRANT_TOKEN");
         if(!empty($sGrantToken))
         {
@@ -632,5 +634,39 @@ class ZoHo_Account extends CI_Model
             }
            
            return $aError;
+    }
+
+    public function zohoCreateNewTags($iEntityId,$aTags)
+    {
+        $aTagsExist = $this->getTags($iEntityId);
+
+        foreach($aTags as $k=>$v)
+        {
+            if(!in_array($v,$aTagsExist))
+            {
+                $oTag = ZCRMTag::getInstance();
+                $oTag->setName($v);
+                $aTagsNonExist[] = $oTag;
+            }
+        }
+
+        try {
+            if(count($aTagsNonExist)>0)
+            {
+                $oApiTags = $this->ZoHo_Account->getInstance("Tags");
+                $oResponseTags = $oApiTags->createTags($aTagsNonExist);
+            }
+        } catch(Exception $e){
+            return ['type'=>'error','message'=>$e->getMessage()];
+        }
+
+        return ['type'=>'ok','results'=>true];
+    }
+
+    public function getTags($iEntityId)
+    {
+        $oApiTags = $this->getInstance("tags",$iEntityId);
+
+        return $oApiTags->getTags();
     }
 }

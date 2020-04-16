@@ -1,10 +1,14 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-use Src\Services\OktaApiService as Okta;
+include APPPATH.'/libraries/CommonDbTrait.php';
 
 class Contacts extends CI_Controller
 {
+    use CommonDbTrait;
+    
+    private $sModule = "CONTACTS";
+
     private $url = '';
     private $easy_ofac_test = '';
     private $auth_key = '';
@@ -21,7 +25,7 @@ class Contacts extends CI_Controller
 
     public function index()
     {
-        //if(!isSessionValid("Contacts")) redirectSession();
+        $this->checkPermission("VIEW",$this->sModule);
 
         if(isJsonRequest())
 		{
@@ -38,7 +42,7 @@ class Contacts extends CI_Controller
             $result = $this->entity_model->getAll();
         } else {
             // fetch all childrens ids, to later fetch
-            $result = $this->entity_model->loadChildAccounts($id,"id");
+            $result = $this->entity_model->getChildAccounts($id,"id");
         }
 
         // create comma seprated ids from result
@@ -52,9 +56,7 @@ class Contacts extends CI_Controller
 
         $data['contacts'] = $this->contacts_model->getAllFromEntityList($arCommaIds);
         
-        $this->load->view("header");
-        $this->load->view("contacts",$data);
-        $this->load->view("footer");
+        responseJson(['data'=>$data]);
     }
 
     public function addAjax()
