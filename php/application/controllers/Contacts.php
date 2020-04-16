@@ -6,7 +6,7 @@ include APPPATH.'/libraries/CommonDbTrait.php';
 class Contacts extends CI_Controller
 {
     use CommonDbTrait;
-    
+
     private $sModule = "CONTACTS";
 
     private $url = '';
@@ -25,20 +25,20 @@ class Contacts extends CI_Controller
 
     public function index()
     {
-        $this->checkPermission("VIEW",$this->sModule);
+//        $this->checkPermission("VIEW",$this->sModule);
 
         if(isJsonRequest())
 		{
             responseJson($this->index_api());
             exit();
         }
-        
+
         $this->load->model("contacts_model");
         $this->load->model("entity_model");
-        
-        $id = $this->session->user['zohoId'];
 
-        if($this->session->user['zohoId'] == getenv("SUPER_USER")){
+        $id = $this->input->get("eid");
+
+        if($id == getenv("SUPER_USER")){
             $result = $this->entity_model->getAll();
         } else {
             // fetch all childrens ids, to later fetch
@@ -55,7 +55,7 @@ class Contacts extends CI_Controller
         $arCommaIds[] = $id;
 
         $data['contacts'] = $this->contacts_model->getAllFromEntityList($arCommaIds);
-        
+
         responseJson(['data'=>$data]);
     }
 
@@ -65,7 +65,7 @@ class Contacts extends CI_Controller
 
         $aResponse = [];
         $this->load->model("Smartystreets_model");
-        
+
         $this->load->library('form_validation');
 
         $this->form_validation->set_rules('entityId', 'Entity', 'required|numeric');
@@ -74,7 +74,7 @@ class Contacts extends CI_Controller
 
         $this->form_validation->set_rules('inputContactEmail', 'Contact Email', ['required','valid_email','callback_checkEmailExist']);
         $this->form_validation->set_rules('inputContactPhone', 'Contact Phone', 'required|regex_match[/[\+\s\-0-9]+/]');
-        
+
         $this->form_validation->set_rules('inputContactType', 'Contact Type', 'required');
         $this->form_validation->set_rules('inputContactStreet', 'Street', 'required');
         $this->form_validation->set_rules('inputContactCity', 'City', 'required');
@@ -92,7 +92,7 @@ class Contacts extends CI_Controller
                 $this->input->post("inputContactState"),
                 $this->input->post("inputContactZipcode")
             );
-            
+
             //$this->Smartystreets_model->run();
             //echo "<pre>";
             //print_r($aResponse);
@@ -112,22 +112,22 @@ HC;
                 $_POST['inputContactCity'] = $aResponse['results'][0]->getComponents()->getCityName();
                 $_POST['inputContactState'] = $aResponse['results'][0]->getComponents()->getStateAbbreviation();
                 $_POST['inputContactZipcode'] = $aResponse['results'][0]->getComponents()->getZIPCode();
-                
+
                 $aResponse = $this->addZoho($sSmartyAddress);
 
             } else if($this->input->post('acceptInvalidAddress'))
             {
                 $aResponse = $this->addZoho($sSmartyAddress);
             }
-            
+
             echo json_encode($aResponse);
-            
+
         }
     }
 
     public function checkEmailExist($strEmail)
     {
-        
+
         $bDontExist = true;
         $this->load->model("Contacts_model");
         $this->load->model("Tempmeta_model");
@@ -146,7 +146,7 @@ HC;
         if($bDontExist){
             $aData = ['json_email'=>$strEmail,'userid'=>$this->input->post('entityId')];
             $bTempmetaRow = $this->Tempmeta_model->checkRowExistInJson($aData);
-            
+
             if($bTempmetaRow)
             {
                 $this->form_validation->set_message('checkEmailExist', 'The {field} already exist');
@@ -172,7 +172,7 @@ HC;
         //$sAccountName = "Najm Test Comliance";
         //var_dump($oAccountRow);
         //die;
-        
+
 $aResponse = $this->ZoHo_Account->newZohoContact(
     $sAccountName,
     [
@@ -195,7 +195,7 @@ if($aResponse['type']=='error'){
 } else {
     $iContactId = $aResponse['results'];
     //add contact to OFAC $aResponse["id"];
-   
+
 
     $this->load->model("Contacts_model");
     // $iContactId = $aResponse['results'];
@@ -239,16 +239,16 @@ if($aResponse['type']=='error'){
 
     //Using the id initiating call to easyOFAC.
     //Ternary operator checks if the Contact meta ID is not empty else will dump an error log.
-    !empty($response_contact_meta_id) ? 
+    !empty($response_contact_meta_id) ?
         $this->addContactOfac(
           $response_contact_meta_id,
           $this->input->post("inputContactFirstName"),
-          $this->input->post("inputContactLastName")) : 
+          $this->input->post("inputContactLastName")) :
         log_message('error', 'Contact Meta ID is missing.');
- 
+
 
     //Sending note to Zoho, stating the initial status of the contact
-    !empty($iContactId) and isset($iContactId) ? 
+    !empty($iContactId) and isset($iContactId) ?
         $this->ZoHo_Account->newZohoNote("Contacts",$iContactId,"Contact OFAC Status",'safe') :
         log_message('error', 'OFAC Status can not be added to the Zoho CRM due to missing Contact ID (ZohoID)');
 
@@ -264,7 +264,7 @@ if($aResponse['type']=='error'){
         } else {
             return ["type"=>"ok","results"=>"Contact added successfully"];
         }
-        
+
     }
 
     //Function for adding the contacts to the easyOFAC
@@ -289,7 +289,7 @@ if($aResponse['type']=='error'){
      // Step 2
      curl_setopt($cSession,CURLOPT_URL,$finalurl);
      curl_setopt($cSession,CURLOPT_RETURNTRANSFER,true);
-     curl_setopt($cSession,CURLOPT_HEADER, false); 
+     curl_setopt($cSession,CURLOPT_HEADER, false);
      // Step 3
      $result=curl_exec($cSession);
      // Step 4
@@ -321,8 +321,8 @@ if($aResponse['type']=='error'){
                             }
                         }
                     }
-                   
-                }  
+
+                }
             }
     } else {
         $get_cron_info = $this->Contacts_model->ofac_cron_job_insert();
@@ -347,7 +347,7 @@ public function getContactOfac($id){
     // Step 2
     curl_setopt($cSession,CURLOPT_URL,$finalurl);
     curl_setopt($cSession,CURLOPT_RETURNTRANSFER,true);
-    curl_setopt($cSession,CURLOPT_HEADER, false); 
+    curl_setopt($cSession,CURLOPT_HEADER, false);
     // Step 3
     $result=curl_exec($cSession);
     // Step 4
@@ -359,12 +359,12 @@ public function getContactOfac($id){
     }
 
     public function index_api()
-    {        
+    {
         $this->load->model("contacts_model");
         $this->load->model("entity_model");
-        
+
         $iParentId = $this->input->get('pid');
-        
+
         // TODO: replace $bAdmin with check through admin table the login user is admin
         $bAdmin = true;
 
@@ -385,7 +385,7 @@ public function getContactOfac($id){
         $arCommaIds[] = $iParentId;
 
         $data['contacts'] = $this->contacts_model->getAllFromEntityList($arCommaIds);
-        
+
         return $data;
     }
 
