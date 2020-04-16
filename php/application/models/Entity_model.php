@@ -8,6 +8,23 @@ class Entity_model extends CI_Model
     public static $parent_entity = "parent_account";
     public static $entity_owner = "owner";
     public static $entity_number = "account_number";
+    
+    private $aColumns = ["id"=>"id","createdAt"=>"created_at","name"=>"account_name","phone"=>"phone","type"=>"account_type",
+    "entityStructure"=>"entity_type","agentId"=>"ra","filingState"=>"filing_state","parentId"=>"parent_account","email"=>"notification_email",
+    "status"=>"status","billingEmail"=>"billing_email","stateId"=>"state_id","formationDate"=>"formation_date","einId"=>"ein",
+    "tag"=>"tag","createdTime"=>"created_time","modifiedTime"=>"modified_time","lastActivityTime"=>"last_activity_time",
+    "billingStreet"=>"billing_street","shippingStreet"=>"shipping_street","billingStreet2"=>"billing_street_2","shippingStreet2"=>"shipping_street_2",
+    "billingCity"=>"billing_city","shippingCity"=>"shipping_city","billingState"=>"billing_state","shippingState"=>"shipping_state",
+    "billingCode"=>"billing_code","shippingCode"=>"shipping_code","billingCountry"=>"billing_country","shippingCountry"=>"shipping_country",
+    "owner"=>"owner","createdBy"=>"created_by",
+    "currency"=>"currency",
+    "layout"=>"layout",
+    "modifiedBy"=>"modified_by",
+    "expirationDate"=>"expiration_date",
+    "subscriptionStatus"=>"subscription_status",
+    "accountName"=>"account_number",
+    "stateStatus"=>"state_status",
+    "businessPurpose"=>"business_purpose"];
 
     private $table = "zoho_accounts";
     private $table_entityMeta = "entitymeta";
@@ -92,13 +109,37 @@ class Entity_model extends CI_Model
         return $query->result();
     }
 
-    public function loadAccount($id)
+    public function isParent($iEntityId,$iParentId){
+        //make sure the entity belongs to right parent or not.
+        $this->db->select('id');
+        $this->db->from($this->table);
+        $this->db->where('id', $iEntityId);
+        $this->db->where(Self::$parent_entity, $iParentId);
+        $query = $this->db->get();
+        $aData = $query->row();
+        
+        if(isset($aData->id)) return true;
+        else return false;
+    }
+
+    public function getOne($id,$aColumns=[])
     {
 
         $data = [
             'id' => $id
             //'id'    =>  '4071993000000411060',
         ];
+
+        if(count($aColumns)>0)    
+            $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
+        else {
+            $aMyColumns = [
+                "id","name","type","filingState","formationDate","agentId"
+            ];
+            $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
+        }
+        foreach($aMyColumns as $k=>$v)
+            $this->db->select("$v as `$k`");
 
         $query = $this->db->get_where('zoho_accounts', $data);
 
@@ -135,16 +176,22 @@ class Entity_model extends CI_Model
      * @param Int $id zoho id of logged in session user
      * @param String $columns (optional) comma seprated columns name
      */
-    public function loadChildAccounts($id, $columns = "")
+    public function getChildAccounts($id, $aColumns = [])
     {
         $data = [
             Entity_model::$parent_entity    =>  $id
         ];
 
-        // select required columns if set
-        if (!empty($columns)) {
-            $this->db->select($columns);
+        if(count($aColumns)>0)    
+            $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
+        else {
+            $aMyColumns = [
+                "id","name","type","filingState","formationDate","agentId"
+            ];
+            $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
         }
+        foreach($aMyColumns as $k=>$v)
+            $this->db->select("$v as `$k`");
 
         $query = $this->db->get_where($this->table, $data);
         $result = $query->result();
@@ -171,19 +218,6 @@ class Entity_model extends CI_Model
         }
 
         return false;
-    }
-
-    public function getOne($id)
-    {
-        $data = [
-            'a.id'    =>  $id
-        ];
-        $query = $this->db->get_where($this->table, $data);
-        $result = $query->row();
-        if (!$result) {
-            return ['msg' => 'No such account found', 'msg_type' => 'error'];
-        }
-        return $result;
     }
 
     public function getAll()

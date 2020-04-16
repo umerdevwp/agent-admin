@@ -1,24 +1,28 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-use Src\Services\OktaApiService as Okta;
+include APPPATH.'/libraries/CommonDbTrait.php';
 
 class Attachments extends CI_Controller
 {
+    use CommonDbTrait;
+    
+    private $sModule = "ATTACHMENTS";
+
     public function index()
     {
-        if(!isSessionValid("Attachments")) redirectSession();
+        $this->checkPermission("VIEW",$this->sModule);
 
         $this->load->model("attachments_model");
         $this->load->model("entity_model");
         
-        $id = $this->session->user['zohoId'];
+        $id = $this->input->get('eid');
 
-        if($this->session->user['zohoId'] == getenv("SUPER_USER")){
+        if($id == getenv("SUPER_USER")){
             $result = $this->entity_model->getAll();
         } else {
             // fetch all childrens ids, to later fetch
-            $result = $this->entity_model->loadChildAccounts($id,"id");
+            $result = $this->entity_model->getChildAccounts($id,"id");
         }
 
         // create comma seprated ids from result
@@ -32,8 +36,6 @@ class Attachments extends CI_Controller
 
         $data['attachments'] = $this->attachments_model->getAllFromEntityList($arCommaIds);
         
-        $this->load->view("header");
-        $this->load->view("attachments",$data);
-        $this->load->view("footer");
+        responseJson(['data'=>$data]);
     }
 }
