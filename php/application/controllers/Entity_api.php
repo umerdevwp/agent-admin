@@ -43,7 +43,7 @@ class Entity_api extends RestController
 
 
         if (!empty($ownerValidity) or !empty($checkSuperUser)) {
-            $entityData = $this->Entity_model->loadAccount($entityID);
+            $entityData = $this->Entity_model->getOne($entityID);
             $oTempAgetAddress = null;
             if ($entityData['type'] == 'error' && $this->session->user['child']) {
                 $aDataTempEntity = $this->Tempmeta_model->getOneInJson([
