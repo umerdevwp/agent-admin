@@ -35,10 +35,10 @@ class Contacts extends CI_Controller
         
         $this->load->model("contacts_model");
         $this->load->model("entity_model");
-        
-        $id = $this->session->user['zohoId'];
 
-        if($this->session->user['zohoId'] == getenv("SUPER_USER")){
+        $id = $this->input->get("eid");
+
+        if($id == getenv("SUPER_USER")){
             $result = $this->entity_model->getAll();
         } else {
             // fetch all childrens ids, to later fetch
