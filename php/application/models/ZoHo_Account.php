@@ -43,6 +43,7 @@ class ZoHo_Account extends CI_Model
         // to generate new token just provide grant token
         // scopes: ZohoCRM.modules.ALL,aaaserver.profile.READ
         // scopes2: ZohoCRM.modules.ALL,aaaserver.profile.READ,ZohoCRM.settings.all
+        // https://accounts.zoho.com/oauth/v2/auth?scope=ZohoCRM.modules.ALL,aaaserver.profile.READ,ZohoCRM.settings.all&client_id=1000.CF9P2PV0P6H66EY284HQZ8G1HVMU3H&response_type=code&access_type=online&redirect_uri=http://api.agentadmin.loc/
         $sGrantToken = getenv("ZOHO_GRANT_TOKEN");
         if(!empty($sGrantToken))
         {

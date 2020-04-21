@@ -1,6 +1,6 @@
 <?php
-class EntityTypes_model extends CI_Model {
-    private $table = "entity_types";
+class States_model extends CI_Model {
+    private $table = "states";
     private $aColumns = [
         "id"    =>  "id",
         "code"  =>  "code",

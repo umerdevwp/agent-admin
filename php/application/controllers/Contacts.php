@@ -59,9 +59,9 @@ class Contacts extends CI_Controller
         responseJson(['data'=>$data]);
     }
 
-    public function addAjax()
+    public function add()
     {
-        if(!isSessionValid("Contacts_Add")) redirectSession();
+        $this->checkPermission("ADD",$this->sModule);
 
         $aResponse = [];
         $this->load->model("Smartystreets_model");
@@ -83,7 +83,7 @@ class Contacts extends CI_Controller
 
         if($this->form_validation->run() == FALSE)
         {
-            echo json_encode(['type'=>'error','results'=>$this->form_validation->error_array()]);
+            responseJson(['errors'=>['code'=>'100','detail'=>$this->form_validation->error_array()]]);
 
         } else {
             $aResponse = $this->Smartystreets_model->find(
@@ -120,7 +120,7 @@ HC;
                 $aResponse = $this->addZoho($sSmartyAddress);
             }
             
-            echo json_encode($aResponse);
+            responseJson($aResponse);
             
         }
     }
@@ -164,17 +164,17 @@ HC;
 
         $arError = [];
         //$iLoginId = $this->session->user['zohoId'];
-        $iLoginId = $this->input->post("entityId");
+        $iEntityId = $this->input->post("entityId");
         //$iLoginId = 4071993000000411118;
         // TODO: validate user is the child entity of login parent
-        $oAccountRow = $this->entity_model->getOne($iLoginId);
-        $sAccountName = $oAccountRow->account_name;
+        //$oAccountRow = $this->entity_model->getOne($iEntityId);
+        //$sAccountName = $oAccountRow->account_name;
         //$sAccountName = "Najm Test Comliance";
         //var_dump($oAccountRow);
         //die;
         
 $aResponse = $this->ZoHo_Account->newZohoContact(
-    $sAccountName,
+    $iEntityId,
     [
         "First_Name"    =>$this->input->post("inputContactFirstName"),
         "Last_Name"     =>$this->input->post("inputContactLastName"),
@@ -182,6 +182,7 @@ $aResponse = $this->ZoHo_Account->newZohoContact(
         "Email"         =>$this->input->post("inputContactEmail"),
         "Phone"         =>$this->input->post("inputContactPhone"),
         "Contact_Type"  =>$this->input->post("inputContactType"),
+        "Account_Name"  =>$iEntityId,
 
         "Mailing_Street"=>$this->input->post("inputContactStreet"),
         "Mailing_City"  =>$this->input->post("inputContactCity"),
