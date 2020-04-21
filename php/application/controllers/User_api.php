@@ -66,11 +66,6 @@ class User_api extends RestController
         //check if zoho account exits in the system
         $zoho_existance_system = $this->Entity_model->loadAccount($zoho_id);
 
-        $this->response([
-            'status' => false,
-            'message' => $checkSuperUser
-        ], 200);
-
         if ($zoho_existance_system['type'] == 'ok') {
             //fetch children for the parent zoho id
             $children = $this->Entity_model->loadChildAccounts($zoho_id);
