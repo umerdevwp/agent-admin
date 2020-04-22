@@ -102,11 +102,11 @@ invalid: The API will return a single candidate for every properly submitted add
         $results = $lookup->getResult();
 
         if (empty($results)) {
-            echo("\nNo candidates. This means the address is not valid.");
+            //echo("\nNo candidates. This means the address is not valid.");
             return false;
         }
 
-        //return $results;
+        return $results;
         
         $firstCandidate = $results[0];
 

@@ -1,8 +1,12 @@
 <?php
 class ContactTypes extends CI_Controller {
 
+    use CommonDbTrait;
+    private $sModule = "CONTACT_TYPES";
+
     public function index($id=0)
     {
+        $this->checkPermission("VIEW",$this->sModule);
 
         $this->load->model("ContactTypes_model");
 
