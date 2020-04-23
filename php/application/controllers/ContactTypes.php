@@ -1,4 +1,7 @@
 <?php
+
+include APPPATH.'/libraries/CommonDbTrait.php';
+
 class ContactTypes extends CI_Controller {
 
     use CommonDbTrait;

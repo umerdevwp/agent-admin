@@ -245,4 +245,18 @@ class Entity_model extends CI_Model
 
 
     }
+
+    public function getEmailId($sEmail)
+    {
+        $this->db->select("id");
+        $query = $this->db->get_where($this->table,['notification_email'=>$sEmail]);
+        $oData = $query->row_object();
+        
+        if($oData)
+        {
+            return ['type'=>'ok','results'=>$oData];
+        }
+
+        return ['type'=>'error','message'=>'Record not found'];
+    }
 }

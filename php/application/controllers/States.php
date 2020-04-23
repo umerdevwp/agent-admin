@@ -1,4 +1,6 @@
 <?php
+include APPPATH.'/libraries/CommonDbTrait.php';
+
 class States extends CI_Controller {
 
     use CommonDbTrait;

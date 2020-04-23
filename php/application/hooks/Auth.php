@@ -6,15 +6,18 @@ class Auth
 {
 //    add a class name here to secure for api
     //private $auth = ['api', 'example_api', 'entity_api'];
-    private $auth = ['api', 'example_api','portal'];
+    private $auth = ['api', 'example_api','portal','entitytype','entity','contacts','states'];
     public function myFunction()
     {
         $CI =& get_instance();
-        if (in_array($CI->router->class, $this->auth)) {
+        if (in_array(strtolower($CI->router->class), $this->auth)) {
             $token = $CI->input->get_request_header('Authorization');
-            $sToken = $this->hasToken($token)->token;
+            
+            $oToken = $this->hasToken($token);
+            $sToken = $oToken->token;
 
             if ($sToken) {
+                $_SESSION['eid'] = $oToken->entity_id;
                 return $sToken;
             }
 
@@ -96,13 +99,33 @@ class Auth
 
 //        //Returns instance of \Okta\JwtVerifier\JWT
        $expired_on = $jwt->getExpirationTime(false);
-
+        
         if(!empty($expired_on)) {
+            // search in entity table
+            //$email = "chboyce@unitedagentservices.com";            
+            $this->load->model("Entity_model");
+            $aEntityData = $this->Entity_model->getEmailId($email);
+            $eid = 0;
+    
+            if($aEntityData['type']=='ok')
+                $eid = $aEntityData['results']->id;
+    
+            // not found, search in admins
+            if($eid==0)
+            {
+                $this->load->model("Admin_model");
+                $aAdminData = $this->Admin_model->checkAdminExist($email);
+                if(count($aAdminData))
+                    $eid = $aAdminData[0]->zoho_id;
+            }
+
+            // set data to store token
             $data = array(
                 'sub' => $sub,
                 'email' => $email,
                 'token' => $token,
-                'expired_on' => date('Y-m-d H:i:s',$expired_on)
+                'expired_on' => date('Y-m-d H:i:s',$expired_on),
+                "entity_id" =>  $eid
             );
             $bContactRow = $CI->Auth_model->add($data);
         }

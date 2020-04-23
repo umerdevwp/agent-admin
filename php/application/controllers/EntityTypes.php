@@ -1,4 +1,7 @@
 <?php
+
+include APPPATH.'/libraries/CommonDbTrait.php';
+
 class EntityTypes extends CI_Controller {
     use CommonDbTrait;
     private $sModule = "ENTITY_TYPES";

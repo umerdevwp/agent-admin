@@ -21,9 +21,11 @@ class Entity extends CI_Controller
 
     }
 
-    public function index($id = "")
+    public function index()
     {
         $this->checkPermission("VIEW",$this->sModule);
+        
+        $id = $_GET["eid"];
 
         if (empty($id)) {
             $this->session->set_flashdata("error", "Invalid entity id");
@@ -198,42 +200,44 @@ class Entity extends CI_Controller
         $this->form_validation->set_rules('inputBusinessPurpose', 'Business purpose', 'required');
 
         $this->load->model("Smartystreets_model");
+        // to avoid smartystreet buffer bug
+        // retrying 0, 1, 2 which disrupst the api response
+        if ($this->form_validation->run() !== FALSE) {
+            $oSmartyStreetResponse = $this->Smartystreets_model->find(
+                $this->input->post("inputNotificationAddress"),
+                $this->input->post("inputNotificationCity"),
+                $this->input->post("inputNotificationState"),
+                $this->input->post("inputNotificationZip")
+            );
+            // to hold smarty address corrections
+            $sSmartyAddress = "";
+            // check wether invalid address entered the 1st time
+            if ($oSmartyStreetResponse['type'] == 'error' && !$this->session->invalid_address_count) {
+                $arError[] = "Unable to validate your address, please recheck and confirm ...";
+                $this->session->invalid_address_count = 1;
 
-        $oSmartyStreetResponse = $this->Smartystreets_model->find(
-            $this->input->post("inputNotificationAddress"),
-            $this->input->post("inputNotificationCity"),
-            $this->input->post("inputNotificationState"),
-            $this->input->post("inputNotificationZip")
-        );
-        // to hold smarty address corrections
-        $sSmartyAddress = "";
-        // check wether invalid address entered the 1st time
-        if ($oSmartyStreetResponse['type'] == 'error' && !$this->session->invalid_address_count) {
-            $arError[] = "Unable to validate your address, please recheck and confirm ...";
-            $this->session->invalid_address_count = 1;
+                // qualify address if invalid address entered 2nd time
+            } else if ($oSmartyStreetResponse['type'] == 'error' && $this->session->invalid_address_count == 1) {
+                $this->session->invalid_address_count = 0;
+                $bTagSmartyValidated = false;
 
-            // qualify address if invalid address entered 2nd time
-        } else if ($oSmartyStreetResponse['type'] == 'error' && $this->session->invalid_address_count == 1) {
-            $this->session->invalid_address_count = 0;
-            $bTagSmartyValidated = false;
-
-            // replace user address with validated smartystreet address
-        } else {
-            // store previous user input for entity note purpose
-            $sSmartyAddress = <<<HC
-                Street: {$this->input->post('inputNotificationAddress')}
-                City: {$this->input->post('inputNotificationCity')}
-                State: {$this->input->post('inputNotificationState')}
-                Zipcode: {$this->input->post('inputNotificationZip')} 
+                // replace user address with validated smartystreet address
+            } else {
+                // store previous user input for entity note purpose
+                $sSmartyAddress = <<<HC
+                    Street: {$this->input->post('inputNotificationAddress')}
+                    City: {$this->input->post('inputNotificationCity')}
+                    State: {$this->input->post('inputNotificationState')}
+                    Zipcode: {$this->input->post('inputNotificationZip')} 
 HC;
-            $_POST['inputNotificationAddress'] = $oSmartyStreetResponse['results'][0]->getDeliveryLine1();
-            $_POST['inputNotificationCity'] = $oSmartyStreetResponse['results'][0]->getComponents()->getCityName();
-            $_POST['inputNotificationState'] = $oSmartyStreetResponse['results'][0]->getComponents()->getStateAbbreviation();
-            $_POST['inputNotificationZip'] = $oSmartyStreetResponse['results'][0]->getComponents()->getZIPCode();
-            $this->session->invalid_address_count = 0;
+                $_POST['inputNotificationAddress'] = $oSmartyStreetResponse['results'][0]->getDeliveryLine1();
+                $_POST['inputNotificationCity'] = $oSmartyStreetResponse['results'][0]->getComponents()->getCityName();
+                $_POST['inputNotificationState'] = $oSmartyStreetResponse['results'][0]->getComponents()->getStateAbbreviation();
+                $_POST['inputNotificationZip'] = $oSmartyStreetResponse['results'][0]->getComponents()->getZIPCode();
+                $this->session->invalid_address_count = 0;
+            }
+            //var_dump($this->session->invalid_address_count);die;
         }
-        //var_dump($this->session->invalid_address_count);die;
-
         // allow without file, else check type and size
         if ($_FILES["inputFiling"]["name"] != "") {
             $this->form_validation->set_rules('inputFiling', 'Filing Attachment',
@@ -313,11 +317,7 @@ HC;
 
     private function redirectAfterAdd($id=0)
     {
-        if (empty($this->input->post('btnSaveNew')))
-            responseJson(['data'=>['redirect'=>'dashboard']]);
-        else
-            responseJson(['data'=>['redirect'=>'new-entity']]);
-
+        responseJson(['data'=>['status'=>'200', 'detail'=>'Added successfully.','id'=>$id]]);
         exit();
     }
 

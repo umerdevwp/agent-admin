@@ -10,7 +10,7 @@ trait CommonDbTrait{
     {
         $this->load->model("Permissions_model");
         
-        $aData = $this->Permissions_model->getPermissionsEntityRow($this->input->post_get("eid"),$sRoute);
+        $aData = $this->Permissions_model->getPermissionsEntityRow($_SESSION['eid'],$sRoute);
         // check method is allowed, else response permission denied
         if(!isSessionValid($sMethodName,$aData)) exit();
         
