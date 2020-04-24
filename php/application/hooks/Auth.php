@@ -12,8 +12,6 @@ class Auth
         $CI =& get_instance();
         if (in_array($CI->router->class, $this->auth)) {
             $token = $CI->input->get_request_header('Authorization');
-            print $token;
-            die();
             $sToken = $this->hasToken($token)->token;
 
             if ($sToken) {
