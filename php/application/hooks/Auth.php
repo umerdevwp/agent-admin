@@ -12,6 +12,8 @@ class Auth
         $CI =& get_instance();
         if (in_array($CI->router->class, $this->auth)) {
             $token = $CI->input->get_request_header('Authorization');
+            print $token;
+            die();
             $sToken = $this->hasToken($token)->token;
 
             if ($sToken) {
@@ -119,7 +121,6 @@ class Auth
         $email = $CI->input->get('email');
         $CI->load->model("Auth_model");
         $auth_object = $CI->Auth_model->tokenExists($token, $email);
-
         if($auth_object->expired_on > date('Y-m-d H:i:s')){
            return $auth_object;
         } else {
