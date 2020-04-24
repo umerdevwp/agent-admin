@@ -1,9 +1,14 @@
 <?php
-class EntityTypes extends CI_Controller {
 
+include APPPATH.'/libraries/CommonDbTrait.php';
+
+class EntityTypes extends CI_Controller {
+    use CommonDbTrait;
+    private $sModule = "ENTITY_TYPES";
     public function index($id=0)
     {
-
+        $this->checkPermission("VIEW",$this->sModule);
+        
         $this->load->model("EntityTypes_model");
 
         $aColumns = getInputFields();

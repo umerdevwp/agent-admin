@@ -1,9 +1,15 @@
 <?php
+include APPPATH.'/libraries/CommonDbTrait.php';
+
 class States extends CI_Controller {
+
+    use CommonDbTrait;
+    private $sModule = "STATES";
 
     public function index($id=0)
     {
-
+        $this->checkPermission("VIEW",$this->sModule);
+        
         $this->load->model("States_model");
 
         $aColumns = getInputFields();
