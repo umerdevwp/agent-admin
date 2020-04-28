@@ -1,12 +1,10 @@
 <?php
-
+header('Access-Control-Allow-Origin: *');
 use zcrmsdk\crm\crud\ZCRMTag;
-
-defined('BASEPATH') OR exit('No direct script access allowed');
-
+use chriskacerguis\RestServer\RestController;
 include APPPATH.'/libraries/CommonDbTrait.php';
 
-class Entity extends CI_Controller
+class Entity extends RestController
 {
     use CommonDbTrait;
 
@@ -16,7 +14,13 @@ class Entity extends CI_Controller
     {
         parent::__construct();
         $this->load->helper("custom");
-
+        header('Access-Control-Allow-Origin: *');
+        header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method, Authorization");
+        header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+        $method = $_SERVER['REQUEST_METHOD'];
+        if ($method == "OPTIONS") {
+            die();
+        }
         validAdminCheck();
 
     }
@@ -24,7 +28,7 @@ class Entity extends CI_Controller
     public function index()
     {
         $this->checkPermission("VIEW",$this->sModule);
-        
+
         $id = $_GET["eid"];
 
         if (empty($id)) {
@@ -73,7 +77,7 @@ class Entity extends CI_Controller
                 } else {
                     $this->session->set_flashdata("error", "No such entity exist.");
                 }
-                
+
                 //$oAgetAddress = $this->entity_model->getAgentAddress($id);
                 $oAgetAddress = $this->RegisterAgents_model->getOne($data['entity']->agentId);
                 $oAgetAddress = $oAgetAddress['results'];
@@ -94,13 +98,13 @@ class Entity extends CI_Controller
                     $data['tasks_completed'] = json_decode($aTasksCompleted['results']->json_data);
                 else
                     $data['tasks_completed'] = [];
-                
+
                 $contact_data = $this->Contacts_model->getAllFromEntityId($id);
                 $aContactMeta = $this->Tempmeta_model->getOne($id,$this->Tempmeta_model->slugNewContact);
-                
+
                 $data['contacts'] = [];
-                if($contact_data['msg_type'] == 'error'){    
-                    if($aContactMeta['type']=='ok') 
+                if($contact_data['msg_type'] == 'error'){
+                    if($aContactMeta['type']=='ok')
                     $data['contacts'] = json_decode($aContactMeta['results']->json_data);
                 } else {
                 $data['contacts'] = $contact_data;
@@ -126,9 +130,9 @@ class Entity extends CI_Controller
         } else {
             $data = ['errors'=>['status'=>404,'detail'=>'Record not found']];
         }
-        
+
         responseJson(['data'=>$data]);
-        
+
     }
 
     private function fetchTempDataOf($iEntityId, $sSlug)
@@ -159,7 +163,7 @@ class Entity extends CI_Controller
         $this->load->view('footer');
     }
 
-    public function add()
+    public function entity_post()
     {
         $this->checkPermission("ADD",$this->sModule);
 
@@ -263,14 +267,14 @@ HC;
                 $this->session->set_flashdata("error", $arError[0]);
             }
             $aError = explode("::",validation_errors(" ","::"));
-            
+
             foreach($aError as $k=>$v)
             {
                 $v = str_replace("\n","",$v);
                 $v = trim($v);
                 $aError[$k] = $v;
             }
-            
+
             responseJson(['errors'=>['status'=>'100','detail'=>$aError]]);
             //$this->form();
 
@@ -281,7 +285,7 @@ HC;
             $_POST['inputFiscalDate'] = date("Y-m-d",strtotime($this->input->post("inputFiscalDate")));
 
             $response = $this->zohoCreateEntity($this->input->post['pid'], $bTagSmartyValidated);
-            
+
             // succcess redirect to dashboard
             if ($response["type"] == 'ok') {
                 $this->session->set_flashdata("ok", $response["message"]);
@@ -297,7 +301,7 @@ HC;
                 if ($sSmartyAddress != '') {
                     $response = $this->ZoHo_Account->newZohoNote("Accounts", $response['data']['id'], "Smartystreet has replaced following", $sSmartyAddress);
                 }
-                
+
                 $this->addPermission($response['data']['id']);
 
                 $this->redirectAfterAdd($response['data']['id']);
@@ -437,13 +441,13 @@ HC;
     {
         $this->load->model("entity_model");
         $this->load->model("Tempmeta_model");
-        
+
         $aColumns = getInputFields();
 
         $aDataChild = $this->entity_model->getChildAccounts($iParentId,$aColumns);
 
         $aMyData = $aDataChild['results'];
-        
+
         $aOutData = ["data"=>$aMyData];
         responseJson($aOutData);
     }
@@ -525,7 +529,7 @@ HC;
     private function zohoAddEntity()
     {
         $iParentZohoId = $this->input->post("pid");
-        
+
         $oApi = $this->ZoHo_Account->getInstance()->getRecordInstance("Accounts", null);
 
         $oApi->setFieldValue("Account_Name", $this->input->post("inputName")); // This function use to set FieldApiName and value similar to all other FieldApis and Custom field
@@ -605,7 +609,7 @@ HC;
         $bTagSmartyValidated = true;
         // to hold smarty address corrections
         $sSmartyAddress = "";
-        
+
         $this->load->model("Smartystreets_model");
 
         $oSmartyStreetResponse = $this->Smartystreets_model->find(
