@@ -80,6 +80,8 @@ $route['ajax/theme/(:any)']['get'] = 'user/getThemeAjax/$1';
 $route['ajax/contact/save']['post'] = 'contacts/addAjax';
 $route['synch'] = 'synch';
 
+// automate
+$route['notify'] = 'notifications/notify';
 
 // API
 $route['api/me'] = 'entity/index';// own profile

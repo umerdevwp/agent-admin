@@ -11,10 +11,16 @@ class Entity extends CI_Controller
     use CommonDbTrait;
 
     private $sModule = "ENTITY";
+    private $url = '';
+    private $easy_ofac_test = '';
+    private $auth_key = '';
 
     public function __construct()
     {
         parent::__construct();
+        $this->url = !empty(getenv('EASY_OFAC_URL')) ? getenv('EASY_OFAC_URL') : '';
+        $this->easy_ofac_test = !empty(getenv('EASY_OFAC_TEST')) ? getenv('EASY_OFAC_TEST') : '';
+        $this->auth_key = !empty(getenv("EASY_OFAC_KEY")) ? getenv('EASY_OFAC_KEY') : '';
         $this->load->helper("custom");
 
         validAdminCheck();
@@ -25,7 +31,7 @@ class Entity extends CI_Controller
     {
         $this->checkPermission("VIEW",$this->sModule);
         
-        $id = $_GET["eid"];
+        $id = $_SESSION["eid"];
 
         if (empty($id)) {
             $this->session->set_flashdata("error", "Invalid entity id");
@@ -188,7 +194,7 @@ class Entity extends CI_Controller
 
 
         $this->form_validation->set_rules('inputNotificationContactType', 'Contact Type', 'required|alpha');
-        $this->form_validation->set_rules('inputFillingState', 'Filing State', 'required|alpha');
+        $this->form_validation->set_rules('inputFillingState', 'Filing State', 'required|alpha|exact_length[2]');
         $this->form_validation->set_rules('inputFillingStructure', 'Entity Type', 'required|regex_match[/[A-Z\-]+/]');
         $this->form_validation->set_rules('inputFormationDate', 'Formation Date', 'required|regex_match[/[0-9]{4,}\-[0-9]{2,}\-[0-9]{2,}/]', ["regex_match" => "Allowed %s format: 2019-01-01"]);
         $this->form_validation->set_rules('inputNotificationEmail', 'Notification Email', 'required|valid_email');
@@ -262,15 +268,8 @@ HC;
             if (count($arError) > 0) {
                 $this->session->set_flashdata("error", $arError[0]);
             }
-            $aError = explode("::",validation_errors(" ","::"));
-            
-            foreach($aError as $k=>$v)
-            {
-                $v = str_replace("\n","",$v);
-                $v = trim($v);
-                $aError[$k] = $v;
-            }
-            
+            $aError = $this->form_validation->error_array();
+
             responseJson(['errors'=>['status'=>'100','detail'=>$aError]]);
             //$this->form();
 
@@ -343,6 +342,8 @@ HC;
             $this->zohoAddContact();
 
             $this->addEntityToTemp($iZohoId, $bContactDone, $bAttachmentDone);
+            // add row to subscription
+            $this->addSubscription($iZohoId);
 
             // add tags
             $oApi = $this->ZoHo_Account->getInstance("Accounts", $iZohoId);
@@ -358,12 +359,13 @@ HC;
                 if (!$bTagSmartyValidated) {
                     $aTags["InvalidatedAddress"] = "Invalidated Address";
                 }
-
+                // TODO: zoho enable on production server
+                /*
                 $this->ZoHo_Account->zohoCreateNewTags($iZohoId,$aTags);
 
                 $oResponseTags = $oApi->addTags($aTags);
 
-                $oData = $oResponseTags->getData();
+                $oData = $oResponseTags->getData();*/
             } catch (Exception $e) {
                 if (count($arError) > 0) $arError[0] .= ", tags failed (".$e->getMessage().").";
                 else $arError[] = "User created successfully, tags failed (".$e->getMessage().").";
@@ -375,6 +377,57 @@ HC;
         }
 
         return ['type' => 'ok', 'message' => "Entity created successfully.", "data" => ['id' => $iZohoId]];
+    }
+
+    private function addSubscription($iEntityId)
+    {
+        $this->load->model("Notifications_model");
+        
+        $this->load->library('session');
+        
+        $id = null;
+
+        $oRule = $this->Notifications_model->getRules(
+            $this->input->post("inputFillingState"),
+            $this->input->post("inputFillingStructure"),
+            $this->input->post("inputFormationDate"),
+            $this->input->post("inputFiscalDate")
+        );
+        if(!empty($oRule->duedate))
+        {
+        $aData = [
+            "created_by"    =>  userLoginId(),
+            "entity_id"     =>  $iEntityId,
+            "due_date"      =>  $oRule->duedate,
+            "description"   =>  "Starting subscription from registeration page",
+            "start_date"    =>  date("Y-m-d"),
+            "type"          =>  "email",
+            "end_date" =>   date("Y-m-d",strtotime("+1 year")),
+            "before_days" => 7,
+            "before_months" =>  1,
+            "interval_days" => 0,
+            "interval_months"=> 2,
+            "limit_notification"=>0,
+            "status"    =>  "active",
+        ];
+
+        $id = $this->Notifications_model->add($aData);
+    } else {
+        error_log("Subscription failed unable to find duedate "
+        . " state: " . $this->input->post("inputFillingState")
+        . " structure: " . $this->input->post("inputFillingStructure")
+        . " formed: " . $this->input->post("inputFormationDate")
+        . "fiscal: " . $this->input->post("inputFiscalDate")
+        );
+    }
+
+        if(!is_numeric($id))
+        {
+            error_log("Subscription failed to insert new entity record");
+        }
+
+        return $id;
+
     }
 
     private function addEntityToTemp($iEntityId, $bContactDone = true, $bAttachmentDone = true)

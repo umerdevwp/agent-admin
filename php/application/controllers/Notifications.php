@@ -214,9 +214,11 @@ class Notifications extends CI_Controller
             $aResult = $this->getNotifyDate($oSubs,$oRule,date("Y-m-d"));
             if(isset($aResult['date']))
             {
-                $oEntity = $this->entity_model->getOne($oSubs->entity_id);
-                if($oEntity->id>0)
+
+                $aDataEntity = $this->entity_model->getOne($oSubs->entity_id,['id','name','email','type','filingState','entityStructure']);
+                if($aDataEntity['type']=='ok' && $aDataEntity['results']->id>0)
                 {
+                    $oEntity = $aDataEntity['results'];
                     $this->sendMail($oEntity,$oRule);
                     $iMailsSent++;
                 }
@@ -239,10 +241,10 @@ class Notifications extends CI_Controller
      */
     private function sendMail($oEntity,$oRule)//$sEmail,$sName,$sState,$sEntityType,$sDate,$sPurpose="recurring")
     {
-        $sEmail = $oEntity->notification_email;
-        $sName = $oEntity->entity_name;
-        $sState = $oEntity->filing_state;
-        $sEntityType = $oEntity->entity_structure;
+        $sEmail = $oEntity->email;
+        $sName = $oEntity->name;
+        $sState = $oEntity->filingState;
+        $sEntityType = $oEntity->entityStructure;
         $sDate = $oRule->duedate;
         $sPurpose = $oRule->period;
 
@@ -271,7 +273,7 @@ HC;
         }
 
         $oEmail = new Mail();
-        $oEmail->setFrom("agentadmin@youragentservices.com", "Your Agent Services Support");
+        $oEmail->setFrom(getenv("NOTIFICATION_FROM_EMAIL"), "Your Agent Services Support");
         $oEmail->addTo($sEmail, $sName);
         $oEmail->setSubject($sSubject);
         $oEmail->addContent("text/html", $sContent);

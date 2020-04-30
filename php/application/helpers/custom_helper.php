@@ -158,7 +158,7 @@ function isDeveloperIp()
  */
 function isAdmin()
 {
-    if($_SESSION['user']['ZohoId']==getenv("SUPER_USER")){
+    if($_SESSION['ZohoId']==getenv("SUPER_USER")){
         return true;
     }
     return false;
@@ -275,6 +275,53 @@ function addToSessionKey($sKey,$aData)
         $_SESSION[$sThisKey] = $aThisData;
     }
 
+}
+
+/**
+ * Convert user input date to MySQL YYYY-MM-DD format
+ * 
+ * @param String $strDate date in string format
+ * @return String formated date / empty string
+ */
+function convToMySqlDate($strDate)
+{
+    $strNewDate = "";
+    // try to correct user date format, then validate
+    if($strDate!="")
+    {
+        $strFormationDate = str_replace("  "," ",$strDate);
+        $posColons = strpos($strFormationDate,":");
+        if($posColons>0)
+        {
+            // find space before colons
+            $strTillColon = substr($strFormationDate,0,$posColons);
+            $strFormationDate = substr($strTillColon,0,strrpos($strTillColon," "));
+        }
+        $strFormationDate = str_replace(" ","-",$strFormationDate);
+        $strFormationDate = date("Y-m-d",strtotime($strFormationDate));
+
+        if($strFormationDate!="1970-01-01")
+        {
+            $strNewDate = $strFormationDate;
+        }
+    }
+
+    return $strNewDate;
+}
+
+/**
+ * Get login id of user else the login admin id instead of super user id
+ * 
+ * @return Integer User Id
+ */
+function userLoginId()
+{
+    if($_SESSION['user']['zohoId']==getenv("SUPER_USER"))
+    {
+        return $_SESSION['user']['AdminId'];
+    }
+
+    return $_SESSION['user']['zohoId'];
 }
 
 
