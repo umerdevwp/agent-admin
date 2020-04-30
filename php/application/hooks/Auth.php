@@ -6,13 +6,13 @@ class Auth
 {
 //    add a class name here to secure for api
     //private $auth = ['api', 'example_api', 'entity_api'];
-    private $auth = ['api', 'example_api','portal','entitytype','entity','contacts','states'];
+    private $auth = ['api', 'example_api','portal','entitytype','contacts','states'];
     public function myFunction()
     {
         $CI =& get_instance();
         if (in_array(strtolower($CI->router->class), $this->auth)) {
             $token = $CI->input->get_request_header('Authorization');
-            
+
             $oToken = $this->hasToken($token);
             $sToken = $oToken->token;
 
@@ -99,17 +99,17 @@ class Auth
 
 //        //Returns instance of \Okta\JwtVerifier\JWT
        $expired_on = $jwt->getExpirationTime(false);
-        
+
         if(!empty($expired_on)) {
             // search in entity table
-            //$email = "chboyce@unitedagentservices.com";            
+            //$email = "chboyce@unitedagentservices.com";
             $this->load->model("Entity_model");
             $aEntityData = $this->Entity_model->getEmailId($email);
             $eid = 0;
-    
+
             if($aEntityData['type']=='ok')
                 $eid = $aEntityData['results']->id;
-    
+
             // not found, search in admins
             if($eid==0)
             {
