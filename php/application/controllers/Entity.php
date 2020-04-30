@@ -2,12 +2,13 @@
 
 // use Src\Services\OktaApiService as Okta;
 header('Access-Control-Allow-Origin: *');
+
 use zcrmsdk\crm\crud\ZCRMTag;
 
 use chriskacerguis\RestServer\RestController;
 
 
-include APPPATH.'/libraries/CommonDbTrait.php';
+include APPPATH . '/libraries/CommonDbTrait.php';
 
 class Entity extends RestController
 {
@@ -26,13 +27,13 @@ class Entity extends RestController
         if ($method == "OPTIONS") {
             die();
         }
-        validAdminCheck();
+
 
     }
 
     public function index()
     {
-        $this->checkPermission("VIEW",$this->sModule);
+        $this->checkPermission("VIEW", $this->sModule);
 
         $id = $_GET["eid"];
 
@@ -42,10 +43,10 @@ class Entity extends RestController
         }
 
         //$this->load->model('ZoHo_Account');
-		$this->load->model('entity_model');
-		$this->load->model('Tasks_model');
-		$this->load->model('Contacts_model');
-		$this->load->model('Attachments_model');
+        $this->load->model('entity_model');
+        $this->load->model('Tasks_model');
+        $this->load->model('Contacts_model');
+        $this->load->model('Attachments_model');
         $this->load->model("Tempmeta_model");
         $this->load->model("RegisterAgents_model");
 
@@ -55,12 +56,10 @@ class Entity extends RestController
         $aColumns = getInputFields();
 
         // fetch data from DB
-        $aDataEntity = $this->entity_model->getOne($id,$aColumns);
-        if($aDataEntity['type']=='ok')
-        {
+        $aDataEntity = $this->entity_model->getOne($id, $aColumns);
+        if ($aDataEntity['type'] == 'ok') {
             // if session is parent then get entity ID from url
-            if($this->entity_model->isParent($id,$iParentId) || $id==$iParentId)
-            {
+            if ($this->entity_model->isParent($id, $iParentId) || $id == $iParentId) {
                 $oTempAgetAddress = null;
                 if ($aDataEntity['type'] == 'error' && $this->session->user['child']) {
                     $aDataTempEntity = $this->Tempmeta_model->getOneInJson([
@@ -105,21 +104,21 @@ class Entity extends RestController
                     $data['tasks_completed'] = [];
 
                 $contact_data = $this->Contacts_model->getAllFromEntityId($id);
-                $aContactMeta = $this->Tempmeta_model->getOne($id,$this->Tempmeta_model->slugNewContact);
+                $aContactMeta = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugNewContact);
 
                 $data['contacts'] = [];
-                if($contact_data['msg_type'] == 'error'){
-                    if($aContactMeta['type']=='ok')
-                    $data['contacts'] = json_decode($aContactMeta['results']->json_data);
+                if ($contact_data['msg_type'] == 'error') {
+                    if ($aContactMeta['type'] == 'ok')
+                        $data['contacts'] = json_decode($aContactMeta['results']->json_data);
                 } else {
-                $data['contacts'] = $contact_data;
-                if($aContactMeta['results']!=null) $data['contacts'] = array_merge($data['contacts'],json_decode($aContactMeta['results']->json_data));
+                    $data['contacts'] = $contact_data;
+                    if ($aContactMeta['results'] != null) $data['contacts'] = array_merge($data['contacts'], json_decode($aContactMeta['results']->json_data));
                 }
 
                 $data['attachments'] = $this->Attachments_model->getAllFromEntityId($id);
                 if ($data['attachments']) {
                     $aDataAttachment = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugNewAttachment);
-                    if ($aDataAttachment['results']!=null) $data['attachments'] = array_merge($data['attachments'], json_decode($aDataAttachment['results']->json_data));
+                    if ($aDataAttachment['results'] != null) $data['attachments'] = array_merge($data['attachments'], json_decode($aDataAttachment['results']->json_data));
                 } else {
                     $aDataAttachment = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugNewAttachment);
                     if ($aDataAttachment['type'] == 'ok') {
@@ -130,13 +129,13 @@ class Entity extends RestController
 
                 }
             } else {
-                $data = ['errors'=>['status'=>403, 'detail'=>'Permission denied']];
+                $data = ['errors' => ['status' => 403, 'detail' => 'Permission denied']];
             }
         } else {
-            $data = ['errors'=>['status'=>404,'detail'=>'Record not found']];
+            $data = ['errors' => ['status' => 404, 'detail' => 'Record not found']];
         }
 
-        responseJson(['data'=>$data]);
+        responseJson(['data' => $data]);
 
     }
 
@@ -170,7 +169,9 @@ class Entity extends RestController
 
     public function create_post()
     {
-        $this->checkPermission("ADD",$this->sModule);
+
+
+//        $this->checkPermission("ADD",$this->sModule);
 
         $bTagSmartyValidated = true;
         $arError = [];
@@ -265,7 +266,9 @@ HC;
             );
         }
 
-        $response = array();
+
+
+
 
         if ($this->form_validation->run() == FALSE) {
             if (count($arError) > 0) {
@@ -273,14 +276,24 @@ HC;
             }
             $aError = $this->form_validation->error_array();
 
-            responseJson(['errors'=>['status'=>'100','detail'=>$aError]]);
+            $this->response([
+                'status' => false,
+                'field_error' => $aError
+            ], 404);
+
+
+
+
+
+
+
             //$this->form();
 
             return false;
 
         } else {
-            $_POST['inputFormationDate'] = date("Y-m-d",strtotime($this->input->post("inputFormationDate")));
-            $_POST['inputFiscalDate'] = date("Y-m-d",strtotime($this->input->post("inputFiscalDate")));
+            $_POST['inputFormationDate'] = date("Y-m-d", strtotime($this->input->post("inputFormationDate")));
+            $_POST['inputFiscalDate'] = date("Y-m-d", strtotime($this->input->post("inputFiscalDate")));
 
             $response = $this->zohoCreateEntity($this->input->post['pid'], $bTagSmartyValidated);
 
@@ -310,17 +323,26 @@ HC;
                 $this->redirectAfterAdd($response['data']['id']);
             } else {
                 $this->session->set_flashdata("error", $response["error"]);
-                responseJson(['errors'=>['status'=>'400',$response['error']]]);
-                //$this->form();
+
+
+                $this->response([
+                    'status' => false,
+                    'error' => $response['error']
+                ], 400);
+
+
             }
 
         }
     }
 
-    private function redirectAfterAdd($id=0)
+    private function redirectAfterAdd($id = 0)
     {
-        responseJson(['data'=>['status'=>'200', 'detail'=>'Added successfully.','id'=>$id]]);
-        exit();
+        $this->response([
+            'status' => true,
+            'id' => $id,
+            'message' => 'Added successfully.'
+        ], 200);
     }
 
     private function zohoCreateEntity($iParentZohoId, $bTagSmartyValidated)
@@ -361,14 +383,14 @@ HC;
                     $aTags["InvalidatedAddress"] = "Invalidated Address";
                 }
 
-                $this->ZoHo_Account->zohoCreateNewTags($iZohoId,$aTags);
+                $this->ZoHo_Account->zohoCreateNewTags($iZohoId, $aTags);
 
                 $oResponseTags = $oApi->addTags($aTags);
 
                 $oData = $oResponseTags->getData();
             } catch (Exception $e) {
-                if (count($arError) > 0) $arError[0] .= ", tags failed (".$e->getMessage().").";
-                else $arError[] = "User created successfully, tags failed (".$e->getMessage().").";
+                if (count($arError) > 0) $arError[0] .= ", tags failed (" . $e->getMessage() . ").";
+                else $arError[] = "User created successfully, tags failed (" . $e->getMessage() . ").";
             }
         }
         //var_dump($arError);die;
@@ -384,25 +406,25 @@ HC;
         $this->load->model("Tempmeta_model");
         $today = date("Y-m-d");
         $aDataEntity = [
-            "id"                =>  (string)$iEntityId,
-            "account_name"       =>  $this->input->post("inputName"),
-            "entity_type"  =>  $this->input->post("inputFillingStructure"),
-            "filing_state"      =>  $this->input->post("inputFillingState"),
-            "formation_date"    =>  $this->input->post("inputFormationDate"),
-            "fiscal_date"       =>  $this->input->post("inputFiscalDate"),
-            "shipping_street"           =>  $this->input->post("inputNotificationAddress"),
-            "shipping_city"              =>  $this->input->post("inputNotificationCity"),
-            "shipping_state"             =>  $this->input->post("inputNotificationState"),
-            "shipping_code"          =>  $this->input->post("inputNotificationZip"),
-            "notification_email"    =>  $this->input->post("inputNotificationEmail"),
-            "agent"=>[
-                        "file_as"=>"United Agent Services LLC",
-                        "address"=>"1729 W. Tilghman Street",
-                        "address2"=>"Suite 2",
-                        "city"=>"Allentown",
-                        "state"=>"PA",
-                        "zip_code"=>"18104"
-                    ],
+            "id" => (string)$iEntityId,
+            "account_name" => $this->input->post("inputName"),
+            "entity_type" => $this->input->post("inputFillingStructure"),
+            "filing_state" => $this->input->post("inputFillingState"),
+            "formation_date" => $this->input->post("inputFormationDate"),
+            "fiscal_date" => $this->input->post("inputFiscalDate"),
+            "shipping_street" => $this->input->post("inputNotificationAddress"),
+            "shipping_city" => $this->input->post("inputNotificationCity"),
+            "shipping_state" => $this->input->post("inputNotificationState"),
+            "shipping_code" => $this->input->post("inputNotificationZip"),
+            "notification_email" => $this->input->post("inputNotificationEmail"),
+            "agent" => [
+                "file_as" => "United Agent Services LLC",
+                "address" => "1729 W. Tilghman Street",
+                "address2" => "Suite 2",
+                "city" => "Allentown",
+                "state" => "PA",
+                "zip_code" => "18104"
+            ],
         ];
         $this->Tempmeta_model->appendRow($this->session->user['zohoId'], $this->Tempmeta_model->slugNewEntity, $aDataEntity);
 
@@ -435,27 +457,26 @@ HC;
         }
     }
 
-    public function getChildAccount($iParentId=0)
+    public function getChildAccount($iParentId = 0)
     {
         $this->load->model("entity_model");
         $this->load->model("Tempmeta_model");
 
         $aColumns = getInputFields();
 
-        $aDataChild = $this->entity_model->getChildAccounts($iParentId,$aColumns);
+        $aDataChild = $this->entity_model->getChildAccounts($iParentId, $aColumns);
 
         $aMyData = $aDataChild['results'];
 
-        $aOutData = ["data"=>$aMyData];
+        $aOutData = ["data" => $aMyData];
         responseJson($aOutData);
     }
 
     private function addPermission($iEntityId)
     {
-        if($iEntityId>0)
-        {
+        if ($iEntityId > 0) {
             $this->load->model("Permissions_model");
-            $this->Permissions_model->add($iEntityId,$this->Permissions_model->aRole['entity']);
+            $this->Permissions_model->add($iEntityId, $this->Permissions_model->aRole['entity']);
         }
     }
 
@@ -482,7 +503,7 @@ HC;
 
         if ($aResponse['type'] == 'error') {
             error_log("Unknown  server error, contact creation failed.");
-            return ['status'=>'500','detail'=>"Unknown server error, contact creation failed."];
+            return ['status' => '500', 'detail' => "Unknown server error, contact creation failed."];
         }
 
         return true;
@@ -516,9 +537,8 @@ HC;
             }
         }
 
-        if(!$bAttachmentDone)
-        {
-            return ['status'=>'500','detail'=>$sError];
+        if (!$bAttachmentDone) {
+            return ['status' => '500', 'detail' => $sError];
         }
 
         return $bAttachmentDone;
@@ -549,7 +569,7 @@ HC;
 
         // fetch RA (registered agent) id from DB
         $strFilingState = $this->input->post("inputFillingState");
-        $row = $this->RegisterAgents_model->find(["name"=>$strFilingState." - UAS"]);
+        $row = $this->RegisterAgents_model->find(["name" => $strFilingState . " - UAS"]);
         $iRAId = "";
         if ($row->id > 0) {
             $iRAId = $row->id;
@@ -602,6 +622,7 @@ HC;
 
         return $sError;
     }
+
     private function validateSmartyStreet()
     {
         $bTagSmartyValidated = true;
