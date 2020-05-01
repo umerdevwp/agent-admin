@@ -158,7 +158,7 @@ class Entity_model extends CI_Model
         $this->db->limit(1);
         $this->db->select("ra.*");
         $this->db->from("zoho_accounts a");
-        $this->db->join("zoho_registered_agents ra", "a.ra=ra.id");
+        $this->db->join("zoho_registered_agents ra", "cast(`a`.`ra` as char) =cast(`ra`.`id` as char)");
         $this->db->where(["a.id" => $id]);
         $query = $this->db->get();
 
