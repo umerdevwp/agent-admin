@@ -4,6 +4,17 @@ header('Access-Control-Allow-Origin: *');
 use \Firebase\JWT\JWT;
 class Auth
 {
+    public function __construct()
+    {
+        parent::__construct();
+        header('Access-Control-Allow-Origin: *');
+        header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method, Authorization");
+        header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+        $method = $_SERVER['REQUEST_METHOD'];
+        if ($method == "OPTIONS") {
+            die();
+        }
+    }
 //    add a class name here to secure for api
     //private $auth = ['api', 'example_api', 'entity_api'];
     private $auth = ['api', 'example_api','portal','entitytypes','contacts','states','contacttypes'];
@@ -142,7 +153,7 @@ class Auth
         $method = strtolower($_SERVER['REQUEST_METHOD']);
         $email = $CI->input->$method('email');
         $CI->load->model("Auth_model");
-        $auth_object = $CI->Auth_model->tokenExists($token, $email);
+        $auth_object = $CI->Auth_model->tokenExists($token);
         if($auth_object->expired_on > date('Y-m-d H:i:s')){
             return $auth_object;
         } else {
