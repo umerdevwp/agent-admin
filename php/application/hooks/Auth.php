@@ -6,7 +6,7 @@ class Auth
 {
 //    add a class name here to secure for api
     //private $auth = ['api', 'example_api', 'entity_api'];
-    private $auth = ['api', 'example_api','portal','entitytype','contacts','states'];
+    private $auth = ['api', 'example_api','portal','entitytypes','contacts','states','contacttypes'];
     public function myFunction()
     {
         $CI =& get_instance();
@@ -44,11 +44,11 @@ class Auth
 
                         $email = $CI->input->get('email');
                         if(!empty($email)){
-                           if($response->email !== $response){
-                               $returnResponse = ['status' => 401, 'message' => "Invalid Email", NULL];
-                               echo json_encode($returnResponse);
-                               die();
-                           }
+                            if($response->email !== $response){
+                                $returnResponse = ['status' => 401, 'message' => "Invalid Email", NULL];
+                                echo json_encode($returnResponse);
+                                die();
+                            }
                         }
 
                         $returnResponse = ['status' => 200, 'message' => "Success", NULL];
@@ -98,13 +98,13 @@ class Auth
         $jwt = $jwtVerifier->verify($token);
 
 //        //Returns instance of \Okta\JwtVerifier\JWT
-       $expired_on = $jwt->getExpirationTime(false);
+        $expired_on = $jwt->getExpirationTime(false);
 
         if(!empty($expired_on)) {
             // search in entity table
             //$email = "chboyce@unitedagentservices.com";
-            $this->load->model("Entity_model");
-            $aEntityData = $this->Entity_model->getEmailId($email);
+            $CI->load->model("Entity_model");
+            $aEntityData = $CI->Entity_model->getEmailId($email);
             $eid = 0;
 
             if($aEntityData['type']=='ok')
@@ -113,8 +113,8 @@ class Auth
             // not found, search in admins
             if($eid==0)
             {
-                $this->load->model("Admin_model");
-                $aAdminData = $this->Admin_model->checkAdminExist($email);
+                $CI->load->model("Admin_model");
+                $aAdminData = $CI->Admin_model->checkAdminExist($email);
                 if(count($aAdminData))
                     $eid = $aAdminData[0]->zoho_id;
             }
@@ -139,12 +139,12 @@ class Auth
     {
 
         $CI =& get_instance();
-        $email = $CI->input->get('email');
+        $method = strtolower($_SERVER['REQUEST_METHOD']);
+        $email = $CI->input->$method('email');
         $CI->load->model("Auth_model");
         $auth_object = $CI->Auth_model->tokenExists($token, $email);
-
         if($auth_object->expired_on > date('Y-m-d H:i:s')){
-           return $auth_object;
+            return $auth_object;
         } else {
             return null;
         }
