@@ -4,17 +4,6 @@ header('Access-Control-Allow-Origin: *');
 use \Firebase\JWT\JWT;
 class Auth
 {
-    public function __construct()
-    {
-        parent::__construct();
-        header('Access-Control-Allow-Origin: *');
-        header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method, Authorization");
-        header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
-        $method = $_SERVER['REQUEST_METHOD'];
-        if ($method == "OPTIONS") {
-            die();
-        }
-    }
 //    add a class name here to secure for api
     //private $auth = ['api', 'example_api', 'entity_api'];
     private $auth = ['api', 'example_api','portal','entitytypes','contacts','states','contacttypes'];
@@ -34,18 +23,19 @@ class Auth
 
             try {
                 if ($token != NULL) {
-                    $url = getenv('OKTA_BASE_URL') . "oauth2/default/v1/userinfo";
+                    $url = getenv('OKTA_BASE_URL')."oauth2/default/v1/userinfo";
                     $ch = curl_init($url);
                     $headers = array(
-                        'Authorization: Bearer ' . $token,
+                        'Authorization: Bearer '.$token,
                     );
                     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
                     curl_setopt($ch, CURLOPT_HEADER, 0);
                     curl_setopt($ch, CURLOPT_POST, 1);
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                     $response = json_decode(curl_exec($ch));
+
                     if (empty($response->sub)) {
-                        $returnResponse = ['status' => 401, 'message' => "Auth Failed", NULL];
+                        $returnResponse = ['status' => 401, 'message' => "No response from OKTA", NULL];
                         echo json_encode($returnResponse);
                         die();
                     } else {
@@ -65,7 +55,7 @@ class Auth
                         $returnResponse = ['status' => 200, 'message' => "Success", NULL];
                     }
                 } else {
-                    $returnResponse = ['status' => 401, 'message' => "Auth Failed", NULL];
+                    $returnResponse = ['status' => 401, 'message' => "Not valid token", NULL];
                     echo json_encode($returnResponse);
                     die();
                 }
@@ -102,8 +92,8 @@ class Auth
             ->setDiscovery(new \Okta\JwtVerifier\Discovery\Oauth) // This is not needed if using oauth.  The other option is OIDC
             ->setAdaptor(new \Okta\JwtVerifier\Adaptors\FirebasePhpJwt)
             ->setAudience('api://default')
-            ->setClientId('0oa2rybhzlmD2YzrJ357')
-            ->setIssuer('https://dev-612069.okta.com/oauth2/default')
+            ->setClientId(getenv("OKTA_CLIENT_ID"))
+            ->setIssuer(getenv("OKTAISSUER"))
             ->build();
 
         $jwt = $jwtVerifier->verify($token);
@@ -130,6 +120,8 @@ class Auth
                     $eid = $aAdminData[0]->zoho_id;
             }
 
+
+
             // set data to store token
             $data = array(
                 'sub' => $sub,
@@ -150,10 +142,9 @@ class Auth
     {
 
         $CI =& get_instance();
-        $method = strtolower($_SERVER['REQUEST_METHOD']);
-        $email = $CI->input->$method('email');
         $CI->load->model("Auth_model");
         $auth_object = $CI->Auth_model->tokenExists($token);
+
         if($auth_object->expired_on > date('Y-m-d H:i:s')){
             return $auth_object;
         } else {
