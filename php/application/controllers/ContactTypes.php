@@ -1,28 +1,34 @@
 <?php
-
+use chriskacerguis\RestServer\RestController;
 include APPPATH.'/libraries/CommonDbTrait.php';
 
-class ContactTypes extends CI_Controller {
+class ContactTypes extends RestController {
 
     use CommonDbTrait;
     private $sModule = "CONTACT_TYPES";
-
-    public function index($id=0)
+    function __construct()
     {
-        $this->checkPermission("VIEW",$this->sModule);
+        // Construct the parent class
+        parent::__construct();
+
+    }
+    
+    public function contacttypelist_get()
+    {
 
         $this->load->model("ContactTypes_model");
 
         $aColumns = getInputFields();
 
-        $aData = $this->ContactTypes_model->getRows($id,$aColumns);
+        $aData = $this->ContactTypes_model->getRows($id, $aColumns);
 
-        if(count($aData))
-        {
-            responseJson(['data'=>$aData]);
-            exit;
+        if (count($aData)) {
+            $this->response(['data' => $aData], 200);
         }
 
-        responseJson(['errors'=>['status'=>'404','detail'=>'No record found']]);
+        $this->response( [
+            'status' => false,
+            'message' => 'No record found'
+        ], 404 );
     }
 }
