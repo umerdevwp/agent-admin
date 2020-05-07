@@ -14,15 +14,12 @@ class EntityTypes extends RestController {
 
     }
 
-    public function entitytypelist_get($id = 0)
+    public function list_get($id = 0)
     {
-
+        $this->checkPermission("VIEW", $this->sModule);
         $this->load->model("EntityTypes_model");
-
         $aColumns = getInputFields();
-
         $aData = $this->EntityTypes_model->getRows($id, $aColumns);
-
         if (count($aData)) {
             $this->response(['data' => $aData], 200 );
         }

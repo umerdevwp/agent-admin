@@ -1,27 +1,30 @@
 <?php
 include APPPATH.'/libraries/CommonDbTrait.php';
+use chriskacerguis\RestServer\RestController;
 
-class States extends CI_Controller {
+class States extends RestController {
 
     use CommonDbTrait;
     private $sModule = "STATES";
+    function __construct()
+    {
+        // Construct the parent class
+        parent::__construct();
 
-    public function index($id=0)
+    }
+    public function list_get($id=0)
     {
         $this->checkPermission("VIEW",$this->sModule);
-        
         $this->load->model("States_model");
-
         $aColumns = getInputFields();
-
         $aData = $this->States_model->getRows($id,$aColumns);
-
         if(count($aData))
         {
-            responseJson(['data'=>$aData]);
-            exit;
+            $this->response(['data' => $aData], 200);
         }
-
-        responseJson(['errors'=>['status'=>'404','detail'=>'No record found']]);
+        $this->response( [
+            'status' => false,
+            'message' => 'No record found'
+        ], 404 );
     }
 }

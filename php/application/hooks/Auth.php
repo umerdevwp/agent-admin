@@ -15,7 +15,7 @@ class Auth
 
             $oToken = $this->hasToken($token);
             $sToken = $oToken->token;
-
+            $_SESSION['eid'] = "not set yet";
             if ($sToken) {
                 $_SESSION['eid'] = $oToken->entity_id;
                 return $sToken;
@@ -23,19 +23,18 @@ class Auth
 
             try {
                 if ($token != NULL) {
-                    $url = getenv('OKTA_BASE_URL')."oauth2/default/v1/userinfo";
+                    $url = getenv('OKTA_BASE_URL') . "oauth2/default/v1/userinfo";
                     $ch = curl_init($url);
                     $headers = array(
-                        'Authorization: Bearer '.$token,
+                        'Authorization: Bearer ' . $token,
                     );
                     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
                     curl_setopt($ch, CURLOPT_HEADER, 0);
                     curl_setopt($ch, CURLOPT_POST, 1);
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                     $response = json_decode(curl_exec($ch));
-
                     if (empty($response->sub)) {
-                        $returnResponse = ['status' => 401, 'message' => "No response from OKTA", NULL];
+                        $returnResponse = ['status' => 401, 'message' => "No response from okta", NULL];
                         echo json_encode($returnResponse);
                         die();
                     } else {
@@ -52,16 +51,17 @@ class Auth
                             }
                         }
 
+                        $_SESSION['eid'] = $this->getEntityId($response->email);
                         $returnResponse = ['status' => 200, 'message' => "Success", NULL];
                     }
                 } else {
-                    $returnResponse = ['status' => 401, 'message' => "Not valid token", NULL];
+                    $returnResponse = ['status' => 401, 'message' => "Auth Failed", NULL];
                     echo json_encode($returnResponse);
                     die();
                 }
             } catch
             (Exception $e) {
-                $response = ['status' => 401, 'message' => "Auth Failed", NULL];
+                $response = ['status' => 401, 'message' => $e->getMessage(), NULL];
                 echo json_encode($response);
                 die();
             }
@@ -120,8 +120,6 @@ class Auth
                     $eid = $aAdminData[0]->zoho_id;
             }
 
-
-
             // set data to store token
             $data = array(
                 'sub' => $sub,
@@ -144,7 +142,6 @@ class Auth
         $CI =& get_instance();
         $CI->load->model("Auth_model");
         $auth_object = $CI->Auth_model->tokenExists($token);
-
         if($auth_object->expired_on > date('Y-m-d H:i:s')){
             return $auth_object;
         } else {
@@ -155,6 +152,19 @@ class Auth
         $CI =& get_instance();
         $CI->load->model("Auth_model");
         return $CI->Auth_model->delete($sub);
+    }
+
+    private function getEntityId($sEmail)
+    {
+        $CI =& get_instance();
+        $CI->load->model("Entity_model");
+        $aEntityData = $CI->Entity_model->getEmailId($sEmail);
+        $eid = -1;
+
+        if($aEntityData['type']=='ok')
+            $eid = $aEntityData['results']->id;
+
+        return $eid;
     }
 
 }
