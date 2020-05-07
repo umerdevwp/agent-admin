@@ -80,8 +80,6 @@ $route['ajax/theme/(:any)']['get'] = 'user/getThemeAjax/$1';
 $route['ajax/contact/save']['post'] = 'contacts/addAjax';
 $route['synch'] = 'synch';
 
-// automate
-$route['notify'] = 'notifications/notify';
 
 // API
 $route['api/me'] = 'entity/index';// own profile
@@ -90,12 +88,12 @@ $route['api/entity/parent/(:num)'] = 'entity/getChildAccount/$1';// child entiti
 $route['api/agent'] = 'RegisterAgents/index';
 $route['api/attachments'] = 'attachments/index';
 $route['api/contacts'] = 'contacts/index';
-$route['api/entity/add']['post'] = 'entity/add';
+//$route['api/entity/add']['post'] = 'entity/add';
 $route['api/entitytype/(:num)'] = 'EntityTypes/index/$1';
-$route['api/entitytypes'] = 'EntityTypes/index';
+//$route['api/entitytypes'] = 'EntityTypes/index';
 $route['api/contact/add']['post'] = 'contacts/add';
 $route['api/contacttype/(:num)'] = 'ContactTypes/index/$1';
-$route['api/contacttypes'] = 'ContactTypes/index';
+//$route['api/contacttypes'] = 'ContactTypes/index';
 $route['api/state/(:num)'] = 'States/index/$1';
 $route['api/states'] = 'States/index';
 //$route['api/users/(:num)'] = 'users/$1';
