@@ -102,8 +102,8 @@ class Auth
             ->setDiscovery(new \Okta\JwtVerifier\Discovery\Oauth) // This is not needed if using oauth.  The other option is OIDC
             ->setAdaptor(new \Okta\JwtVerifier\Adaptors\FirebasePhpJwt)
             ->setAudience('api://default')
-            ->setClientId('0oa2rybhzlmD2YzrJ357')
-            ->setIssuer('https://dev-612069.okta.com/oauth2/default')
+            ->setClientId(getenv("OKTA_CLIENT_ID"))
+            ->setIssuer(getenv("OKTAISSUER"))
             ->build();
 
         $jwt = $jwtVerifier->verify($token);
@@ -150,8 +150,6 @@ class Auth
     {
 
         $CI =& get_instance();
-        $method = strtolower($_SERVER['REQUEST_METHOD']);
-        $email = $CI->input->$method('email');
         $CI->load->model("Auth_model");
         $auth_object = $CI->Auth_model->tokenExists($token);
         if($auth_object->expired_on > date('Y-m-d H:i:s')){
