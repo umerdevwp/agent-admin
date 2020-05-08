@@ -4,17 +4,6 @@ header('Access-Control-Allow-Origin: *');
 use \Firebase\JWT\JWT;
 class Auth
 {
-    public function __construct()
-    {
-        parent::__construct();
-        header('Access-Control-Allow-Origin: *');
-        header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method, Authorization");
-        header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
-        $method = $_SERVER['REQUEST_METHOD'];
-        if ($method == "OPTIONS") {
-            die();
-        }
-    }
 //    add a class name here to secure for api
     //private $auth = ['api', 'example_api', 'entity_api'];
     private $auth = ['api', 'example_api','portal','entitytypes','contacts','states','contacttypes'];
@@ -26,7 +15,7 @@ class Auth
 
             $oToken = $this->hasToken($token);
             $sToken = $oToken->token;
-
+            $_SESSION['eid'] = "not set yet";
             if ($sToken) {
                 $_SESSION['eid'] = $oToken->entity_id;
                 return $sToken;
@@ -45,7 +34,7 @@ class Auth
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                     $response = json_decode(curl_exec($ch));
                     if (empty($response->sub)) {
-                        $returnResponse = ['status' => 401, 'message' => "Auth Failed", NULL];
+                        $returnResponse = ['status' => 401, 'message' => "No response from okta", NULL];
                         echo json_encode($returnResponse);
                         die();
                     } else {
@@ -62,6 +51,7 @@ class Auth
                             }
                         }
 
+                        $_SESSION['eid'] = $this->getEntityId($response->email);
                         $returnResponse = ['status' => 200, 'message' => "Success", NULL];
                     }
                 } else {
@@ -71,7 +61,7 @@ class Auth
                 }
             } catch
             (Exception $e) {
-                $response = ['status' => 401, 'message' => "Auth Failed", NULL];
+                $response = ['status' => 401, 'message' => $e->getMessage(), NULL];
                 echo json_encode($response);
                 die();
             }
@@ -102,8 +92,8 @@ class Auth
             ->setDiscovery(new \Okta\JwtVerifier\Discovery\Oauth) // This is not needed if using oauth.  The other option is OIDC
             ->setAdaptor(new \Okta\JwtVerifier\Adaptors\FirebasePhpJwt)
             ->setAudience('api://default')
-            ->setClientId('0oa2rybhzlmD2YzrJ357')
-            ->setIssuer('https://dev-612069.okta.com/oauth2/default')
+            ->setClientId(getenv("OKTA_CLIENT_ID"))
+            ->setIssuer(getenv("OKTAISSUER"))
             ->build();
 
         $jwt = $jwtVerifier->verify($token);
@@ -150,8 +140,6 @@ class Auth
     {
 
         $CI =& get_instance();
-        $method = strtolower($_SERVER['REQUEST_METHOD']);
-        $email = $CI->input->$method('email');
         $CI->load->model("Auth_model");
         $auth_object = $CI->Auth_model->tokenExists($token);
         if($auth_object->expired_on > date('Y-m-d H:i:s')){
@@ -164,6 +152,19 @@ class Auth
         $CI =& get_instance();
         $CI->load->model("Auth_model");
         return $CI->Auth_model->delete($sub);
+    }
+
+    private function getEntityId($sEmail)
+    {
+        $CI =& get_instance();
+        $CI->load->model("Entity_model");
+        $aEntityData = $CI->Entity_model->getEmailId($sEmail);
+        $eid = -1;
+
+        if($aEntityData['type']=='ok')
+            $eid = $aEntityData['results']->id;
+
+        return $eid;
     }
 
 }

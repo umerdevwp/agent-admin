@@ -2,25 +2,30 @@
 
 include APPPATH.'/libraries/CommonDbTrait.php';
 
-class EntityTypes extends CI_Controller {
+use chriskacerguis\RestServer\RestController;
+
+class EntityTypes extends RestController {
     use CommonDbTrait;
     private $sModule = "ENTITY_TYPES";
-    public function index($id=0)
+    function __construct()
     {
-        $this->checkPermission("VIEW",$this->sModule);
-        
+        // Construct the parent class
+        parent::__construct();
+
+    }
+
+    public function list_get($id = 0)
+    {
+        $this->checkPermission("VIEW", $this->sModule);
         $this->load->model("EntityTypes_model");
-
         $aColumns = getInputFields();
-
-        $aData = $this->EntityTypes_model->getRows($id,$aColumns);
-
-        if(count($aData))
-        {
-            responseJson(['data'=>$aData]);
-            exit();
+        $aData = $this->EntityTypes_model->getRows($id, $aColumns);
+        if (count($aData)) {
+            $this->response(['data' => $aData], 200 );
         }
-
-        responseJson(['errors'=>['status'=>'404','detail'=>'No record found']]);
+        $this->response( [
+            'status' => false,
+            'message' => 'No record found'
+        ], 404 );
     }
 }
