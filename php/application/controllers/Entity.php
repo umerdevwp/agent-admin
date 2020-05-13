@@ -375,11 +375,16 @@ HC;
             $oApi = $this->ZoHo_Account->getInstance("Accounts", $iZohoId);
             try {
                 $sComplianceOnly = ($this->input->post("inputComplianceOnly") ?? 0);
+                $sForeign = ($this->input->post("inputForeign") ?? 0);
 
                 $aTags = ["name" => "OnBoard"];
 
                 if ($sComplianceOnly) {
                     $aTags["ComplianceOnly"] = "Compliance Only";
+                }
+
+                if ($sForeign) {
+                    $aTags["Foreign"] = "Foreign";
                 }
 
                 if (!$bTagSmartyValidated) {

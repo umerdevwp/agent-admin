@@ -3,7 +3,7 @@ class Permissions_model extends CI_Model
 {
 
     private $vu_permissions = "vu_permissions vp";
-    private $table_entity_role = "entity_roles er";
+    private $table_entity_role = "entity_roles";
     private $table_role = "roles";
     public $aRole = ['entity'=>'Child Entity','parent'=>'Parent Organization','admin'=>'Administrator'];
 
@@ -22,7 +22,7 @@ class Permissions_model extends CI_Model
             $aWhere["resource_name"] =  $sResourceName;
         
         $this->db->from($this->vu_permissions);
-        $this->db->join($this->table_entity_role,"er.role_id=vp.role_id");
+        $this->db->join($this->table_entity_role . " er","er.role_id=vp.role_id");
         $this->db->where($aWhere);
         $oResult = $this->db->get();
         
