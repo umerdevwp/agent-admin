@@ -70,7 +70,9 @@ class Contacts_model extends CI_Model
             $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
         else {
             $aMyColumns = [
-                "id","name","email","phone"
+                "id","name","email","phone", "contactType",
+                "mailingStreet", "mailingCountry", "mailingCity",
+        "mailingState", "mailingZip"
             ];
             $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
         }
@@ -78,12 +80,11 @@ class Contacts_model extends CI_Model
         $this->db->select("zc.$v as `$k`");
 
         //$this->db->select('zoho_contacts.*,contactmeta.*');
-        $this->db->from('contactmeta');
-        $this->db->join('zoho_contacts zc','zc.id=contactmeta.contact_id', 'left');
+        $this->db->from('zoho_contacts zc');
+        $this->db->join('contactmeta','zc.id=contactmeta.contact_id', 'left');
         $this->db->where(["zc.account_name"=>$id]);
 
         $query = $this->db->get();
-
         if ($query->num_rows() > 0) {
             $result = $query->result_object();
         }
@@ -102,7 +103,9 @@ class Contacts_model extends CI_Model
             $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
         else {
             $aMyColumns = [
-                "id","name","email","phone"
+                "id","name","email","phone", "contactType",
+                "mailingStreet", "mailingCountry", "mailingCity",
+        "mailingState", "mailingZip"
             ];
             $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
         }
