@@ -9,13 +9,30 @@ class Entity_model extends CI_Model
     public static $entity_owner = "owner";
     public static $entity_number = "account_number";
     
-    private $aColumns = ["id"=>"id","createdAt"=>"created_at","name"=>"account_name","phone"=>"phone","type"=>"account_type",
-    "entityStructure"=>"entity_type","agentId"=>"ra","filingState"=>"filing_state","parentId"=>"parent_account","email"=>"notification_email",
-    "status"=>"status","billingEmail"=>"billing_email","stateId"=>"state_id","formationDate"=>"formation_date","einId"=>"ein",
-    "tag"=>"tag","createdTime"=>"created_time","modifiedTime"=>"modified_time","lastActivityTime"=>"last_activity_time",
-    "billingStreet"=>"billing_street","shippingStreet"=>"shipping_street","billingStreet2"=>"billing_street_2","shippingStreet2"=>"shipping_street_2",
-    "billingCity"=>"billing_city","shippingCity"=>"shipping_city","billingState"=>"billing_state","shippingState"=>"shipping_state",
-    "billingCode"=>"billing_code","shippingCode"=>"shipping_code","billingCountry"=>"billing_country","shippingCountry"=>"shipping_country",
+    private $aColumns = ["id"=>"id","createdAt"=>"created_at",
+    "name"=>"account_name",
+    "phone"=>"phone",
+    "type"=>"account_type",
+    "entityStructure"=>"entity_type",
+    "agentId"=>"ra",
+    "filingState"=>"filing_state",
+    "parentId"=>"parent_account",
+    "email"=>"notification_email",
+    "status"=>"status",
+    "billingEmail"=>"billing_email",
+    "stateId"=>"state_id",
+    "formationDate"=>"formation_date",
+    "einId"=>"ein",
+    "tag"=>"tag",
+    "createdTime"=>"created_time",
+    "modifiedTime"=>"modified_time",
+    "lastActivityTime"=>"last_activity_time",
+    "billingStreet"=>"billing_street","shippingStreet"=>"shipping_street",
+    "billingStreet2"=>"billing_street_2","shippingStreet2"=>"shipping_street_2",
+    "billingCity"=>"billing_city","shippingCity"=>"shipping_city",
+    "billingState"=>"billing_state","shippingState"=>"shipping_state",
+    "billingCode"=>"billing_code","shippingCode"=>"shipping_code",
+    "billingCountry"=>"billing_country","shippingCountry"=>"shipping_country",
     "owner"=>"owner","createdBy"=>"created_by",
     "currency"=>"currency",
     "layout"=>"layout",
@@ -134,7 +151,9 @@ class Entity_model extends CI_Model
             $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
         else {
             $aMyColumns = [
-                "id","name","type","filingState","formationDate","agentId"
+                "id","name","type","filingState",
+                "formationDate","agentId", "shippingStreet",
+                 "shippingCity", "shippingState", "shippingCode"                
             ];
             $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
         }
