@@ -43,8 +43,8 @@ class Attachments_model extends CI_Model
         ZCRMRestClient::initialize($configuration);
 
         //$rest = ZCRMRestClient::getInstance("Attachments"); // to get the rest client
-        
-/*        
+
+/*
         //$zcrmModuleIns = ZCRMModule::getInstance("Attachments");
         //$bulkAPIResponse = $zcrmModuleIns->searchRecordsByCriteria("entityId:equals:4071993000001295295", 1, 2);
         //$bulkAPIResponse=$zcrmModuleIns->getRecords();
@@ -96,8 +96,8 @@ class Attachments_model extends CI_Model
             'parent_id' => $id,
             //'parent_id'    =>  '1000000028468', // fake id
         ];
-        
-        if(count($aColumns)>0)    
+
+        if(count($aColumns)>0)
         $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
     else {
         $aMyColumns = [
@@ -120,7 +120,7 @@ class Attachments_model extends CI_Model
 
     public function getAllFromEntityList($arCommaIds,$aColumns=[])
     {
-        if(count($aColumns)>0)    
+        if(count($aColumns)>0)
         $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
     else {
         $aMyColumns = [
@@ -161,7 +161,7 @@ class Attachments_model extends CI_Model
 
     public function replace($id,$data)
     {
-        
+
             // update
             if($id>0)
             {

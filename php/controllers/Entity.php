@@ -730,4 +730,15 @@ HC;
 
         return $sSmartyAddress;
     }
+
+    public function attachment_get($sLoraxFileId)
+    {
+        $this->load->model("Attachments_model");
+        $this->Attachments_model->download($sLoraxFileId);
+        $this->response([
+            'status' => true,
+            'message' => 'Download link of file'
+        ], 200);
+    }
+
 }
