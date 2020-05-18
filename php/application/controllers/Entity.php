@@ -508,17 +508,16 @@ HC;
 
         if ($bContactDone) {
             $aDataContacts = [
-                "first_name" => $this->input->post("inputFirstName"),
-                "last_name" => $this->input->post("inputLastName"),
-
+                "id"   =>   "-1",
+                "name" => $this->input->post("inputFirstName") . " " . $this->input->post("inputLastName"),
                 "email" => $this->input->post("inputNotificationEmail"),
                 "phone" => $this->input->post("inputNotificationPhone"),
-                "title" => $this->input->post("inputNotificationContactType"),
+                "contactType" => $this->input->post("inputNotificationContactType"),
 
-                "mailing_street" => $this->input->post("inputNotificationAddress"),
-                "mailing_city" => $this->input->post("inputNotificationCity"),
-                "mailing_state" => $this->input->post("inputNotificationState"),
-                "mailing_zip" => $this->input->post("inputNotificationZip"),
+                "mailingStreet" => $this->input->post("inputNotificationAddress"),
+                "mailingCity" => $this->input->post("inputNotificationCity"),
+                "mailingState" => $this->input->post("inputNotificationState"),
+                "mailingZip" => $this->input->post("inputNotificationZip"),
             ];
 
             $this->Tempmeta_model->appendRow($iEntityId, $this->Tempmeta_model->slugNewContact, $aDataContacts);
@@ -747,5 +746,12 @@ HC;
         }
 
         return $sSmartyAddress;
+    }
+
+    public function attachment_get($sLoraxFileId)
+    {
+        $this->load->model("Attachments_model");
+
+        $this->Attachments_model->download($sLoraxFileId);
     }
 }
