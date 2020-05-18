@@ -6,6 +6,7 @@ header('Access-Control-Allow-Origin: *');
 use zcrmsdk\crm\crud\ZCRMTag;
 
 defined('BASEPATH') OR exit('No direct script access allowed');
+
 use chriskacerguis\RestServer\RestController;
 
 
@@ -36,9 +37,9 @@ class Entity extends RestController
     {
         $this->checkPermission("VIEW", $this->sModule);
 
-        $id = $_SESSION["eid"];
+        $sid = $_SESSION["eid"];
 
-        if (empty($id)) {
+        if (empty($sid)) {
             $this->session->set_flashdata("error", "Invalid entity id");
             redirectSession();
         }
@@ -47,42 +48,53 @@ class Entity extends RestController
         $this->load->model('entity_model');
         $this->load->model('Tasks_model');
         $this->load->model('Contacts_model');
-        $this->load->model('Attachments_model');
+        $this->load->model('LoraxAttachments_model');
         $this->load->model("Tempmeta_model");
         $this->load->model("RegisterAgents_model");
 
         // use login entity id
-        $iParentId = $this->input->get("pid");
+        $iParentId = ($this->input->get("eid") ? $sid : null);
+
+        // entity id is session id, when requesting as parent
+        $id = $this->input->get("eid") ?: $sid;
 
         $aColumns = getInputFields();
+        $bIsParentValid = $this->entity_model->isParent($id, $iParentId);
+        $aDataTempEntity = null;
+        
+        if (!$bIsParentValid) {
+            $aDataTempEntity = $this->Tempmeta_model->getOneInJson([
+                'userid' => $iParentId,
+                'json_id' => $id,
+                'slug' => $this->Tempmeta_model->slugNewEntity
+            ]);
+            if ($aDataTempEntity['type'] == 'ok')
+                $bIsParentValid = true;
+        }
 
-        // fetch data from DB
-        $aDataEntity = $this->entity_model->getOne($id, $aColumns);
-        if ($aDataEntity['type'] == 'ok') {
-            // if session is parent then get entity ID from url
-            if ($this->entity_model->isParent($id, $iParentId) || $id == $iParentId) {
-                $oTempAgetAddress = null;
-                if ($aDataEntity['type'] == 'error' && $this->session->user['child']) {
+        // if session is parent then get entity ID from url
+        if ($bIsParentValid || $iParentId == null) {
+            // fetch data from DB
+            $aDataEntity = $this->entity_model->getOne($id, $aColumns);
+
+            $oTempAgetAddress = null;
+            if ($aDataEntity['type'] == 'error' && $iParentId > 0) {
+                if (!is_array($aDataTempEntity)) {
                     $aDataTempEntity = $this->Tempmeta_model->getOneInJson([
                         'userid' => $iParentId,
                         'json_id' => $id,
                         'slug' => $this->Tempmeta_model->slugNewEntity
                     ]);
-                    if ($aDataTempEntity['type'] == 'ok') {
-                        $data['entity'] = $aDataTempEntity['results'];
-                        $oTempAgetAddress = $data['entity']->agent;
-
-                        $this->session->set_flashdata("info", "Please note: missing fields will be updated shortly.");
-                    } else {
-                        $this->session->set_flashdata("error", "No such entity exist.");
-                    }
-
-                } else if ($aDataEntity['type'] == 'ok') {
-                    $data['entity'] = $aDataEntity['results'];
-                } else {
-                    $this->session->set_flashdata("error", "No such entity exist.");
                 }
-
+                if ($aDataTempEntity['type'] == 'ok') {
+                    $data['entity'] = $aDataTempEntity['results'];
+                    $oTempAgetAddress = $data['entity']->agent;
+                }
+            } else if ($aDataEntity['type'] == 'ok') {
+                $data['entity'] = $aDataEntity['results'];
+            }
+            // data found in zoho_accounts or tempmeta table, then proceed
+            if (is_object($data['entity'])) {
                 //$oAgetAddress = $this->entity_model->getAgentAddress($id);
                 $oAgetAddress = $this->RegisterAgents_model->getOne($data['entity']->agentId);
                 $oAgetAddress = $oAgetAddress['results'];
@@ -92,7 +104,7 @@ class Entity extends RestController
                 } else if (is_object($oTempAgetAddress)) {
                     $data['registerAgent'] = (array)$oTempAgetAddress;
                 } else {
-                    $data['registerAgent'] = false;
+                    $data['registerAgent'] = [];
                 }
 
                 $data['tasks'] = $this->Tasks_model->getAll($id);
@@ -116,36 +128,28 @@ class Entity extends RestController
                     if ($aContactMeta['results'] != null) $data['contacts'] = array_merge($data['contacts'], json_decode($aContactMeta['results']->json_data));
                 }
 
-                $data['attachments'] = $this->Attachments_model->getAllFromEntityId($id);
-                if ($data['attachments']) {
+                $aDataAttachment = $this->LoraxAttachments_model->getAllFromEntityId($id);
+
+                if ($aDataAttachment['type'] == 'ok') {
+                    $data['attachments'] = $aDataAttachment['results'];
                     $aDataAttachment = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugNewAttachment);
-                    if ($aDataAttachment['results'] != null) $data['attachments'] = array_merge($data['attachments'], json_decode($aDataAttachment['results']->json_data));
                 } else {
-                    $aDataAttachment = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugNewAttachment);
-                    if ($aDataAttachment['type'] == 'ok') {
-                        $data['attachments'] = json_decode($aDataAttachment['results']->json_data);
-                    } else {
-                        $data['attachments'] = [];
-                    }
-
+                    $data['attachments'] = [];
                 }
-            } else {
 
+                // invalid id, record do not exist in zoho_accounts and tempmeta
                 $this->response([
-                  'errors' => ['status' => 403, 'detail' => 'Permission denied']
-                ], 403);
+                    'result' => $data
+                ], 200);
             }
         } else {
-            $data = ['errors' => ['status' => 404, 'detail' => 'Record not found']];
-
             $this->response([
-              'errors' => ['status' => 404, 'detail' => 'Record not found']
+                'errors' => ['status' => 404, 'detail' => 'Record not found']
             ], 404);
         }
-
         $this->response([
-            'result' => $data
-        ], 200);
+            'errors' => ['status' => 404, 'detail' => 'This will never appear']
+        ], 404);
 
     }
 
@@ -277,9 +281,6 @@ HC;
         }
 
 
-
-
-
         if ($this->form_validation->run() == FALSE) {
             if (count($arError) > 0) {
                 $this->session->set_flashdata("error", $arError[0]);
@@ -290,11 +291,6 @@ HC;
                 'status' => false,
                 'field_error' => $aError
             ], 404);
-
-
-
-
-
 
 
             //$this->form();
@@ -428,36 +424,34 @@ HC;
             $this->input->post("inputFormationDate"),
             $this->input->post("inputFiscalDate")
         );
-        if(!empty($oRule->duedate))
-        {
-        $aData = [
-            "created_by"    =>  userLoginId(),
-            "entity_id"     =>  $iEntityId,
-            "due_date"      =>  $oRule->duedate,
-            "description"   =>  "Starting subscription from registeration page",
-            "start_date"    =>  date("Y-m-d"),
-            "type"          =>  "email",
-            "end_date" =>   date("Y-m-d",strtotime("+1 year")),
-            "before_days" => 7,
-            "before_months" =>  1,
-            "interval_days" => 0,
-            "interval_months"=> 2,
-            "limit_notification"=>0,
-            "status"    =>  "active",
-        ];
+        if (!empty($oRule->duedate)) {
+            $aData = [
+                "created_by" => userLoginId(),
+                "entity_id" => $iEntityId,
+                "due_date" => $oRule->duedate,
+                "description" => "Starting subscription from registeration page",
+                "start_date" => date("Y-m-d"),
+                "type" => "email",
+                "end_date" => date("Y-m-d", strtotime("+1 year")),
+                "before_days" => 7,
+                "before_months" => 1,
+                "interval_days" => 0,
+                "interval_months" => 2,
+                "limit_notification" => 0,
+                "status" => "active",
+            ];
 
-        $id = $this->Notifications_model->add($aData);
-    } else {
-        error_log("Subscription failed unable to find duedate "
-        . " state: " . $this->input->post("inputFillingState")
-        . " structure: " . $this->input->post("inputFillingStructure")
-        . " formed: " . $this->input->post("inputFormationDate")
-        . "fiscal: " . $this->input->post("inputFiscalDate")
-        );
-    }
+            $id = $this->Notifications_model->add($aData);
+        } else {
+            error_log("Subscription failed unable to find duedate "
+                . " state: " . $this->input->post("inputFillingState")
+                . " structure: " . $this->input->post("inputFillingStructure")
+                . " formed: " . $this->input->post("inputFormationDate")
+                . "fiscal: " . $this->input->post("inputFiscalDate")
+            );
+        }
 
-        if(!is_numeric($id))
-        {
+        if (!is_numeric($id)) {
             error_log("Subscription failed to insert new entity record");
         }
 
@@ -504,17 +498,15 @@ HC;
 
         if ($bContactDone) {
             $aDataContacts = [
-                "first_name" => $this->input->post("inputFirstName"),
-                "last_name" => $this->input->post("inputLastName"),
-
+                "name" => $this->input->post("inputFirstName") . " " . $this->input->post("inputLastName"),
                 "email" => $this->input->post("inputNotificationEmail"),
                 "phone" => $this->input->post("inputNotificationPhone"),
-                "title" => $this->input->post("inputNotificationContactType"),
+                "contactType" => $this->input->post("inputNotificationContactType"),
 
-                "mailing_street" => $this->input->post("inputNotificationAddress"),
-                "mailing_city" => $this->input->post("inputNotificationCity"),
-                "mailing_state" => $this->input->post("inputNotificationState"),
-                "mailing_zip" => $this->input->post("inputNotificationZip"),
+                "mailingStreet" => $this->input->post("inputNotificationAddress"),
+                "mailingCity" => $this->input->post("inputNotificationCity"),
+                "mailingState" => $this->input->post("inputNotificationState"),
+                "mailingZip" => $this->input->post("inputNotificationZip"),
             ];
 
             $this->Tempmeta_model->appendRow($iEntityId, $this->Tempmeta_model->slugNewContact, $aDataContacts);
