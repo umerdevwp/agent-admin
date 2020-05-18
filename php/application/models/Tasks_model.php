@@ -36,7 +36,7 @@ class Tasks_model extends CI_Model
     {
         // TODO: remove fake id
         $data = [
-            'who_id' => $id,
+            'what_id' => $id,
             //'task_owner'    =>  '4071993000000224013', // fake id
         ];
 

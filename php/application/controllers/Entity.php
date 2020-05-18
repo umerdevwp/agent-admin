@@ -93,6 +93,7 @@ class Entity extends RestController
             } else if ($aDataEntity['type'] == 'ok') {
                 $data['entity'] = $aDataEntity['results'];
             }
+            
             // data found in zoho_accounts or tempmeta table, then proceed
             if (is_object($data['entity'])) {
                 //$oAgetAddress = $this->entity_model->getAgentAddress($id);
@@ -108,7 +109,7 @@ class Entity extends RestController
                 }
 
                 $data['tasks'] = $this->Tasks_model->getAll($id);
-
+                
                 $aTasksCompleted = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugTasksComplete);
 
                 if (is_object($aTasksCompleted['results']))
@@ -118,7 +119,7 @@ class Entity extends RestController
 
                 $contact_data = $this->Contacts_model->getAllFromEntityId($id);
                 $aContactMeta = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugNewContact);
-
+                
                 $data['contacts'] = [];
                 if ($contact_data['msg_type'] == 'error') {
                     if ($aContactMeta['type'] == 'ok')
@@ -129,7 +130,7 @@ class Entity extends RestController
                 }
 
                 $aDataAttachment = $this->LoraxAttachments_model->getAllFromEntityId($id);
-
+                
                 if ($aDataAttachment['type'] == 'ok') {
                     $data['attachments'] = $aDataAttachment['results'];
                     $aDataAttachment = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugNewAttachment);
@@ -722,4 +723,17 @@ HC;
 
         return $sSmartyAddress;
     }
+
+    
+    public function attachment_get($sLoraxFileId)
+    {
+        $this->load->model("Attachments_model");
+        $this->Attachments_model->download($sLoraxFileId);
+        $this->response([
+            'status' => true,
+            'message' => 'Download link of file'
+        ], 200);
+    }
 }
+
+

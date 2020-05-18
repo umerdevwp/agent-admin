@@ -168,4 +168,49 @@ class Attachments_model extends CI_Model
                 $this->db->replace($this->table, $data);
             }
     }
+    public function download($sLoraxFileId)
+    {
+        
+        $aParams = [
+            "expire_url_in_mins"    =>  120,// between 5 - 120 minutes
+
+        ];
+        $sLoraxUrl = "https://lorax-api-sandbox.filemystuff.com/api/v1/download/" . $sLoraxFileId;
+        
+        $sResponse = $this->curlGetUrl($sLoraxUrl);
+        
+        $aGoogleFile = json_decode($sResponse,true);
+
+        $cURLConnection = curl_init();
+        curl_setopt($cURLConnection, CURLOPT_URL, $aGoogleFile['url']);
+        curl_setopt($cURLConnection, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($cURLConnection, CURLOPT_HTTPHEADER, array(
+            'x-goog-encryption-algorithm:' . $aGoogleFile['x-goog-encryption-algorithm'],
+            'x-goog-encryption-key:' . $aGoogleFile['x-goog-encryption-key'],
+            'x-goog-encryption-key-sha256:' . $aGoogleFile['x-goog-encryption-key-sha256'],
+
+        ));
+        $filePath = tmpfile() . '.pdf';
+        $fileOpen = fopen($filePath, 'w');
+        curl_setopt($cURLConnection, CURLOPT_FILE, $fileOpen);
+        $fileData = curl_exec($cURLConnection);
+        $contentType = curl_getinfo($cURLConnection, CURLINFO_CONTENT_TYPE);
+
+        curl_close($cURLConnection);
+        header("Content-type: application/pdf");
+        readfile($filePath);
+
+    }
+
+    private function curlGetUrl($sUrl)
+    {
+        $cURLConnection = curl_init();
+        curl_setopt($cURLConnection, CURLOPT_URL, $sUrl);
+        curl_setopt($cURLConnection, CURLOPT_RETURNTRANSFER, true);
+        
+        $sResponse = curl_exec($cURLConnection);
+        curl_close($cURLConnection);
+
+        return $sResponse;
+    }
 }
