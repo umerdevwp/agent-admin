@@ -8,7 +8,7 @@ class Entity_model extends CI_Model
     public static $parent_entity = "parent_account";
     public static $entity_owner = "owner";
     public static $entity_number = "account_number";
-    
+
     private $aColumns = ["id"=>"id","createdAt"=>"created_at",
     "name"=>"account_name",
     "phone"=>"phone",
@@ -134,7 +134,7 @@ class Entity_model extends CI_Model
         $this->db->where(Self::$parent_entity, $iParentId);
         $query = $this->db->get();
         $aData = $query->row();
-        
+
         if(isset($aData->id)) return true;
         else return false;
     }
@@ -147,13 +147,13 @@ class Entity_model extends CI_Model
             //'id'    =>  '4071993000000411060',
         ];
 
-        if(count($aColumns)>0)    
+        if(count($aColumns)>0)
             $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
         else {
             $aMyColumns = [
                 "id","name","type","filingState",
                 "formationDate","agentId", "shippingStreet",
-                 "shippingCity", "shippingState", "shippingCode"                
+                 "shippingCity", "shippingState", "shippingCode", "email"
             ];
             $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
         }
@@ -201,7 +201,7 @@ class Entity_model extends CI_Model
             Entity_model::$parent_entity    =>  $id
         ];
 
-        if(count($aColumns)>0)    
+        if(count($aColumns)>0)
             $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
         else {
             $aMyColumns = [
@@ -270,7 +270,7 @@ class Entity_model extends CI_Model
         $this->db->select("id");
         $query = $this->db->get_where($this->table,['notification_email'=>$sEmail]);
         $oData = $query->row_object();
-        
+
         if($oData)
         {
             return ['type'=>'ok','results'=>$oData];

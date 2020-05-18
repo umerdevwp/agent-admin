@@ -32,13 +32,13 @@ class Entity extends RestController
 
     }
 
-    public function profile_get()
+    public function entityview_get()
     {
         $this->checkPermission("VIEW", $this->sModule);
 
-        $sid = $_SESSION["eid"];
+        $id = $_SESSION["eid"];
 
-        if (empty($sid)) {
+        if (empty($id)) {
             $this->session->set_flashdata("error", "Invalid entity id");
             redirectSession();
         }
@@ -47,105 +47,105 @@ class Entity extends RestController
         $this->load->model('entity_model');
         $this->load->model('Tasks_model');
         $this->load->model('Contacts_model');
-        $this->load->model('LoraxAttachments_model');
+        $this->load->model('Attachments_model');
         $this->load->model("Tempmeta_model");
         $this->load->model("RegisterAgents_model");
 
         // use login entity id
-        $iParentId = ($this->input->get("eid")?$sid:null);
-        
-        // entity id is session id, when requesting as parent
-        $id = $this->input->get("eid")?:$sid;
+        $iParentId = $this->input->get("pid");
 
         $aColumns = getInputFields();
-        $bIsParentValid = $this->entity_model->isParent($id, $iParentId);
-        $aDataTempEntity = null;
-        if(!$bIsParentValid)
-        {
-            $aDataTempEntity = $this->Tempmeta_model->getOneInJson([
-                'userid' => $iParentId,
-                'json_id' => $id,
-                'slug' => $this->Tempmeta_model->slugNewEntity
-            ]);
-            if($aDataTempEntity['type'] == 'ok')
-                $bIsParentValid = true;
-        }
-        // if session is parent then get entity ID from url
-        if ( $bIsParentValid || $iParentId == null) {
-            // fetch data from DB
-            $aDataEntity = $this->entity_model->getOne($id, $aColumns);
-            
+
+        // fetch data from DB
+        $aDataEntity = $this->entity_model->getOne($id, $aColumns);
+        if ($aDataEntity['type'] == 'ok') {
+            // if session is parent then get entity ID from url
+            if ($this->entity_model->isParent($id, $iParentId) || $id == $iParentId) {
                 $oTempAgetAddress = null;
-                if ($aDataEntity['type'] == 'error' && $iParentId>0) {
-                    if(!is_array($aDataTempEntity))
-                    {
-                        $aDataTempEntity = $this->Tempmeta_model->getOneInJson([
-                            'userid' => $iParentId,
-                            'json_id' => $id,
-                            'slug' => $this->Tempmeta_model->slugNewEntity
-                        ]);
-                    }
+                if ($aDataEntity['type'] == 'error' && $this->session->user['child']) {
+                    $aDataTempEntity = $this->Tempmeta_model->getOneInJson([
+                        'userid' => $iParentId,
+                        'json_id' => $id,
+                        'slug' => $this->Tempmeta_model->slugNewEntity
+                    ]);
                     if ($aDataTempEntity['type'] == 'ok') {
                         $data['entity'] = $aDataTempEntity['results'];
                         $oTempAgetAddress = $data['entity']->agent;
+
+                        $this->session->set_flashdata("info", "Please note: missing fields will be updated shortly.");
+                    } else {
+                        $this->session->set_flashdata("error", "No such entity exist.");
                     }
+
                 } else if ($aDataEntity['type'] == 'ok') {
                     $data['entity'] = $aDataEntity['results'];
+                } else {
+                    $this->session->set_flashdata("error", "No such entity exist.");
                 }
-                // data found in zoho_accounts or tempmeta table, then proceed
-                if(is_object($data['entity']))
-                {
-                    //$oAgetAddress = $this->entity_model->getAgentAddress($id);
-                    $oAgetAddress = $this->RegisterAgents_model->getOne($data['entity']->agentId);
-                    $oAgetAddress = $oAgetAddress['results'];
 
-                    if (is_object($oAgetAddress)) {
-                        $data['registerAgent'] = (array)$oAgetAddress;
-                    } else if (is_object($oTempAgetAddress)) {
-                        $data['registerAgent'] = (array)$oTempAgetAddress;
-                    } else {
-                        $data['registerAgent'] = [];
-                    }
+                //$oAgetAddress = $this->entity_model->getAgentAddress($id);
+                $oAgetAddress = $this->RegisterAgents_model->getOne($data['entity']->agentId);
+                $oAgetAddress = $oAgetAddress['results'];
 
-                    $data['tasks'] = $this->Tasks_model->getAll($id);
+                if (is_object($oAgetAddress)) {
+                    $data['registerAgent'] = (array)$oAgetAddress;
+                } else if (is_object($oTempAgetAddress)) {
+                    $data['registerAgent'] = (array)$oTempAgetAddress;
+                } else {
+                    $data['registerAgent'] = false;
+                }
 
-                    $aTasksCompleted = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugTasksComplete);
+                $data['tasks'] = $this->Tasks_model->getAll($id);
 
-                    if (is_object($aTasksCompleted['results']))
-                        $data['tasks_completed'] = json_decode($aTasksCompleted['results']->json_data);
-                    else
-                        $data['tasks_completed'] = [];
+                $aTasksCompleted = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugTasksComplete);
 
-                    $contact_data = $this->Contacts_model->getAllFromEntityId($id);
-                    $aContactMeta = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugNewContact);
+                if (is_object($aTasksCompleted['results']))
+                    $data['tasks_completed'] = json_decode($aTasksCompleted['results']->json_data);
+                else
+                    $data['tasks_completed'] = [];
 
-                    $data['contacts'] = [];
-                    if ($contact_data['msg_type'] == 'error') {
-                        if ($aContactMeta['type'] == 'ok')
-                            $data['contacts'] = json_decode($aContactMeta['results']->json_data);
-                    } else {
-                        $data['contacts'] = $contact_data;
-                        if ($aContactMeta['results'] != null) $data['contacts'] = array_merge($data['contacts'], json_decode($aContactMeta['results']->json_data));
-                    }
+                $contact_data = $this->Contacts_model->getAllFromEntityId($id);
+                $aContactMeta = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugNewContact);
 
-                    $aDataAttachment = $this->LoraxAttachments_model->getAllFromEntityId($id);
-                    
-                    if ($aDataAttachment['type']=='ok') {
-                        $data['attachments'] = $aDataAttachment['results'];
-                        $aDataAttachment = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugNewAttachment);
+                $data['contacts'] = [];
+                if ($contact_data['msg_type'] == 'error') {
+                    if ($aContactMeta['type'] == 'ok')
+                        $data['contacts'] = json_decode($aContactMeta['results']->json_data);
+                } else {
+                    $data['contacts'] = $contact_data;
+                    if ($aContactMeta['results'] != null) $data['contacts'] = array_merge($data['contacts'], json_decode($aContactMeta['results']->json_data));
+                }
+
+                $data['attachments'] = $this->Attachments_model->getAllFromEntityId($id);
+                if ($data['attachments']) {
+                    $aDataAttachment = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugNewAttachment);
+                    if ($aDataAttachment['results'] != null) $data['attachments'] = array_merge($data['attachments'], json_decode($aDataAttachment['results']->json_data));
+                } else {
+                    $aDataAttachment = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugNewAttachment);
+                    if ($aDataAttachment['type'] == 'ok') {
+                        $data['attachments'] = json_decode($aDataAttachment['results']->json_data);
                     } else {
                         $data['attachments'] = [];
                     }
 
-                // invalid id, record do not exist in zoho_accounts and tempmeta
-                } else {
-                    $data = ['errors' => ['status' => 404, 'detail' => 'Record not found']];
                 }
             } else {
-                $data = ['errors' => ['status' => 403, 'detail' => 'Permission denied']];
-            }
 
-        responseJson(['data' => $data]);
+                $this->response([
+                  'errors' => ['status' => 403, 'detail' => 'Permission denied']
+                ], 403);
+            }
+        } else {
+            $data = ['errors' => ['status' => 404, 'detail' => 'Record not found']];
+
+            $this->response([
+              'errors' => ['status' => 404, 'detail' => 'Record not found']
+            ], 404);
+        }
+
+        $this->response([
+            'result' => $data
+        ], 200);
 
     }
 
@@ -179,6 +179,8 @@ class Entity extends RestController
 
     public function create_post()
     {
+
+
 //        $this->checkPermission("ADD",$this->sModule);
 
         $bTagSmartyValidated = true;
@@ -311,7 +313,7 @@ HC;
 
                 // allow without file, else check type and size
                 $iZohoId = $response['data']['id'];
-                //$this->zohoAddAttachment($iZohoId);
+                $this->zohoAddAttachment($iZohoId);
 
                 // check address is valid
                 $sSmartyAddress = $this->validateSmartyStreet();
@@ -370,9 +372,9 @@ HC;
             $bAttachmentDone = $bContactDone = false;
             $oAttachment = null;
 
-            $bAttachmentDone = $this->zohoAddAttachment($iZohoId);
+            $this->zohoAddAttachment($iZohoId);
 
-            $bContactDone = $this->zohoAddContact();
+            $this->zohoAddContact();
 
             $this->addEntityToTemp($iZohoId, $bContactDone, $bAttachmentDone);
             // add row to subscription
@@ -382,16 +384,11 @@ HC;
             $oApi = $this->ZoHo_Account->getInstance("Accounts", $iZohoId);
             try {
                 $sComplianceOnly = ($this->input->post("inputComplianceOnly") ?? 0);
-                $sForeign = ($this->input->post("inputForeign") ?? 0);
 
                 $aTags = ["name" => "OnBoard"];
 
                 if ($sComplianceOnly) {
                     $aTags["ComplianceOnly"] = "Compliance Only";
-                }
-
-                if ($sForeign) {
-                    $aTags["Foreign"] = "Foreign";
                 }
 
                 if (!$bTagSmartyValidated) {
@@ -420,9 +417,9 @@ HC;
     private function addSubscription($iEntityId)
     {
         $this->load->model("Notifications_model");
-        
+
         $this->load->library('session');
-        
+
         $id = null;
 
         $oRule = $this->Notifications_model->getRules(
@@ -493,9 +490,8 @@ HC;
                 "zip_code" => "18104"
             ],
         ];
-        $this->Tempmeta_model->appendRow($_SESSION['eid'], $this->Tempmeta_model->slugNewEntity, $aDataEntity);
-        // attachment is not needed because lorax table storing attachments data
-        /*
+        $this->Tempmeta_model->appendRow($this->session->user['zohoId'], $this->Tempmeta_model->slugNewEntity, $aDataEntity);
+
         if ($bAttachmentDone) {
             $aDataAttachments = [
                 "file_name" => $this->input->post("attachment"),
@@ -504,7 +500,7 @@ HC;
                 "link_url" => getenv("UPLOAD_PATH") . $this->input->post("attachment"),// it helps user to download file from temp path
             ];
             $this->Tempmeta_model->appendRow($iEntityId, $this->Tempmeta_model->slugNewAttachment, $aDataAttachments);
-        }*/
+        }
 
         if ($bContactDone) {
             $aDataContacts = [
@@ -580,21 +576,7 @@ HC;
     private function zohoAddAttachment($iEntityId)
     {
         $bAttachmentDone = false;
-        $sError = "File upload failed, please contact administrator...";
-        $this->load->model("LoraxAttachments_model");
-        $aData = [
-            'entity_id'   =>  $iEntityId,
-            'file_id'   =>  $this->input->post('inputFileId'),
-            'name'  =>  'Initial Registery Document'
-        ];
-
-        $id = $this->LoraxAttachments_model->insert($aData);
-        
-        if($id>0)
-        {
-            $bAttachmentDone = true;
-        }
-        /*
+        $sError = "";
         // select entity instance
         $oApi = $this->ZoHo_Account->getInstance("Accounts", $iEntityId);
 
@@ -618,7 +600,7 @@ HC;
                 $sError = "User created successfully, Internal Server Error: file upload failed.";
             }
         }
-        */
+
         if (!$bAttachmentDone) {
             return ['status' => '500', 'detail' => $sError];
         }
