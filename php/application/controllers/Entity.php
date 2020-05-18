@@ -32,7 +32,7 @@ class Entity extends RestController
 
     }
 
-    public function index()
+    public function entityview_get()
     {
         $this->checkPermission("VIEW", $this->sModule);
 
@@ -130,13 +130,22 @@ class Entity extends RestController
 
                 }
             } else {
-                $data = ['errors' => ['status' => 403, 'detail' => 'Permission denied']];
+
+                $this->response([
+                  'errors' => ['status' => 403, 'detail' => 'Permission denied']
+                ], 403);
             }
         } else {
             $data = ['errors' => ['status' => 404, 'detail' => 'Record not found']];
+
+            $this->response([
+              'errors' => ['status' => 404, 'detail' => 'Record not found']
+            ], 404);
         }
 
-        responseJson(['data' => $data]);
+        $this->response([
+            'result' => $data
+        ], 200);
 
     }
 
@@ -375,16 +384,11 @@ HC;
             $oApi = $this->ZoHo_Account->getInstance("Accounts", $iZohoId);
             try {
                 $sComplianceOnly = ($this->input->post("inputComplianceOnly") ?? 0);
-                $sForeign = ($this->input->post("inputForeign") ?? 0);
 
                 $aTags = ["name" => "OnBoard"];
 
                 if ($sComplianceOnly) {
                     $aTags["ComplianceOnly"] = "Compliance Only";
-                }
-
-                if ($sForeign) {
-                    $aTags["Foreign"] = "Foreign";
                 }
 
                 if (!$bTagSmartyValidated) {
@@ -413,9 +417,9 @@ HC;
     private function addSubscription($iEntityId)
     {
         $this->load->model("Notifications_model");
-        
+
         $this->load->library('session');
-        
+
         $id = null;
 
         $oRule = $this->Notifications_model->getRules(
