@@ -181,7 +181,7 @@ class Entity extends RestController
     {
 
 
-//        $this->checkPermission("ADD",$this->sModule);
+        $this->checkPermission("ADD",$this->sModule);
 
         $bTagSmartyValidated = true;
         $arError = [];
