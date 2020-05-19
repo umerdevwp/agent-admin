@@ -185,7 +185,6 @@ class Entity extends RestController
     public function create_post()
     {
 
-
         $this->checkPermission("ADD",$this->sModule);
 
         $bTagSmartyValidated = true;
@@ -310,7 +309,7 @@ HC;
 
                 // allow without file, else check type and size
                 $iZohoId = $response['data']['id'];
-                $this->zohoAddAttachment($iZohoId);
+                //$this->zohoAddAttachment($iZohoId);
 
                 // check address is valid
                 $sSmartyAddress = $this->validateSmartyStreet();
@@ -369,9 +368,9 @@ HC;
             $bAttachmentDone = $bContactDone = false;
             $oAttachment = null;
 
-            $this->zohoAddAttachment($iZohoId);
+            $bAttachmentDone = $this->zohoAddAttachment($iZohoId);
 
-            $this->zohoAddContact();
+            $bContactDone = $this->zohoAddContact();
 
             $this->addEntityToTemp($iZohoId, $bContactDone, $bAttachmentDone);
             // add row to subscription
@@ -381,6 +380,7 @@ HC;
             $oApi = $this->ZoHo_Account->getInstance("Accounts", $iZohoId);
             try {
                 $sComplianceOnly = ($this->input->post("inputComplianceOnly") ?? 0);
+                $sForeign = ($this->input->post("inputForeign") ?? 0);
 
                 $aTags = ["name" => "OnBoard"];
 
@@ -388,16 +388,20 @@ HC;
                     $aTags["ComplianceOnly"] = "Compliance Only";
                 }
 
+                if ($sForeign) {
+                    $aTags["Foreign"] = "Foreign";
+                }
+
                 if (!$bTagSmartyValidated) {
                     $aTags["InvalidatedAddress"] = "Invalidated Address";
                 }
                 // TODO: zoho enable on production server
-                /*
+                
                 $this->ZoHo_Account->zohoCreateNewTags($iZohoId, $aTags);
 
                 $oResponseTags = $oApi->addTags($aTags);
 
-                $oData = $oResponseTags->getData();*/
+                $oData = $oResponseTags->getData();
             } catch (Exception $e) {
                 if (count($arError) > 0) $arError[0] .= ", tags failed (" . $e->getMessage() . ").";
                 else $arError[] = "User created successfully, tags failed (" . $e->getMessage() . ").";
@@ -486,7 +490,8 @@ HC;
             ],
         ];
         $this->Tempmeta_model->appendRow($this->session->user['zohoId'], $this->Tempmeta_model->slugNewEntity, $aDataEntity);
-
+        // attachment is not needed because lorax table storing attachments data
+        /*
         if ($bAttachmentDone) {
             $aDataAttachments = [
                 "file_name" => $this->input->post("attachment"),
@@ -495,7 +500,7 @@ HC;
                 "link_url" => getenv("UPLOAD_PATH") . $this->input->post("attachment"),// it helps user to download file from temp path
             ];
             $this->Tempmeta_model->appendRow($iEntityId, $this->Tempmeta_model->slugNewAttachment, $aDataAttachments);
-        }
+        }*/
 
         if ($bContactDone) {
             $aDataContacts = [
@@ -569,7 +574,21 @@ HC;
     private function zohoAddAttachment($iEntityId)
     {
         $bAttachmentDone = false;
-        $sError = "";
+        $sError = "File upload failed, please contact administrator...";
+        $this->load->model("LoraxAttachments_model");
+        $aData = [
+            'entity_id'   =>  $iEntityId,
+            'file_id'   =>  $this->input->post('inputFileId'),
+            'name'  =>  $this->input->post('inputFileName')
+        ];
+
+        $id = $this->LoraxAttachments_model->insert($aData);
+        
+        if($id>0)
+        {
+            $bAttachmentDone = true;
+        }
+        /*
         // select entity instance
         $oApi = $this->ZoHo_Account->getInstance("Accounts", $iEntityId);
 
@@ -593,7 +612,7 @@ HC;
                 $sError = "User created successfully, Internal Server Error: file upload failed.";
             }
         }
-
+        */
         if (!$bAttachmentDone) {
             return ['status' => '500', 'detail' => $sError];
         }
@@ -603,7 +622,7 @@ HC;
 
     private function zohoAddEntity()
     {
-        $iParentZohoId = $this->input->post("pid");
+        $iParentZohoId = $_SESSION['eid'];
 
         $oApi = $this->ZoHo_Account->getInstance()->getRecordInstance("Accounts", null);
 
