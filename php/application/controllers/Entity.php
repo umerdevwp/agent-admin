@@ -368,7 +368,8 @@ HC;
             $bAttachmentDone = $bContactDone = false;
             $oAttachment = null;
 
-            $bAttachmentDone = $this->zohoAddAttachment($iZohoId);
+            if(!empty($this->input->post("inputFileId")))
+                $bAttachmentDone = $this->zohoAddAttachment($iZohoId);
 
             $bContactDone = $this->zohoAddContact();
 
