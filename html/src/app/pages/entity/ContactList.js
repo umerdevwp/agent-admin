@@ -33,20 +33,19 @@ function ContactList(props) {
     const [state, setState] = React.useState(props.data);
     const history = useHistory();
     const classes = useStyles();
-
+    console.log(props.data);
 
 
     const handleUpdate = (newData) => {
         return Promise.resolve(console.log(newData));
     }
 
-    console.log(state);
     return (
 
         <Grid item xs={12}>
             <MaterialTable
                 isLoading={props.loading}
-                actions={[
+                actions={  props.action ? [
                     {
                         icon: 'add',
                         tooltip: props.tooltip ? props.tooltip : 'Add User',
@@ -57,10 +56,10 @@ function ContactList(props) {
                             }
                         }
                     }
-                ]}
+                ] : ''}
                 title={props.title !== '' ? props.title : ''}
-                columns={state.columns}
-                data={state.data}
+                columns={props.data.columns}
+                data={props.data.data}
                 editable={isAdmin ? {
                     // onRowAdd: newData =>
                     //     new Promise(resolve => {

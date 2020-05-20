@@ -17,6 +17,9 @@ import ContactPhoneIcon from '@material-ui/icons/ContactPhone';
 import {OktaUserContext} from "../../context/OktaUserContext";
 import {contactList} from "../../crud/contact.crud";
 import ContactList from "../entity/ContactList";
+import GeneralListing from "./GeneralListing";
+
+
 const useStyles = makeStyles(theme => ({
     root: {
         flexGrow: 1,
@@ -43,33 +46,33 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
-
 const Contacts = () => {
     const {oktaprofile, isAdmin} = useContext(OktaUserContext);
     const history = useHistory();
     const classes = useStyles();
-    const [contacts, setContacts] = React.useState([])
+    const [listcontacts, setListcontacts] = React.useState([])
     const [loading, setLoading] = React.useState(true)
     useEffect(() => {
         fetchContactData();
     }, []);
 
     const fetchContactData = async () => {
-        const response = await contactList(oktaprofile.organization);
-        setContacts(response.data.contacts);
-        setLoading(false);
+        try {
+            const response = await contactList(oktaprofile.organization);
+            await setListcontacts(response.data.contacts);
+            setLoading(false);
+
+        } catch (e) {
+            console.log(e);
+        }
     }
-    const dummyData = {
+    const dummyDataa = {
         columns: [
             {title: 'Name', field: 'name'},
-            {title: 'Contact Type', field: 'title'},
             {title: 'email', field: 'email'},
-            {title: 'Street', field: 'mailing_street'},
-            {title: 'City', field: 'mailing_city'},
-            {title: 'State', field: 'mailing_state'},
             {title: 'Phone', field: 'phone'},
         ],
-        data: contacts,
+        data: listcontacts,
 
 
     };
@@ -82,8 +85,9 @@ const Contacts = () => {
                     <Portlet fluidHeight={true}>
                         <PortletHeader icon={<ContactPhoneIcon className={classes.adjustment}/>} title="Contact List"/>
                         <PortletBody>
-                            <ContactList loading={loading} tooltip={'Add Contact'} redirect={true}
-                                         url={'/dashboard/contact/form/add'} data={dummyData} title={''}/>                        </PortletBody>
+                            <GeneralListing loading={loading} tooltip={'Add Contact'} redirect={true} data={dummyDataa}
+                                            title={''}/>
+                        </PortletBody>
                     </Portlet>
                 </Grid>
             </Grid>

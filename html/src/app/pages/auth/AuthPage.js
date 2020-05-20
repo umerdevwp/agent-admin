@@ -59,6 +59,9 @@ export default withAuth(class AuthPage extends React.Component{
     }
 
     render() {
+        const today = new Date().getFullYear();
+
+
         if (this.state.authenticated === null) return null;
         return (this.state.authenticated ? <Redirect to={{pathname: '/dashboard'}}/> :
             <>
@@ -68,40 +71,36 @@ export default withAuth(class AuthPage extends React.Component{
                         <div
                             className="kt-grid__item kt-grid__item--order-tablet-and-mobile-2 kt-grid kt-grid--hor kt-login__aside"
                             style={{
-                                backgroundImage: `url(${toAbsoluteUrl("/media/bg/bg-4.jpg")})`
+                                backgroundImage: `url(${toAbsoluteUrl("/media/agentadmin/bg/login.jpg")})`
                             }}>
                             <div className="kt-grid__item">
                                 <Link to="/" className="kt-login__logo">
                                     <img
                                         alt="Logo"
-                                        src={toAbsoluteUrl("/media/logos/logo-4.png")}
+                                        src={toAbsoluteUrl("/media/agentadmin/logo/aa_logo.png")}
                                     />
                                 </Link>
                             </div>
                             <div className="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--ver">
                                 <div className="kt-grid__item kt-grid__item--middle">
-                                    <h3 className="kt-login__title">Welcome to Metronic!</h3>
-                                    <h4 className="kt-login__subtitle">
-                                        The ultimate Bootstrap & Angular 6 admin theme framework for
-                                        next generation web apps.
-                                    </h4>
+                                    <h3 className="kt-login__title">Welcome to AgentAdmin</h3>
                                 </div>
                             </div>
                             <div className="kt-grid__item">
                                 <div className="kt-login__info">
                                     <div className="kt-login__copyright">
-                                        &copy; 2018 Metronic
+                                        &copy;   {today.toString()} AgentAdmin
                                     </div>
                                     <div className="kt-login__menu">
-                                        <Link to="/terms" className="kt-link">
+                                        <Link to="/privacy-policy" className="kt-link">
                                             Privacy
                                         </Link>
-                                        <Link to="/terms" className="kt-link">
-                                            Legal
-                                        </Link>
-                                        <Link to="/terms" className="kt-link">
-                                            Contact
-                                        </Link>
+                                        {/*<Link to="/terms" className="kt-link">*/}
+                                        {/*    Legal*/}
+                                        {/*</Link>*/}
+                                        {/*<Link to="/terms" className="kt-link">*/}
+                                        {/*    Contact*/}
+                                        {/*</Link>*/}
                                     </div>
                                 </div>
                             </div>

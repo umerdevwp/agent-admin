@@ -67,7 +67,7 @@ function EntityListing(props) {
             {title: 'Name', field: 'account_name'},
             {title: 'Entity Structure', field: 'entity_type'},
             {title: 'Filing State', field: 'filing_state'},
-            {title: 'Formation Date', field: 'created_time'},
+            {title: 'Formation Date', field: 'formation_date'},
         ],
         data: entitydata,
     };
@@ -83,7 +83,7 @@ function EntityListing(props) {
         <Grid item xs={12}>
             <MaterialTable
                 isLoading={loading}
-                actions={[
+                actions={ isAdmin ? [
                     {
                         icon: 'add',
                         tooltip: props.tooltip ? props.tooltip : 'Add User',
@@ -94,7 +94,7 @@ function EntityListing(props) {
                             }
                         }
                     }
-                ]}
+                ] : ''}
                 title={props.title !== '' ? props.title : ''}
                 columns={settingData.columns}
                 data={settingData.data}

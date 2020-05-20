@@ -39,7 +39,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import SnackbarContent from '@material-ui/core/SnackbarContent';
 import WarningIcon from '@material-ui/icons/Warning';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import {ContactTypeList, EntitytypesList, StateRegionList, createEntity, testcall} from "../../crud/enitity.crud";
+import {ContactTypeList, EntitytypesList, StateRegionList, createEntity, lorexFileUpload} from "../../crud/enitity.crud";
 import {OktaUserContext} from '../../context/OktaUserContext';
 const useStylesFacebook = makeStyles({
     root: {
@@ -221,11 +221,11 @@ const AddEntityForm = (props) => {
     const [contactType, setContactType] = React.useState([]);
     const [FillingStructureData, setFillingStructureData] = React.useState([])
     const [StateRegion, setStateRegion] = React.useState([])
-    const [successMessage, setSuccessMessage] = React.useState(false)
+    const [successMessage, setSuccessMessage] = React.useState(false);
+
     //form state
 
     const [inputName, setInputName] = React.useState({value: '', error: ' ',});
-    // const [inputFillingState, setInputFillingState] = React.useState({value: '', error: ' '});
     const [inputComplianceOnly, setInputComplianceOnly] = React.useState({value: '', error: ' '});
     const [inputFillingState, setInputFillingState] = React.useState({value: '', error: ' '});
     const [inputFillingStructure, setInputFillingStructure] = React.useState({value: '', error: ' '});
@@ -239,9 +239,10 @@ const AddEntityForm = (props) => {
     const [inputNotificationCity, setInputNotificationCity] = React.useState({value: '', error: ' '});
     const [inputNotificationState, setInputNotificationState] = React.useState({value: '', error: ' '});
     const [inputNotificationZip, setInputNotificationZip] = React.useState({value: '', error: ' '});
-    const [inputFiling, setInputFiling] = React.useState({value: '', error: ' '});
+    const [inputFiling, setInputFiling] = React.useState({value: '', error: ' ', success: ' '});
     const [inputBusinessPurpose, setInputBusinessPurpose] = React.useState({value: '', error: ' '});
-
+    const [inputForeign,setInputForeign] = React.useState({value: '', error: ' '});
+    const [inputFileName, setInputFileName] = React.useState({value: '', error: ' '});
 
     function FacebookProgress(props) {
         const classes = useStylesFacebook();
@@ -292,20 +293,17 @@ const AddEntityForm = (props) => {
 
     const fetchDataforDropdownsContactTypeList = async () => {
             const response = await ContactTypeList(oktaprofile.organization, oktaprofile.email);
-        console.log(response);
             setContactType(response.data);
     }
 
     const fetchDataforDropdownsFillingStructureData = async () => {
         const response = await EntitytypesList(oktaprofile.organization, oktaprofile.email);
-        console.log(response);
         setFillingStructureData(response.data);
 
     }
 
     const fetchDataforDropdownsStateRegion = async () => {
         const response = await StateRegionList(oktaprofile.organization, oktaprofile.email);
-        console.log(response);
         setStateRegion(response.data);
 
     }
@@ -323,8 +321,26 @@ const AddEntityForm = (props) => {
         setError(false);
     }
 
-    const handleOnSubmit = async (event) => {
 
+    const fileChange = async (e) => {
+        setLoading(true);
+        let formData = new FormData();
+        formData.append('file', e.target.files[0]);
+        const filename = e.target.files[0].name;
+        const response = await lorexFileUpload(formData);
+        if (response.error === false) {
+            setInputFiling({...inputFiling, value: response.record_id, success: 'uploaded'});
+            if (filename) {
+                setInputFileName({...inputFileName, value: filename});
+                setLoading(false);
+            }
+        } else {
+            setLoading(false);
+        }
+    }
+
+
+    const handleOnSubmit = async (event) => {
 
 
         setInputName({...inputName, error: ' '})
@@ -342,13 +358,15 @@ const AddEntityForm = (props) => {
         setInputNotificationZip({...inputNotificationZip, error: ' '})
         setInputBusinessPurpose({...inputBusinessPurpose, error: ' '})
         setInputNotificationContactType({...inputNotificationContactType, error: ' '})
-
+        setInputForeign({...inputForeign, error:' '});
 
         event.preventDefault();
         let formData = new FormData();
 
+        console.log(inputComplianceOnly.value);
         formData.append('inputName', inputName.value)
         formData.append('inputComplianceOnly', inputComplianceOnly.value)
+        formData.append('inputForeign', inputForeign.value)
         formData.append('inputFillingState', inputFillingState.value)
         formData.append('inputFillingStructure', inputFillingStructure.value)
         formData.append('inputFormationDate', inputFormationDate.value)
@@ -358,15 +376,12 @@ const AddEntityForm = (props) => {
         formData.append('inputNotificationPhone', inputNotificationPhone.value)
         formData.append('inputNotificationAddress', addressObject.text)
         formData.append('inputNotificationContactType', inputNotificationContactType.value)
-        formData.append('inputNotificationCity', inputNotificationCity.value)
-        formData.append('inputNotificationState', inputNotificationState.value)
-        formData.append('inputNotificationZip', inputNotificationZip.value)
-        formData.append('inputFiling', inputFiling.value)
+        formData.append('inputNotificationCity', inputNotificationCity.value);
+        formData.append('inputNotificationState', inputNotificationState.value);
+        formData.append('inputNotificationZip', inputNotificationZip.value);
+        formData.append('inputFileId', inputFiling.value);
+        formData.append('inputFileName', inputFileName.value);
         formData.append('inputBusinessPurpose', inputBusinessPurpose.value)
-
-
-
-
 
         const response = await createEntity(formData);
         if(response.field_error) {
@@ -435,11 +450,11 @@ const AddEntityForm = (props) => {
             }
         }
 
-        //
-        // for (var pair of formData.entries()) {
-        //     console.log(pair[0] + ', ' + pair[1]);
-        // }
-        //
+
+        for (var pair of formData.entries()) {
+            console.log(pair[0] + ', ' + pair[1]);
+        }
+
         // setTimeout(() => {
         //     setInputName({...inputName, error: 'Field is required'})
         //     setLoading(false);
@@ -492,13 +507,29 @@ const AddEntityForm = (props) => {
                                                 helperText={inputName.error}
                                             />
                                         </div>
-                                        <div className={'col-md-6'}>
+                                        <div className={'col-md-3'}>
+                                            <FormControlLabel
+                                                disabled={loading}
+                                                error={inputForeign.error !== ' '}
+                                                onChange={e => setInputForeign({
+                                                    ...inputForeign,
+                                                    value: e.target.checked
+                                                })}
+                                                value={inputForeign}
+                                                control={<Checkbox color="primary"/>}
+                                                label="Foreign"
+                                                className={clsx(classes.textField, classes.checkbox)}
+                                                labelPlacement="start"
+                                            />
+                                        </div>
+
+                                        <div className={'col-md-3'}>
                                             <FormControlLabel
                                                 disabled={loading}
                                                 error={inputComplianceOnly.error !== ' '}
                                                 onChange={e => setInputComplianceOnly({
                                                     ...inputComplianceOnly,
-                                                    value: e.target.value
+                                                    value: e.target.checked
                                                 })}
                                                 value={inputComplianceOnly}
                                                 control={<Checkbox color="primary"/>}
@@ -507,9 +538,10 @@ const AddEntityForm = (props) => {
                                                 labelPlacement="start"
                                             />
                                         </div>
+
                                         <div className={'col-md-4'}>
                                             <FormControl className={clsx(classes.selectField)}>
-                                                <InputLabel htmlFor="age-native-simple">Filling State</InputLabel>
+                                                <InputLabel htmlFor="age-native-simple">Filing State</InputLabel>
                                                 <Select
                                                     disabled={loading}
                                                     required
@@ -533,7 +565,7 @@ const AddEntityForm = (props) => {
                                         </div>
                                         <div className={'col-md-4'}>
                                             <FormControl className={clsx(classes.selectField)}>
-                                                <InputLabel htmlFor="age-native-simple">Filling
+                                                <InputLabel htmlFor="age-native-simple">Filing
                                                     Structure</InputLabel>
                                                 <Select
                                                     disabled={loading}
@@ -784,15 +816,14 @@ const AddEntityForm = (props) => {
                                                 required
                                                 id="attachment"
                                                 value={inputFiling.value.File}
-                                                onChange={e => setInputFiling({
-                                                    ...inputFiling,
-                                                    value: e.target.files[0]
-                                                })}
+                                                onChange={e => fileChange(e)}
                                                 label="Attachment"
                                                 className={clsx(classes.fileUploading, classes.dense)}
                                                 margin="dense"
                                                 invalid={inputFiling.error !== ' '}
+                                                valid={inputFiling.success !== ' '}
                                             />
+                                            <span>{inputFiling.success !== ' ' ? inputFiling.success : ' '}</span>
                                         </div>
                                         <div className={'col-md-12'}>
                                         <TextField
@@ -824,10 +855,10 @@ const AddEntityForm = (props) => {
                                                             <FacebookProgress/>
                                                         </div>)
                                                     : null}
-                                                <input className={clsx('btn btn-primary', classes.restButton)}
+                                                <input disabled={loading} className={clsx('btn btn-primary', classes.restButton)}
                                                        type="submit" value="Reset"/>
 
-                                                <input className={clsx('btn btn-primary', classes.restButton)}
+                                                <input disabled={loading} className={clsx('btn btn-primary', classes.restButton)}
                                                        type="submit" value="Create New Entity"/>
 
                                             </div>

@@ -18,6 +18,7 @@ export default class OktaSignInWidget extends Component {
             clientId: process.env.REACT_APP_OKTA_CLIENT_ID,
             redirectUri: process.env.REACT_APP_OKTA_REDIRECT_URI,
             authScheme: 'OAUTH2',
+            logo: '/media/agentadmin/logo/logo-mini-md-aa.png',
             authParams: {
                 issuer: process.env.REACT_APP_OKTA_BASE_URL + 'oauth2/default',
                 display: 'page',

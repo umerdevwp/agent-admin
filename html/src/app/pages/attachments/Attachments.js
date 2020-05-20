@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext, useEffect} from 'react';
 import Grid from "@material-ui/core/Grid";
 import {Title} from '../home/helpers/titles'
 import {
@@ -15,6 +15,9 @@ import {useHistory} from "react-router-dom";
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
 import MaterialTable from 'material-table';
+import {OktaUserContext} from "../../context/OktaUserContext";
+import {AttachmentsList} from "../../crud/attachment";
+import ContactList from "../entity/ContactList";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -43,44 +46,42 @@ const useStyles = makeStyles(theme => ({
 
 
 const Attachments = () => {
+    const {oktaprofile, isAdmin} = useContext(OktaUserContext);
     const history = useHistory();
     const classes = useStyles();
+    const [attachmentList, setattachmentList] = React.useState([])
+    const [loading, setLoading] = React.useState(true)
+    useEffect(() => {
+        fetchAttachmentData();
+    }, []);
+
+    const fetchAttachmentData = async () => {
+        try {
+            const response = await AttachmentsList(oktaprofile.organization);
+            await setattachmentList(response.data.attachments);
+            setLoading(false);
+            console.log(response);
+        } catch (e) {
+            console.log(e);
+        }
+    }
 
     const dummyData = {
         columns: [
             {
                 title: 'File Name',
                 editable: 'never',
-                render: rowData => rowData ? (<Link
-                    component="button"
-                    variant="body2"
-                    onClick={() => {
-                        history.push(`/dashboard/entity/${rowData.id}`);
-                    }}>
-                    <PictureAsPdfIcon/> {rowData.file_name}
-                </Link>) : 'Sample.pdf'
+                render: rowData => <a download href={`${process.env.REACT_APP_SERVER_API_URL}/download/file/${rowData.fid}?name=${rowData.name}`}> <PictureAsPdfIcon/> {rowData.name}
+                </a>
             },
-            {title: 'Attached By', field: 'attachment_by'},
-            {title: 'Date Added', field: 'date_added'},
-            {title: 'Size', field: 'size', editable: 'never'},
+            {title: 'Date Added', field: 'created_time'},
+            {
+                title: 'Size', editable: 'never', render: rowData => {
+                    return '2 MB';
+                }
+            },
         ],
-        data: [
-            {id: 1, file_name: 'Profile.pdf', attachment_by: 'Omer Shafqat', date_added: '2020-12-01', size: '2MB'},
-            {id: 1, file_name: 'Profile.pdf', attachment_by: 'Omer Shafqat', date_added: '2020-12-01', size: '2MB'},
-            {id: 1, file_name: 'Profile.pdf', attachment_by: 'Omer Shafqat', date_added: '2020-12-01', size: '2MB'},
-            {id: 1, file_name: 'Profile.pdf', attachment_by: 'Omer Shafqat', date_added: '2020-12-01', size: '2MB'},
-            {id: 1, file_name: 'Profile.pdf', attachment_by: 'Omer Shafqat', date_added: '2020-12-01', size: '2MB'},
-            {id: 1, file_name: 'Profile.pdf', attachment_by: 'Omer Shafqat', date_added: '2020-12-01', size: '2MB'},
-            {id: 1, file_name: 'Profile.pdf', attachment_by: 'Omer Shafqat', date_added: '2020-12-01', size: '2MB'},
-            {id: 1, file_name: 'Profile.pdf', attachment_by: 'Omer Shafqat', date_added: '2020-12-01', size: '2MB'},
-            {id: 1, file_name: 'Profile.pdf', attachment_by: 'Omer Shafqat', date_added: '2020-12-01', size: '2MB'},
-            {id: 1, file_name: 'Profile.pdf', attachment_by: 'Omer Shafqat', date_added: '2020-12-01', size: '2MB'},
-            {id: 1, file_name: 'Profile.pdf', attachment_by: 'Omer Shafqat', date_added: '2020-12-01', size: '2MB'},
-            {id: 1, file_name: 'Profile.pdf', attachment_by: 'Omer Shafqat', date_added: '2020-12-01', size: '2MB'},
-            {id: 1, file_name: 'Profile.pdf', attachment_by: 'Omer Shafqat', date_added: '2020-12-01', size: '2MB'},
-
-
-        ],
+        data: attachmentList,
     };
 
 
@@ -97,7 +98,9 @@ const Attachments = () => {
                     <Portlet fluidHeight={true}>
                         <PortletHeader icon={<AttachmentIcon className={classes.adjustment}/>} title="Attachment List"/>
                         <PortletBody>
-                            <EntityListing tooltip={'Add Attachment'} redirect={true} url={'/dashboard/attachment/form/add'} click={Additem} data={dummyData} title={''}/>
+                            <ContactList loading={loading} tooltip={'Add Attachment'} redirect={true}
+                                         url={'/dashboard/attachment/form/add'} click={Additem} data={dummyData}
+                                         title={''}/>
                         </PortletBody>
                     </Portlet>
                 </Grid>

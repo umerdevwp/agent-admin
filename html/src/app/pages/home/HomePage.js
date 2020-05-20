@@ -52,8 +52,8 @@ function HomePage(props) {
                         <SecureRoute exact path="/dashboard/admins" component={Admins}/>
                         <SecureRoute exact path="/dashboard/contacts" component={Contacts}/>
                         <SecureRoute exact path="/dashboard/attachments" component={Attachments}/>
-                        <SecureRoute exact path="/dashboard/contact/form/add" component={AddContactForm}/>
-                        <SecureRoute exact path="/dashboard/attachment/form/add" component={AddAttachmentForm}/>
+                        <SecureRoute exact path="/dashboard/contact/form/add/:id" component={AddContactForm}/>
+                        <SecureRoute exact path="/dashboard/attachment/form/add/:id" component={AddAttachmentForm}/>
                         <SecureRoute exact path="/dashboard/agents" component={RegisteredAgents}/>
                         <SecureRoute exact path="/test" component={Test}/>
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
@@ -40,7 +40,9 @@ import SnackbarContent from '@material-ui/core/SnackbarContent';
 import WarningIcon from '@material-ui/icons/Warning';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import {useHistory} from "react-router-dom";
-
+import {ContactTypeList, EntitytypesList, StateRegionList} from "../../crud/enitity.crud";
+import {createContact} from "../../crud/contact.crud";
+import {OktaUserContext} from "../../context/OktaUserContext";
 
 
 const useStylesFacebook = makeStyles({
@@ -213,26 +215,30 @@ const AddContactForm = (props) => {
 
     const history = useHistory();
     const classes = useStyles();
+
+
+    const {oktaprofile, isAdmin} = useContext(OktaUserContext);
+
     const inputLabel = React.useRef(null);
     const [labelWidth, setLabelWidth] = React.useState(0);
     const [addressObject, setAddressObject] = React.useState([]);
     const [addressValue, setAddressValue] = React.useState('');
     const [loading, setLoading] = React.useState(false)
-
+    const [contactType, setContactType] = React.useState([]);
+    const [successMessage, setSuccessMessage] = React.useState(false);
+    const [StateRegion, setStateRegion] = React.useState([])
     //form state
 
 
-    const [inputFirstName, setInputFirstName] = React.useState({value: '', error: ' '});
-    const [inputLastName, setInputLastName] = React.useState({value: '', error: ' '});
-    const [inputNotificationEmail, setInputNotificationEmail] = React.useState({value: '', error: ' '});
-    const [inputNotificationPhone, setInputNotificationPhone] = React.useState({value: '', error: ' '});
-    const [inputNotificationAddress, setInputNotificationAddress] = React.useState({value: '', error: ' '});
-    const [inputNotificationContactType, setInputNotificationContactType] = React.useState({value: '', error: ' '});
-    const [inputNotificationCity, setInputNotificationCity] = React.useState({value: '', error: ' '});
-    const [inputNotificationState, setInputNotificationState] = React.useState({value: '', error: ' '});
-    const [inputNotificationZip, setInputNotificationZip] = React.useState({value: '', error: ' '});
-    const [inputFiling, setInputFiling] = React.useState({value: '', error: ' '});
-    const [inputBusinessPurpose, setInputBusinessPurpose] = React.useState({value: '', error: ' '});
+    const [inputContactFirstName, setInputContactFirstName] = React.useState({value: '', error: ' '});
+    const [inputContactLastName, setInputLastName] = React.useState({value: '', error: ' '});
+    const [inputContactEmail, setInputNotificationEmail] = React.useState({value: '', error: ' '});
+    const [inputContactPhone, setInputNotificationPhone] = React.useState({value: '', error: ' '});
+    const [inputContactStreet, setInputNotificationAddress] = React.useState({value: '', error: ' '});
+    const [inputContactType, setInputNotificationContactType] = React.useState({value: '', error: ' '});
+    const [inputContactCity, setInputNotificationCity] = React.useState({value: '', error: ' '});
+    const [inputContactState, setInputNotificationState] = React.useState({value: '', error: ' '});
+    const [inputContactZipcode, setInputNotificationZip] = React.useState({value: '', error: ' '});
 
 
     function FacebookProgress(props) {
@@ -265,12 +271,31 @@ const AddContactForm = (props) => {
     React.useEffect(() => {
         if (addressObject) {
             if (typeof addressObject === 'object') {
-                setInputNotificationCity({...inputNotificationCity, value: addressObject.city})
-                setInputNotificationState({...inputNotificationState, value: addressObject.state})
+                setInputNotificationCity({...inputContactCity, value: addressObject.city})
+                setInputNotificationState({...inputContactState, value: addressObject.state})
             }
         }
 
     }, [addressObject, addressValue])
+
+
+    React.useEffect(() => {
+        fetchDataforDropdownsContactTypeList();
+        fetchDataforDropdownsStateRegion();
+    }, [])
+
+
+    const fetchDataforDropdownsContactTypeList = async () => {
+        const response = await ContactTypeList(oktaprofile.organization, oktaprofile.email);
+        setContactType(response.data);
+    }
+
+
+    const fetchDataforDropdownsStateRegion = async () => {
+        const response = await StateRegionList(oktaprofile.organization, oktaprofile.email);
+        setStateRegion(response.data);
+
+    }
 
 
     const addressObjectChangeHandler = (value) => {
@@ -287,38 +312,92 @@ const AddContactForm = (props) => {
         }
     }
 
-    const handleOnSubmit = (event) => {
+    const handleOnSubmit = async (event) => {
         event.preventDefault();
         let formData = new FormData();
 
-        // console.log(inputFormationDate.value);
-        // formData.append('asdasdas', 'asdasdasdasdas')
-        // Display the key/value pairs
+        setInputContactFirstName({...inputContactFirstName, error: ' '})
+        setInputLastName({...inputContactLastName, error: ' '})
+        setInputNotificationEmail({...inputContactEmail, error: ' '})
+        setInputNotificationPhone({...inputContactPhone, error: ' '})
+        setInputNotificationAddress({...inputContactStreet, error: ' '})
+        setInputNotificationContactType({...inputContactType, error: ' '})
+        setInputNotificationCity({...inputContactCity, error: ' '})
+        setInputNotificationState({...inputContactState, error: ' '})
+        setInputNotificationZip({...inputContactZipcode, error: ' '})
 
 
+        formData.append('entityId', props.match.params.id)
+        formData.append('inputContactFirstName', inputContactFirstName.value)
+        formData.append('inputContactLastName', inputContactLastName.value)
+        formData.append('inputContactEmail', inputContactEmail.value)
+        formData.append('inputContactPhone', inputContactPhone.value)
+        formData.append('inputContactStreet', addressObject.text)
+        formData.append('inputContactType', inputContactType.value)
+        formData.append('inputContactCity', inputContactCity.value)
+        formData.append('inputContactState', inputContactState.value)
+        formData.append('inputContactZipcode', inputContactZipcode.value)
 
-        formData.append('inputFirstName', inputFirstName.value)
-        formData.append('inputLastName', inputLastName.value)
-        formData.append('inputNotificationEmail', inputNotificationEmail.value)
-        formData.append('inputNotificationPhone', inputNotificationPhone.value)
-        formData.append('inputNotificationAddress', addressObject.text)
-        formData.append('inputNotificationContactType', inputNotificationContactType.value)
-        formData.append('inputNotificationCity', inputNotificationCity.value)
-        formData.append('inputNotificationState', inputNotificationState.value)
-        formData.append('inputNotificationZip', inputNotificationZip.value)
-        formData.append('inputFiling', inputFiling.value)
-        for (var pair of formData.entries()) {
-            console.log(pair[0] + ', ' + pair[1]);
+
+        const response = await createContact(formData);
+        if (response.field_error) {
+
+
+            Object.keys(response.field_error).forEach((key, index) => {
+                if (key === 'inputContactFirstName') {
+                    setInputContactFirstName({...inputContactFirstName, error: response.field_error[key]})
+                }
+
+                if (key === 'inputContactLastName') {
+                    setInputLastName({...inputContactLastName, error: response.field_error[key]})
+                }
+
+                if (key === 'inputContactEmail') {
+                    setInputNotificationEmail({...inputContactEmail, error: response.field_error[key]})
+                }
+
+                if (key === 'inputContactPhone') {
+                    setInputNotificationPhone({...inputContactPhone, error: response.field_error[key]})
+                }
+
+                if (key === 'inputContactStreet') {
+                    setInputNotificationAddress({...inputContactStreet, error: response.field_error[key]})
+                }
+                if (key === 'inputContactType') {
+                    setInputNotificationContactType({...inputContactType, error: response.field_error[key]})
+                }
+                if (key === 'inputContactCity') {
+                    setInputNotificationCity({...inputContactCity, error: response.field_error[key]})
+                }
+                if (key === 'inputContactState') {
+                    setInputNotificationState({...inputContactState, error: response.field_error[key]})
+                }
+                if (key === 'inputContactZipcode') {
+                    setInputNotificationZip({...inputContactZipcode, error: response.field_error[key]})
+                }
+
+
+            })
         }
 
 
+        if (response) {
+            if (response.status) {
+                setSuccessMessage(true);
+            }
+        }
+
+        // for (var pair of formData.entries()) {
+        //     console.log(pair[0] + ', ' + pair[1]);
+        // }
 
 
-        setTimeout(() => {
-            setLoading(false);
-            history.goBack();
-        }, 4000)
-        setLoading(true);
+        //
+        // setTimeout(() => {
+        //     setLoading(false);
+        //     history.goBack();
+        // }, 4000)
+        // setLoading(true);
 
 
     }
@@ -333,75 +412,78 @@ const AddContactForm = (props) => {
                         <PortletHeader icon={<PermIdentityIcon className={classes.adjustment}/>}
                                        title="Add new contact"/>
                         <PortletBody>
-                            <MySnackbarContentWrapper
-                                onClose={handleClose}
-                                variant="success"
-                                message="This is a success message!"
-                            />
+                            {successMessage ? (
+                                <MySnackbarContentWrapper
+                                    onClose={handleClose}
+                                    variant="success"
+                                    message="Contact has been added"
+                                />
+                            ) : ''}
                             <div className="row">
                                 <form className={classes.container} onSubmit={handleOnSubmit} noValidate
                                       autoComplete="off">
                                     <FormGroup row>
 
 
-
                                         <div className={'col-md-6'}>
                                             <TextField
                                                 disabled={loading}
                                                 required
-                                                error={inputFirstName.error !== ' '}
+                                                error={inputContactFirstName.error !== ' '}
                                                 label="First Name"
-                                                value={inputFirstName.value}
-                                                onChange={e => setInputFirstName({
-                                                    ...inputFirstName,
+                                                value={inputContactFirstName.value}
+                                                onChange={e => setInputContactFirstName({
+                                                    ...inputContactFirstName,
                                                     value: e.target.value
                                                 })}
                                                 inputProps={{
-                                                    name: 'inputFirstName',
-                                                    id: 'inputFirstName',
+                                                    name: 'inputContactFirstName',
+                                                    id: 'inputContactFirstName',
                                                 }}
                                                 className={clsx(classes.textFieldtwofield, classes.dense)}
                                                 margin="dense"
-                                                helperText={inputFirstName.error}
+                                                helperText={inputContactFirstName.error}
                                             />
                                         </div>
                                         <div className={'col-md-6'}>
                                             <TextField
                                                 disabled={loading}
                                                 required
-                                                value={inputLastName.value}
+                                                value={inputContactLastName.value}
                                                 onChange={e => setInputLastName({
-                                                    ...inputLastName,
+                                                    ...inputContactLastName,
                                                     value: e.target.value
                                                 })}
                                                 inputProps={{
-                                                    name: 'inputLastName',
-                                                    id: 'inputLastName',
+                                                    name: 'inputContactLastName',
+                                                    id: 'inputContactLastName',
                                                 }}
-                                                error={inputLastName.error !== ' '}
+                                                error={inputContactLastName.error !== ' '}
                                                 label="Last Name"
                                                 className={clsx(classes.textFieldtwofield, classes.dense)}
                                                 margin="dense"
-                                                helperText={inputLastName.error}
+                                                helperText={inputContactLastName.error}
                                             />
                                         </div>
+
+
                                         <div className={'col-md-6'}>
                                             <TextField
                                                 disabled={loading}
                                                 required
 
                                                 type="email"
-                                                value={inputNotificationEmail.value}
+                                                value={inputContactEmail.value}
                                                 onChange={e => setInputNotificationEmail({
-                                                    ...inputNotificationEmail,
+                                                    ...inputContactEmail,
                                                     value: e.target.value
                                                 })}
                                                 inputProps={{
-                                                    name: 'inputNotificationEmail',
-                                                    id: 'inputNotificationEmail',
+                                                    name: 'inputContactEmail',
+                                                    id: 'inputContactEmail',
                                                 }}
-                                                error={inputNotificationEmail.error !== ' '}
-                                                helperText={inputNotificationEmail.error}
+                                                error={inputContactEmail.error !== ' '}
+                                                helperText={inputContactEmail.error}
                                                 label="Email"
                                                 className={clsx(classes.textFieldtwofield, classes.dense)}
                                                 margin="dense"
@@ -412,17 +494,17 @@ const AddContactForm = (props) => {
                                             <TextField
                                                 disabled={loading}
                                                 required
-                                                value={inputNotificationPhone.value}
+                                                value={inputContactPhone.value}
                                                 onChange={e => setInputNotificationPhone({
-                                                    ...inputNotificationPhone,
+                                                    ...inputContactPhone,
                                                     value: e.target.value
                                                 })}
                                                 inputProps={{
-                                                    name: 'inputNotificationPhone',
-                                                    id: 'inputNotificationPhone',
+                                                    name: 'inputContactPhone',
+                                                    id: 'inputContactPhone',
                                                 }}
-                                                error={inputNotificationPhone.error !== ' '}
-                                                helperText={inputNotificationPhone.error}
+                                                error={inputContactPhone.error !== ' '}
+                                                helperText={inputContactPhone.error}
                                                 label="Phone"
                                                 className={clsx(classes.textFieldtwofield, classes.dense)}
                                                 margin="dense"
@@ -436,11 +518,11 @@ const AddContactForm = (props) => {
                                                 addressObject={addressObjectChangeHandler}
                                                 addressValue={addressValueChangeHandler}
                                                 inputProps={{
-                                                    name: 'inputNotificationAddress',
-                                                    id: 'inputNotificationAddress',
+                                                    name: 'inputContactStreet',
+                                                    id: 'inputContactStreet',
                                                 }}
-                                                error={inputNotificationAddress.error !== ' '}
-                                                helperText={inputNotificationAddress.error}
+                                                error={inputContactStreet.error !== ' '}
+                                                helperText={inputContactStreet.error}
                                                 className={clsx(classes.dense)}
                                             />
                                         </div>
@@ -451,40 +533,42 @@ const AddContactForm = (props) => {
                                                 <Select
                                                     disabled={loading}
                                                     native
-                                                    value={inputNotificationContactType.value}
+                                                    value={inputContactType.value}
                                                     onChange={e => setInputNotificationContactType({
-                                                        ...inputNotificationContactType,
+                                                        ...inputContactType,
                                                         value: e.target.value
                                                     })}
                                                     inputProps={{
-                                                        name: 'inputNotificationContactType',
-                                                        id: 'inputNotificationContactType',
+                                                        name: 'inputContactType',
+                                                        id: 'inputContactType',
                                                     }}
-                                                    error={inputNotificationContactType.error !== ' '}
-                                                    helperText={inputNotificationContactType.error}
+                                                    error={inputContactType.error !== ' '}
+                                                    helperText={inputContactType.error}
                                                 >
                                                     <option value=""/>
-                                                    {contactType.map((anObjectMapped, index) => <option key={index}
-                                                                                                        value={anObjectMapped.value}>{anObjectMapped.value}</option>)}
+                                                    {contactType?.map((anObjectMapped, index) => <option key={index}
+                                                                                                         value={anObjectMapped.code}>{anObjectMapped.name}</option>)}
 
                                                 </Select>
                                             </FormControl>
                                         </div>
+
+
                                         <div className={clsx(classes.textFieldCity, 'col-md-4')}>
                                             <TextField
                                                 disabled={loading}
                                                 required
-                                                value={inputNotificationCity.value}
+                                                value={inputContactCity.value}
                                                 onChange={e => setInputNotificationCity({
-                                                    ...inputNotificationCity,
+                                                    ...inputContactCity,
                                                     value: e.target.value
                                                 })}
                                                 inputProps={{
-                                                    name: 'inputNotificationCity',
-                                                    id: 'inputNotificationCity',
+                                                    name: 'inputContactCity',
+                                                    id: 'inputContactCity',
                                                 }}
-                                                error={inputNotificationCity.error !== ' '}
-                                                helperText={inputNotificationCity.error}
+                                                error={inputContactCity.error !== ' '}
+                                                helperText={inputContactCity.error}
                                                 label="City"
                                                 className={clsx(classes.textFieldtwofield, classes.dense)}
                                                 margin="dense"
@@ -499,21 +583,21 @@ const AddContactForm = (props) => {
                                                     disabled={loading}
                                                     required
                                                     native
-                                                    value={inputNotificationState.value}
+                                                    value={inputContactState.value}
                                                     onChange={e => setInputNotificationState({
-                                                        ...inputNotificationState,
+                                                        ...inputContactState,
                                                         value: e.target.value
                                                     })}
                                                     inputProps={{
-                                                        name: 'inputNotificationState',
-                                                        id: 'inputNotificationState',
+                                                        name: 'inputContactState',
+                                                        id: 'inputContactState',
                                                     }}
-                                                    error={inputNotificationState.error !== ' '}
-                                                    helperText={inputNotificationState.error}
+                                                    error={inputContactState.error !== ' '}
+                                                    helperText={inputContactState.error}
                                                 >
                                                     <option value=""/>
-                                                    {StateRegion.map((anObjectMapped, index) => <option key={index}
-                                                                                                        value={anObjectMapped.value}>{anObjectMapped.label}</option>)}
+                                                    {StateRegion?.map((anObjectMapped, index) => <option key={index}
+                                                                                                         value={anObjectMapped.code}>{anObjectMapped.name}</option>)}
 
                                                 </Select>
                                             </FormControl>
@@ -523,16 +607,16 @@ const AddContactForm = (props) => {
                                                 disabled={loading}
                                                 required
                                                 type="text"
-                                                value={inputNotificationZip.value}
+                                                value={inputContactZipcode.value}
                                                 onChange={e => setInputNotificationZip({
-                                                    ...inputNotificationZip,
+                                                    ...inputContactZipcode,
                                                     value: e.target.value
                                                 })}
                                                 inputProps={{
-                                                    name: 'inputNotificationZip',
-                                                    id: 'inputNotificationZip',
+                                                    name: 'inputContactZipcode',
+                                                    id: 'inputContactZipcode',
                                                 }}
-                                                error={inputNotificationZip.error !== ' '}
+                                                error={inputContactZipcode.error !== ' '}
                                                 label="Postal / Zip Code"
                                                 className={clsx(classes.textFieldtwofield, classes.dense)}
                                                 margin="dense"

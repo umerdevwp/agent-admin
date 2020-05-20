@@ -81,65 +81,36 @@ class UserProfile extends React.Component {
               </span>
             </div>
             <div className="kt-user-card__name">{this.state.profile.name}</div>
-            <div className="kt-user-card__badge">
-              <span className="btn btn-success btn-sm btn-bold btn-font-md">
-                23 messages
-              </span>
-            </div>
           </div>
           <div className="kt-notification">
-            <a className="kt-notification__item">
-              <div className="kt-notification__item-icon">
-                <i className="flaticon2-calendar-3 kt-font-success" />
-              </div>
-              <div className="kt-notification__item-details">
-                <div className="kt-notification__item-title kt-font-bold">
-                  My Profile
-                </div>
-                <div className="kt-notification__item-time">
-                  Account settings and more
-                </div>
-              </div>
-            </a>
-            <a className="kt-notification__item">
-              <div className="kt-notification__item-icon">
-                <i className="flaticon2-mail kt-font-warning" />
-              </div>
-              <div className="kt-notification__item-details">
-                <div className="kt-notification__item-title kt-font-bold">
-                  My Messages
-                </div>
-                <div className="kt-notification__item-time">
-                  Inbox and tasks
-                </div>
-              </div>
-            </a>
-            <a className="kt-notification__item">
-              <div className="kt-notification__item-icon">
-                <i className="flaticon2-rocket-1 kt-font-danger" />
-              </div>
-              <div className="kt-notification__item-details">
-                <div className="kt-notification__item-title kt-font-bold">
-                  My Activities
-                </div>
-                <div className="kt-notification__item-time">
-                  Logs and notifications
-                </div>
-              </div>
-            </a>
-            <a className="kt-notification__item">
-              <div className="kt-notification__item-icon">
-                <i className="flaticon2-hourglass kt-font-brand" />
-              </div>
-              <div className="kt-notification__item-details">
-                <div className="kt-notification__item-title kt-font-bold">
-                  My Tasks
-                </div>
-                <div className="kt-notification__item-time">
-                  latest tasks and projects
-                </div>
-              </div>
-            </a>
+            {/*<a className="kt-notification__item">*/}
+            {/*  <div className="kt-notification__item-icon">*/}
+            {/*    <i className="flaticon2-calendar-3 kt-font-success" />*/}
+            {/*  </div>*/}
+            {/*  <div className="kt-notification__item-details">*/}
+            {/*    <div className="kt-notification__item-title kt-font-bold">*/}
+            {/*      My Profile*/}
+            {/*    </div>*/}
+            {/*    <div className="kt-notification__item-time">*/}
+            {/*      Account settings and more*/}
+            {/*    </div>*/}
+            {/*  </div>*/}
+            {/*</a>*/}
+
+
+            {/*<a className="kt-notification__item">*/}
+            {/*  <div className="kt-notification__item-icon">*/}
+            {/*    <i className="flaticon2-hourglass kt-font-brand" />*/}
+            {/*  </div>*/}
+            {/*  <div className="kt-notification__item-details">*/}
+            {/*    <div className="kt-notification__item-title kt-font-bold">*/}
+            {/*      My Tasks*/}
+            {/*    </div>*/}
+            {/*    <div className="kt-notification__item-time">*/}
+            {/*      latest tasks and projects*/}
+            {/*    </div>*/}
+            {/*  </div>*/}
+            {/*</a>*/}
             <div className="kt-notification__custom">
 
                <button className={'btn btn-primary'} onClick={()=>{this.props.auth.logout('/')}}>Sign Out</button>
