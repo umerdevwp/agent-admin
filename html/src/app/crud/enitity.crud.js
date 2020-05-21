@@ -44,7 +44,7 @@ export const entityDetail = async (zoho_id, email, entity) => {
     const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
 
     if(okta) {
-        const response = await fetch(`${ENTITY}/entity/entityview/?eid=${entity}`, {
+        const response = await fetch(`${ENTITY}/entity/entityview/?eid=${zoho_id}`, {
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Authorization': okta.accessToken.accessToken,

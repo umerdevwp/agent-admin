@@ -226,6 +226,7 @@ const AddEntityForm = (props) => {
     //form state
 
     const [inputName, setInputName] = React.useState({value: '', error: ' ',});
+    // const [inputFillingState, setInputFillingState] = React.useState({value: '', error: ' '});
     const [inputComplianceOnly, setInputComplianceOnly] = React.useState({value: '', error: ' '});
     const [inputFillingState, setInputFillingState] = React.useState({value: '', error: ' '});
     const [inputFillingStructure, setInputFillingStructure] = React.useState({value: '', error: ' '});
@@ -334,8 +335,6 @@ const AddEntityForm = (props) => {
                 setInputFileName({...inputFileName, value: filename});
                 setLoading(false);
             }
-        } else {
-            setLoading(false);
         }
     }
 
@@ -541,7 +540,7 @@ const AddEntityForm = (props) => {
 
                                         <div className={'col-md-4'}>
                                             <FormControl className={clsx(classes.selectField)}>
-                                                <InputLabel htmlFor="age-native-simple">Filing State</InputLabel>
+                                                <InputLabel htmlFor="age-native-simple">Filling State</InputLabel>
                                                 <Select
                                                     disabled={loading}
                                                     required
@@ -565,7 +564,7 @@ const AddEntityForm = (props) => {
                                         </div>
                                         <div className={'col-md-4'}>
                                             <FormControl className={clsx(classes.selectField)}>
-                                                <InputLabel htmlFor="age-native-simple">Filing
+                                                <InputLabel htmlFor="age-native-simple">Filling
                                                     Structure</InputLabel>
                                                 <Select
                                                     disabled={loading}

@@ -71,13 +71,23 @@ const Attachments = () => {
             {
                 title: 'File Name',
                 editable: 'never',
-                render: rowData => <a download href={`${process.env.REACT_APP_SERVER_API_URL}/download/file/${rowData.fid}?name=${rowData.name}`}> <PictureAsPdfIcon/> {rowData.name}
+                render: rowData => <a href={rowData.link_url}> <PictureAsPdfIcon/> {rowData.name}
                 </a>
             },
             {title: 'Date Added', field: 'created_time'},
             {
                 title: 'Size', editable: 'never', render: rowData => {
-                    return '2 MB';
+                    const bytes = parseInt(rowData.size);
+                    const decimals = 2;
+                    if (bytes === 0) return '0 Bytes';
+
+                    const k = 1024;
+                    const dm = decimals < 0 ? 0 : decimals;
+                    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+                    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+                    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
                 }
             },
         ],

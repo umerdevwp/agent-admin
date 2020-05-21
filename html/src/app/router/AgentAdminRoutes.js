@@ -41,7 +41,7 @@ const AgentAdminRoutes = withRouter(({history}) => {
             <Route exact={true} path='/dashboard/contacts' component={CustomLayoutForAgentAdmin}/>
             <Route exact={true} path='/dashboard/contact/form/add/:id' component={CustomLayoutForAgentAdmin}/>
             <Route exact={true} path='/dashboard/attachments' component={CustomLayoutForAgentAdmin}/>
-            <Route exact={true} path='/dashboard/attachment/form/add/:id' component={CustomLayoutForAgentAdmin}/>
+            <Route exact={true} path='/dashboard/attachment/form/add' component={CustomLayoutForAgentAdmin}/>
             <Route exact={true} path='/dashboard/agents' component={CustomLayoutForAgentAdmin}/>
             <Route exact={true} path='/test' component={CustomLayoutForAgentAdmin}/>
         </OktaUserContextProvider>

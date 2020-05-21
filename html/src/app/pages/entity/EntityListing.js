@@ -67,7 +67,7 @@ function EntityListing(props) {
             {title: 'Name', field: 'account_name'},
             {title: 'Entity Structure', field: 'entity_type'},
             {title: 'Filing State', field: 'filing_state'},
-            {title: 'Formation Date', field: 'formation_date'},
+            {title: 'Formation Date', field: 'created_time'},
         ],
         data: entitydata,
     };

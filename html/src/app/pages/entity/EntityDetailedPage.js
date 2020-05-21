@@ -28,9 +28,9 @@ import {Title} from '../home/helpers/titles'
 import PermIdentityIcon from '@material-ui/icons/PermIdentity';
 import RoomIcon from '@material-ui/icons/Room';
 import PersonIcon from '@material-ui/icons/Person';
-import StreetviewIcon from '@material-ui/icons/Streetview';
+
 import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
-import LocationCityIcon from '@material-ui/icons/LocationCity';
+
 import BusinessIcon from '@material-ui/icons/Business';
 import MailIcon from '@material-ui/icons/Mail';
 import Container from "@material-ui/core/Container";
@@ -110,7 +110,6 @@ const EntityDetailedPage = (props) => {
     const taskData = {
         columns: [
             {title: 'Name', field: 'subject'},
-            {title: 'Due Date', field: 'dueDate'},
             {title: 'Status', field: 'status'},
         ],
         data: taskList,
@@ -134,25 +133,23 @@ const EntityDetailedPage = (props) => {
             {
                 title: 'File Name',
                 editable: 'never',
-                render: rowData => <a download href={`${process.env.REACT_APP_SERVER_API_URL}/download/file/${rowData.fid}?name=${rowData.name}`}> <PictureAsPdfIcon/> {rowData.name}
+                render: rowData => <a href={rowData.link_url}> <PictureAsPdfIcon/> {rowData.name}
                 </a>
             },
-
+            {title: 'Date Added', field: 'created_time'},
             {
                 title: 'Size', editable: 'never', render: rowData => {
+                    const bytes = parseInt(rowData.size);
+                    const decimals = 2;
+                    if (bytes === 0) return '0 Bytes';
 
-                    return '2 MB';
-                    // const bytes = parseInt(rowData.size);
-                    // const decimals = 2;
-                    // if (bytes === 0) return '0 Bytes';
-                    //
-                    // const k = 1024;
-                    // const dm = decimals < 0 ? 0 : decimals;
-                    // const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-                    //
-                    // const i = Math.floor(Math.log(bytes) / Math.log(k));
-                    //
-                    // return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+                    const k = 1024;
+                    const dm = decimals < 0 ? 0 : decimals;
+                    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+                    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+                    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
                 }
             },
         ],
@@ -180,7 +177,8 @@ const EntityDetailedPage = (props) => {
                                     <li className={classes.listItem}><strong>State ID:</strong> 0</li>
                                     <li className={classes.listItem}><strong>Formation
                                         Date:</strong> {entitydetail.entity.formationDate}</li>
-                                    <li className={classes.listItem}><strong>Registered Agent Expiration Date: </strong> {entitydetail.entity.expirationDate}</li>
+                                    <li className={classes.listItem}><strong>Expiration
+                                        Date: </strong> {entitydetail.entity.expiration_date}</li>
                                     {/*<li className={classes.listItem}><strong>Tax ID:</strong> 09890890</li>*/}
                                 </ul> :
 
@@ -201,17 +199,14 @@ const EntityDetailedPage = (props) => {
                         <PortletHeader icon={<RoomIcon className={classes.adjustment}/>} title="RA Address"/>
                         <PortletBody>
                             {entitydetail ?
-
                                 <ul className={classes.companyinfo}>
-                                    <li className={classes.listItem}>
+                                    <li className={classes.listItem}><PersonIcon className={classes.adjustment}/>
                                         <strong>{entitydetail.registerAgent.name}</strong></li>
-                                <li className={classes.listItem}><PersonIcon className={classes.adjustment}/>
-                                <strong>{entitydetail.registerAgent.fileAs}</strong></li>
-                                    <li className={classes.listItem}><StreetviewIcon className={classes.adjustment}/> {entitydetail.registerAgent.address}
+                                    <li className={classes.listItem}><RoomIcon
+                                        className={classes.adjustment}/> {entitydetail.registerAgent.address} {entitydetail.registerAgent.address2}
                                     </li>
-                                <li className={classes.listItem}><RoomIcon
-                                    className={classes.adjustment}/>{entitydetail.registerAgent.address2}</li>
-                                    <li className={classes.listItem}><LocationCityIcon className={classes.adjustment}/> {entitydetail.registerAgent.city}, {entitydetail.registerAgent.state} {entitydetail.registerAgent.zip_code}
+                                    <li className={classes.listItem}><BusinessIcon
+                                        className={classes.adjustment}/> {entitydetail.registerAgent.city}, {entitydetail.registerAgent.state} {entitydetail.registerAgent.zip_code}
                                     </li>
                                 </ul> :
                                 <ul className={classes.companyinfo}>
@@ -220,8 +215,6 @@ const EntityDetailedPage = (props) => {
                                     <li className={classes.listItem}><RoomIcon className={classes.adjustment}/> -
                                     </li>
                                     <li className={classes.listItem}><BusinessIcon className={classes.adjustment}/> -
-                                    </li>
-                                    <li className={classes.listItem}><LocationCityIcon className={classes.adjustment}/> -
                                     </li>
                                 </ul>
                             }
@@ -239,7 +232,8 @@ const EntityDetailedPage = (props) => {
                             {entitydetail ?
                                 <ul className={classes.companyinfo}>
                                     <li className={classes.listItem}><RoomIcon className={classes.adjustment}/>
-                                        <strong>{entitydetail.entity.shippingStreet},  {entitydetail.entity.shippingCity}, {entitydetail.entity.shippingState} {entitydetail.entity.shippingCode} </strong>
+                                        <strong>{entitydetail.entity.shippingStreet} , {entitydetail.entity.shippingCity} {entitydetail.entity.shippingState}
+                                        {entitydetail.entity.shippingCode} </strong>
                                     </li>
                                     <li className={classes.listItem}><MailIcon
                                         className={classes.adjustment}/> {entitydetail.entity.email}
@@ -269,8 +263,8 @@ const EntityDetailedPage = (props) => {
 
             <Grid container spacing={5}>
                 <Grid item xs={12}>
-                    <ContactList action={true} loading={loading} tooltip={'Add New Attachment'} redirect={true}
-                                 url={`/dashboard/attachment/form/add/${props.match.params.id}`} data={attachmentData} title={'Attachments'}/>
+                    <ContactList loading={loading} tooltip={'Add New Contact'} redirect={true}
+                                 url={'/dashboard/contact/form/add'} data={attachmentData} title={'Attachments'}/>
                 </Grid>
 
             </Grid>

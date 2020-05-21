@@ -36,7 +36,7 @@ class Tasks_model extends CI_Model
     {
         // TODO: remove fake id
         $data = [
-            'what_id' => $id,
+            'who_id' => $id,
             //'task_owner'    =>  '4071993000000224013', // fake id
         ];
 
@@ -45,7 +45,7 @@ class Tasks_model extends CI_Model
             $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
         else {
             $aMyColumns = [
-                "id","subject","status","dueDate"
+                "id","subject","status"
             ];
             $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
         }

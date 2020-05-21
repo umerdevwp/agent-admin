@@ -43,8 +43,8 @@ class Attachments_model extends CI_Model
         ZCRMRestClient::initialize($configuration);
 
         //$rest = ZCRMRestClient::getInstance("Attachments"); // to get the rest client
-
-/*
+        
+/*        
         //$zcrmModuleIns = ZCRMModule::getInstance("Attachments");
         //$bulkAPIResponse = $zcrmModuleIns->searchRecordsByCriteria("entityId:equals:4071993000001295295", 1, 2);
         //$bulkAPIResponse=$zcrmModuleIns->getRecords();
@@ -96,8 +96,8 @@ class Attachments_model extends CI_Model
             'parent_id' => $id,
             //'parent_id'    =>  '1000000028468', // fake id
         ];
-
-        if(count($aColumns)>0)
+        
+        if(count($aColumns)>0)    
         $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
     else {
         $aMyColumns = [
@@ -120,7 +120,7 @@ class Attachments_model extends CI_Model
 
     public function getAllFromEntityList($arCommaIds,$aColumns=[])
     {
-        if(count($aColumns)>0)
+        if(count($aColumns)>0)    
         $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
     else {
         $aMyColumns = [
@@ -161,56 +161,11 @@ class Attachments_model extends CI_Model
 
     public function replace($id,$data)
     {
-
+        
             // update
             if($id>0)
             {
                 $this->db->replace($this->table, $data);
             }
-    }
-    public function download($sLoraxFileId)
-    {
-        
-        $aParams = [
-            "expire_url_in_mins"    =>  120,// between 5 - 120 minutes
-
-        ];
-        $sLoraxUrl = "https://lorax-api-sandbox.filemystuff.com/api/v1/download/" . $sLoraxFileId;
-        
-        $sResponse = $this->curlGetUrl($sLoraxUrl);
-        
-        $aGoogleFile = json_decode($sResponse,true);
-
-        $cURLConnection = curl_init();
-        curl_setopt($cURLConnection, CURLOPT_URL, $aGoogleFile['url']);
-        curl_setopt($cURLConnection, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($cURLConnection, CURLOPT_HTTPHEADER, array(
-            'x-goog-encryption-algorithm:' . $aGoogleFile['x-goog-encryption-algorithm'],
-            'x-goog-encryption-key:' . $aGoogleFile['x-goog-encryption-key'],
-            'x-goog-encryption-key-sha256:' . $aGoogleFile['x-goog-encryption-key-sha256'],
-
-        ));
-        $filePath = tmpfile() . '.pdf';
-        $fileOpen = fopen($filePath, 'w');
-        curl_setopt($cURLConnection, CURLOPT_FILE, $fileOpen);
-        $fileData = curl_exec($cURLConnection);
-        $contentType = curl_getinfo($cURLConnection, CURLINFO_CONTENT_TYPE);
-
-        curl_close($cURLConnection);
-        header("Content-type: application/pdf");
-        readfile($filePath);
-
-    }
-
-    private function curlGetUrl($sUrl)
-    {
-        $cURLConnection = curl_init();
-        curl_setopt($cURLConnection, CURLOPT_URL, $sUrl);
-        curl_setopt($cURLConnection, CURLOPT_RETURNTRANSFER, true);
-        
-        $sResponse = curl_exec($cURLConnection);
-        curl_close($cURLConnection);
-
-        return $sResponse;
     }
 }

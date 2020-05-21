@@ -53,7 +53,7 @@ class RegisterAgents_model extends CI_Model
             $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
         else {
             $aMyColumns = [
-                "id","name","email","phone","fileAs","address","address2","state","city","zipcode"
+                "id","fileAs","address","address2","state","city","zipcode"
             ];
             $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
         }
@@ -88,13 +88,12 @@ class RegisterAgents_model extends CI_Model
             $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
         else {
             $aMyColumns = [
-                "id","name","email","phone","address","address2","zipcode","state","fileAs","city"
+                "id","name","email","phone","address"
             ];
             $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
         }
 
-        foreach($aMyColumns as $k=>$v)
-        $this->db->select("$v as `$k`");
+        $this->db->select($aMyColumns);
 
         $query = $this->db->get_where($this->table, $aDataWhere);
 

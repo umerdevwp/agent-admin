@@ -40,8 +40,6 @@ import SnackbarContent from '@material-ui/core/SnackbarContent';
 import WarningIcon from '@material-ui/icons/Warning';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import {useHistory} from "react-router-dom";
-import {lorexFileUpload} from "../../crud/enitity.crud";
-import {attachFiles} from "../../crud/attachment";
 
 const useStylesFacebook = makeStyles({
     root: {
@@ -227,9 +225,23 @@ const AddAttachmentForm = (props) => {
     const [addressValue, setAddressValue] = React.useState('');
     const [loading, setLoading] = React.useState(false)
     const [error, setError] = React.useState(false);
-    const [inputFileName, setInputFileName] = React.useState({value: '', error: ' '});
-    const [inputFiling, setInputFiling] = React.useState({value: '', error: ' ', success: ' '});
-    const [successMessage, setSuccessMessage] = React.useState(false);
+    const [inputName, setInputName] = React.useState({value: '', error: ' ',});
+    const [fillingState, setFillingState] = React.useState({value: '', error: ' '});
+    const [inputComplianceOnly, setInputComplianceOnly] = React.useState({value: '', error: ' '});
+    const [inputFillingState, setInputFillingState] = React.useState({value: '', error: ' '});
+    const [inputFillingStructure, setInputFillingStructure] = React.useState({value: '', error: ' '});
+    const [inputFormationDate, setInputFormationDate] = React.useState({value: '', error: ' '});
+    const [inputFirstName, setInputFirstName] = React.useState({value: '', error: ' '});
+    const [inputLastName, setInputLastName] = React.useState({value: '', error: ' '});
+    const [inputNotificationEmail, setInputNotificationEmail] = React.useState({value: '', error: ' '});
+    const [inputNotificationPhone, setInputNotificationPhone] = React.useState({value: '', error: ' '});
+    const [inputNotificationAddress, setInputNotificationAddress] = React.useState({value: '', error: ' '});
+    const [inputNotificationContactType, setInputNotificationContactType] = React.useState({value: '', error: ' '});
+    const [inputNotificationCity, setInputNotificationCity] = React.useState({value: '', error: ' '});
+    const [inputNotificationState, setInputNotificationState] = React.useState({value: '', error: ' '});
+    const [inputNotificationZip, setInputNotificationZip] = React.useState({value: '', error: ' '});
+    const [inputFiling, setInputFiling] = React.useState({value: '', error: ' '});
+    const [inputBusinessPurpose, setInputBusinessPurpose] = React.useState({value: '', error: ' '});
 
 
     function FacebookProgress(props) {
@@ -259,56 +271,69 @@ const AddAttachmentForm = (props) => {
     }
 
 
+    React.useEffect(() => {
+        if (addressObject) {
+            if (typeof addressObject === 'object') {
+                setInputNotificationCity({...inputNotificationCity, value: addressObject.city})
+                setInputNotificationState({...inputNotificationState, value: addressObject.state})
+            }
+        }
+
+    }, [addressObject, addressValue])
 
 
+    const addressObjectChangeHandler = (value) => {
+        setAddressObject(value);
+    }
 
+    const addressValueChangeHandler = (value) => {
+        setAddressValue(value);
+    }
 
     const handleClose = (event, reason) => {
         setError(false);
     }
 
-    const handleOnSubmit = async(event) => {
+    const handleOnSubmit = (event) => {
         event.preventDefault();
         let formData = new FormData();
 
 // console.log(inputFormationDate.value);
-
+        formData.append('asdasdas', 'asdasdasdasdas')
 // Display the key/value pairs
 
-        formData.append('entityId', props.match.params.id)
-        formData.append('inputFileId', inputFiling.value);
-        formData.append('inputFileName', inputFileName.value);
 
-        const response = await attachFiles(formData);
-        if(response){
-            if(response.status == true){
-                setSuccessMessage(true);
-            }
+        formData.append('inputName', inputName.value)
+        formData.append('inputComplianceOnly', inputComplianceOnly.value)
+        formData.append('inputFillingState', inputFillingState.value)
+        formData.append('inputFillingStructure', inputFillingStructure.value)
+        formData.append('inputFormationDate', inputFormationDate.value)
+        formData.append('inputFirstName', inputFirstName.value)
+        formData.append('inputLastName', inputLastName.value)
+        formData.append('inputNotificationEmail', inputNotificationEmail.value)
+        formData.append('inputNotificationPhone', inputNotificationPhone.value)
+        formData.append('inputNotificationAddress', addressObject.text)
+        formData.append('inputNotificationContactType', inputNotificationContactType.value)
+        formData.append('inputNotificationCity', inputNotificationCity.value)
+        formData.append('inputNotificationState', inputNotificationState.value)
+        formData.append('inputNotificationZip', inputNotificationZip.value)
+        formData.append('inputFiling', inputFiling.value)
+        for (var pair of formData.entries()) {
+            console.log(pair[0] + ', ' + pair[1]);
         }
 
-        if(response.status == true) {
-            setTimeout(() => {
-                history.goBack();
-            }, 4000)
-        }
+        setTimeout(() => {
+            setInputName({...inputName, error: 'Field is required'})
+            setInputFiling({...inputName, error: 'Field is required'})
 
-    }
-
-    const fileChange = async (e) => {
-        setLoading(true);
-        let formData = new FormData();
-        formData.append('file', e.target.files[0]);
-        const filename = e.target.files[0].name;
-        const response = await lorexFileUpload(formData);
-        if (response.error === false) {
-            setInputFiling({...inputFiling, value: response.record_id, success: 'uploaded'});
-            if (filename) {
-                setInputFileName({...inputFileName, value: filename});
-                setLoading(false);
-            }
-        } else {
             setLoading(false);
-        }
+            setError(true)
+        }, 4000)
+        setLoading(true);
+        setTimeout(() => {
+            history.goBack();
+        }, 6000)
+
     }
 
     return (
@@ -327,32 +352,40 @@ const AddAttachmentForm = (props) => {
                                 message="Something went wrong"
                             />) : null}
 
-                            {successMessage ? (
-                                <MySnackbarContentWrapper
-                                    onClose={handleClose}
-                                    variant="success"
-                                    message="File is attached"
-                                />
-                            ) : '' }
-
                             <div className="row">
                                 <form className={classes.formStyle} onSubmit={handleOnSubmit} noValidate
                                       autoComplete="off">
                                     <FormGroup row>
+                                        <div className={'col-md-6'}>
+                                            <TextField
+                                                disabled={loading}
+                                                required
+                                                error={inputName.error !== ' '}
+                                                onChange={e => setInputName({...inputName, value: e.target.value})}
+                                                id="inputName"
+                                                label="File Name"
+                                                className={clsx(classes.textFieldOther, classes.dense)}
+                                                margin="dense"
+                                                helperText={inputName.error}
+                                            />
+                                        </div>
+
+
                                         <div className={'col-md-6'}>
                                             <CustomFileInput
                                                 disabled={loading}
                                                 required
                                                 id="attachment"
                                                 value={inputFiling.value.File}
-                                                onChange={e => fileChange(e)}
+                                                onChange={e => setInputFiling({
+                                                    ...inputFiling,
+                                                    value: e.target.files[0]
+                                                })}
                                                 label="Attachment"
                                                 className={clsx(classes.fileUploading, classes.dense)}
                                                 margin="dense"
                                                 invalid={inputFiling.error !== ' '}
-                                                valid={inputFiling.success !== ' '}
                                             />
-                                            <span>{inputFiling.success !== ' ' ? inputFiling.success : ' '}</span>
                                         </div>
 
                                         <div className={'col-md-12'}>
@@ -362,11 +395,11 @@ const AddAttachmentForm = (props) => {
                                                             <FacebookProgress/>
                                                         </div>)
                                                     : null}
-                                                <input disabled={loading} className={clsx('btn btn-primary', classes.restButton)}
+                                                <input className={clsx('btn btn-primary', classes.restButton)}
                                                        type="submit" value="Reset"/>
 
-                                                <input disabled={loading} className={clsx('btn btn-primary', classes.restButton)}
-                                                       type="submit" value="Add attachment"/>
+                                                <input className={clsx('btn btn-primary', classes.restButton)}
+                                                       type="submit" value="Create New Entity"/>
 
                                             </div>
                                         </div>

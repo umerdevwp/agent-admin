@@ -153,8 +153,7 @@ class Entity_model extends CI_Model
             $aMyColumns = [
                 "id","name","type","filingState",
                 "formationDate","agentId", "shippingStreet",
-                 "shippingCity", "shippingState", "shippingCode", "email",
-                 "expirationDate"
+                 "shippingCity", "shippingState", "shippingCode", "email"
             ];
             $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
         }
