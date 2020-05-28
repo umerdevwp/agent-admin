@@ -106,7 +106,7 @@ class Auth
             //$email = "chboyce@unitedagentservices.com";
             $CI->load->model("Entity_model");
             $aEntityData = $CI->Entity_model->getEmailId($email);
-            $eid = 0;
+            $eid = $CI->input->get('eid');
 
             if($aEntityData['type']=='ok')
                 $eid = $aEntityData['results']->id;
