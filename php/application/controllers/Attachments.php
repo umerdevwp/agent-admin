@@ -35,7 +35,7 @@ class Attachments extends RestController
         // add parent id as well
         $arCommaIds[] = $id;
 
-        $aDataAttachment = $this->LoraxAttachments_model->getAllFromEntityId($id);
+        $aDataAttachment = $this->LoraxAttachments_model->getAllFromParentId($id);
                 
         if ($aDataAttachment['type'] == 'ok') {
             $data['attachments'] = $aDataAttachment['results'];

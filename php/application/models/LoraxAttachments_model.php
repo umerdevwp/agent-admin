@@ -22,7 +22,7 @@ class LoraxAttachments_model extends CI_Model
         $this->load->database();
     }
 
-    public function getAllFromEntityId($id,$aColumns=[])
+    public function getAllFromParentId($id,$aColumns=[])
     {
         $data = [
             'za.parent_account' => $id,
@@ -37,24 +37,44 @@ class LoraxAttachments_model extends CI_Model
             $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
         }
 
-//        $this->db->from($this->table . " la");
         
-    $sColumns = "";
-    foreach($aMyColumns as $k=>$v){
-        $sColumns .= ",la.$v as `$k`";
-        //$this->db->select("la.$v as `$k`");
-    }
-        $sColumns = substr($sColumns,1);
-        $sQuery = 'SELECT ' . $sColumns .' FROM lorax_attachments la, zoho_accounts za WHERE la.entity_id=za.id AND za.parent_account=' . $id;
+        foreach($aMyColumns as $k=>$v){
+            $this->db->select("la.$v as `$k`");
+        }
+        $this->db->from($this->table . " la");
 
-//echo $sQuery;die;
-        //$this->db->join("zoho_accounts za","za.id=la.entity_id");
-        //$query = $this->get_where($data);
-        $query = $this->db->query($sQuery);// $this->db->get_where($this->table, $data);
+        $this->db->join("zoho_accounts za","za.id=la.entity_id");
+        $this->db->where($data);
+        $query = $this->db->get();
         $result = $query->result_object();
+        if (! is_array($result)) {
+            return ['message'=>'No attachments available','type'=>'error'];
+        }
 
-//        echo $this->db->last_query();
-        //var_dump($result);die;
+        return ['type'=>'ok','results'=>$result];
+    }
+    
+    public function getAllFromEntityId($id,$aColumns=[])
+    {
+        $data = [
+            'entity_id' => $id,
+        ];
+        
+        if(count($aColumns)>0)    
+            $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
+        else {
+            $aMyColumns = [
+                "id","name","fid","eid"
+            ];
+            $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
+        }
+
+    foreach($aMyColumns as $k=>$v){
+        $this->db->select("$v as `$k`");
+    }
+
+        $query = $this->db->get_where($this->table,$data);
+        $result = $query->result_object();
         if (! is_array($result)) {
             return ['message'=>'No attachments available','type'=>'error'];
         }
