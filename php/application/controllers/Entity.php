@@ -471,26 +471,27 @@ HC;
         $today = date("Y-m-d");
         $aDataEntity = [
             "id" => (string)$iEntityId,
-            "account_name" => $this->input->post("inputName"),
-            "entity_type" => $this->input->post("inputFillingStructure"),
-            "filing_state" => $this->input->post("inputFillingState"),
-            "formation_date" => $this->input->post("inputFormationDate"),
-            "fiscal_date" => $this->input->post("inputFiscalDate"),
-            "shipping_street" => $this->input->post("inputNotificationAddress"),
-            "shipping_city" => $this->input->post("inputNotificationCity"),
-            "shipping_state" => $this->input->post("inputNotificationState"),
-            "shipping_code" => $this->input->post("inputNotificationZip"),
-            "notification_email" => $this->input->post("inputNotificationEmail"),
+            "name" => $this->input->post("inputName"),
+            "entityStructure" => $this->input->post("inputFillingStructure"),
+            "filingState" => $this->input->post("inputFillingState"),
+            "formationDate" => $this->input->post("inputFormationDate"),
+            "fiscalDate" => $this->input->post("inputFiscalDate"),
+            "shippingStreet" => $this->input->post("inputNotificationAddress"),
+            "shippingCity" => $this->input->post("inputNotificationCity"),
+            "shippingState" => $this->input->post("inputNotificationState"),
+            "shippingCode" => $this->input->post("inputNotificationZip"),
+            "email" => $this->input->post("inputNotificationEmail"),
+            "type" => $this->input->post("inputNotificationContactType"),
             "agent" => [
-                "file_as" => "United Agent Services LLC",
+                "fileAs" => "United Agent Services LLC",
                 "address" => "1729 W. Tilghman Street",
                 "address2" => "Suite 2",
                 "city" => "Allentown",
                 "state" => "PA",
-                "zip_code" => "18104"
+                "zipcode" => "18104"
             ],
         ];
-        $this->Tempmeta_model->appendRow($this->session->user['zohoId'], $this->Tempmeta_model->slugNewEntity, $aDataEntity);
+        $this->Tempmeta_model->appendRow($_SESSION['eid'], $this->Tempmeta_model->slugNewEntity, $aDataEntity);
         // attachment is not needed because lorax table storing attachments data
         /*
         if ($bAttachmentDone) {
@@ -520,16 +521,35 @@ HC;
         }
     }
 
-    public function getChildAccount($iParentId = 0)
+    public function getChildAccount_get()
     {
+        $this->checkPermission("ADD",$this->sModule);
+
         $this->load->model("entity_model");
+
         $this->load->model("Tempmeta_model");
+        $iParentId = $_SESSION['eid'];
 
         $aColumns = getInputFields();
 
         $aDataChild = $this->entity_model->getChildAccounts($iParentId, $aColumns);
+        $aDataTempEntity = $this->Tempmeta_model->getAll(
+            $iParentId,
+            $this->Tempmeta_model->slugNewEntity
+        );
 
-        $aMyData = $aDataChild['results'];
+        if($aDataTempEntity['type']=='ok')
+            if(count($aDataTempEntity['results'])>0)
+            {
+                if(count($aDataChild['results'])>0)
+                {
+                    $aDataChild = array_merge($aDataChild['results'],json_decode($aDataTempEntity['results'][0]['json_data']));
+                } else {
+                    $aDataChild = json_decode($aDataTempEntity['results'][0]['json_data']);
+                }
+            }
+
+        $aMyData = $aDataChild;
 
         $aOutData = ["data" => $aMyData];
         responseJson($aOutData);
