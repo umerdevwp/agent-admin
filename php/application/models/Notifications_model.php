@@ -369,8 +369,9 @@ HC;
 
     public function getLogDates($sDate1,$sDate2)
     {
-        $q = "SELECT * FROM {$this->table_maillog} WHERE send_time BETWEEN '{$sDate1}' AND '{$sDate2}'";
+        $q = "SELECT * FROM {$this->table_maillog} WHERE send_time BETWEEN '{$sDate1}' AND '{$sDate2} 23:59:59'";
         $oResult = $this->db->query($q);
+//        echo $this->db->last_query();die;
         $aData = $oResult->result_object();
         return $aData;
     }
