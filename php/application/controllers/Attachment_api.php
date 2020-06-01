@@ -29,7 +29,8 @@ class Attachment_api extends RestController
         $data = array(
             'file_id' => $_POST["inputFileId"],
             'entity_id' => $_POST["entityId"],
-            'name' => $_POST["inputFileName"]
+            'name' => $_POST["inputFileName"],
+            'file_size' =>  $_POST["inputFileSize"],
         );
         $this->load->model("LoraxAttachments_model");
         $id = $this->LoraxAttachments_model->insert($data);

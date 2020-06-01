@@ -93,7 +93,7 @@ class Entity extends RestController
             } else if ($aDataEntity['type'] == 'ok') {
                 $data['entity'] = $aDataEntity['results'];
             }
-            
+
             // data found in zoho_accounts or tempmeta table, then proceed
             if (is_object($data['entity'])) {
                 //$oAgetAddress = $this->entity_model->getAgentAddress($id);
@@ -109,7 +109,7 @@ class Entity extends RestController
                 }
 
                 $data['tasks'] = $this->Tasks_model->getAll($id);
-                
+
                 $aTasksCompleted = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugTasksComplete);
 
                 if (is_object($aTasksCompleted['results']))
@@ -119,7 +119,7 @@ class Entity extends RestController
 
                 $contact_data = $this->Contacts_model->getAllFromEntityId($id);
                 $aContactMeta = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugNewContact);
-                
+
                 $data['contacts'] = [];
                 if ($contact_data['msg_type'] == 'error') {
                     if ($aContactMeta['type'] == 'ok')
@@ -130,7 +130,7 @@ class Entity extends RestController
                 }
 
                 $aDataAttachment = $this->LoraxAttachments_model->getAllFromEntityId($id);
-                
+
                 if ($aDataAttachment['type'] == 'ok') {
                     $data['attachments'] = $aDataAttachment['results'];
                     $aDataAttachment = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugNewAttachment);
@@ -397,7 +397,7 @@ HC;
                     $aTags["InvalidatedAddress"] = "Invalidated Address";
                 }
                 // TODO: zoho enable on production server
-                
+
                 $this->ZoHo_Account->zohoCreateNewTags($iZohoId, $aTags);
 
                 $oResponseTags = $oApi->addTags($aTags);
@@ -551,8 +551,11 @@ HC;
 
         $aMyData = $aDataChild;
 
-        $aOutData = ["data" => $aMyData];
-        responseJson($aOutData);
+//        $aOutData = ["data" => $aMyData];
+        $this->response([
+            'status' => true,
+            'data' => $aMyData
+        ], 200);
     }
 
     private function addPermission($iEntityId)
@@ -600,11 +603,12 @@ HC;
         $aData = [
             'entity_id'   =>  $iEntityId,
             'file_id'   =>  $this->input->post('inputFileId'),
-            'name'  =>  $this->input->post('inputFileName')
+            'name'  =>  $this->input->post('inputFileName'),
+            'file_size' =>  $this->input->post('inputFileSize'),
         ];
 
         $id = $this->LoraxAttachments_model->insert($aData);
-        
+
         if($id>0)
         {
             $bAttachmentDone = true;
@@ -764,7 +768,7 @@ HC;
         return $sSmartyAddress;
     }
 
-    
+
     public function attachment_get($sLoraxFileId)
     {
         $this->load->model("Attachments_model");

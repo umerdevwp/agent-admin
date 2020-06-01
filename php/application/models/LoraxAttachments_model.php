@@ -8,7 +8,7 @@ class LoraxAttachments_model extends CI_Model
 {
 
     private $table = "lorax_attachments";
-    
+
     private $aColumns = [
         "id"    =>  "id",
         "fid"     =>  "file_id",
@@ -27,17 +27,17 @@ class LoraxAttachments_model extends CI_Model
         $data = [
             'za.parent_account' => $id,
         ];
-        
-        if(count($aColumns)>0)    
+
+        if(count($aColumns)>0)
             $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
         else {
             $aMyColumns = [
-                "id","name","fid","eid"
+                "id","name","fid","eid","file_size"
             ];
             $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
         }
 
-        
+
         foreach($aMyColumns as $k=>$v){
             $this->db->select("la.$v as `$k`");
         }
@@ -53,18 +53,18 @@ class LoraxAttachments_model extends CI_Model
 
         return ['type'=>'ok','results'=>$result];
     }
-    
+
     public function getAllFromEntityId($id,$aColumns=[])
     {
         $data = [
             'entity_id' => $id,
         ];
-        
-        if(count($aColumns)>0)    
+
+        if(count($aColumns)>0)
             $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
         else {
             $aMyColumns = [
-                "id","name","fid","eid"
+                "id","name","fid","eid",'file_size'
             ];
             $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
         }
@@ -84,7 +84,7 @@ class LoraxAttachments_model extends CI_Model
 
     public function getAllFromEntityList($arCommaIds,$aColumns=[])
     {
-        if(count($aColumns)>0)    
+        if(count($aColumns)>0)
         $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
     else {
         $aMyColumns = [
@@ -126,7 +126,7 @@ class LoraxAttachments_model extends CI_Model
 
     public function replace($id,$data)
     {
-        
+
             // update
             if($id>0)
             {
