@@ -42,14 +42,14 @@ class Auth
                         $this->deletePreviousToken($response->sub);
                         $this->addToken($response->sub, $response->email , $token);
 
-                        $email = $CI->input->get('email');
-                        if(!empty($email)){
-                            if($response->email !== $response){
-                                $returnResponse = ['status' => 401, 'message' => "Invalid Email", NULL];
-                                echo json_encode($returnResponse);
-                                die();
-                            }
-                        }
+//                        $email = $CI->input->get('email');
+//                        if(!empty($email)){
+//                            if($response->email !== $response){
+//                                $returnResponse = ['status' => 401, 'message' => "Invalid Email", NULL];
+//                                echo json_encode($returnResponse);
+//                                die();
+//                            }
+//                        }
 
                         $_SESSION['eid'] = $this->getEntityId($response->email);
                         $returnResponse = ['status' => 200, 'message' => "Success", NULL];
