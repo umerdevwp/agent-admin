@@ -532,7 +532,7 @@ HC;
 
         $aColumns = getInputFields();
 
-        $aDataChild = $this->entity_model->getChildAccounts($iParentId, $aColumns);
+        $aDataChild['results'] = $this->entity_model->getChildAccounts($iParentId, $aColumns);
         $aDataTempEntity = $this->Tempmeta_model->getAll(
             $iParentId,
             $this->Tempmeta_model->slugNewEntity
