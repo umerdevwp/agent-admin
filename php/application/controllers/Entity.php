@@ -543,9 +543,9 @@ HC;
             {
                 if(count($aDataChild['results'])>0)
                 {
-                    $aDataChild = array_merge($aDataChild['results'],json_decode($aDataTempEntity['results'][0]['json_data']));
+                    $aDataChild['results'] = array_merge($aDataChild['results'],json_decode($aDataTempEntity['results'][0]['json_data']));
                 } else {
-                    $aDataChild = json_decode($aDataTempEntity['results'][0]['json_data']);
+                    $aDataChild['results'] = json_decode($aDataTempEntity['results'][0]['json_data']);
                 }
             }
 
