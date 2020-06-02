@@ -8,7 +8,7 @@ class LoraxAttachments_model extends CI_Model
 {
 
     private $table = "lorax_attachments";
-    
+
     private $aColumns = [
         "id"    =>  "id",
         "fid"     =>  "file_id",
@@ -22,27 +22,59 @@ class LoraxAttachments_model extends CI_Model
         $this->load->database();
     }
 
+    public function getAllFromParentId($id,$aColumns=[])
+    {
+        $data = [
+            'za.parent_account' => $id,
+        ];
+
+        if(count($aColumns)>0)
+            $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
+        else {
+            $aMyColumns = [
+                "id","name","fid","eid","file_size"
+            ];
+            $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
+        }
+
+
+        foreach($aMyColumns as $k=>$v){
+            $this->db->select("la.$v as `$k`");
+        }
+        $this->db->from($this->table . " la");
+
+        $this->db->join("zoho_accounts za","za.id=la.entity_id");
+        $this->db->where($data);
+        $query = $this->db->get();
+        $result = $query->result_object();
+        if (! is_array($result)) {
+            return ['message'=>'No attachments available','type'=>'error'];
+        }
+
+        return ['type'=>'ok','results'=>$result];
+    }
+
     public function getAllFromEntityId($id,$aColumns=[])
     {
         $data = [
             'entity_id' => $id,
         ];
-        
-        if(count($aColumns)>0)    
-        $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
-    else {
-        $aMyColumns = [
-            "id","name","fid","eid"
-        ];
-        $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
-    }
-    foreach($aMyColumns as $k=>$v)
-        $this->db->select("$v as `$k`");
 
-        $query = $this->db->get_where($this->table, $data);
+        if(count($aColumns)>0)
+            $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
+        else {
+            $aMyColumns = [
+                "id","name","fid","eid",'file_size'
+            ];
+            $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
+        }
+
+    foreach($aMyColumns as $k=>$v){
+        $this->db->select("$v as `$k`");
+    }
+
+        $query = $this->db->get_where($this->table,$data);
         $result = $query->result_object();
-//        echo $this->db->last_query();
-        //var_dump($result);die;
         if (! is_array($result)) {
             return ['message'=>'No attachments available','type'=>'error'];
         }
@@ -52,7 +84,7 @@ class LoraxAttachments_model extends CI_Model
 
     public function getAllFromEntityList($arCommaIds,$aColumns=[])
     {
-        if(count($aColumns)>0)    
+        if(count($aColumns)>0)
         $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
     else {
         $aMyColumns = [
@@ -94,7 +126,7 @@ class LoraxAttachments_model extends CI_Model
 
     public function replace($id,$data)
     {
-        
+
             // update
             if($id>0)
             {

@@ -83,7 +83,7 @@ function EntityListing(props) {
         <Grid item xs={12}>
             <MaterialTable
                 isLoading={loading}
-                actions={[
+                actions={ isAdmin ? [
                     {
                         icon: 'add',
                         tooltip: props.tooltip ? props.tooltip : 'Add User',
@@ -94,7 +94,7 @@ function EntityListing(props) {
                             }
                         }
                     }
-                ]}
+                ] : ''}
                 title={props.title !== '' ? props.title : ''}
                 columns={settingData.columns}
                 data={settingData.data}

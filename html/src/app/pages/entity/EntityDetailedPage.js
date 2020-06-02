@@ -92,13 +92,16 @@ const EntityDetailedPage = (props) => {
 
     const contactData = {
         columns: [
-            {title: 'Name', field: 'full_name'},
-            {title: 'Contact Type', field: 'title'},
-            {title: 'email', field: 'email'},
-            {title: 'Street', field: 'mailing_street'},
-            {title: 'City', field: 'mailing_city'},
-            {title: 'State', field: 'mailing_state'},
+            {title: 'Name', field: 'name'},
             {title: 'Phone', field: 'phone'},
+            {title: 'Contact Type', field: 'contactType'},
+            {title: 'email', field: 'email'},
+            {title: 'Street', field: 'mailingStreet'},
+            {title: 'Country', field: 'mailingCountry'},
+            {title: 'City', field: 'mailingCity'},
+            {title: 'State', field: 'mailingState'},
+            {title: 'Zip', field: 'mailingZip'},
+
         ],
         data: contactList,
     };
@@ -161,7 +164,7 @@ const EntityDetailedPage = (props) => {
     return (
 
         <>
-            {entitydetail ? <Title title={entitydetail.entity.account_name}/> : <Title title={''}/>}
+            {entitydetail ? <Title title={entitydetail.entity.name}/> : <Title title={''}/>}
 
             <Grid container spacing={1}>
                 <Grid item xs={12} sm={4}>
@@ -173,10 +176,10 @@ const EntityDetailedPage = (props) => {
                                 <ul className={classes.companyinfo}>
                                     <li className={classes.listItem}><strong>State ID:</strong> 0</li>
                                     <li className={classes.listItem}><strong>Formation
-                                        Date:</strong> {entitydetail.entity.formation_date}</li>
+                                        Date:</strong> {entitydetail.entity.formationDate}</li>
                                     <li className={classes.listItem}><strong>Expiration
                                         Date: </strong> {entitydetail.entity.expiration_date}</li>
-                                    <li className={classes.listItem}><strong>Tax ID:</strong> 09890890</li>
+                                    {/*<li className={classes.listItem}><strong>Tax ID:</strong> 09890890</li>*/}
                                 </ul> :
 
                                 <ul className={classes.companyinfo}>
@@ -198,12 +201,12 @@ const EntityDetailedPage = (props) => {
                             {entitydetail ?
                                 <ul className={classes.companyinfo}>
                                     <li className={classes.listItem}><PersonIcon className={classes.adjustment}/>
-                                        <strong>{entitydetail.AgentAddress.file_as}</strong></li>
+                                        <strong>{entitydetail.registerAgent.name}</strong></li>
                                     <li className={classes.listItem}><RoomIcon
-                                        className={classes.adjustment}/> {entitydetail.AgentAddress.address} {entitydetail.AgentAddress.address2}
+                                        className={classes.adjustment}/> {entitydetail.registerAgent.address} {entitydetail.registerAgent.address2}
                                     </li>
                                     <li className={classes.listItem}><BusinessIcon
-                                        className={classes.adjustment}/> {entitydetail.AgentAddress.city}, {entitydetail.AgentAddress.state} {entitydetail.AgentAddress.zip_code}
+                                        className={classes.adjustment}/> {entitydetail.registerAgent.city}, {entitydetail.registerAgent.state} {entitydetail.registerAgent.zip_code}
                                     </li>
                                 </ul> :
                                 <ul className={classes.companyinfo}>
@@ -229,10 +232,11 @@ const EntityDetailedPage = (props) => {
                             {entitydetail ?
                                 <ul className={classes.companyinfo}>
                                     <li className={classes.listItem}><RoomIcon className={classes.adjustment}/>
-                                        <strong>{entitydetail.entity.billing_street} , {entitydetail.entity.billing_state} {entitydetail.entity.billing_code}</strong>
+                                        <strong>{entitydetail.entity.shippingStreet} , {entitydetail.entity.shippingCity} {entitydetail.entity.shippingState}
+                                        {entitydetail.entity.shippingCode} </strong>
                                     </li>
                                     <li className={classes.listItem}><MailIcon
-                                        className={classes.adjustment}/> {entitydetail.entity.notification_email}
+                                        className={classes.adjustment}/> {entitydetail.entity.email}
                                     </li>
                                 </ul> :
                                 <ul className={classes.companyinfo}>
@@ -253,7 +257,7 @@ const EntityDetailedPage = (props) => {
 
                 <Grid item xs={12}>
                     <ContactList loading={loading} tooltip={'Add New Contact'} redirect={true}
-                                 url={'/dashboard/contact/form/add'} data={taskData} title={'Compliance Tasks'}/>
+                                 url={`/dashboard/contact/form/add/${props.match.params.id}`} data={taskData} title={'Compliance Tasks'}/>
                 </Grid>
             </Grid>
 
@@ -266,8 +270,8 @@ const EntityDetailedPage = (props) => {
             </Grid>
             <Grid container spacing={5}>
                 <Grid item xs={12}>
-                    <ContactList loading={loading} tooltip={'Add New Contact'} redirect={true}
-                                 url={'/dashboard/contact/form/add'} data={contactData} title={'Contacts'}/>
+                    <ContactList  action={true} loading={loading} tooltip={'Add New Contact'} redirect={true}
+                                 url={`/dashboard/contact/form/add/${props.match.params.id}`} data={contactData} title={'Contacts'}/>
                 </Grid>
             </Grid>
 

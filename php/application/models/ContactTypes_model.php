@@ -29,6 +29,7 @@ class ContactTypes_model extends CI_Model {
 
         foreach($aMyColumns as $k=>$v)
         $this->db->select("$v as `$k`");
+        $this->db->order_by("name","asc");
 
         $query = $this->db->get_where($this->table, $data);
         $result = $query->result_object();

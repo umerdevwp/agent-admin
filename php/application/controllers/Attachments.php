@@ -16,7 +16,7 @@ class Attachments extends RestController
 
         $this->load->model("attachments_model");
         $this->load->model("entity_model");
-
+        $this->load->model('LoraxAttachments_model');
         $id = $_SESSION['eid'];
 
         if($id == getenv("SUPER_USER")){
@@ -35,7 +35,17 @@ class Attachments extends RestController
         // add parent id as well
         $arCommaIds[] = $id;
 
-        $data['attachments'] = $this->attachments_model->getAllFromEntityList($arCommaIds);
+        $aDataAttachment = $this->LoraxAttachments_model->getAllFromParentId($id);
+                
+        if ($aDataAttachment['type'] == 'ok') {
+            $data['attachments'] = $aDataAttachment['results'];
+            //$aDataAttachment = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugNewAttachment);
+        } else {
+            $data['attachments'] = [];
+        }
+
+        //$data['attachments'] = $this->attachments_model->getAllFromEntityList($arCommaIds);
+
 
         $this->response([
             'data' => $data

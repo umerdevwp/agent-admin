@@ -136,9 +136,8 @@ class Tempmeta_model extends CI_Model
     private function updateDbSynchTime()
     {
 
-        $query = 'SELECT `UPDATE_TIME` AS updatetime FROM information_schema.tables'
-        . '  WHERE TABLE_SCHEMA="'.getenv("DB_NAME").'" AND table_name="zoho_status_history"';
-        
+        $query = 'SELECT `UPDATE_TIME` updatetime FROM information_schema.tables WHERE TABLE_SCHEMA="'.getenv("DB_NAME").'" AND table_name="zoho_accounts"';
+
         $dbResponse = $this->db->query($query);
         $row = $dbResponse->row();
         
@@ -163,7 +162,7 @@ class Tempmeta_model extends CI_Model
         TO_SECONDS(
         (
             SELECT `UPDATE_TIME` FROM information_schema.tables WHERE TABLE_SCHEMA="{$dbname}" 
-            AND table_name="zoho_status_history")
+            AND table_name="zoho_accounts")
         ) - TO_SECONDS(REPLACE(json_data->"$.datetime",'"',''))) last_synch_seconds FROM appmeta
 HC;
 

@@ -61,7 +61,7 @@ class Entity extends RestController
         $aColumns = getInputFields();
         $bIsParentValid = $this->entity_model->isParent($id, $iParentId);
         $aDataTempEntity = null;
-        
+
         if (!$bIsParentValid) {
             $aDataTempEntity = $this->Tempmeta_model->getOneInJson([
                 'userid' => $iParentId,
@@ -93,6 +93,7 @@ class Entity extends RestController
             } else if ($aDataEntity['type'] == 'ok') {
                 $data['entity'] = $aDataEntity['results'];
             }
+
             // data found in zoho_accounts or tempmeta table, then proceed
             if (is_object($data['entity'])) {
                 //$oAgetAddress = $this->entity_model->getAgentAddress($id);
@@ -184,8 +185,7 @@ class Entity extends RestController
     public function create_post()
     {
 
-
-//        $this->checkPermission("ADD",$this->sModule);
+        $this->checkPermission("ADD",$this->sModule);
 
         $bTagSmartyValidated = true;
         $arError = [];
@@ -309,7 +309,7 @@ HC;
 
                 // allow without file, else check type and size
                 $iZohoId = $response['data']['id'];
-                $this->zohoAddAttachment($iZohoId);
+                //$this->zohoAddAttachment($iZohoId);
 
                 // check address is valid
                 $sSmartyAddress = $this->validateSmartyStreet();
@@ -368,9 +368,10 @@ HC;
             $bAttachmentDone = $bContactDone = false;
             $oAttachment = null;
 
-            $this->zohoAddAttachment($iZohoId);
+            if(!empty($this->input->post("inputFileId")))
+                $bAttachmentDone = $this->zohoAddAttachment($iZohoId);
 
-            $this->zohoAddContact();
+            $bContactDone = $this->zohoAddContact();
 
             $this->addEntityToTemp($iZohoId, $bContactDone, $bAttachmentDone);
             // add row to subscription
@@ -380,6 +381,7 @@ HC;
             $oApi = $this->ZoHo_Account->getInstance("Accounts", $iZohoId);
             try {
                 $sComplianceOnly = ($this->input->post("inputComplianceOnly") ?? 0);
+                $sForeign = ($this->input->post("inputForeign") ?? 0);
 
                 $aTags = ["name" => "OnBoard"];
 
@@ -387,16 +389,20 @@ HC;
                     $aTags["ComplianceOnly"] = "Compliance Only";
                 }
 
+                if ($sForeign) {
+                    $aTags["Foreign"] = "Foreign";
+                }
+
                 if (!$bTagSmartyValidated) {
                     $aTags["InvalidatedAddress"] = "Invalidated Address";
                 }
                 // TODO: zoho enable on production server
-                /*
+
                 $this->ZoHo_Account->zohoCreateNewTags($iZohoId, $aTags);
 
                 $oResponseTags = $oApi->addTags($aTags);
 
-                $oData = $oResponseTags->getData();*/
+                $oData = $oResponseTags->getData();
             } catch (Exception $e) {
                 if (count($arError) > 0) $arError[0] .= ", tags failed (" . $e->getMessage() . ").";
                 else $arError[] = "User created successfully, tags failed (" . $e->getMessage() . ").";
@@ -465,27 +471,29 @@ HC;
         $today = date("Y-m-d");
         $aDataEntity = [
             "id" => (string)$iEntityId,
-            "account_name" => $this->input->post("inputName"),
-            "entity_type" => $this->input->post("inputFillingStructure"),
-            "filing_state" => $this->input->post("inputFillingState"),
-            "formation_date" => $this->input->post("inputFormationDate"),
-            "fiscal_date" => $this->input->post("inputFiscalDate"),
-            "shipping_street" => $this->input->post("inputNotificationAddress"),
-            "shipping_city" => $this->input->post("inputNotificationCity"),
-            "shipping_state" => $this->input->post("inputNotificationState"),
-            "shipping_code" => $this->input->post("inputNotificationZip"),
-            "notification_email" => $this->input->post("inputNotificationEmail"),
+            "name" => $this->input->post("inputName"),
+            "entityStructure" => $this->input->post("inputFillingStructure"),
+            "filingState" => $this->input->post("inputFillingState"),
+            "formationDate" => $this->input->post("inputFormationDate"),
+            "fiscalDate" => $this->input->post("inputFiscalDate"),
+            "shippingStreet" => $this->input->post("inputNotificationAddress"),
+            "shippingCity" => $this->input->post("inputNotificationCity"),
+            "shippingState" => $this->input->post("inputNotificationState"),
+            "shippingCode" => $this->input->post("inputNotificationZip"),
+            "email" => $this->input->post("inputNotificationEmail"),
+            "type" => $this->input->post("inputNotificationContactType"),
             "agent" => [
-                "file_as" => "United Agent Services LLC",
+                "fileAs" => "United Agent Services LLC",
                 "address" => "1729 W. Tilghman Street",
                 "address2" => "Suite 2",
                 "city" => "Allentown",
                 "state" => "PA",
-                "zip_code" => "18104"
+                "zipcode" => "18104"
             ],
         ];
-        $this->Tempmeta_model->appendRow($this->session->user['zohoId'], $this->Tempmeta_model->slugNewEntity, $aDataEntity);
-
+        $this->Tempmeta_model->appendRow($_SESSION['eid'], $this->Tempmeta_model->slugNewEntity, $aDataEntity);
+        // attachment is not needed because lorax table storing attachments data
+        /*
         if ($bAttachmentDone) {
             $aDataAttachments = [
                 "file_name" => $this->input->post("attachment"),
@@ -494,7 +502,7 @@ HC;
                 "link_url" => getenv("UPLOAD_PATH") . $this->input->post("attachment"),// it helps user to download file from temp path
             ];
             $this->Tempmeta_model->appendRow($iEntityId, $this->Tempmeta_model->slugNewAttachment, $aDataAttachments);
-        }
+        }*/
 
         if ($bContactDone) {
             $aDataContacts = [
@@ -514,19 +522,41 @@ HC;
         }
     }
 
-    public function getChildAccount($iParentId = 0)
+    public function getChildAccount_get()
     {
+        $this->checkPermission("ADD",$this->sModule);
+
         $this->load->model("entity_model");
+
         $this->load->model("Tempmeta_model");
+        $iParentId = $_SESSION['eid'];
 
         $aColumns = getInputFields();
 
         $aDataChild = $this->entity_model->getChildAccounts($iParentId, $aColumns);
+        $aDataTempEntity = $this->Tempmeta_model->getAll(
+            $iParentId,
+            $this->Tempmeta_model->slugNewEntity
+        );
 
-        $aMyData = $aDataChild['results'];
+        if($aDataTempEntity['type']=='ok')
+            if(count($aDataTempEntity['results'])>0)
+            {
+                if(count($aDataChild['results'])>0)
+                {
+                    $aDataChild = array_merge($aDataChild['results'],json_decode($aDataTempEntity['results'][0]['json_data']));
+                } else {
+                    $aDataChild = json_decode($aDataTempEntity['results'][0]['json_data']);
+                }
+            }
 
-        $aOutData = ["data" => $aMyData];
-        responseJson($aOutData);
+        $aMyData = $aDataChild;
+
+//        $aOutData = ["data" => $aMyData];
+        $this->response([
+            'status' => true,
+            'data' => $aMyData
+        ], 200);
     }
 
     private function addPermission($iEntityId)
@@ -569,7 +599,22 @@ HC;
     private function zohoAddAttachment($iEntityId)
     {
         $bAttachmentDone = false;
-        $sError = "";
+        $sError = "File upload failed, please contact administrator...";
+        $this->load->model("LoraxAttachments_model");
+        $aData = [
+            'entity_id'   =>  $iEntityId,
+            'file_id'   =>  $this->input->post('inputFileId'),
+            'name'  =>  $this->input->post('inputFileName'),
+            'file_size' =>  $this->input->post('inputFileSize'),
+        ];
+
+        $id = $this->LoraxAttachments_model->insert($aData);
+
+        if($id>0)
+        {
+            $bAttachmentDone = true;
+        }
+        /*
         // select entity instance
         $oApi = $this->ZoHo_Account->getInstance("Accounts", $iEntityId);
 
@@ -593,7 +638,7 @@ HC;
                 $sError = "User created successfully, Internal Server Error: file upload failed.";
             }
         }
-
+        */
         if (!$bAttachmentDone) {
             return ['status' => '500', 'detail' => $sError];
         }
@@ -603,7 +648,7 @@ HC;
 
     private function zohoAddEntity()
     {
-        $iParentZohoId = $this->input->post("pid");
+        $iParentZohoId = $_SESSION['eid'];
 
         $oApi = $this->ZoHo_Account->getInstance()->getRecordInstance("Accounts", null);
 
@@ -724,10 +769,16 @@ HC;
         return $sSmartyAddress;
     }
 
+
     public function attachment_get($sLoraxFileId)
     {
         $this->load->model("Attachments_model");
-
         $this->Attachments_model->download($sLoraxFileId);
+        $this->response([
+            'status' => true,
+            'message' => 'Download link of file'
+        ], 200);
     }
 }
+
+
