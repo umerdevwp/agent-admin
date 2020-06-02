@@ -185,7 +185,7 @@ class Entity extends RestController
     public function create_post()
     {
 
-        $this->checkPermission("ADD",$this->sModule);
+        $this->checkPermission("ADD", $this->sModule);
 
         $bTagSmartyValidated = true;
         $arError = [];
@@ -368,7 +368,7 @@ HC;
             $bAttachmentDone = $bContactDone = false;
             $oAttachment = null;
 
-            if(!empty($this->input->post("inputFileId")))
+            if (!empty($this->input->post("inputFileId")))
                 $bAttachmentDone = $this->zohoAddAttachment($iZohoId);
 
             $bContactDone = $this->zohoAddContact();
@@ -523,7 +523,7 @@ HC;
 
     public function getChildAccount_get()
     {
-        $this->checkPermission("ADD",$this->sModule);
+        $this->checkPermission("ADD", $this->sModule);
 
         $this->load->model("entity_model");
 
@@ -532,21 +532,21 @@ HC;
 
         $aColumns = getInputFields();
 
-        $aDataChild['results'] = $this->entity_model->getChildAccounts($iParentId, $aColumns);
+        $aDataChild = $this->entity_model->getChildAccounts($iParentId, $aColumns);
         $aDataTempEntity = $this->Tempmeta_model->getAll(
             $iParentId,
             $this->Tempmeta_model->slugNewEntity
         );
 
-        if($aDataTempEntity['type']=='ok')
-            if(count($aDataTempEntity['results'])>0)
-            {
-                if(count($aDataChild['results'])>0)
-                {
-                    $aDataChild['results'] = array_merge($aDataChild['results'],json_decode($aDataTempEntity['results'][0]['json_data']));
+        if ($aDataTempEntity['type'] == 'ok')
+            if (count($aDataTempEntity['results']) > 0) {
+                $aNewDataChild = [];
+                if (count($aDataChild['results']) > 0) {
+                    $aNewDataChild = array_merge($aDataChild['results'], json_decode($aDataTempEntity['results'][0]['json_data']));
                 } else {
-                    $aDataChild['results'] = json_decode($aDataTempEntity['results'][0]['json_data']);
+                    $aNewDataChild = json_decode($aDataTempEntity['results'][0]['json_data']);
                 }
+                $aDataChild['results'] = $aNewDataChild;
             }
 
         $aMyData = $aDataChild;
@@ -599,16 +599,15 @@ HC;
         $sError = "File upload failed, please contact administrator...";
         $this->load->model("LoraxAttachments_model");
         $aData = [
-            'entity_id'   =>  $iEntityId,
-            'file_id'   =>  $this->input->post('inputFileId'),
-            'name'  =>  $this->input->post('inputFileName'),
-            'file_size' =>  $this->input->post('inputFileSize'),
+            'entity_id' => $iEntityId,
+            'file_id' => $this->input->post('inputFileId'),
+            'name' => $this->input->post('inputFileName'),
+            'file_size' => $this->input->post('inputFileSize'),
         ];
 
         $id = $this->LoraxAttachments_model->insert($aData);
 
-        if($id>0)
-        {
+        if ($id > 0) {
             $bAttachmentDone = true;
         }
         /*
