@@ -550,8 +550,6 @@ HC;
             }
 
         $aMyData = $aDataChild;
-
-//        $aOutData = ["data" => $aMyData];
         $this->response([
             'status' => true,
             'data' => $aMyData
