@@ -84,7 +84,7 @@ class LoraxAttachments_model extends CI_Model
         return ['type'=>'ok','results'=>$result];
     }
 
-    public function getAllFromEntityList($arCommaIds,$aColumns=[])
+    public function getAllFromEntityList($aCommaIds,$aColumns=[])
     {
         if(count($aColumns)>0)
             $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
@@ -98,17 +98,16 @@ class LoraxAttachments_model extends CI_Model
             $this->db->select("$v as `$k`");
 
         $this->db->from($this->table);
-        $this->db->left_join("zoho_accounts za","za.id=eid");
-        $this->db->where_in('parent_id',$arCommaIds);
+        $query = $this->db->where_in('entity_id',$aCommaIds);
+
         $query = $this->db->get();
         $result = $query->result_object();
-        //echo $this->db->last_query();
-        //var_dump($result);die;
+        
         if (! is_array($result)) {
             return ['msg'=>'No contacts available','msg_type'=>'error'];
         }
 
-        return $result;
+        return ['type'=>'ok','results'=>$result];
     }
 
     public function checkOwnership($owner,$id)
