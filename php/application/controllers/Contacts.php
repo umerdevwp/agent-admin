@@ -94,6 +94,7 @@ class Contacts extends RestController
 
 
         } else {
+            /*
             $aResponse = $this->Smartystreets_model->find(
                 $this->input->post("inputContactStreet"),
                 $this->input->post("inputContactCity"),
@@ -124,9 +125,9 @@ HC;
                 $aResponse = $this->addZoho($sSmartyAddress);
 
             } else if($this->input->post('acceptInvalidAddress'))
-            {
+            {*/
                 $aResponse = $this->addZoho($sSmartyAddress);
-            }
+            //}
 
             $this->response([
                 'data' => $aResponse
@@ -202,7 +203,7 @@ $aResponse = $this->ZoHo_Account->newZohoContact(
 );
 
 if($aResponse['type']=='error'){
-    $arError[] = $aResponse['message'];
+    $arError[] = "crm: " . $aResponse['message'];
 } else {
     $iContactId = $aResponse['results'];
     //add contact to OFAC $aResponse["id"];
@@ -212,7 +213,7 @@ if($aResponse['type']=='error'){
     // $iContactId = $aResponse['results'];
     $data = [
                 "id" => $iContactId,
-                "owner" => $this->session->user['zohoId'],
+                "owner" => $_SESSION['eid'],
                 "first_name"    =>  $this->input->post("inputContactFirstName"),
                 "last_name"    =>  $this->input->post("inputContactLastName"),
                 "full_name" => $this->input->post("inputContactFirstName").' '.$this->input->post("inputContactLastName"),
@@ -224,7 +225,7 @@ if($aResponse['type']=='error'){
                 "mailing_city"    =>  $this->input->post("inputContactCity"),
                 "mailing_state"    =>  $this->input->post("inputContactState"),
                 "mailing_zip"    =>  $this->input->post("inputContactZipcode"),
-                "created_by" => $this->session->user["isAdmin"] ? $this->session->user["isAdminId"] : $this->session->user['zohoId'],
+                "created_by" => $_SESSION['eid'],
                 "created_time" => date('Y-m-d H:i:s'),
                 "modified_time" => date('Y-m-d H:i:s'),
                 "last_activity_time" => date('Y-m-d H:i:s'),
@@ -232,8 +233,6 @@ if($aResponse['type']=='error'){
                 "average_time_spent_minutes" => '0.00',
                 "days_visited" => '0',
                 "visitor_score" => '0'
-
-
     ];
 
     $response_contact = $this->Contacts_model->addContact($data);
