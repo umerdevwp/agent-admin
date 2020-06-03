@@ -14,7 +14,7 @@ class Contacts_model extends CI_Model
         "salutation"=>"salutation",
         "leadSource"=>"lead_source",
         "accountName"=>"account_name",
-        "contactType"=>"contact_type",
+        "contactType"=>"title",
         "email"=>"email",
         "name"=>"full_name",
         "vendorName"=>"vendor_name",
@@ -66,7 +66,7 @@ class Contacts_model extends CI_Model
         // TODO: remove fake id
 
         $aMyColumns = [];
-        if(count($aColumns)>0)    
+        if(count($aColumns)>0)
             $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
         else {
             $aMyColumns = [
@@ -99,7 +99,7 @@ class Contacts_model extends CI_Model
     public function getAllFromEntityList($arCommaIds,$aColumns=[])
     {
         $aMyColumns = [];
-        if(count($aColumns)>0)    
+        if(count($aColumns)>0)
             $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
         else {
             $aMyColumns = [
