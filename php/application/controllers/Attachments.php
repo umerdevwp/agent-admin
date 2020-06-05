@@ -16,6 +16,7 @@ class Attachments extends RestController
 
         $this->load->model("attachments_model");
         $this->load->model("entity_model");
+        $this->load->model("Tempmeta_model");
         $this->load->model('LoraxAttachments_model');
         $id = $_SESSION['eid'];
 
@@ -24,18 +25,40 @@ class Attachments extends RestController
         } else {
             // fetch all childrens ids, to later fetch
             $result = $this->entity_model->getChildAccounts($id,"id");
+
+            $aDataTempEntity = $this->Tempmeta_model->getAll(
+                $id,
+                $this->Tempmeta_model->slugNewEntity
+            );
+    
+            if ($aDataTempEntity['type'] == 'ok')
+            {
+                if (count($aDataTempEntity['results']) > 0) {
+
+                    $aNewDataChild = [];
+                    
+                    if (count($result['results']) > 0) {
+                        $aNewDataChild = array_merge($result['results'], json_decode($aDataTempEntity['results'][0]['json_data']));
+                    } else {
+                        $aNewDataChild = json_decode($aDataTempEntity['results'][0]['json_data']);
+                    }
+                    
+                    $result = $aNewDataChild;
+                }
+            }
         }
 
         // create comma seprated ids from result
         $arCommaIds = array();
         foreach($result as $v)
         {
-            $arCommaIds[] = $v->id;
+            $arCommaIds[] = (int)$v->id;
         }
-        // add parent id as well
-        $arCommaIds[] = $id;
 
-        $aDataAttachment = $this->LoraxAttachments_model->getAllFromParentId($id);
+        // add parent id as well
+        $arCommaIds[] = (int)$id;
+
+        $aDataAttachment = $this->LoraxAttachments_model->getAllFromEntityList($arCommaIds);
                 
         if ($aDataAttachment['type'] == 'ok') {
             $data['attachments'] = $aDataAttachment['results'];

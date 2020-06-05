@@ -185,7 +185,7 @@ class Entity extends RestController
     public function create_post()
     {
 
-        $this->checkPermission("ADD",$this->sModule);
+        $this->checkPermission("ADD", $this->sModule);
 
         $bTagSmartyValidated = true;
         $arError = [];
@@ -365,15 +365,16 @@ HC;
         if ($iZohoId > 0) {
             // setting 2, so error only reports attachment issue
             $iErrorType = 2;
-            $bAttachmentDone = $bContactDone = false;
+            $bAttachmentDone = false;
+            $iContactId = 0;
             $oAttachment = null;
 
-            if(!empty($this->input->post("inputFileId")))
+            if (!empty($this->input->post("inputFileId")))
                 $bAttachmentDone = $this->zohoAddAttachment($iZohoId);
 
-            $bContactDone = $this->zohoAddContact();
+            $iContactId = $this->zohoAddContact($iZohoId);
 
-            $this->addEntityToTemp($iZohoId, $bContactDone, $bAttachmentDone);
+            $this->addEntityToTemp($iZohoId, $iContactId, $bAttachmentDone);
             // add row to subscription
             $this->addSubscription($iZohoId);
 
@@ -465,7 +466,7 @@ HC;
 
     }
 
-    private function addEntityToTemp($iEntityId, $bContactDone = true, $bAttachmentDone = true)
+    private function addEntityToTemp($iEntityId, $iContactId = 0, $bAttachmentDone = true)
     {
         $this->load->model("Tempmeta_model");
         $today = date("Y-m-d");
@@ -504,7 +505,35 @@ HC;
             $this->Tempmeta_model->appendRow($iEntityId, $this->Tempmeta_model->slugNewAttachment, $aDataAttachments);
         }*/
 
-        if ($bContactDone) {
+        if ($iContactId>0) {
+            $this->load->model("Contacts_model");
+            // $iContactId = $aResponse['results'];
+            $data = [
+                        "id" => $iContactId,
+                        "owner" => $_SESSION['eid'],
+                        "first_name"    =>  $this->input->post("inputFirstName"),
+                        "last_name"    =>  $this->input->post("inputLastName"),
+                        "full_name" => $this->input->post("inputFirstName") . " " . $this->input->post("inputLastName"),
+                        "account_name" => $iEntityId,
+                        "email"    =>  $this->input->post("inputNotificationEmail"),
+                        "phone"    =>  $this->input->post("inputNotificationPhone"),
+                        "title"    =>  $this->input->post("inputNotificationContactType"),
+                        "mailing_street"    =>  $this->input->post("inputNotificationAddress"),
+                        "mailing_city"    =>  $this->input->post("inputNotificationCity"),
+                        "mailing_state"    =>  $this->input->post("inputNotificationState"),
+                        "mailing_zip"    =>  $this->input->post("inputNotificationZip"),
+                        "created_by" => $_SESSION['eid'],
+                        "created_time" => date('Y-m-d H:i:s'),
+                        "modified_time" => date('Y-m-d H:i:s'),
+                        "last_activity_time" => date('Y-m-d H:i:s'),
+                        "number_of_chats"=> '0',
+                        "average_time_spent_minutes" => '0.00',
+                        "days_visited" => '0',
+                        "visitor_score" => '0'
+            ];
+        
+            $response_contact = $this->Contacts_model->addContact($data);
+/*
             $aDataContacts = [
                 "id"   =>   "-1",
                 "name" => $this->input->post("inputFirstName") . " " . $this->input->post("inputLastName"),
@@ -518,13 +547,13 @@ HC;
                 "mailingZip" => $this->input->post("inputNotificationZip"),
             ];
 
-            $this->Tempmeta_model->appendRow($iEntityId, $this->Tempmeta_model->slugNewContact, $aDataContacts);
+            $this->Tempmeta_model->appendRow($iEntityId, $this->Tempmeta_model->slugNewContact, $aDataContacts);*/
         }
     }
 
     public function getChildAccount_get()
     {
-        $this->checkPermission("ADD",$this->sModule);
+        $this->checkPermission("ADD", $this->sModule);
 
         $this->load->model("entity_model");
 
@@ -539,20 +568,18 @@ HC;
             $this->Tempmeta_model->slugNewEntity
         );
 
-        if($aDataTempEntity['type']=='ok')
-            if(count($aDataTempEntity['results'])>0)
-            {
-                if(count($aDataChild['results'])>0)
-                {
-                    $aDataChild = array_merge($aDataChild['results'],json_decode($aDataTempEntity['results'][0]['json_data']));
+        if ($aDataTempEntity['type'] == 'ok')
+            if (count($aDataTempEntity['results']) > 0) {
+                $aNewDataChild = [];
+                if (count($aDataChild['results']) > 0) {
+                    $aNewDataChild = array_merge($aDataChild['results'], json_decode($aDataTempEntity['results'][0]['json_data']));
                 } else {
-                    $aDataChild = json_decode($aDataTempEntity['results'][0]['json_data']);
+                    $aNewDataChild = json_decode($aDataTempEntity['results'][0]['json_data']);
                 }
+                $aDataChild['results'] = $aNewDataChild;
             }
 
         $aMyData = $aDataChild;
-
-//        $aOutData = ["data" => $aMyData];
         $this->response([
             'status' => true,
             'data' => $aMyData
@@ -567,12 +594,12 @@ HC;
         }
     }
 
-    public function zohoAddContact()
+    public function zohoAddContact($iEntityId)
     {
         $arError = [];
 
         $aResponse = $this->ZoHo_Account->newZohoContact(
-            $this->input->post("inputName"),
+            $iEntityId,
             [
                 "First_Name" => $this->input->post("inputFirstName"),
                 "Last_Name" => $this->input->post("inputLastName"),
@@ -593,7 +620,7 @@ HC;
             return ['status' => '500', 'detail' => "Unknown server error, contact creation failed."];
         }
 
-        return true;
+        return $aResponse['results'];
     }
 
     private function zohoAddAttachment($iEntityId)
@@ -602,16 +629,15 @@ HC;
         $sError = "File upload failed, please contact administrator...";
         $this->load->model("LoraxAttachments_model");
         $aData = [
-            'entity_id'   =>  $iEntityId,
-            'file_id'   =>  $this->input->post('inputFileId'),
-            'name'  =>  $this->input->post('inputFileName'),
-            'file_size' =>  $this->input->post('inputFileSize'),
+            'entity_id' => $iEntityId,
+            'file_id' => $this->input->post('inputFileId'),
+            'name' => $this->input->post('inputFileName'),
+            'file_size' => $this->input->post('inputFileSize'),
         ];
 
         $id = $this->LoraxAttachments_model->insert($aData);
 
-        if($id>0)
-        {
+        if ($id > 0) {
             $bAttachmentDone = true;
         }
         /*

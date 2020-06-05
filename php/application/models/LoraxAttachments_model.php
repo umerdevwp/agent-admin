@@ -14,7 +14,8 @@ class LoraxAttachments_model extends CI_Model
         "fid"     =>  "file_id",
         "eid"   =>        "entity_id",
         "name"=>        "name",
-        "created"=> "added"
+        "created"=> "added",
+        "fileSize"  =>  "file_size",
     ];
 
     public function __construct()
@@ -32,7 +33,7 @@ class LoraxAttachments_model extends CI_Model
             $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
         else {
             $aMyColumns = [
-                "id","name","fid","eid","file_size"
+                "id","name","fid","eid","fileSize","created"
             ];
             $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
         }
@@ -64,17 +65,18 @@ class LoraxAttachments_model extends CI_Model
             $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
         else {
             $aMyColumns = [
-                "id","name","fid","eid",'file_size'
+                "id","name","fid","eid",'fileSize',"created"
             ];
             $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
         }
 
-    foreach($aMyColumns as $k=>$v){
-        $this->db->select("$v as `$k`");
-    }
+        foreach($aMyColumns as $k=>$v){
+            $this->db->select("$v as `$k`");
+        }
 
         $query = $this->db->get_where($this->table,$data);
         $result = $query->result_object();
+
         if (! is_array($result)) {
             return ['message'=>'No attachments available','type'=>'error'];
         }
@@ -82,31 +84,30 @@ class LoraxAttachments_model extends CI_Model
         return ['type'=>'ok','results'=>$result];
     }
 
-    public function getAllFromEntityList($arCommaIds,$aColumns=[])
+    public function getAllFromEntityList($aCommaIds,$aColumns=[])
     {
         if(count($aColumns)>0)
-        $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
-    else {
-        $aMyColumns = [
-            "id","name","fid","eid"
-        ];
-        $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
-    }
-    foreach($aMyColumns as $k=>$v)
-        $this->db->select("$v as `$k`");
+            $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
+        else {
+            $aMyColumns = [
+                "id","name","fid","eid","fileSize","created"
+            ];
+            $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
+        }
+        foreach($aMyColumns as $k=>$v)
+            $this->db->select("$v as `$k`");
 
         $this->db->from($this->table);
-        $this->db->left_join("zoho_accounts za","za.id=eid");
-        $this->db->where_in('parent_id',$arCommaIds);
+        $query = $this->db->where_in('entity_id',$aCommaIds);
+
         $query = $this->db->get();
         $result = $query->result_object();
-        //echo $this->db->last_query();
-        //var_dump($result);die;
+        
         if (! is_array($result)) {
             return ['msg'=>'No contacts available','msg_type'=>'error'];
         }
 
-        return $result;
+        return ['type'=>'ok','results'=>$result];
     }
 
     public function checkOwnership($owner,$id)
@@ -127,11 +128,11 @@ class LoraxAttachments_model extends CI_Model
     public function replace($id,$data)
     {
 
-            // update
-            if($id>0)
-            {
-                $this->db->replace($this->table, $data);
-            }
+        // update
+        if($id>0)
+        {
+            $this->db->replace($this->table, $data);
+        }
     }
 
     public function insert($data)

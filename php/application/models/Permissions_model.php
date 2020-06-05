@@ -31,7 +31,7 @@ class Permissions_model extends CI_Model
         return $aData;
     }
 
-    public function add($iEntityId,$sRoleName="")
+    public function add($iEntityId,$sRoleName="entity")
     {
         $oData = $this->getRoleId($sRoleName);
         

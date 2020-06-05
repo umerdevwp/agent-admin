@@ -57,3 +57,32 @@ body {
     stroke-dashoffset: -124;
   }
 }
+
+
+label.MuiInputLabel-formControl {
+  font-size: medium !important;
+}
+
+input#downshift-simple-input {
+  font-size: 15px;
+}
+
+input#inputBusinessPurpose {
+  margin-top: 20px;
+  font-size: medium;
+}
+
+
+nav.MuiTypography-root {
+  margin-bottom: 10px !important;
+}
+
+ol.MuiBreadcrumbs-ol li {
+  font-size: 15px;
+}
+
+
+ol.MuiBreadcrumbs-ol li p {
+  font-size: 15px;
+}
+
