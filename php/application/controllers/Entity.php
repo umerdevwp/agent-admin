@@ -77,7 +77,6 @@ class Entity extends RestController
             // fetch data from DB
             $aDataEntity = $this->entity_model->getOne($id, $aColumns);
 
-            $oTempAgetAddress = null;
             if ($aDataEntity['type'] == 'error' && $iParentId > 0) {
                 if (!is_array($aDataTempEntity)) {
                     $aDataTempEntity = $this->Tempmeta_model->getOneInJson([
@@ -88,7 +87,6 @@ class Entity extends RestController
                 }
                 if ($aDataTempEntity['type'] == 'ok') {
                     $data['entity'] = $aDataTempEntity['results'];
-                    $oTempAgetAddress = $data['entity']->agent;
                 }
             } else if ($aDataEntity['type'] == 'ok') {
                 $data['entity'] = $aDataEntity['results'];
@@ -102,8 +100,6 @@ class Entity extends RestController
 
                 if (is_object($oAgetAddress)) {
                     $data['registerAgent'] = (array)$oAgetAddress;
-                } else if (is_object($oTempAgetAddress)) {
-                    $data['registerAgent'] = (array)$oTempAgetAddress;
                 } else {
                     $data['registerAgent'] = [];
                 }
@@ -360,7 +356,9 @@ HC;
         $this->load->model("entity_model");
         $this->load->model("RegisterAgents_model");
 
-        $iZohoId = $this->zohoAddEntity();
+        $aZohoResponse = $this->zohoAddEntity();
+        $iZohoId = $aZohoResponse['entityId'];
+        $iAgentId = $aZohoResponse['agentId'];
 
         if ($iZohoId > 0) {
             // setting 2, so error only reports attachment issue
@@ -374,7 +372,7 @@ HC;
 
             $iContactId = $this->zohoAddContact($iZohoId);
 
-            $this->addEntityToTemp($iZohoId, $iContactId, $bAttachmentDone);
+            $this->addEntityToTemp($iZohoId, $iContactId, $iAgentId, $bAttachmentDone);
             // add row to subscription
             $this->addSubscription($iZohoId);
 
@@ -466,7 +464,7 @@ HC;
 
     }
 
-    private function addEntityToTemp($iEntityId, $iContactId = 0, $bAttachmentDone = true)
+    private function addEntityToTemp($iEntityId, $iContactId = 0, $iAgentId=0, $bAttachmentDone = true)
     {
         $this->load->model("Tempmeta_model");
         $today = date("Y-m-d");
@@ -483,14 +481,7 @@ HC;
             "shippingCode" => $this->input->post("inputNotificationZip"),
             "email" => $this->input->post("inputNotificationEmail"),
             "type" => $this->input->post("inputNotificationContactType"),
-            "agent" => [
-                "fileAs" => "United Agent Services LLC",
-                "address" => "1729 W. Tilghman Street",
-                "address2" => "Suite 2",
-                "city" => "Allentown",
-                "state" => "PA",
-                "zipcode" => "18104"
-            ],
+            "agentId"   =>  $iAgentId
         ];
         $this->Tempmeta_model->appendRow($_SESSION['eid'], $this->Tempmeta_model->slugNewEntity, $aDataEntity);
         // attachment is not needed because lorax table storing attachments data
@@ -742,7 +733,7 @@ HC;
 
             $oResponse = $responseIns->getDetails();
 
-            return $oResponse["id"];
+            return ['entityId'=>$oResponse["id"],'agentId'=>$iRAId];
         } catch (Exception $oError) {
             // message
             $sError = "code: " . $oError->data[0]->code . ", error: Api: " . $oError->data[0]->details->expected_data_type . ", " . $oError->data[0]->details->api_name . ", message: " . $oError->getMessage();
