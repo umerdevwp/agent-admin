@@ -151,7 +151,7 @@ class Entity_model extends CI_Model
             $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
         else {
             $aMyColumns = [
-                "id","name","type","filingState",
+                "id","name","type","filingState","entityStructure",
                 "formationDate","agentId", "shippingStreet",
                  "shippingCity", "shippingState", "shippingCode", "email",
                  "expirationDate"
@@ -206,7 +206,7 @@ class Entity_model extends CI_Model
             $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
         else {
             $aMyColumns = [
-                "id","name","type","filingState","formationDate","agentId"
+                "id","name","type","filingState","formationDate","agentId","entityStructure"
             ];
             $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
         }
