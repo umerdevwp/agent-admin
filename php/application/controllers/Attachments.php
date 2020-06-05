@@ -30,7 +30,6 @@ class Attachments extends RestController
                 $id,
                 $this->Tempmeta_model->slugNewEntity
             );
-    
             if ($aDataTempEntity['type'] == 'ok')
             {
                 if (count($aDataTempEntity['results']) > 0) {
@@ -42,15 +41,14 @@ class Attachments extends RestController
                     } else {
                         $aNewDataChild = json_decode($aDataTempEntity['results'][0]['json_data']);
                     }
-                    
-                    $result = $aNewDataChild;
+                    $result['results'] = $aNewDataChild;
                 }
             }
         }
 
         // create comma seprated ids from result
         $arCommaIds = array();
-        foreach($result as $v)
+        foreach($result['results'] as $v)
         {
             $arCommaIds[] = (int)$v->id;
         }
