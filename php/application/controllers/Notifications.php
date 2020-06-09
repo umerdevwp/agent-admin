@@ -2,8 +2,10 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 use SendGrid\Mail\Mail;
+use chriskacerguis\RestServer\RestController;
+include APPPATH.'/libraries/CommonDbTrait.php';
 
-class Notifications extends CI_Controller
+class Notifications extends RestController
 {
     public function form($id=0)
     {
@@ -18,10 +20,10 @@ class Notifications extends CI_Controller
             {
                 $data['oEntity'] = $oEntity;
             } else {
-                set_flashdata("error","Entity doesn't exist or expired.");
+                //set_flashdata("error","Entity doesn't exist or expired.");
             }
         } else {
-            set_flashdata("error","Entity doesn't exist");
+            //set_flashdata("error","Entity doesn't exist");
         }
         
         if($this->session->user['zohoId']==getenv("SUPER_USER"))
@@ -572,31 +574,36 @@ HC;
         return $sResult;
     }
 
-    public function showEmailLogs()
+    public function showEmailLogs_get()
     {
-        if(!isSessionValid("EmailLogs")) redirectSession();
-
+        //if(!isSessionValid("EmailLogs")) redirectSession();
         $this->load->model("Notifications_model");
-        $sDate1 = $this->input->post("date1");
-        $sDate2 = $this->input->post("date2");
+        $sDate1 = $this->input->get("startDate");
+        $sDate2 = $this->input->get("endDate");
 
-        if(!isset($_POST['daterange']))
+        if(!isset($_GET['startDate']) || !isset($_GET['endDate']))
         {
             $sDate1 = date("Y-m-d",strtotime("-1 week"));
-            $sDate2 = date("Y-m-d");    
-            $_POST['daterange'] = date("m/d/Y",strtotime("-1 week")) . " - " . date("m/d/Y");
+            $sDate2 = date("Y-m-d");
         } else {
-            $aDate = explode(" - ",$this->input->post("daterange"));
-            $sDate1 = date("Y-m-d",strtotime($aDate[0]));
-            $sDate2 = date("Y-m-d",strtotime($aDate[1]));
+            $sDate1 = date("Y-m-d",strtotime($sDate1));
+            $sDate2 = date("Y-m-d",strtotime($sDate2));
         }
-
 
         $aData =$this->Notifications_model->getLogEntityDates($sDate1,$sDate2);
 
-        $this->load->view("header");
-        $this->load->view("log-email",['aEmailLogs'=>$aData]);
-        $this->load->view("footer");
+        $this->response([
+            'startDate' =>  $sDate1,
+            'endDate'   =>  $sDate2,
+            'data' => $aData
+        ], 200);
     }
 
+    public function najm_get()
+    {
+
+        $this->response([
+            'data' => []
+        ], 200);
+    }
 }

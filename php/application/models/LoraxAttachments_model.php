@@ -101,7 +101,13 @@ class LoraxAttachments_model extends CI_Model
         $query = $this->db->where_in('entity_id',$aCommaIds);
 
         $query = $this->db->get();
-        $result = $query->result_object();
+        $result = false;
+        
+        if($query)
+        {
+            $result = $query->result_object();
+        }
+
         
         if (! is_array($result)) {
             return ['msg'=>'No contacts available','msg_type'=>'error'];

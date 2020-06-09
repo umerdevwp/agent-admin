@@ -379,9 +379,15 @@ HC;
     
     public function getLogEntityDates($sDate1,$sDate2)
     {
-        $q = "SELECT m.*,e.id as entity_id,e.entity_name FROM {$this->table_maillog} m, {$this->table_entity} e WHERE e.id=m.entity_id AND send_time BETWEEN '{$sDate1}' AND '{$sDate2}' ORDER BY send_time DESC";
+        $q = "SELECT m.id id, m.entity_id eid, m.to email, m.subject, m.sg_message_id msgid, m.send_time `sent`, m.updated, m.status, e.account_name `name` FROM {$this->table_maillog} m, {$this->table_entity} e WHERE e.id=m.entity_id AND send_time BETWEEN '{$sDate1}' AND '{$sDate2}' ORDER BY send_time DESC";
         $oResult = $this->db->query($q);
-        $aData = $oResult->result_object();
+//        echo $this->db->last_query();die;
+        $aData = [];
+        if($oResult)
+        {
+            $aData = $oResult->result_object();
+        }
+
         return $aData;
     }
 }
