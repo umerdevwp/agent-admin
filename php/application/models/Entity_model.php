@@ -279,4 +279,20 @@ class Entity_model extends CI_Model
 
         return ['type'=>'error','message'=>'Record not found'];
     }
+
+    public function checkRole($id)
+    {
+        if ($this->db->table_exists($this->table)) {
+            $this->db->select('parent_account');
+            $this->db->from($this->table);
+            $this->db->where('id', $id);
+            $query = $this->db->get();
+            return $query->result();
+        } else {
+            log_message('error', 'Administrators table does not exit');
+            return NULL;
+        }
+
+    }
+
 }

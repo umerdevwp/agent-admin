@@ -113,7 +113,10 @@ class UserProfile extends React.Component {
             {/*</a>*/}
             <div className="kt-notification__custom">
 
-               <button className={'btn btn-primary'} onClick={()=>{this.props.auth.logout('/')}}>Sign Out</button>
+               <button className={'btn btn-primary'} onClick={()=>{
+                 localStorage.clear();
+                 this.props.auth.logout('/');
+               }}>Sign Out</button>
 
             </div>
           </div>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="724d5bbc-b32b-482c-b29b-b81523075c04" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/asset-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/asset-manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/html/src/_metronic/layout/Layout.js" beforeDir="false" afterPath="$PROJECT_DIR$/html/src/_metronic/layout/Layout.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/html/src/app/context/OktaUserContext.js" beforeDir="false" afterPath="$PROJECT_DIR$/html/src/app/context/OktaUserContext.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/html/src/app/crud/admin.crud.js" beforeDir="false" afterPath="$PROJECT_DIR$/html/src/app/crud/admin.crud.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/html/src/app/crud/attachment.js" beforeDir="false" afterPath="$PROJECT_DIR$/html/src/app/crud/attachment.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/html/src/app/crud/enitity.crud.js" beforeDir="false" afterPath="$PROJECT_DIR$/html/src/app/crud/enitity.crud.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/html/src/app/pages/attachments/AddAttachmentForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/html/src/app/pages/attachments/AddAttachmentForm.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/html/src/app/pages/attachments/Attachments.js" beforeDir="false" afterPath="$PROJECT_DIR$/html/src/app/pages/attachments/Attachments.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/html/src/app/pages/auth/Logout.js" beforeDir="false" afterPath="$PROJECT_DIR$/html/src/app/pages/auth/Logout.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/html/src/app/pages/contacts/AddContactForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/html/src/app/pages/contacts/AddContactForm.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/html/src/app/pages/entity/AddEntityForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/html/src/app/pages/entity/AddEntityForm.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/html/src/app/pages/entity/ContactList.js" beforeDir="false" afterPath="$PROJECT_DIR$/html/src/app/pages/entity/ContactList.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/html/src/app/pages/entity/EntityDetailedPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/html/src/app/pages/entity/EntityDetailedPage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/html/src/app/pages/entity/EntityListing.js" beforeDir="false" afterPath="$PROJECT_DIR$/html/src/app/pages/entity/EntityListing.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/html/src/app/pages/entity/TestAutocomplete.js" beforeDir="false" afterPath="$PROJECT_DIR$/html/src/app/pages/entity/TestAutocomplete.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/html/src/app/pages/home/HomePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/html/src/app/pages/home/HomePage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/html/src/app/partials/layout/UserProfile.js" beforeDir="false" afterPath="$PROJECT_DIR$/html/src/app/partials/layout/UserProfile.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/html/src/app/router/AgentAdminRoutes.js" beforeDir="false" afterPath="$PROJECT_DIR$/html/src/app/router/AgentAdminRoutes.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/precache-manifest.025fc1eaf3dfda2b626d75fcb1487afc.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/service-worker.js" beforeDir="false" afterPath="$PROJECT_DIR$/service-worker.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/2.602bd7a6.chunk.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/2.602bd7a6.chunk.js.LICENSE.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/2.602bd7a6.chunk.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/main.46c04b64.chunk.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/main.46c04b64.chunk.js.LICENSE.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/main.46c04b64.chunk.js.map" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings" synchronizationState="SYNCHRONIZE">
+    <pharConfigPath>$PROJECT_DIR$/php/composer.json</pharConfigPath>
+    <execution>
+      <executable />
+    </execution>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration">
+    <include_path>
+      <path value="$PROJECT_DIR$/php/vendor/symfony/var-dumper" />
+      <path value="$PROJECT_DIR$/php/vendor/symfony/translation-contracts" />
+      <path value="$PROJECT_DIR$/php/vendor/zohocrm/php-sdk" />
+      <path value="$PROJECT_DIR$/php/vendor/symfony/yaml" />
+      <path value="$PROJECT_DIR$/php/vendor/nesbot/carbon" />
+      <path value="$PROJECT_DIR$/php/vendor/league/flysystem-memory" />
+      <path value="$PROJECT_DIR$/php/vendor/symfony/options-resolver" />
+      <path value="$PROJECT_DIR$/php/vendor/vlucas/phpdotenv" />
+      <path value="$PROJECT_DIR$/php/vendor/symfony/polyfill-mbstring" />
+      <path value="$PROJECT_DIR$/php/vendor/symfony/polyfill-ctype" />
+      <path value="$PROJECT_DIR$/php/vendor/symfony/translation" />
+      <path value="$PROJECT_DIR$/php/vendor/symfony/polyfill-php72" />
+      <path value="$PROJECT_DIR$/php/vendor/okta/sdk" />
+      <path value="$PROJECT_DIR$/php/vendor/okta/jwt-verifier" />
+      <path value="$PROJECT_DIR$/php/vendor/cache/filesystem-adapter" />
+      <path value="$PROJECT_DIR$/php/vendor/cache/adapter-common" />
+      <path value="$PROJECT_DIR$/php/vendor/nikic/php-parser" />
+      <path value="$PROJECT_DIR$/php/vendor/cache/tag-interop" />
+      <path value="$PROJECT_DIR$/php/vendor/league/flysystem" />
+      <path value="$PROJECT_DIR$/php/vendor/kenjis/ci-phpunit-test" />
+      <path value="$PROJECT_DIR$/php/vendor/psr/cache" />
+      <path value="$PROJECT_DIR$/php/vendor/psr/log" />
+      <path value="$PROJECT_DIR$/php/vendor/psr/http-message" />
+      <path value="$PROJECT_DIR$/php/vendor/clue/stream-filter" />
+      <path value="$PROJECT_DIR$/php/vendor/psr/simple-cache" />
+      <path value="$PROJECT_DIR$/php/vendor/smartystreets/phpsdk" />
+      <path value="$PROJECT_DIR$/php/vendor/guzzlehttp/psr7" />
+      <path value="$PROJECT_DIR$/php/vendor/chriskacerguis/codeigniter-restserver" />
+      <path value="$PROJECT_DIR$/php/vendor/php-http/httplug" />
+      <path value="$PROJECT_DIR$/php/vendor/php-http/discovery" />
+      <path value="$PROJECT_DIR$/php/vendor/php-http/message-factory" />
+      <path value="$PROJECT_DIR$/php/vendor/php-http/message" />
+      <path value="$PROJECT_DIR$/php/vendor/phpoption/phpoption" />
+      <path value="$PROJECT_DIR$/php/vendor/php-http/promise" />
+      <path value="$PROJECT_DIR$/php/vendor/tightenco/collect" />
+      <path value="$PROJECT_DIR$/php/vendor/ralouphie/getallheaders" />
+      <path value="$PROJECT_DIR$/php/vendor/composer" />
+      <path value="$PROJECT_DIR$/php/vendor/firebase/php-jwt" />
+      <path value="$PROJECT_DIR$/php/vendor/php-http/curl-client" />
+      <path value="$PROJECT_DIR$/php/vendor/php-http/client-common" />
+    </include_path>
+  </component>
+  <component name="ProjectId" id="1d7kTCDEOBzt2Hmtma9CP51Odpm" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="724d5bbc-b32b-482c-b29b-b81523075c04" name="Default Changelist" comment="" />
+      <created>1591783524069</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1591783524069</updated>
+      <workItem from="1591783525321" duration="7574000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+</project>

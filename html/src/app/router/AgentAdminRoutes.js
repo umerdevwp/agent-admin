@@ -22,35 +22,35 @@ const AgentAdminRoutes = withRouter(({history}) => {
         <>
 
 
+            <Security className={'kt-grid kt-grid--ver kt-grid--root'}
+                      issuer={process.env.REACT_APP_OKTA_BASE_URL + 'oauth2/default'}
+                      clientId={process.env.REACT_APP_OKTA_CLIENT_ID}
+                      redirectUri={window.location.origin + '/implicit/callback'}
+                      onAuthRequired={onAuthRequired}
+                      pkce={true}>
 
-    <Security className={'kt-grid kt-grid--ver kt-grid--root'}
-              issuer={process.env.REACT_APP_OKTA_BASE_URL + 'oauth2/default'}
-              clientId={process.env.REACT_APP_OKTA_CLIENT_ID}
-              redirectUri={window.location.origin + '/implicit/callback'}
-              onAuthRequired={onAuthRequired}
-              pkce={true}>
+                <Route exact path='/' exact={true} component={AuthPage}/>
+                <Route exact path='/privacy-policy' component={Privacy}/>
 
-        <Route exact path='/' exact={true} component={AuthPage}/>
-        <Route exact path='/privacy-policy' component={Privacy}/>
+                <OktaUserContextProvider>
+                    <SecureRoute exact path='/dashboard' component={CustomLayoutForAgentAdmin}/>
+                    <Route exact path='/dashboard/entity/:id' component={CustomLayoutForAgentAdmin}/>
+                    <Route exact={true} path='/dashboard/entity/form/add' component={CustomLayoutForAgentAdmin}/>
+                    <Route exact={true} path='/dashboard/admins' component={CustomLayoutForAgentAdmin}/>
+                    <Route exact={true} path='/dashboard/contacts' component={CustomLayoutForAgentAdmin}/>
+                    <Route exact={true} path='/dashboard/contact/form/add/:id' component={CustomLayoutForAgentAdmin}/>
+                    <Route exact={true} path='/dashboard/attachments' component={CustomLayoutForAgentAdmin}/>
+                    <Route exact={true} path='/dashboard/attachment/form/add/:id'
+                           component={CustomLayoutForAgentAdmin}/>
+                    <Route exact={true} path='/dashboard/agents' component={CustomLayoutForAgentAdmin}/>
+                    <Route exact={true} path='/test' component={CustomLayoutForAgentAdmin}/>
+                </OktaUserContextProvider>
+                <Route path='/implicit/callback' component={ImplicitCallback}/>
+                <Route path="/error" component={ErrorsPage}/>
 
-        <OktaUserContextProvider>
-            <SecureRoute exact path='/dashboard' component={CustomLayoutForAgentAdmin}/>
-            <Route exact path='/dashboard/entity/:id' component={CustomLayoutForAgentAdmin}/>
-            <Route exact={true} path='/dashboard/entity/form/add' component={CustomLayoutForAgentAdmin}/>
-            <Route exact={true} path='/dashboard/admins' component={CustomLayoutForAgentAdmin}/>
-            <Route exact={true} path='/dashboard/contacts' component={CustomLayoutForAgentAdmin}/>
-            <Route exact={true} path='/dashboard/contact/form/add/:id' component={CustomLayoutForAgentAdmin}/>
-            <Route exact={true} path='/dashboard/attachments' component={CustomLayoutForAgentAdmin}/>
-            <Route exact={true} path='/dashboard/attachment/form/add' component={CustomLayoutForAgentAdmin}/>
-            <Route exact={true} path='/dashboard/agents' component={CustomLayoutForAgentAdmin}/>
-            <Route exact={true} path='/test' component={CustomLayoutForAgentAdmin}/>
-        </OktaUserContextProvider>
-        <Route path='/implicit/callback' component={ImplicitCallback}/>
-        <Route path="/error" component={ErrorsPage}/>
-
-    </Security>
-</>
-)
+            </Security>
+        </>
+    )
 });
 
 

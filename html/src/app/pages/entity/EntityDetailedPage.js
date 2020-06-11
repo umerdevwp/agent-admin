@@ -28,9 +28,9 @@ import {Title} from '../home/helpers/titles'
 import PermIdentityIcon from '@material-ui/icons/PermIdentity';
 import RoomIcon from '@material-ui/icons/Room';
 import PersonIcon from '@material-ui/icons/Person';
-
+import StreetviewIcon from '@material-ui/icons/Streetview';
 import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
-
+import LocationCityIcon from '@material-ui/icons/LocationCity';
 import BusinessIcon from '@material-ui/icons/Business';
 import MailIcon from '@material-ui/icons/Mail';
 import Container from "@material-ui/core/Container";
@@ -38,6 +38,9 @@ import Link from "@material-ui/core/Link";
 import {useHistory} from "react-router-dom";
 import {entityDetail} from '../../crud/enitity.crud';
 import {OktaUserContext} from '../../context/OktaUserContext';
+import Breadcrumbs from "@material-ui/core/Breadcrumbs";
+import Typography from "@material-ui/core/Typography";
+
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -66,6 +69,12 @@ const useStyles = makeStyles(theme => ({
 
 
 const EntityDetailedPage = (props) => {
+
+
+    const entity_id = props.entityid ? props.entityid : props.match.params.id;
+    const breadcrumbs_show = !props.breadcrumbz ? props.breadcrumbz : true;
+    const HOST = process.env.REACT_APP_SERVER_API_URL;
+
     const {oktaprofile, isAdmin} = useContext(OktaUserContext);
     const classes = useStyles();
     const history = useHistory();
@@ -81,7 +90,7 @@ const EntityDetailedPage = (props) => {
 
 
     const fetchDetailedProfile = async () => {
-        const detailedView = await entityDetail(oktaprofile.organization, oktaprofile.email, props.match.params.id);
+        const detailedView = await entityDetail(oktaprofile.organization, oktaprofile.email, entity_id);
         setEntitydetail(detailedView.result)
         setContactList(detailedView.result.contacts);
         setAttachmentList(detailedView.result.attachments)
@@ -97,7 +106,6 @@ const EntityDetailedPage = (props) => {
             {title: 'Contact Type', field: 'contactType'},
             {title: 'email', field: 'email'},
             {title: 'Street', field: 'mailingStreet'},
-            {title: 'Country', field: 'mailingCountry'},
             {title: 'City', field: 'mailingCity'},
             {title: 'State', field: 'mailingState'},
             {title: 'Zip', field: 'mailingZip'},
@@ -110,6 +118,7 @@ const EntityDetailedPage = (props) => {
     const taskData = {
         columns: [
             {title: 'Name', field: 'subject'},
+            {title: 'Due Date', field: 'dueDate'},
             {title: 'Status', field: 'status'},
         ],
         data: taskList,
@@ -133,37 +142,35 @@ const EntityDetailedPage = (props) => {
             {
                 title: 'File Name',
                 editable: 'never',
-                render: rowData => <a href={rowData.link_url}> <PictureAsPdfIcon/> {rowData.name}
+                render: rowData => <a target="_blank"
+                                      href={`${HOST}/download/file/${rowData.fid}?name=${rowData.name}`}>
+                    <PictureAsPdfIcon/> {rowData.name}
                 </a>
             },
-            {title: 'Date Added', field: 'created_time'},
-            {
-                title: 'Size', editable: 'never', render: rowData => {
-                    const bytes = parseInt(rowData.size);
-                    const decimals = 2;
-                    if (bytes === 0) return '0 Bytes';
-
-                    const k = 1024;
-                    const dm = decimals < 0 ? 0 : decimals;
-                    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-
-                    const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-                    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-                }
-            },
+            {title: 'Date', field: 'created'},
+            {title: 'Size', field: 'fileSize'},
         ],
         data: attachmentList,
     };
 
 
-    if (entitydetail) {
-        console.log(entitydetail)
-    }
-
     return (
 
         <>
+
+            <div>
+                <h3>Navigation</h3>
+                <Breadcrumbs aria-label="breadcrumb">
+                    <Link color="inherit" onClick={(e) => {
+                        history.goBack()
+                    }}>
+                        Dashboard
+                    </Link>
+                    <Typography color="textPrimary">Entity</Typography>
+                </Breadcrumbs>
+            </div>
+
+
             {entitydetail ? <Title title={entitydetail.entity.name}/> : <Title title={''}/>}
 
             <Grid container spacing={1}>
@@ -177,8 +184,8 @@ const EntityDetailedPage = (props) => {
                                     <li className={classes.listItem}><strong>State ID:</strong> 0</li>
                                     <li className={classes.listItem}><strong>Formation
                                         Date:</strong> {entitydetail.entity.formationDate}</li>
-                                    <li className={classes.listItem}><strong>Expiration
-                                        Date: </strong> {entitydetail.entity.expiration_date}</li>
+                                    <li className={classes.listItem}><strong>Registered Agent Expiration
+                                        Date: </strong> {entitydetail.entity.expirationDate}</li>
                                     {/*<li className={classes.listItem}><strong>Tax ID:</strong> 09890890</li>*/}
                                 </ul> :
 
@@ -199,14 +206,19 @@ const EntityDetailedPage = (props) => {
                         <PortletHeader icon={<RoomIcon className={classes.adjustment}/>} title="RA Address"/>
                         <PortletBody>
                             {entitydetail ?
+
                                 <ul className={classes.companyinfo}>
-                                    <li className={classes.listItem}><PersonIcon className={classes.adjustment}/>
+                                    <li className={classes.listItem}>
                                         <strong>{entitydetail.registerAgent.name}</strong></li>
-                                    <li className={classes.listItem}><RoomIcon
-                                        className={classes.adjustment}/> {entitydetail.registerAgent.address} {entitydetail.registerAgent.address2}
+                                    <li className={classes.listItem}><PersonIcon className={classes.adjustment}/>
+                                        <strong>{entitydetail.registerAgent.fileAs}</strong></li>
+                                    <li className={classes.listItem}><StreetviewIcon
+                                        className={classes.adjustment}/> {entitydetail.registerAgent.address}
                                     </li>
-                                    <li className={classes.listItem}><BusinessIcon
-                                        className={classes.adjustment}/> {entitydetail.registerAgent.city}, {entitydetail.registerAgent.state} {entitydetail.registerAgent.zip_code}
+                                    <li className={classes.listItem}><RoomIcon
+                                        className={classes.adjustment}/>{entitydetail.registerAgent.address2}</li>
+                                    <li className={classes.listItem}><LocationCityIcon
+                                        className={classes.adjustment}/> {entitydetail.registerAgent.city}, {entitydetail.registerAgent.state} {entitydetail.registerAgent.zipcode}
                                     </li>
                                 </ul> :
                                 <ul className={classes.companyinfo}>
@@ -215,6 +227,9 @@ const EntityDetailedPage = (props) => {
                                     <li className={classes.listItem}><RoomIcon className={classes.adjustment}/> -
                                     </li>
                                     <li className={classes.listItem}><BusinessIcon className={classes.adjustment}/> -
+                                    </li>
+                                    <li className={classes.listItem}><LocationCityIcon
+                                        className={classes.adjustment}/> -
                                     </li>
                                 </ul>
                             }
@@ -232,8 +247,7 @@ const EntityDetailedPage = (props) => {
                             {entitydetail ?
                                 <ul className={classes.companyinfo}>
                                     <li className={classes.listItem}><RoomIcon className={classes.adjustment}/>
-                                        <strong>{entitydetail.entity.shippingStreet} , {entitydetail.entity.shippingCity} {entitydetail.entity.shippingState}
-                                        {entitydetail.entity.shippingCode} </strong>
+                                        <strong>{entitydetail.entity.shippingStreet}, {entitydetail.entity.shippingCity}, {entitydetail.entity.shippingState} {entitydetail.entity.shippingCode} </strong>
                                     </li>
                                     <li className={classes.listItem}><MailIcon
                                         className={classes.adjustment}/> {entitydetail.entity.email}
@@ -257,21 +271,24 @@ const EntityDetailedPage = (props) => {
 
                 <Grid item xs={12}>
                     <ContactList loading={loading} tooltip={'Add New Contact'} redirect={true}
-                                 url={`/dashboard/contact/form/add/${props.match.params.id}`} data={taskData} title={'Compliance Tasks'}/>
+                                 url={`/dashboard/contact/form/add/${entity_id}`} data={taskData}
+                                 title={'Compliance Tasks'}/>
                 </Grid>
             </Grid>
 
             <Grid container spacing={5}>
                 <Grid item xs={12}>
-                    <ContactList loading={loading} tooltip={'Add New Contact'} redirect={true}
-                                 url={'/dashboard/contact/form/add'} data={attachmentData} title={'Attachments'}/>
+                    <ContactList action={true} loading={loading} tooltip={'Add New Attachment'} redirect={true}
+                                 url={`/dashboard/attachment/form/add/${entity_id}`} data={attachmentData}
+                                 title={'Attachments'}/>
                 </Grid>
 
             </Grid>
             <Grid container spacing={5}>
                 <Grid item xs={12}>
-                    <ContactList  action={true} loading={loading} tooltip={'Add New Contact'} redirect={true}
-                                 url={`/dashboard/contact/form/add/${props.match.params.id}`} data={contactData} title={'Contacts'}/>
+                    <ContactList action={true} loading={loading} tooltip={'Add New Contact'} redirect={true}
+                                 url={`/dashboard/contact/form/add/${entity_id}`} data={contactData}
+                                 title={'Contacts'}/>
                 </Grid>
             </Grid>
 

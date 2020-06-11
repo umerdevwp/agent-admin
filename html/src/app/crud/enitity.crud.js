@@ -1,6 +1,14 @@
 import axios from "axios";
 
-const HOST = process.env.REACT_APP_SERVER_API_URL
+const HOST = process.env.REACT_APP_SERVER_API_URL;
+
+const LOREX_TOKEN = process.env.REACT_APP_LOREX_TOKEN;
+const LOREX_API_HOST = process.env.REACT_APP_LOREX_API_HOST;
+
+
+
+// const LOREX_TOKEN = '3cJe5YXiSBGUAqYd0uFC2cKYvgfBIUswmXTudN3HQfvzIGvddfVYjPmakGOkGVM9g5YRKJR2FF9iYuZQ0GsbGw';
+// const LOREX_API_HOST = 'https://lorax-api-sandbox.filemystuff.com';
 export const LOGIN_URL = "api/auth/login";
 export const REGISTER_URL = "api/auth/register";
 export const REQUEST_PASSWORD_URL = "api/auth/forgot-password";
@@ -10,11 +18,11 @@ export const ENTITY = HOST;
 
 export const ME_URL = "api/me";
 
-export const entityList = async (zoho_id, email) => {
+export const entityList = async () => {
     const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
 
     if(okta) {
-        const response = await fetch(`${ENTITY}/user_api/userdata/?zoho_id=${zoho_id}&email=${email}`, {
+        const response = await fetch(`${ENTITY}/Entity/getChildAccount`, {
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Authorization': okta.accessToken.accessToken,
@@ -24,6 +32,23 @@ export const entityList = async (zoho_id, email) => {
         return Promise.resolve(response.json());
     }
 }
+
+export const checkRole = async () => {
+    const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
+
+    if(okta) {
+        const response = await fetch(`${ENTITY}/user_api/role`, {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': okta.accessToken.accessToken,
+
+            }
+        });
+        return Promise.resolve(response.json());
+    }
+}
+
+
 
 export const checkAdmin = async (zoho_id, email) => {
     const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
@@ -44,7 +69,7 @@ export const entityDetail = async (zoho_id, email, entity) => {
     const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
 
     if(okta) {
-        const response = await fetch(`${ENTITY}/entity/entityview/?eid=${zoho_id}`, {
+        const response = await fetch(`${ENTITY}/entity/entityview/?eid=${entity}`, {
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Authorization': okta.accessToken.accessToken,
@@ -116,13 +141,17 @@ export const createEntity = async (data) => {
 }
 
 export const lorexFileUpload = async (data) => {
+
+
+    console.log('LOREX_TOKEN',LOREX_TOKEN);
+    console.log('LOREX_URL',`${LOREX_API_HOST}/api/v1/upload`);
+    console.log('LOREX_URL',HOST);
     const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
     if(okta) {
-        const response = await fetch(`https://lorax-api-sandbox.filemystuff.com/api/v1/upload`, {
+        const response = await fetch(`${LOREX_API_HOST}/api/v1/upload`, {
             method: 'post',
             headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Authorization': okta.accessToken.accessToken,
+                'authorization': LOREX_TOKEN,
             },
             body: data
         })

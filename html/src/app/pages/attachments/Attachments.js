@@ -14,6 +14,8 @@ import Link from "@material-ui/core/Link";
 import {useHistory} from "react-router-dom";
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
+import Breadcrumbs from '@material-ui/core/Breadcrumbs';
+import Typography from '@material-ui/core/Typography';
 import MaterialTable from 'material-table';
 import {OktaUserContext} from "../../context/OktaUserContext";
 import {AttachmentsList} from "../../crud/attachment";
@@ -60,7 +62,7 @@ const Attachments = () => {
             const response = await AttachmentsList(oktaprofile.organization);
             await setattachmentList(response.data.attachments);
             setLoading(false);
-            console.log(response);
+
         } catch (e) {
             console.log(e);
         }
@@ -71,25 +73,11 @@ const Attachments = () => {
             {
                 title: 'File Name',
                 editable: 'never',
-                render: rowData => <a href={rowData.link_url}> <PictureAsPdfIcon/> {rowData.name}
+                render: rowData => <a target="_blank" href={`${process.env.REACT_APP_SERVER_API_URL}/download/file/${rowData.fid}?name=${rowData.name}`}> <PictureAsPdfIcon/> {rowData.name}
                 </a>
             },
-            {title: 'Date Added', field: 'created_time'},
-            {
-                title: 'Size', editable: 'never', render: rowData => {
-                    const bytes = parseInt(rowData.size);
-                    const decimals = 2;
-                    if (bytes === 0) return '0 Bytes';
-
-                    const k = 1024;
-                    const dm = decimals < 0 ? 0 : decimals;
-                    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-
-                    const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-                    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-                }
-            },
+            {title: 'Date', field: 'created'},
+            {title: 'Size', field: 'fileSize'},
         ],
         data: attachmentList,
     };
@@ -102,6 +90,8 @@ const Attachments = () => {
 
     return (
         <>
+
+
             <Title title={'Attachments'}/>
             <Grid container spacing={1}>
                 <Grid item xs={12}>
