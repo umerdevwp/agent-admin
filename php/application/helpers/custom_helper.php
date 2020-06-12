@@ -86,6 +86,7 @@ function validateFileExt($strFileFullPath,$arAllowedExts)
  */
 function isSessionValid($action,$aData)
 {
+
     foreach($aData as $k=>$v)
     {
         if(strtoupper($k)=="CAN_$action" && $v=="Y")
@@ -94,7 +95,11 @@ function isSessionValid($action,$aData)
         }
     }
 
-    responseJson(['type'=>'error','message'=>'Access not allowed']);
+    if(!$aData){
+        responseJson(['type'=>'error','message'=>'Login is not define']);
+    } else {
+        responseJson(['type'=>'error','message'=>'Access not allowed']);
+    }
     exit();
 }
 
