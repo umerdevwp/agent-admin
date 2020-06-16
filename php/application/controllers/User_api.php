@@ -34,10 +34,9 @@ class User_api extends RestController
         if (!empty($checkSuperUser)) {
             foreach ($checkSuperUser as $value) {
                 if (!empty($value->parent_account)) {
-                    $this->response(['role' => 'child'], 200);
+                    $this->response([ 'status' => true, 'role' => 'child'], 200);
                 } else {
-                    $this->response(['role' => 'parent'], 200);
-
+                    $this->response([ 'status' => true, 'role' => 'parent'], 200);
                 }
             }
         } else {
