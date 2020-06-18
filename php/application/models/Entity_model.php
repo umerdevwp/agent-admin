@@ -126,6 +126,14 @@ class Entity_model extends CI_Model
         return $query->result();
     }
 
+    /**
+     * Check entity id is under parent id
+     * 
+     * @param Integer $iEntityId Integer id of entity
+     * @param Integer $iParentId Integer id of parent
+     * 
+     * @return Bool Bolean false or true
+     */
     public function isParent($iEntityId,$iParentId){
         //make sure the entity belongs to right parent or not.
         $this->db->select('id');
@@ -134,7 +142,7 @@ class Entity_model extends CI_Model
         $this->db->where(Self::$parent_entity, $iParentId);
         $query = $this->db->get();
         $aData = $query->row();
-
+        
         if(isset($aData->id)) return true;
         else return false;
     }

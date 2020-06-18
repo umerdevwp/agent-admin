@@ -40,7 +40,6 @@ class Entity extends RestController
         $sid = $_SESSION["eid"];
 
         if (empty($sid)) {
-            $this->session->set_flashdata("error", "Invalid entity id");
             redirectSession();
         }
 
@@ -140,9 +139,16 @@ class Entity extends RestController
                 ], 200);
             }
         } else {
-            $this->response([
-                'errors' => ['status' => 404, 'detail' => 'Record not found']
-            ], 404);
+            if(!$bIsParentValid && $iParentId > 0)
+            {
+                $this->response([
+                    'errors' => ['status' => 401, 'detail' => 'Invalid detail request']
+                ], 404);
+            } else {
+                $this->response([
+                    'errors' => ['status' => 404, 'detail' => 'Record not found']
+                ], 404);
+            }
         }
         $this->response([
             'errors' => ['status' => 404, 'detail' => 'This will never appear']
@@ -278,9 +284,7 @@ HC;
 
 
         if ($this->form_validation->run() == FALSE) {
-            if (count($arError) > 0) {
-                $this->session->set_flashdata("error", $arError[0]);
-            }
+            
             $aError = $this->form_validation->error_array();
 
             $this->response([
@@ -301,7 +305,6 @@ HC;
 
             // succcess redirect to dashboard
             if ($response["type"] == 'ok') {
-                $this->session->set_flashdata("ok", $response["message"]);
 
                 // allow without file, else check type and size
                 $iZohoId = $response['data']['id'];
@@ -321,20 +324,137 @@ HC;
 
                 // redirect to form, show error
             } else if ($response["error_code"] == 2) {
-                $this->session->set_flashdata("error", $response["error"]);
                 $this->redirectAfterAdd($response['data']['id']);
             } else {
-                $this->session->set_flashdata("error", $response["error"]);
-
-
                 $this->response([
                     'status' => false,
                     'error' => $response['error']
                 ], 400);
-
-
             }
 
+        }
+    }
+
+    private function validateForm()
+    {
+        $bTagSmartyValidated = true;
+        $arError = [];
+        $this->load->helper("custom");
+        $this->load->library('form_validation');
+
+        // try to correct user date format, then validate
+        if ($this->input->post("inputFormationDate") != "") {
+            $strFormationDate = str_replace("  ", " ", $this->input->post("inputFormationDate"));
+            $strFormationDate = str_replace(" ", "-", $strFormationDate);
+            $strFormationDate = date("Y-m-d", strtotime($strFormationDate));
+
+            if ($strFormationDate == "1970-01-01") {
+                //$_POST["inputFormationDate"] = "0000 00 00";
+            } else {
+                $_POST["inputFormationDate"] = $strFormationDate;
+            }
+        }
+
+        $this->form_validation->set_rules('inputName', 'Account Name', 'required|regex_match[/[a-zA-Z\s]+/]', ["regex_match" => "Only alphabets and spaces allowed."]);
+
+        $this->form_validation->set_rules('inputFirstName', 'First Name', 'required|regex_match[/[a-zA-Z\s]+/]', ["regex_match" => "Only alphabets and spaces allowed."]);
+        $this->form_validation->set_rules('inputLastName', 'Last Name', 'required|regex_match[/[a-zA-Z\s]+/]', ["regex_match" => "Only alphabets and spaces allowed."]);
+
+
+        $this->form_validation->set_rules('inputNotificationContactType', 'Contact Type', 'required|alpha');
+        $this->form_validation->set_rules('inputFillingState', 'Filing State', 'required|alpha|exact_length[2]');
+        $this->form_validation->set_rules('inputFillingStructure', 'Entity Type', 'required|regex_match[/[A-Z\-]+/]');
+        $this->form_validation->set_rules('inputFormationDate', 'Formation Date', 'required|regex_match[/[0-9]{4,}\-[0-9]{2,}\-[0-9]{2,}/]', ["regex_match" => "Allowed %s format: 2019-01-01"]);
+        $this->form_validation->set_rules('inputFiscalDate', 'Fiscal Date', 'required|regex_match[/[0-9]{4,}\-[0-9]{2,}\-[0-9]{2,}/]', ["regex_match" => "Allowed %s format: 2019-01-01"]);
+        $this->form_validation->set_rules('inputNotificationEmail', 'Notification Email', 'required|valid_email');
+        $this->form_validation->set_rules('inputNotificationPhone', 'Phone', 'required|regex_match[/[\+\s\-0-9]+/]');
+        $this->form_validation->set_rules('inputNotificationAddress', 'Shipping Street', 'required');
+        $this->form_validation->set_rules('inputNotificationCity', 'Shipping City', 'required');
+        $this->form_validation->set_rules('inputNotificationState', 'Shipping State', 'required');
+        $this->form_validation->set_rules('inputNotificationZip', 'Shipping Code', 'required');
+        $this->form_validation->set_rules('inputBusinessPurpose', 'Business purpose', 'required');
+
+        if ($this->form_validation->run() === FALSE) {
+            return $this->form_validation->error_array();
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Handle API post request to edit entity details
+     */
+    public function edit_post()
+    {
+        $this->checkPermission("EDIT", $this->sModule);
+        
+        $this->load->model("Entity_model");
+
+        // is user editing his child or own profile
+        $bAllowEdit = $bValidateParent = false;
+
+        // edit request is for child user? check valid parent
+        if($_SESSION['eid']!=$this->input->post("eid"))
+        $bValidateParent = $this->Entity_model->isParent($this->input->post("eid"),$_SESSION['eid']);
+        
+        // parent is valid
+        if($bValidateParent)
+            $bAllowEdit = true;
+        // user editing own profile? allow edit
+        else if($_SESSION['eid']==$this->input->post("eid"))
+            $bAllowEdit = true;
+
+        if($bAllowEdit)
+        {
+            // return true or error list
+            $aError = $this->validateForm();
+        
+            if (is_array($aError)) {
+
+                $this->response([
+                    'status' => false,
+                    'field_error' => $aError
+                ], 404);
+
+            } else {
+                
+                $_POST['inputFormationDate'] = date("Y-m-d", strtotime($this->input->post("inputFormationDate")));
+                $_POST['inputFiscalDate'] = date("Y-m-d", strtotime($this->input->post("inputFiscalDate")));
+
+                $response = $this->zohoEditEntity($this->input->post("eid"));
+
+                // succcess redirect to dashboard
+                if ($response["entityId"] > 0) {
+                    // allow without file, else check type and size
+                    $iZohoId = $this->input->post("eid");
+
+                    // add a note if smarty validated address successfuly
+                    //if (!$bSmartyAddress) {
+                    //    $response = $this->ZoHo_Account->newZohoNote("Accounts", $response['data']['id'], "Smartystreet has replaced following", $sSmartyAddress);
+                    //}
+
+                    $this->redirectAfterAdd($response['data']['id']);
+
+                    // redirect to form, show error
+                } else if ($response["error_code"] == 2) {
+                    $this->redirectAfterAdd($response['data']['id']);
+                } else {
+
+
+                    $this->response([
+                        'status' => false,
+                        'error' => $response['error']
+                    ], 400);
+
+
+                }
+
+            }
+        } else {
+            $this->response([
+                'status' => false,
+                'message' => 'Invalid edit request'
+            ], 401);            
         }
     }
 
@@ -584,8 +704,46 @@ HC;
             $this->Permissions_model->add($iEntityId, $this->Permissions_model->aRole['entity']);
         }
     }
-
+    /**
+     * Add zoho contact in the crm, populate all the fields from post request
+     * @param Integer $iEntityId numeric id of the actual contact
+     * @return Array Response from zoho api
+     */
     public function zohoAddContact($iEntityId)
+    {
+        $arError = [];
+
+        $aResponse = $this->ZoHo_Account->newZohoContact(
+            $iEntityId,
+            [
+                "First_Name" => $this->input->post("inputFirstName"),
+                "Last_Name" => $this->input->post("inputLastName"),
+
+                "Email" => $this->input->post("inputNotificationEmail"),
+                "Phone" => $this->input->post("inputNotificationPhone"),
+                "Contact_Type" => $this->input->post("inputNotificationContactType"),
+
+                "Mailing_Street" => $this->input->post("inputNotificationAddress"),
+                "Mailing_City" => $this->input->post("inputNotificationCity"),
+                "Mailing_State" => $this->input->post("inputNotificationState"),
+                "Mailing_Zip" => $this->input->post("inputNotificationZip")
+            ]
+        );
+
+        if ($aResponse['type'] == 'error') {
+            error_log("Unknown  server error, contact creation failed.");
+            return ['status' => '500', 'detail' => "Unknown server error, contact creation failed."];
+        }
+
+        return $aResponse['results'];
+    }
+
+    /**
+     * Add zoho contact in the crm, populate all the fields from post request
+     * @param Integer $iEntityId numeric id of the actual contact
+     * @return Array Response from zoho api
+     */
+    public function zohoEditContact($iEntityId)
     {
         $arError = [];
 
@@ -631,31 +789,7 @@ HC;
         if ($id > 0) {
             $bAttachmentDone = true;
         }
-        /*
-        // select entity instance
-        $oApi = $this->ZoHo_Account->getInstance("Accounts", $iEntityId);
-
-        // if file is give for attachment
-        if ($_FILES['inputFiling']["name"] != "") {
-            $sFilename = time() . "-" . $_FILES['inputFiling']['name'];
-            $_POST['attachment'] = $sFilename;
-            // move uploaded file to local
-            if (move_uploaded_file($_FILES['inputFiling']['tmp_name'], getenv("UPLOAD_PATH") . $sFilename)) {
-                try {
-                    $oAttachment = $oApi->uploadAttachment($_SERVER['DOCUMENT_ROOT'] . "/" . getenv("UPLOAD_PATH") . $sFilename); // $filePath - absolute path of the attachment to be uploaded.
-                    //$oAttachmentResponse = $oAttachment->getDetails();
-                    $bAttachmentDone = true;
-                } catch (Exception $e) {
-                    $sError = "code: " . $e->getCode() . ", error: Api: " . $e->getMessage();
-                    $bAttachmentDone = false;
-                }
-
-                // TODO: remove uploaded file from directory getenv("UPLOAD_PATH")
-            } else {
-                $sError = "User created successfully, Internal Server Error: file upload failed.";
-            }
-        }
-        */
+        
         if (!$bAttachmentDone) {
             return ['status' => '500', 'detail' => $sError];
         }
@@ -663,6 +797,81 @@ HC;
         return $bAttachmentDone;
     }
 
+    /**
+     * Allow editing zoho entity details based on provided id, by populating respective values
+     */
+    private function zohoEditEntity($iEid)
+    {
+        $iParentZohoId = $_SESSION['eid'];
+        $this->load->model("ZoHo_Account");
+        $this->load->model("RegisterAgents_model");
+
+        $oApi = $this->ZoHo_Account->getInstance()->getRecordInstance("Accounts", $iEid);
+
+        $oApi->setFieldValue("Account_Name", $this->input->post("inputName")); // This function use to set FieldApiName and value similar to all other FieldApis and Custom field
+        $oApi->setFieldValue("Filing_State", $this->input->post("inputFillingState")); // Account Name can be given for a new account, account_id is not mandatory in that case
+        $oApi->setFieldValue("Entity_Type", $this->input->post("inputFillingStructure")); // Account Name can be given for a new account, account_id is not mandatory in that case
+
+        $oApi->setFieldValue("Formation_Date", $this->input->post("inputFormationDate"));
+
+        // firstName, lastName fields going under contacts
+
+        $oApi->setFieldValue("Notification_Email", $this->input->post("inputNotificationEmail"));
+        $oApi->setFieldValue("Phone", $this->input->post("inputNotificationPhone"));
+        $oApi->setFieldValue("Shipping_Street", $this->input->post("inputNotificationAddress"));
+        $oApi->setFieldValue("Shipping_City", $this->input->post("inputNotificationCity"));
+        $oApi->setFieldValue("Shipping_State", $this->input->post("inputNotificationState"));
+        $oApi->setFieldValue("Shipping_Code", $this->input->post("inputNotificationZip"));
+        $oApi->setFieldValue("Business_purpose", $this->input->post("inputBusinessPurpose"));
+
+
+        // fetch RA (registered agent) id from DB
+        $strFilingState = $this->input->post("inputFillingState");
+        $row = $this->RegisterAgents_model->find(["name" => $strFilingState . " - UAS"]);
+        $iRAId = "";
+        if ($row->id > 0) {
+            $iRAId = $row->id;
+        }
+
+        // additional detail as default values for new entity
+        // tag call needs account id instance, added below after attachments
+        if (isDev()) {
+            $oApi->setFieldValue("RA", "");
+            // parent account fail on sandbox
+            // layout fail on sandbox
+        } else {
+            // push the RA id data to zoho
+            $oApi->setFieldValue("RA", $iRAId);
+            // parent account not needed for edit
+            $oApi->setFieldValue("Layout", "4071993000001376034");// for customer layout id = Customer
+        }
+        $oApi->setFieldValue("Account_Type", "Distributor");
+        $oApi->setFieldValue("status", "InProcess");
+
+        // Billing addresses not require in edit
+
+        $trigger = array();//triggers to include
+        $lar_id = "";//lead assignment rule id
+
+        $oResponse = null;
+        try {
+            // setting trigger and $lar_id causing issue, api url not correct
+            $responseIns = $oApi->update();//$trigger , $larid optional
+
+            $oResponse = $responseIns->getDetails();
+
+            return ['entityId'=>$oResponse["id"],'agentId'=>$iRAId];
+        } catch (Exception $oError) {
+            // message
+            $sError = "code: " . $oError->data[0]->code . ", error: Api: " . $oError->data[0]->details->expected_data_type . ", " . $oError->data[0]->details->api_name . ", message: " . $oError->getMessage();
+        }
+
+        return $sError;
+    }
+
+    /**
+     * Add entity into zoho crm, by populating respective values from post request
+     */
     private function zohoAddEntity()
     {
         $iParentZohoId = $_SESSION['eid'];
