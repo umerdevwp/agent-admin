@@ -609,6 +609,42 @@ class ZoHo_Account extends CI_Model
     }
 
     /**
+     * Edit zoho contact, using the zoho api.
+     * 
+     * @param Array $aData Associative array of keys: First_Name,Last_Name,Email,Phone,Contact_Type,Mailing_Street,Mailing_City,Mailing_State,Mailing_Zip
+     */
+    public function editZohoContact($iContactId,$aData)
+    {
+        $arError = ['type'=>'ok','results'=>"Edit successfully"];
+
+        extract($aData);
+
+        $oApi = $this->getInstance("Contacts",$iContactId);
+                
+        $oApi->setFieldValue("First_Name",$First_Name);
+        $oApi->setFieldValue("Last_Name",$Last_Name);
+
+        $oApi->setFieldValue("Email",$Email);
+        $oApi->setFieldValue("Phone",$Phone);
+        $oApi->setFieldValue("Contact_Type",$Contact_Type);
+
+        $oApi->setFieldValue("Mailing_Street",$Mailing_Street);
+        $oApi->setFieldValue("Mailing_City",$Mailing_City);
+        $oApi->setFieldValue("Mailing_State",$Mailing_State);
+        $oApi->setFieldValue("Mailing_Zip",$Mailing_Zip);
+        
+        try {
+            $response = $oApi->update();
+            $object = $response->getDetails();
+            $arError = ['type'=>'ok','id'=> $object['id'] ];
+        } catch(Exception $e){
+            $arError = ['type'=>'error','results'=>"Server failed to add contact.",'message'=>$e->getMessage()];
+        }
+
+        return $arError;
+    }
+
+    /**
      * Add note to zoho records entity/contact
      * 
      * @param $sNoteFor String can be Accounts/Contacts

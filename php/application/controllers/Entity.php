@@ -190,103 +190,11 @@ class Entity extends RestController
         $this->checkPermission("ADD", $this->sModule);
 
         $bTagSmartyValidated = true;
-        $arError = [];
-        $this->load->helper("custom");
-        $this->load->library('form_validation');
+        $aError = [];
 
-        // try to correct user date format, then validate
-        if ($this->input->post("inputFormationDate") != "") {
-            $strFormationDate = str_replace("  ", " ", $this->input->post("inputFormationDate"));
-            $strFormationDate = str_replace(" ", "-", $strFormationDate);
-            $strFormationDate = date("Y-m-d", strtotime($strFormationDate));
-
-            if ($strFormationDate == "1970-01-01") {
-                //$_POST["inputFormationDate"] = "0000 00 00";
-            } else {
-                $_POST["inputFormationDate"] = $strFormationDate;
-            }
-        }
-
-        $this->form_validation->set_rules('inputName', 'Account Name', 'required|regex_match[/[a-zA-Z\s]+/]', ["regex_match" => "Only alphabets and spaces allowed."]);
-
-        $this->form_validation->set_rules('inputFirstName', 'First Name', 'required|regex_match[/[a-zA-Z\s]+/]', ["regex_match" => "Only alphabets and spaces allowed."]);
-        $this->form_validation->set_rules('inputLastName', 'Last Name', 'required|regex_match[/[a-zA-Z\s]+/]', ["regex_match" => "Only alphabets and spaces allowed."]);
-
-
-        $this->form_validation->set_rules('inputNotificationContactType', 'Contact Type', 'required|alpha');
-        $this->form_validation->set_rules('inputFillingState', 'Filing State', 'required|alpha|exact_length[2]');
-        $this->form_validation->set_rules('inputFillingStructure', 'Entity Type', 'required|regex_match[/[A-Z\-]+/]');
-        $this->form_validation->set_rules('inputFormationDate', 'Formation Date', 'required|regex_match[/[0-9]{4,}\-[0-9]{2,}\-[0-9]{2,}/]', ["regex_match" => "Allowed %s format: 2019-01-01"]);
-        $this->form_validation->set_rules('inputNotificationEmail', 'Notification Email', 'required|valid_email');
-        $this->form_validation->set_rules('inputNotificationPhone', 'Phone', 'required|regex_match[/[\+\s\-0-9]+/]');
-        $this->form_validation->set_rules('inputNotificationAddress', 'Shipping Street', 'required');
-        $this->form_validation->set_rules('inputNotificationCity', 'Shipping City', 'required');
-        $this->form_validation->set_rules('inputNotificationState', 'Shipping State', 'required');
-        $this->form_validation->set_rules('inputNotificationZip', 'Shipping Code', 'required');
-        $this->form_validation->set_rules('inputBusinessPurpose', 'Business purpose', 'required');
-
-        $this->load->model("Smartystreets_model");
-        // to avoid smartystreet buffer bug
-        // retrying 0, 1, 2 which disrupst the api response
-        if ($this->form_validation->run() !== FALSE) {
-            $oSmartyStreetResponse = $this->Smartystreets_model->find(
-                $this->input->post("inputNotificationAddress"),
-                $this->input->post("inputNotificationCity"),
-                $this->input->post("inputNotificationState"),
-                $this->input->post("inputNotificationZip")
-            );
-            // to hold smarty address corrections
-            $sSmartyAddress = "";
-            // check wether invalid address entered the 1st time
-            if ($oSmartyStreetResponse['type'] == 'error' && !$this->session->invalid_address_count) {
-                $arError[] = "Unable to validate your address, please recheck and confirm ...";
-                $this->session->invalid_address_count = 1;
-
-                // qualify address if invalid address entered 2nd time
-            } else if ($oSmartyStreetResponse['type'] == 'error' && $this->session->invalid_address_count == 1) {
-                $this->session->invalid_address_count = 0;
-                $bTagSmartyValidated = false;
-
-                // replace user address with validated smartystreet address
-            } else {
-                // store previous user input for entity note purpose
-                $sSmartyAddress = <<<HC
-                    Street: {$this->input->post('inputNotificationAddress')}
-                    City: {$this->input->post('inputNotificationCity')}
-                    State: {$this->input->post('inputNotificationState')}
-                    Zipcode: {$this->input->post('inputNotificationZip')} 
-HC;
-                $_POST['inputNotificationAddress'] = $oSmartyStreetResponse['results'][0]->getDeliveryLine1();
-                $_POST['inputNotificationCity'] = $oSmartyStreetResponse['results'][0]->getComponents()->getCityName();
-                $_POST['inputNotificationState'] = $oSmartyStreetResponse['results'][0]->getComponents()->getStateAbbreviation();
-                $_POST['inputNotificationZip'] = $oSmartyStreetResponse['results'][0]->getComponents()->getZIPCode();
-                $this->session->invalid_address_count = 0;
-            }
-            //var_dump($this->session->invalid_address_count);die;
-        }
-        // allow without file, else check type and size
-        if ($_FILES["inputFiling"]["name"] != "") {
-            $this->form_validation->set_rules('inputFiling', 'Filing Attachment',
-                array(
-                    array('validate_extention', function () {
-                        return validateFileExt($_FILES['inputFiling']['tmp_name'], ['application/pdf']);
-                    }),
-                    array('validate_size', function () {
-                        return validateFileSize($_FILES['inputFiling']['tmp_name'], 10 * 1000 * 1000);
-                    }),
-                ),
-                array(
-                    'validate_extention' => 'Only MIME .pdf files are allowed',
-                    'validate_size' => 'Input file: ' . getFileSize(filesize($_FILES['inputFiling']['tmp_name'])) . ' exceeding limit of 10MB.'
-                )
-            );
-        }
-
-
-        if ($this->form_validation->run() == FALSE) {
+        $aError = $this->validateForm(); 
+        if (is_array($aError)) {
             
-            $aError = $this->form_validation->error_array();
-
             $this->response([
                 'status' => false,
                 'field_error' => $aError
@@ -298,37 +206,49 @@ HC;
             return false;
 
         } else {
+            if(!empty($this->input->post('smartyValidated')))
+                {
+                $sSmartyAddress = <<<HC
+                Street: {$this->input->post('smartyNotificationAddress')}
+                City: {$this->input->post('smartyNotificationCity')}
+                State: {$this->input->post('smartyNotificationState')}
+                Zipcode: {$this->input->post('smartyNotificationZip')} 
+HC;
+            }
             $_POST['inputFormationDate'] = date("Y-m-d", strtotime($this->input->post("inputFormationDate")));
             $_POST['inputFiscalDate'] = date("Y-m-d", strtotime($this->input->post("inputFiscalDate")));
 
-            $response = $this->zohoCreateEntity($this->input->post['pid'], $bTagSmartyValidated);
+            $aResponseZoho = $this->zohoCreateEntity($_SESSION['eid'], $bTagSmartyValidated);
 
             // succcess redirect to dashboard
-            if ($response["type"] == 'ok') {
-
+            if ($aResponseZoho["type"] == 'ok') {
+                $aResponseZoho['message'] = 'Added successfully.';
                 // allow without file, else check type and size
-                $iZohoId = $response['data']['id'];
+                $iZohoId = $aResponseZoho['id'];
                 //$this->zohoAddAttachment($iZohoId);
 
-                // check address is valid
-                $sSmartyAddress = $this->validateSmartyStreet();
-
+                // check address is valid from smarty is not needed, validation is at interface
+                $sSmartyAddress = '';//$this->validateSmartyStreet();
+                
                 // add a note if smarty validated address successfuly
                 if ($sSmartyAddress != '') {
-                    $response = $this->ZoHo_Account->newZohoNote("Accounts", $response['data']['id'], "Smartystreet has replaced following", $sSmartyAddress);
+                    $aResponseNote = $this->ZoHo_Account->newZohoNote("Accounts", $iZohoId, "Smartystreet has replaced following", $sSmartyAddress);
+                    if($aResponseNote['type']=='error')
+                    {
+                        $aResponseZoho['type'] = 'error';
+                        $aResponseZoho['message'] = $aResponseNote['message'];
+                    }
                 }
 
-                $this->addPermission($response['data']['id']);
+                $this->addPermission($iZohoId);
 
-                $this->redirectAfterAdd($response['data']['id']);
+                $this->redirectAfterAdd($aResponseZoho);
 
                 // redirect to form, show error
-            } else if ($response["error_code"] == 2) {
-                $this->redirectAfterAdd($response['data']['id']);
             } else {
                 $this->response([
                     'status' => false,
-                    'error' => $response['error']
+                    'error' => $aResponseZoho['error']
                 ], 400);
             }
 
@@ -359,7 +279,6 @@ HC;
 
         $this->form_validation->set_rules('inputFirstName', 'First Name', 'required|regex_match[/[a-zA-Z\s]+/]', ["regex_match" => "Only alphabets and spaces allowed."]);
         $this->form_validation->set_rules('inputLastName', 'Last Name', 'required|regex_match[/[a-zA-Z\s]+/]', ["regex_match" => "Only alphabets and spaces allowed."]);
-
 
         $this->form_validation->set_rules('inputNotificationContactType', 'Contact Type', 'required|alpha');
         $this->form_validation->set_rules('inputFillingState', 'Filing State', 'required|alpha|exact_length[2]');
@@ -417,33 +336,48 @@ HC;
                 ], 404);
 
             } else {
-                
+                if(!empty($this->input->post('smartyNotificationAddress')))
+                {
+                $sSmartyAddress = <<<HC
+                Street: {$this->input->post('smartyNotificationAddress')}
+                City: {$this->input->post('smartyNotificationCity')}
+                State: {$this->input->post('smartyNotificationState')}
+                Zipcode: {$this->input->post('smartyNotificationZip')} 
+HC;
+            }
                 $_POST['inputFormationDate'] = date("Y-m-d", strtotime($this->input->post("inputFormationDate")));
                 $_POST['inputFiscalDate'] = date("Y-m-d", strtotime($this->input->post("inputFiscalDate")));
 
-                $response = $this->zohoEditEntity($this->input->post("eid"));
+                $aResponse = $this->zohoEditEntity($this->input->post("eid"));
 
                 // succcess redirect to dashboard
-                if ($response["entityId"] > 0) {
+                if ($aResponse["entityId"] > 0) {
+                    $aResponse['message'] = 'Edit successfully.';
+                    $aResponse['id'] = $aResponse['entityId'];
                     // allow without file, else check type and size
                     $iZohoId = $this->input->post("eid");
-
+                    $this->load->model("Contacts_model");
+                    $aContactDetail = $this->Contacts_model->getEntityProfileContact($iZohoId);
+                    $iContactId = $aContactDetail['data']->id;
+                    $aEditResponse = $this->zohoEditContact($iContactId);
+                    if($aEditResponse['type'] == 'error')
+                    {
+                        $aResponse['type'] = 'error';
+                        $aResponse['message'] = $aEditResponse['results'] . " " . $aEditResponse['message'];
+                    }
                     // add a note if smarty validated address successfuly
                     //if (!$bSmartyAddress) {
                     //    $response = $this->ZoHo_Account->newZohoNote("Accounts", $response['data']['id'], "Smartystreet has replaced following", $sSmartyAddress);
                     //}
 
-                    $this->redirectAfterAdd($response['data']['id']);
+                    $this->redirectAfterAdd($aResponse);// $response['data']['id']);
 
                     // redirect to form, show error
-                } else if ($response["error_code"] == 2) {
-                    $this->redirectAfterAdd($response['data']['id']);
                 } else {
-
 
                     $this->response([
                         'status' => false,
-                        'error' => $response['error']
+                        'error' => $aResponse['message']
                     ], 400);
 
 
@@ -458,13 +392,22 @@ HC;
         }
     }
 
-    private function redirectAfterAdd($id = 0)
+    private function redirectAfterAdd($aResponse)
     {
-        $this->response([
-            'status' => true,
-            'id' => $id,
-            'message' => 'Added successfully.'
-        ], 200);
+        if($aResponse['type']=='error')
+        {
+            $this->response([
+                'status' => true,
+                'id' => $aResponse['id'],
+                'message' => $aResponse['message'],
+            ], 200);
+        } else {
+            $this->response([
+                'status' => true,
+                'id' => $aResponse['id'],
+                'message' => $aResponse['message']
+            ], 200);
+        }
     }
 
     private function zohoCreateEntity($iParentZohoId, $bTagSmartyValidated)
@@ -494,45 +437,61 @@ HC;
 
             $this->addEntityToTemp($iZohoId, $iContactId, $iAgentId, $bAttachmentDone);
             // add row to subscription
-            $this->addSubscription($iZohoId);
-
+            $iSubId = $this->addSubscription($iZohoId);
+            // if subscription fail report is sent to logs, users are not informed at this point
+            
             // add tags
-            $oApi = $this->ZoHo_Account->getInstance("Accounts", $iZohoId);
-            try {
-                $sComplianceOnly = ($this->input->post("inputComplianceOnly") ?? 0);
-                $sForeign = ($this->input->post("inputForeign") ?? 0);
-
-                $aTags = ["name" => "OnBoard"];
-
-                if ($sComplianceOnly) {
-                    $aTags["ComplianceOnly"] = "Compliance Only";
-                }
-
-                if ($sForeign) {
-                    $aTags["Foreign"] = "Foreign";
-                }
-
-                if (!$bTagSmartyValidated) {
-                    $aTags["InvalidatedAddress"] = "Invalidated Address";
-                }
-                // TODO: zoho enable on production server
-
-                $this->ZoHo_Account->zohoCreateNewTags($iZohoId, $aTags);
-
-                $oResponseTags = $oApi->addTags($aTags);
-
-                $oData = $oResponseTags->getData();
-            } catch (Exception $e) {
-                if (count($arError) > 0) $arError[0] .= ", tags failed (" . $e->getMessage() . ").";
-                else $arError[] = "User created successfully, tags failed (" . $e->getMessage() . ").";
+            if(!isDev())
+            {
+                $arError = $this->processTags($iZohoId,$bTagSmartyValidated);
             }
+        } else {
+            return ['type'=>'error', 'message' => $aZohoResponse['message']];
         }
         //var_dump($arError);die;
         if (count($arError) > 0) {
-            return ['error' => $arError[0], 'error_code' => $iErrorType];
+            return ['type'=>'error', 'message' => $arError[0], 'id'=>$iZohoId];
         }
 
-        return ['type' => 'ok', 'message' => "Entity created successfully.", "data" => ['id' => $iZohoId]];
+        return ['type' => 'ok', 'message' => "Entity created successfully.", 'id' => $iZohoId];
+    }
+    
+    private function processTags($iZohoId,$bTagSmartyValidated)
+    {
+        // no error occur, tags success
+        $aResponse = [];
+
+        $oApi = $this->ZoHo_Account->getInstance("Accounts", $iZohoId);
+        try {
+            $sComplianceOnly = ($this->input->post("inputComplianceOnly") ?? 0);
+            $sForeign = ($this->input->post("inputForeign") ?? 0);
+
+            $aTags = ["name" => "OnBoard"];
+
+            if ($sComplianceOnly) {
+                $aTags["ComplianceOnly"] = "Compliance Only";
+            }
+
+            if ($sForeign) {
+                $aTags["Foreign"] = "Foreign";
+            }
+
+            if (!$bTagSmartyValidated) {
+                $aTags["InvalidatedAddress"] = "Invalidated Address";
+            }
+            // TODO: zoho enable on production server
+
+            $this->ZoHo_Account->zohoCreateNewTags($iZohoId, $aTags);
+
+            $oResponseTags = $oApi->addTags($aTags);
+
+            $oData = $oResponseTags->getData();
+            $aResponse = ['type'=>'ok','message'=>'Tags added successfully'];
+        } catch (Exception $e) {
+            $aResponse = ['type'=>'error','message'=>"User created successfully, tags failed (" . $e->getMessage() . ")."];
+        }
+
+        return $aResponse;
     }
 
     private function addSubscription($iEntityId)
@@ -604,17 +563,6 @@ HC;
             "agentId"   =>  $iAgentId
         ];
         $this->Tempmeta_model->appendRow($_SESSION['eid'], $this->Tempmeta_model->slugNewEntity, $aDataEntity);
-        // attachment is not needed because lorax table storing attachments data
-        /*
-        if ($bAttachmentDone) {
-            $aDataAttachments = [
-                "file_name" => $this->input->post("attachment"),
-                "size" => filesize(getenv("UPLOAD_PATH") . $this->input->post("attachment")),
-                "create_time" => $today,
-                "link_url" => getenv("UPLOAD_PATH") . $this->input->post("attachment"),// it helps user to download file from temp path
-            ];
-            $this->Tempmeta_model->appendRow($iEntityId, $this->Tempmeta_model->slugNewAttachment, $aDataAttachments);
-        }*/
 
         if ($iContactId>0) {
             $this->load->model("Contacts_model");
@@ -644,21 +592,7 @@ HC;
             ];
         
             $response_contact = $this->Contacts_model->addContact($data);
-/*
-            $aDataContacts = [
-                "id"   =>   "-1",
-                "name" => $this->input->post("inputFirstName") . " " . $this->input->post("inputLastName"),
-                "email" => $this->input->post("inputNotificationEmail"),
-                "phone" => $this->input->post("inputNotificationPhone"),
-                "contactType" => $this->input->post("inputNotificationContactType"),
 
-                "mailingStreet" => $this->input->post("inputNotificationAddress"),
-                "mailingCity" => $this->input->post("inputNotificationCity"),
-                "mailingState" => $this->input->post("inputNotificationState"),
-                "mailingZip" => $this->input->post("inputNotificationZip"),
-            ];
-
-            $this->Tempmeta_model->appendRow($iEntityId, $this->Tempmeta_model->slugNewContact, $aDataContacts);*/
         }
     }
 
@@ -704,9 +638,10 @@ HC;
             $this->Permissions_model->add($iEntityId, $this->Permissions_model->aRole['entity']);
         }
     }
+
     /**
      * Add zoho contact in the crm, populate all the fields from post request
-     * @param Integer $iEntityId numeric id of the actual contact
+     * @param Integer $iEntityId numeric id of related entity
      * @return Array Response from zoho api
      */
     public function zohoAddContact($iEntityId)
@@ -739,16 +674,16 @@ HC;
     }
 
     /**
-     * Add zoho contact in the crm, populate all the fields from post request
-     * @param Integer $iEntityId numeric id of the actual contact
+     * Edit zoho contact related to profile in the crm, populate all the fields from post request
+     * @param Integer $iContactId numeric id of related to entity
      * @return Array Response from zoho api
      */
-    public function zohoEditContact($iEntityId)
+    public function zohoEditContact($iContactId)
     {
         $arError = [];
-
-        $aResponse = $this->ZoHo_Account->newZohoContact(
-            $iEntityId,
+        $this->load->model("ZoHo_Account");
+        $aResponse = $this->ZoHo_Account->editZohoContact(
+            $iContactId,
             [
                 "First_Name" => $this->input->post("inputFirstName"),
                 "Last_Name" => $this->input->post("inputLastName"),
@@ -766,10 +701,10 @@ HC;
 
         if ($aResponse['type'] == 'error') {
             error_log("Unknown  server error, contact creation failed.");
-            return ['status' => '500', 'detail' => "Unknown server error, contact creation failed."];
+            return $aResponse;
         }
-
-        return $aResponse['results'];
+        // id of the contact updated
+        return $aResponse['id'];
     }
 
     private function zohoAddAttachment($iEntityId)
@@ -853,20 +788,22 @@ HC;
         $trigger = array();//triggers to include
         $lar_id = "";//lead assignment rule id
 
-        $oResponse = null;
+        $oResponse = $aResponse = null;
         try {
             // setting trigger and $lar_id causing issue, api url not correct
             $responseIns = $oApi->update();//$trigger , $larid optional
 
             $oResponse = $responseIns->getDetails();
 
-            return ['entityId'=>$oResponse["id"],'agentId'=>$iRAId];
+            $aResponse  = ['entityId'=>$oResponse['id'],'agentId'=>$iRAId];
+
         } catch (Exception $oError) {
             // message
             $sError = "code: " . $oError->data[0]->code . ", error: Api: " . $oError->data[0]->details->expected_data_type . ", " . $oError->data[0]->details->api_name . ", message: " . $oError->getMessage();
+            $aResponse = ['type'=>'error','message'=>$sError];
         }
 
-        return $sError;
+        return $aResponse;
     }
 
     /**
@@ -935,20 +872,22 @@ HC;
         $trigger = array();//triggers to include
         $lar_id = "";//lead assignment rule id
 
-        $oResponse = null;
+        $oResponse = $aResponse = null;
         try {
             // setting trigger and $lar_id causing issue, api url not correct
             $responseIns = $oApi->create();//$trigger , $larid optional
 
             $oResponse = $responseIns->getDetails();
 
-            return ['entityId'=>$oResponse["id"],'agentId'=>$iRAId];
+            $aResponse  = ['entityId'=>$oResponse['id'],'agentId'=>$iRAId];
+
         } catch (Exception $oError) {
             // message
             $sError = "code: " . $oError->data[0]->code . ", error: Api: " . $oError->data[0]->details->expected_data_type . ", " . $oError->data[0]->details->api_name . ", message: " . $oError->getMessage();
+            $aResponse = ['type'=>'error','message'=>$sError];
         }
 
-        return $sError;
+        return $aResponse;
     }
 
     private function validateSmartyStreet()

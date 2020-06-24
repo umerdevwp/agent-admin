@@ -241,5 +241,44 @@ class Contacts_model extends CI_Model
         $this->db->update('appmeta');
         return ['type' => 'ok'];
     }
+    /**
+     * Get entity main contact by ascending contacts by id, to get 1st contact
+     * related to entity..
+     * 
+     * @param Integer $iEntityId entity id of the contact owner
+     * @param Array $aColumns array of columns api should response with
+     */
+    public function getEntityProfileContact($iEntityId,$aColumns=[])
+    {
+        $aMyColumns = [];
+        if(count($aColumns)>0)
+            $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
+        else {
+            $aMyColumns = [
+                "id","name","email","phone", "contactType",
+                "mailingStreet", "mailingCountry", "mailingCity",
+                "mailingState", "mailingZip"
+            ];
+            $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
+        }
+        foreach($aMyColumns as $k=>$v)
+        $this->db->select("zc.$v as `$k`");
 
+        $this->db->from('zoho_contacts zc');
+        $this->db->join('contactmeta','zc.id=contactmeta.contact_id', 'left');
+        $this->db->where(["zc.account_name"=>$iEntityId]);
+        $this->db->order_by("zc.id", "ASC");
+        $this->db->limit(1);
+
+        $query = $this->db->get();
+        if ($query->num_rows() > 0) {
+            $result = $query->row_object();
+        }
+
+        if (!is_object($result)) {
+            return ['type' => 'error','message'=>'No contacts available'];
+        }
+
+        return ['type'=>'ok','data'=>$result];
+    }
 }
