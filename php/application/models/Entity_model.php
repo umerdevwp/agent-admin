@@ -287,4 +287,51 @@ class Entity_model extends CI_Model
 
         return ['type'=>'error','message'=>'Record not found'];
     }
+
+    public function checkRole($id)
+    {
+        if ($this->db->table_exists($this->table)) {
+            $this->db->select('parent_account');
+            $this->db->from($this->table);
+            $this->db->where('id', $id);
+            $query = $this->db->get();
+            return $query->result();
+        } else {
+            log_message('error', 'Administrators table does not exit');
+            return NULL;
+        }
+
+    }
+
+    public function getRoleStatus($id)
+    {
+        $this->db->from($this->table. " e");
+        $this->db->join("entity_roles er", "er.entity_id = e.id","left");
+        $this->db->join("entitymeta em", "er.entity_id = e.id","left");
+        $this->db->join("roles r","r.id=er.role_id","left");
+        
+        $this->db->select("e.id, r.role_name role, em.entity_status status");
+        $this->db->where("e.id",$id);
+
+        $oResult = $this->db->get();
+
+        if($oResult)
+        {            
+            $aData = $oResult->row_array();
+            
+            if(empty($aData['id']))
+            {
+                return null;
+            } else if(empty($aData['status']))
+            {
+                $aData['status'] = 1;
+            }
+
+            return $aData;
+        } else {
+            log_message('error', 'role query failed');
+            return NULL;
+        }
+
+    }
 }

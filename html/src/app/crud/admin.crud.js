@@ -24,9 +24,18 @@ export const adminList = async (zoho_id, email) => {
 
 
 export const adminCreate = async (data) => {
-    const response = await fetch(`${ENTITY}/admin_api/create`, {
-        method: 'post',
-        body: data
-    })
-    return Promise.resolve(response.json());
+    const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
+
+
+    if(okta) {
+        const response = await fetch(`${ENTITY}/admin_api/create`, {
+            method: 'post',
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': okta.accessToken.accessToken,
+            },
+            body: data
+        })
+        return Promise.resolve(response.json());
+    }
 }

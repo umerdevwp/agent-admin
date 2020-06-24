@@ -54,7 +54,7 @@ function Layout({
     return selfLayout !== "blank" ? (
         <UserContextProvider>
             <LayoutInitializer
-                menuConfig={!isAdmin ? MenuConfig : MenuConfigForAdmin}
+                menuConfig={ isAdmin ? MenuConfigForAdmin : MenuConfig}
                 layoutConfig={LayoutConfig}
                 htmlClassService={htmlClassService}
             >

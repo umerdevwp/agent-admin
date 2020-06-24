@@ -40,10 +40,9 @@ class Entity extends RestController
         $sid = $_SESSION["eid"];
 
         if (empty($sid)) {
-            redirectSession();
+            responseJson(['type'=>'error','message'=>'Login is not define']);           
         }
 
-        //$this->load->model('ZoHo_Account');
         $this->load->model('entity_model');
         $this->load->model('Tasks_model');
         $this->load->model('Contacts_model');
@@ -143,16 +142,13 @@ class Entity extends RestController
             {
                 $this->response([
                     'errors' => ['status' => 401, 'detail' => 'Invalid detail request']
-                ], 404);
+                ], 401);
             } else {
                 $this->response([
                     'errors' => ['status' => 404, 'detail' => 'Record not found']
                 ], 404);
             }
         }
-        $this->response([
-            'errors' => ['status' => 404, 'detail' => 'This will never appear']
-        ], 404);
 
     }
 
@@ -942,6 +938,24 @@ HC;
         $this->response([
             'status' => true,
             'message' => 'Download link of file'
+        ], 200);
+    }
+
+    public function role_get()
+    {
+        $sid = $_SESSION["eid"];
+
+        if (empty($sid)) {
+            responseJson(['type'=>'error','message'=>'Login is not define']);
+        }
+
+        $this->load->model('entity_model');
+
+        $aData = $this->entity_model->getRoleStatus($sid);
+        
+        $this->response([
+            'status' => true,
+            'data' => $aData
         ], 200);
     }
 }

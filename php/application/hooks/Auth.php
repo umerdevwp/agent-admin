@@ -6,7 +6,7 @@ class Auth
 {
 //    add a class name here to secure for api
     //private $auth = ['api', 'example_api', 'entity_api'];
-    private $auth = ['api', 'example_api','portal','entitytypes','contacts','states','contacttypes', 'entity', 'registeragents', 'attachments', 'notifications', 'admin_api'];
+    private $auth = ['api', 'user_api','portal','entitytypes','contacts','states','contacttypes', 'entity', 'registeragents', 'attachments', 'admin_api'];
     public function myFunction()
     {
         $CI =& get_instance();

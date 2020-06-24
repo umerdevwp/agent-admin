@@ -39,8 +39,17 @@ import Snackbar from '@material-ui/core/Snackbar';
 import SnackbarContent from '@material-ui/core/SnackbarContent';
 import WarningIcon from '@material-ui/icons/Warning';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import {ContactTypeList, EntitytypesList, StateRegionList, createEntity, lorexFileUpload} from "../../crud/enitity.crud";
+import {
+    ContactTypeList,
+    EntitytypesList,
+    StateRegionList,
+    createEntity,
+    lorexFileUpload
+} from "../../crud/enitity.crud";
 import {OktaUserContext} from '../../context/OktaUserContext';
+
+
+
 const useStylesFacebook = makeStyles({
     root: {
         position: 'relative',
@@ -108,8 +117,14 @@ const useStyles = makeStyles(theme => ({
         width: '100%',
         marginTop: 16,
     },
+
+    label: {
+        fontSize: 14
+    },
+
     dense: {
         marginTop: 16,
+        fontSize: 14
     },
     container: {
         display: 'flex',
@@ -210,6 +225,7 @@ MySnackbarContentWrapper.propTypes = {
 
 const AddEntityForm = (props) => {
 
+
     const {oktaprofile, isAdmin} = useContext(OktaUserContext);
     const classes = useStyles();
     const inputLabel = React.useRef(null);
@@ -222,15 +238,17 @@ const AddEntityForm = (props) => {
     const [FillingStructureData, setFillingStructureData] = React.useState([])
     const [StateRegion, setStateRegion] = React.useState([])
     const [successMessage, setSuccessMessage] = React.useState(false);
+    var d = new Date();
+    const fiscal = d.getFullYear() + '-12-31'
 
     //form state
-
     const [inputName, setInputName] = React.useState({value: '', error: ' ',});
-    // const [inputFillingState, setInputFillingState] = React.useState({value: '', error: ' '});
     const [inputComplianceOnly, setInputComplianceOnly] = React.useState({value: '', error: ' '});
     const [inputFillingState, setInputFillingState] = React.useState({value: '', error: ' '});
     const [inputFillingStructure, setInputFillingStructure] = React.useState({value: '', error: ' '});
     const [inputFormationDate, setInputFormationDate] = React.useState({value: '', error: ' '});
+    const [inputFiscalDate, setInputFiscalDate] = React.useState({value: fiscal, error: ' '});
+
     const [inputFirstName, setInputFirstName] = React.useState({value: '', error: ' '});
     const [inputLastName, setInputLastName] = React.useState({value: '', error: ' '});
     const [inputNotificationEmail, setInputNotificationEmail] = React.useState({value: '', error: ' '});
@@ -242,8 +260,9 @@ const AddEntityForm = (props) => {
     const [inputNotificationZip, setInputNotificationZip] = React.useState({value: '', error: ' '});
     const [inputFiling, setInputFiling] = React.useState({value: '', error: ' ', success: ' '});
     const [inputBusinessPurpose, setInputBusinessPurpose] = React.useState({value: '', error: ' '});
-    const [inputForeign,setInputForeign] = React.useState({value: '', error: ' '});
+    const [inputForeign, setInputForeign] = React.useState({value: '', error: ' '});
     const [inputFileName, setInputFileName] = React.useState({value: '', error: ' '});
+    const [inputFileSize, setInputFileSize] = React.useState({value: '', error: ' ', success: ' '});
 
     function FacebookProgress(props) {
         const classes = useStylesFacebook();
@@ -284,17 +303,16 @@ const AddEntityForm = (props) => {
     }, [addressObject, addressValue])
 
 
-
-    React.useEffect(()=>{
+    React.useEffect(() => {
         fetchDataforDropdownsContactTypeList()
         fetchDataforDropdownsFillingStructureData();
         fetchDataforDropdownsStateRegion();
-    },[])
+    }, [])
 
 
     const fetchDataforDropdownsContactTypeList = async () => {
-            const response = await ContactTypeList(oktaprofile.organization, oktaprofile.email);
-            setContactType(response.data);
+        const response = await ContactTypeList(oktaprofile.organization, oktaprofile.email);
+        setContactType(response.data);
     }
 
     const fetchDataforDropdownsFillingStructureData = async () => {
@@ -318,37 +336,45 @@ const AddEntityForm = (props) => {
         setAddressValue(value);
     }
 
-    const handleClose = (event, reason) => {
-        setError(false);
-    }
 
 
     const fileChange = async (e) => {
-        setLoading(true);
-        let formData = new FormData();
-        formData.append('file', e.target.files[0]);
-        const filename = e.target.files[0].name;
-        const response = await lorexFileUpload(formData);
-        if (response.error === false) {
-            setInputFiling({...inputFiling, value: response.record_id, success: 'uploaded'});
-            if (filename) {
-                setInputFileName({...inputFileName, value: filename});
+        if(e.target.files[0]) {
+            setLoading(true);
+            let formData = new FormData();
+            formData.append('file', e.target.files[0]);
+            const filename = e.target.files[0].name;
+            const response = await lorexFileUpload(formData);
+            if (response.error === false) {
+                setInputFiling({...inputFiling, value: response.record_id, success: 'uploaded'});
+                setInputFileSize({...inputFileSize, value: response.file_size});
+
+                if (filename) {
+                    setInputFileName({...inputFileName, value: filename});
+                    setLoading(false);
+                }
+            } else {
                 setLoading(false);
             }
+        } else {
+            setInputFiling({...inputFiling, value: '', success: ' '});
+            setInputFileSize({...inputFileSize, value: ''});
+            setInputFileName({...inputFileName, value: ''});
         }
     }
 
 
     const handleOnSubmit = async (event) => {
 
-
+        setLoading(true);
         setInputName({...inputName, error: ' '})
         setInputComplianceOnly({...inputComplianceOnly, error: ' '})
         setInputFillingState({...inputFillingState, error: ' '})
-        setInputFirstName({...inputLastName, error: ' '})
+        setInputFirstName({...inputFirstName, error: ' '})
         setInputLastName({...inputLastName, error: ' '})
         setInputFillingStructure({...inputFillingStructure, error: ' '})
         setInputFormationDate({...inputFormationDate, error: ' '})
+        setInputFiscalDate({...inputFormationDate, error: ' '})
         setInputNotificationEmail({...inputNotificationEmail, error: ' '})
         setInputNotificationPhone({...inputNotificationPhone, error: ' '})
         setInputNotificationAddress({...inputNotificationAddress, error: ' '})
@@ -357,23 +383,23 @@ const AddEntityForm = (props) => {
         setInputNotificationZip({...inputNotificationZip, error: ' '})
         setInputBusinessPurpose({...inputBusinessPurpose, error: ' '})
         setInputNotificationContactType({...inputNotificationContactType, error: ' '})
-        setInputForeign({...inputForeign, error:' '});
-
+        setInputForeign({...inputForeign, error: ' '});
+        setInputFileSize({...inputFileSize, error: ' '})
         event.preventDefault();
         let formData = new FormData();
 
-        console.log(inputComplianceOnly.value);
         formData.append('inputName', inputName.value)
         formData.append('inputComplianceOnly', inputComplianceOnly.value)
         formData.append('inputForeign', inputForeign.value)
         formData.append('inputFillingState', inputFillingState.value)
         formData.append('inputFillingStructure', inputFillingStructure.value)
         formData.append('inputFormationDate', inputFormationDate.value)
+        formData.append('inputFiscalDate', inputFiscalDate.value)
         formData.append('inputFirstName', inputFirstName.value)
         formData.append('inputLastName', inputLastName.value)
         formData.append('inputNotificationEmail', inputNotificationEmail.value)
         formData.append('inputNotificationPhone', inputNotificationPhone.value)
-        formData.append('inputNotificationAddress', addressObject.text)
+        formData.append('inputNotificationAddress', addressObject.streetLine)
         formData.append('inputNotificationContactType', inputNotificationContactType.value)
         formData.append('inputNotificationCity', inputNotificationCity.value);
         formData.append('inputNotificationState', inputNotificationState.value);
@@ -381,9 +407,11 @@ const AddEntityForm = (props) => {
         formData.append('inputFileId', inputFiling.value);
         formData.append('inputFileName', inputFileName.value);
         formData.append('inputBusinessPurpose', inputBusinessPurpose.value)
+        formData.append('inputFileSize', inputFileSize.value);
 
         const response = await createEntity(formData);
-        if(response.field_error) {
+        if (response.field_error) {
+            setLoading(false);
             Object.keys(response.field_error).forEach((key, index) => {
                 if (key === 'inputName') {
                     setInputName({...inputName, error: response.field_error[key]})
@@ -398,7 +426,7 @@ const AddEntityForm = (props) => {
                 }
 
                 if (key === 'inputFirstName') {
-                    setInputFirstName({...inputLastName, error: response.field_error[key]})
+                    setInputFirstName({...inputFirstName, error: response.field_error[key]})
                 }
 
                 if (key === 'inputLastName') {
@@ -440,19 +468,25 @@ const AddEntityForm = (props) => {
                     setInputNotificationContactType({...inputNotificationContactType, error: response.field_error[key]})
                 }
 
+                if (key === 'inputFiscalDate') {
+                    setInputFiscalDate({...inputFiscalDate, error: response.field_error[key]})
+                }
+
+
             })
         }
 
-        if(response){
-            if(response.status){
+        if (response) {
+            if (response.status) {
+                setLoading(false);
                 setSuccessMessage(true);
             }
         }
 
 
-        for (var pair of formData.entries()) {
-            console.log(pair[0] + ', ' + pair[1]);
-        }
+        // for (var pair of formData.entries()) {
+        //     console.log(pair[0] + ', ' + pair[1]);
+        // }
 
         // setTimeout(() => {
         //     setInputName({...inputName, error: 'Field is required'})
@@ -466,6 +500,9 @@ const AddEntityForm = (props) => {
     return (
 
         <div className={classes.root}>
+
+
+
             <Title title={'Add New Entity'}/>
 
             <Grid container spacing={1}>
@@ -475,18 +512,18 @@ const AddEntityForm = (props) => {
                                        title="New RA Client"/>
                         <PortletBody>
                             {error ? (<MySnackbarContentWrapper
-                                onClose={handleClose}
+
                                 variant="error"
                                 message="Something went wrong"
                             />) : ''}
 
                             {successMessage ? (
-                            <MySnackbarContentWrapper
-                                onClose={handleClose}
-                                variant="success"
-                                message="Entity has been added"
-                            />
-                            ) : '' }
+                                <MySnackbarContentWrapper
+
+                                    variant="success"
+                                    message="Entity has been added"
+                                />
+                            ) : ''}
 
 
                             <div className="row">
@@ -501,7 +538,7 @@ const AddEntityForm = (props) => {
                                                 onChange={e => setInputName({...inputName, value: e.target.value})}
                                                 id="inputName"
                                                 label="Entity Name"
-                                                className={clsx(classes.textField, classes.dense)}
+                                                className={clsx(classes.textField, classes.dense, classes.label)}
                                                 margin="dense"
                                                 helperText={inputName.error}
                                             />
@@ -516,7 +553,7 @@ const AddEntityForm = (props) => {
                                                 })}
                                                 value={inputForeign}
                                                 control={<Checkbox color="primary"/>}
-                                                label="Foreign"
+                                                label="Foreign Qualified"
                                                 className={clsx(classes.textField, classes.checkbox)}
                                                 labelPlacement="start"
                                             />
@@ -533,14 +570,14 @@ const AddEntityForm = (props) => {
                                                 value={inputComplianceOnly}
                                                 control={<Checkbox color="primary"/>}
                                                 label="Compliance Only"
-                                                className={clsx(classes.textField, classes.checkbox)}
+                                                className={clsx(classes.textField, classes.checkbox, 'hellllallsldsald')}
                                                 labelPlacement="start"
                                             />
                                         </div>
 
-                                        <div className={'col-md-4'}>
+                                        <div className={'col-md-6'}>
                                             <FormControl className={clsx(classes.selectField)}>
-                                                <InputLabel htmlFor="age-native-simple">Filling State</InputLabel>
+                                                <InputLabel    className={clsx(classes.label)} htmlFor="age-native-simple">Entity State</InputLabel>
                                                 <Select
                                                     disabled={loading}
                                                     required
@@ -557,15 +594,14 @@ const AddEntityForm = (props) => {
                                                     }}>
                                                     <option value=""/>
                                                     {StateRegion?.map((anObjectMapped, index) => <option key={index}
-                                                                                                        value={anObjectMapped.code}>{anObjectMapped.name}</option>)}
+                                                                                                         value={anObjectMapped.code}>{anObjectMapped.name}</option>)}
 
                                                 </Select>
                                             </FormControl>
                                         </div>
-                                        <div className={'col-md-4'}>
+                                        <div className={'col-md-6'}>
                                             <FormControl className={clsx(classes.selectField)}>
-                                                <InputLabel htmlFor="age-native-simple">Filling
-                                                    Structure</InputLabel>
+                                                <InputLabel htmlFor="age-native-simple">Entity Structure</InputLabel>
                                                 <Select
                                                     disabled={loading}
                                                     required
@@ -588,7 +624,7 @@ const AddEntityForm = (props) => {
                                                 </Select>
                                             </FormControl>
                                         </div>
-                                        <div className={'col-md-4'}>
+                                        <div className={'col-md-6'}>
                                             <TextField
                                                 disabled={loading}
                                                 required
@@ -613,6 +649,34 @@ const AddEntityForm = (props) => {
 
                                             />
                                         </div>
+
+                                        <div className={'col-md-6'}>
+                                            <TextField
+                                                disabled={loading}
+                                                required
+                                                label="Fiscal Date"
+                                                defaultValue={inputFiscalDate.value}
+                                                error={inputFiscalDate.error !== ' '}
+                                                value={inputFiscalDate.value}
+                                                onChange={e => setInputFiscalDate({
+                                                    ...inputFormationDate,
+                                                    value: e.target.value
+                                                })}
+                                                inputProps={{
+                                                    name: 'inputFiscalDate',
+                                                    id: 'inputFiscalDate',
+                                                }}
+
+                                                InputLabelProps={{
+                                                    shrink: true,
+                                                }}
+                                                type="date"
+                                                className={clsx(classes.textFieldOther, classes.dense)}
+
+                                            />
+                                        </div>
+
+
                                         <div className={'col-md-6'}>
                                             <TextField
                                                 disabled={loading}
@@ -735,7 +799,7 @@ const AddEntityForm = (props) => {
                                                 >
                                                     <option value=""/>
                                                     {contactType?.map((anObjectMapped, index) => <option key={index}
-                                                                                                        value={anObjectMapped.code}>{anObjectMapped.name}</option>)}
+                                                                                                         value={anObjectMapped.code}>{anObjectMapped.name}</option>)}
 
                                                 </Select>
                                             </FormControl>
@@ -784,7 +848,7 @@ const AddEntityForm = (props) => {
                                                 >
                                                     <option value=""/>
                                                     {StateRegion?.map((anObjectMapped, index) => <option key={index}
-                                                                                                        value={anObjectMapped.code}>{anObjectMapped.name}</option>)}
+                                                                                                         value={anObjectMapped.code}>{anObjectMapped.name}</option>)}
 
                                                 </Select>
                                             </FormControl>
@@ -825,26 +889,26 @@ const AddEntityForm = (props) => {
                                             <span>{inputFiling.success !== ' ' ? inputFiling.success : ' '}</span>
                                         </div>
                                         <div className={'col-md-12'}>
-                                        <TextField
-                                            id="standard-full-width"
+                                            <TextField
+                                                id="standard-full-width"
 
-                                            placeholder="Business Purpose"
-                                            error={inputBusinessPurpose.error !== ' '}
-                                            helperText={inputBusinessPurpose.error}
-                                            onChange={e => setInputBusinessPurpose({
-                                                ...inputBusinessPurpose,
-                                                value: e.target.value
-                                            })}
-                                            fullWidth
-                                            margin="normal"
-                                            InputLabelProps={{
-                                                shrink: true,
-                                            }}
-                                            inputProps={{
-                                                name: 'inputBusinessPurpose',
-                                                id: 'inputBusinessPurpose',
-                                            }}
-                                        />
+                                                placeholder="Business Purpose"
+                                                error={inputBusinessPurpose.error !== ' '}
+                                                helperText={inputBusinessPurpose.error}
+                                                onChange={e => setInputBusinessPurpose({
+                                                    ...inputBusinessPurpose,
+                                                    value: e.target.value
+                                                })}
+                                                fullWidth
+                                                margin="normal"
+                                                InputLabelProps={{
+                                                    shrink: true,
+                                                }}
+                                                inputProps={{
+                                                    name: 'inputBusinessPurpose',
+                                                    id: 'inputBusinessPurpose',
+                                                }}
+                                            />
                                         </div>
 
                                         <div className={'col-md-12'}>
@@ -854,10 +918,12 @@ const AddEntityForm = (props) => {
                                                             <FacebookProgress/>
                                                         </div>)
                                                     : null}
-                                                <input disabled={loading} className={clsx('btn btn-primary', classes.restButton)}
-                                                       type="submit" value="Reset"/>
+                                                {/*<input disabled={loading}*/}
+                                                {/*       className={clsx('btn btn-primary', classes.restButton)}*/}
+                                                {/*       type="reset"  value="Reset"/>*/}
 
-                                                <input disabled={loading} className={clsx('btn btn-primary', classes.restButton)}
+                                                <input disabled={loading}
+                                                       className={clsx('btn btn-primary', classes.restButton)}
                                                        type="submit" value="Create New Entity"/>
 
                                             </div>

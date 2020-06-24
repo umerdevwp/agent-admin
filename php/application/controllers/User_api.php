@@ -25,73 +25,28 @@ class User_api extends RestController
 
     public function role_get()
     {
-        $email = $this->get('email');
-        $checkSuperUser = $this->Admin_model->checkAdminExist($email);
+//        $id = $this->get('id');
+        $id = $_SESSION["eid"];
+
+        $this->load->model('Entity_model');
+        $checkSuperUser = $this->Entity_model->checkRole($id);
+
         if (!empty($checkSuperUser)) {
-            $this->Admin_model->updateAdmin($email);
-            $this->response(['isAdmin' => true], 200);
-        } else {
-            $this->response(['isAdmin' => false], 200);
-        }
-    }
-
-
-    public function permissions_get()
-    {
-
-    }
-
-
-    public function userdata_get()
-    {
-
-        $email = $this->get('email');
-        $zoho_id = $this->get('zoho_id');
-        //check if the parameters are not empty
-        if (empty($email) or empty($zoho_id)) {
-            $this->response([
-                'status' => false,
-                'message' => 'zoho_id or email of the user is missing.'
-            ], 404);
-        }
-        //check of the user is valid admin
-        $email = $this->get('email');
-        $checkSuperUser = $this->Admin_model->checkAdminExist($email);
-        if (!empty($checkSuperUser)) {
-            //fetching the list of all entities
-            $entity_list = $this->Entity_model->getAll();
-            $this->response($entity_list, 200);
-        }
-
-        //check if zoho account exits in the system
-        $zoho_existance_system = $this->Entity_model->getChildAccounts($zoho_id);
-
-        if ($zoho_existance_system['type'] == 'ok') {
-            //fetch children for the parent zoho id
-            $children = $this->Entity_model->getChildAccounts($zoho_id, array('account_name'));
-
-            if ($children['type'] == 'ok' and !empty($children['results'])) {
-                $this->response($children['results'], RESTController::HTTP_OK);
-            } else {
-                $this->response([
-                    'status' => true,
-                    'child_count' => 0,
-                    'message' => 'This account does not have any child account'
-                ], RESTController::HTTP_OK);
-
+            foreach ($checkSuperUser as $value) {
+                if (!empty($value->parent_account)) {
+                    $this->response([ 'status' => true, 'role' => 'child'], 200);
+                } else {
+                    $this->response([ 'status' => true, 'role' => 'parent'], 200);
+                }
             }
         } else {
-            //if account does not exist in the agentAdmin
             $this->response([
                 'status' => false,
-                'message' => 'Account does not exist'
-            ], 404);
+                'message' => 'User does not exist'
+            ], 401);
         }
+
     }
 
 
-
-    public function index_options() {
-        return $this->response(NULL, RESTController::HTTP_OK);
-    }
 }
