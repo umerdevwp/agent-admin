@@ -8,7 +8,7 @@ use zcrmsdk\crm\crud\ZCRMTag;
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 use chriskacerguis\RestServer\RestController;
-
+use zcrmsdk\crm\exception\ZCRMException;
 
 include APPPATH . '/libraries/CommonDbTrait.php';
 
@@ -218,7 +218,6 @@ HC;
 
             // succcess redirect to dashboard
             if ($aResponseZoho["type"] == 'ok') {
-                $aResponseZoho['message'] = 'Added successfully.';
                 // allow without file, else check type and size
                 $iZohoId = $aResponseZoho['id'];
                 //$this->zohoAddAttachment($iZohoId);
@@ -232,7 +231,11 @@ HC;
                     if($aResponseNote['type']=='error')
                     {
                         $aResponseZoho['type'] = 'error';
+                        if(!empty($aResponseZoho['message']))
+                        $aResponseZoho['message'] .= "," . $aResponseNote['message'];
+                        else
                         $aResponseZoho['message'] = $aResponseNote['message'];
+                        
                     }
                 }
 
@@ -244,7 +247,7 @@ HC;
             } else {
                 $this->response([
                     'status' => false,
-                    'error' => $aResponseZoho['error']
+                    'error' => $aResponseZoho['message']
                 ], 400);
             }
 
@@ -273,10 +276,7 @@ HC;
 
         $this->form_validation->set_rules('inputName', 'Account Name', 'required|regex_match[/[a-zA-Z\s]+/]', ["regex_match" => "Only alphabets and spaces allowed."]);
 
-        $this->form_validation->set_rules('inputFirstName', 'First Name', 'required|regex_match[/[a-zA-Z\s]+/]', ["regex_match" => "Only alphabets and spaces allowed."]);
-        $this->form_validation->set_rules('inputLastName', 'Last Name', 'required|regex_match[/[a-zA-Z\s]+/]', ["regex_match" => "Only alphabets and spaces allowed."]);
-
-        $this->form_validation->set_rules('inputNotificationContactType', 'Contact Type', 'required|alpha');
+        $this->form_validation->set_rules('inputEIN', 'EIN', 'numeric|exact_length[9]',["numeric" => "Only numbers are allowed.","exact_length"=>"Must contain 9 digits"]);
         $this->form_validation->set_rules('inputFillingState', 'Filing State', 'required|alpha|exact_length[2]');
         $this->form_validation->set_rules('inputFillingStructure', 'Entity Type', 'required|regex_match[/[A-Z\-]+/]');
         $this->form_validation->set_rules('inputFormationDate', 'Formation Date', 'required|regex_match[/[0-9]{4,}\-[0-9]{2,}\-[0-9]{2,}/]', ["regex_match" => "Allowed %s format: 2019-01-01"]);
@@ -350,22 +350,7 @@ HC;
                 if ($aResponse["entityId"] > 0) {
                     $aResponse['message'] = 'Edit successfully.';
                     $aResponse['id'] = $aResponse['entityId'];
-                    // allow without file, else check type and size
-                    $iZohoId = $this->input->post("eid");
-                    $this->load->model("Contacts_model");
-                    $aContactDetail = $this->Contacts_model->getEntityProfileContact($iZohoId);
-                    $iContactId = $aContactDetail['data']->id;
-                    $aEditResponse = $this->zohoEditContact($iContactId);
-                    if($aEditResponse['type'] == 'error')
-                    {
-                        $aResponse['type'] = 'error';
-                        $aResponse['message'] = $aEditResponse['results'] . " " . $aEditResponse['message'];
-                    }
-                    // add a note if smarty validated address successfuly
-                    //if (!$bSmartyAddress) {
-                    //    $response = $this->ZoHo_Account->newZohoNote("Accounts", $response['data']['id'], "Smartystreet has replaced following", $sSmartyAddress);
-                    //}
-
+                    
                     $this->redirectAfterAdd($aResponse);// $response['data']['id']);
 
                     // redirect to form, show error
@@ -409,7 +394,7 @@ HC;
     private function zohoCreateEntity($iParentZohoId, $bTagSmartyValidated)
     {
 
-        $arError = array();
+        $aError = array();
         $iErrorType = 1;// 1 means user creation failed, 2 means only attachment failed
         $this->load->model('ZoHo_Account');
         $this->load->model("entity_model");
@@ -420,36 +405,39 @@ HC;
         $iAgentId = $aZohoResponse['agentId'];
 
         if ($iZohoId > 0) {
-            // setting 2, so error only reports attachment issue
-            $iErrorType = 2;
-            $bAttachmentDone = false;
-            $iContactId = 0;
-            $oAttachment = null;
-
+            $aErrorAttachment = ['type'=>'ok'];
             if (!empty($this->input->post("inputFileId")))
-                $bAttachmentDone = $this->zohoAddAttachment($iZohoId);
+                $aErrorAttachment = $this->zohoAddAttachment($iZohoId);
+            // contact with entity is skipped 24/6/2020
+            //$iContactId = $this->zohoAddContact($iZohoId);
 
-            $iContactId = $this->zohoAddContact($iZohoId);
-
-            $this->addEntityToTemp($iZohoId, $iContactId, $iAgentId, $bAttachmentDone);
+            $this->addEntityToTemp($iZohoId, $iAgentId);
             // add row to subscription
             $iSubId = $this->addSubscription($iZohoId);
             // if subscription fail report is sent to logs, users are not informed at this point
-            
+            $aErrorTag = ['type'=>'ok'];
             // add tags
             if(!isDev())
             {
-                $arError = $this->processTags($iZohoId,$bTagSmartyValidated);
+                $aErrorTag = $this->processTags($iZohoId,$bTagSmartyValidated);
             }
         } else {
             return ['type'=>'error', 'message' => $aZohoResponse['message']];
         }
-        //var_dump($arError);die;
-        if (count($arError) > 0) {
-            return ['type'=>'error', 'message' => $arError[0], 'id'=>$iZohoId];
+        $aResponse = ['type' => 'ok', 'message' => "Entity created successfully.", 'id' => $iZohoId];
+        
+        if ($aErrorTag['type']=='error' && $aErrorAttachment['type']=='error') {
+            $sErrorMessage = $aErrorTag['message'] . ", " . $aErrorAttachment['message'];
+            $aResponse['message'] = $sErrorMessage;
+        } else if($aErrorAttachment['type']=='error')
+        {
+            $aResponse['message'] = $aErrorAttachment['message'];
+        } else if($aErrorTag['type']=='error')
+        {
+            $aResponse['message'] = $aErrorTag['message'];
         }
 
-        return ['type' => 'ok', 'message' => "Entity created successfully.", 'id' => $iZohoId];
+        return $aResponse;
     }
     
     private function processTags($iZohoId,$bTagSmartyValidated)
@@ -539,7 +527,7 @@ HC;
 
     }
 
-    private function addEntityToTemp($iEntityId, $iContactId = 0, $iAgentId=0, $bAttachmentDone = true)
+    private function addEntityToTemp($iEntityId, $iAgentId=0)
     {
         $this->load->model("Tempmeta_model");
         $today = date("Y-m-d");
@@ -560,6 +548,11 @@ HC;
         ];
         $this->Tempmeta_model->appendRow($_SESSION['eid'], $this->Tempmeta_model->slugNewEntity, $aDataEntity);
 
+        //$this->addContactToTemp($iContactId);
+    }
+
+    private function addContactToTemp($iEntityId,$iContactId=0)
+    {
         if ($iContactId>0) {
             $this->load->model("Contacts_model");
             // $iContactId = $aResponse['results'];
@@ -722,10 +715,10 @@ HC;
         }
         
         if (!$bAttachmentDone) {
-            return ['status' => '500', 'detail' => $sError];
+            return ['type' => 'error', 'message' => $sError];
         }
 
-        return $bAttachmentDone;
+        return ['type'=>'ok','id'=>$id];
     }
 
     /**
@@ -754,7 +747,7 @@ HC;
         $oApi->setFieldValue("Shipping_State", $this->input->post("inputNotificationState"));
         $oApi->setFieldValue("Shipping_Code", $this->input->post("inputNotificationZip"));
         $oApi->setFieldValue("Business_purpose", $this->input->post("inputBusinessPurpose"));
-
+        $oApi->setFieldValue("EIN", $this->input->post("inputEIN"));
 
         // fetch RA (registered agent) id from DB
         $strFilingState = $this->input->post("inputFillingState");
@@ -767,17 +760,17 @@ HC;
         // additional detail as default values for new entity
         // tag call needs account id instance, added below after attachments
         if (isDev()) {
-            $oApi->setFieldValue("RA", "");
-            // parent account fail on sandbox
-            // layout fail on sandbox
+            $oApi->setFieldValue("RA", "3743841000000932064");//sandbox id
+            $oApi->setFieldValue("Parent_Account", "3743841000000932091");//sandbox id
+            $oApi->setFieldValue("Layout", "3743841000000983988");// sandbox id = Customer layout
         } else {
             // push the RA id data to zoho
             $oApi->setFieldValue("RA", $iRAId);
             // parent account not needed for edit
             $oApi->setFieldValue("Layout", "4071993000001376034");// for customer layout id = Customer
         }
-        $oApi->setFieldValue("Account_Type", "Distributor");
-        $oApi->setFieldValue("status", "InProcess");
+        //$oApi->setFieldValue("Account_Type", "Distributor");
+        //$oApi->setFieldValue("status", "InProcess");
 
         // Billing addresses not require in edit
 
@@ -793,9 +786,9 @@ HC;
 
             $aResponse  = ['entityId'=>$oResponse['id'],'agentId'=>$iRAId];
 
-        } catch (Exception $oError) {
+        } catch (ZCRMException $oError) {
             // message
-            $sError = "code: " . $oError->data[0]->code . ", error: Api: " . $oError->data[0]->details->expected_data_type . ", " . $oError->data[0]->details->api_name . ", message: " . $oError->getMessage();
+            $sError = "code: " . $oError->getCode() . ", api error: " . $oError->getExceptionCode() . ", name: " . $oError->getExceptionDetails()['api_name'] . ", message: " . $oError->getMessage();
             $aResponse = ['type'=>'error','message'=>$sError];
         }
 
@@ -826,7 +819,7 @@ HC;
         $oApi->setFieldValue("Shipping_State", $this->input->post("inputNotificationState"));
         $oApi->setFieldValue("Shipping_Code", $this->input->post("inputNotificationZip"));
         $oApi->setFieldValue("Business_purpose", $this->input->post("inputBusinessPurpose"));
-
+        $oApi->setFieldValue("EIN", $this->input->post("inputEIN"));
 
         // fetch RA (registered agent) id from DB
         $strFilingState = $this->input->post("inputFillingState");
@@ -839,9 +832,9 @@ HC;
         // additional detail as default values for new entity
         // tag call needs account id instance, added below after attachments
         if (isDev()) {
-            $oApi->setFieldValue("RA", "");
-            //$oApi->setFieldValue("Parent_Account", "3743841000000633019");
-            //$oApi->setFieldValue("Layout", "4071993000001376034");// for customer layout id = Customer
+            $oApi->setFieldValue("RA", "3743841000000932064");//sandbox id
+            $oApi->setFieldValue("Parent_Account", "3743841000000932091");//sandbox id
+            $oApi->setFieldValue("Layout", "3743841000000983988");// sandbox id = Customer layout
         } else {
             // push the RA id data to zoho
             $oApi->setFieldValue("RA", $iRAId);
@@ -851,18 +844,20 @@ HC;
         $oApi->setFieldValue("Account_Type", "Distributor");
         $oApi->setFieldValue("status", "InProcess");
 
-        $oLoginUser = $this->entity_model->getOne(getenv("SUPER_ZOHO_ID"));
-        $oLoginUser = $oLoginUser['results'];
-        if ($oLoginUser->id) {
-            // billing info using entity profile
-            $oApi->setFieldValue("Billing_City", $oLoginUser->billing_city);
-            $oApi->setFieldValue("Billing_Code", $oLoginUser->billing_code);
+        // get billing values of parent entity
+        $aBillingColumns = ['id','billingCity','billingCode','billingState','billingStreet','billingStreet2','billingCountry'];
+        $oParent = $this->entity_model->getOne($_SESSION['eid'],$aBillingColumns);
+        $oParent = $oParent['results'];
+        if ($oParent->id) {
+            // set child entity billing fields to parent billing details
+            $oApi->setFieldValue("Billing_City", $oParent->billingCity);
+            $oApi->setFieldValue("Billing_Code", $oParent->billingCode);
             $oApi->setFieldValue("Billing_Country", "US");
-            $oApi->setFieldValue("Billing_State", $oLoginUser->billing_state);
-            $oApi->setFieldValue("Billing_Street", $oLoginUser->billing_street);
-            $oApi->setFieldValue("Billing_Street_2", $oLoginUser->billing_street_2);
+            $oApi->setFieldValue("Billing_State", $oParent->billingState);
+            $oApi->setFieldValue("Billing_Street", $oParent->billingStreet);
+            $oApi->setFieldValue("Billing_Street_2", $oParent->billingStreet2);
         } else {
-            $sError = "Billing addresses failed";
+            error_log("Parent billing address not found for child profile");
         }
 
         $trigger = array();//triggers to include
@@ -877,9 +872,9 @@ HC;
 
             $aResponse  = ['entityId'=>$oResponse['id'],'agentId'=>$iRAId];
 
-        } catch (Exception $oError) {
+        } catch (ZCRMException $oError) {
             // message
-            $sError = "code: " . $oError->data[0]->code . ", error: Api: " . $oError->data[0]->details->expected_data_type . ", " . $oError->data[0]->details->api_name . ", message: " . $oError->getMessage();
+            $sError = "code: " . $oError->getCode() . ", api error: " . $oError->getExceptionCode() . ", name: " . $oError->getExceptionDetails()['api_name'] . ", message: " . $oError->getMessage();
             $aResponse = ['type'=>'error','message'=>$sError];
         }
 
