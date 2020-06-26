@@ -244,7 +244,7 @@ MySnackbarContentWrapper.propTypes = {
     variant: PropTypes.oneOf(['success', 'warning', 'error', 'info']).isRequired,
 }
 
-const AddContactForm = (props) => {
+const EditContactForm = (props) => {
 
     const history = useHistory();
     const classes = useStyles();
@@ -488,17 +488,17 @@ const AddContactForm = (props) => {
             }
         }
 
-        // for (var pair of formData.entries()) {
-        //     console.log(pair[0] + ', ' + pair[1]);
-        // }
+        for (var pair of formData.entries()) {
+            console.log(pair[0] + ', ' + pair[1]);
+        }
 
 
-        //
-        // setTimeout(() => {
-        //     setLoading(false);
-        //     history.goBack();
-        // }, 4000)
-        // setLoading(true);
+
+        setTimeout(() => {
+            setLoading(false);
+            history.goBack();
+        }, 4000)
+        setLoading(true);
 
 
     }
@@ -829,4 +829,4 @@ const AddContactForm = (props) => {
 }
 
 
-export default withAuth(AddContactForm);
+export default withAuth(EditContactForm);

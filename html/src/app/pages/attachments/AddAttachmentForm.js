@@ -261,15 +261,11 @@ const AddAttachmentForm = (props) => {
     }
 
 
-
-
-
-
     const handleClose = (event, reason) => {
         setError(false);
     }
 
-    const handleOnSubmit = async(event) => {
+    const handleOnSubmit = async (event) => {
         event.preventDefault();
         setLoading(true);
         let formData = new FormData();
@@ -285,8 +281,8 @@ const AddAttachmentForm = (props) => {
 
 
         const response = await attachFiles(formData);
-        if(response){
-            if(response.status == true){
+        if (response) {
+            if (response.status == true) {
                 setSuccessMessage(true);
                 setLoading(false);
             }
@@ -326,7 +322,9 @@ const AddAttachmentForm = (props) => {
                 <Link color="inherit" href="/">
                     Dashboard
                 </Link>
-                <Link color="inherit" onClick={(e) => {history.goBack()}}>
+                <Link color="inherit" onClick={(e) => {
+                    history.goBack()
+                }}>
                     Entity
                 </Link>
                 <Typography color="textPrimary">Add Attachment</Typography>
@@ -351,7 +349,7 @@ const AddAttachmentForm = (props) => {
                                     variant="success"
                                     message="File is attached"
                                 />
-                            ) : '' }
+                            ) : ''}
 
                             <div className="row">
                                 <form className={classes.formStyle} onSubmit={handleOnSubmit} noValidate
@@ -381,7 +379,8 @@ const AddAttachmentForm = (props) => {
                                                         </div>)
                                                     : null}
 
-                                                <input disabled={loading} className={clsx('btn btn-primary', classes.restButton)}
+                                                <input disabled={loading}
+                                                       className={clsx('btn btn-primary', classes.restButton)}
                                                        type="submit" value="Add attachment"/>
 
                                             </div>

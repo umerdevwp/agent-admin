@@ -223,7 +223,7 @@ MySnackbarContentWrapper.propTypes = {
     variant: PropTypes.oneOf(['success', 'warning', 'error', 'info']).isRequired,
 }
 
-const AddEntityForm = (props) => {
+const EditEntityForm = (props) => {
 
 
     const {oktaprofile, isAdmin} = useContext(OktaUserContext);
@@ -984,4 +984,4 @@ const AddEntityForm = (props) => {
 }
 
 
-export default withAuth(AddEntityForm);
+export default withAuth(EditEntityForm);

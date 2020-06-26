@@ -37,7 +37,7 @@ export const checkRole = async () => {
     const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
 
     if(okta) {
-        const response = await fetch(`${ENTITY}/user_api/role`, {
+        const response = await fetch(`${ENTITY}/entity/role`, {
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Authorization': okta.accessToken.accessToken,
@@ -65,11 +65,28 @@ export const checkAdmin = async (zoho_id, email) => {
     }
 }
 
-export const entityDetail = async (zoho_id, email, entity) => {
+export const entityDetail = async (entity) => {
     const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
 
     if(okta) {
         const response = await fetch(`${ENTITY}/entity/entityview/?eid=${entity}`, {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': okta.accessToken.accessToken,
+
+            }
+        });
+        return Promise.resolve(response.json());
+    }
+}
+
+
+
+export const selfEntityDetail = async () => {
+    const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
+
+    if(okta) {
+        const response = await fetch(`${ENTITY}/entity/entityview`, {
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Authorization': okta.accessToken.accessToken,

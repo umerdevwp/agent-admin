@@ -49,6 +49,12 @@ function EntityListing(props) {
                 setEntityData(response.data.results);
                 setLoading(false);
             }
+
+            if(response.error){
+                entityDashboardList(response.error.message)
+            }
+
+
         })
     }
 
@@ -78,7 +84,7 @@ function EntityListing(props) {
     return (
 
         <Grid item xs={12}>
-            { role === 'parent' ?
+            { role === 'Parent Organization' ?
             <div style={{maxWidth: "100%"}}>
                 <MaterialTable
                     isLoading={loading}
@@ -128,7 +134,71 @@ function EntityListing(props) {
                             }),
                     } : ''}
                 />
-            </div> : <EntityDetailedPage entityid={oktaprofile.organization} /> }
+            </div> : '' }
+
+            {
+                role === 'Child Entity' ?
+                    <EntityDetailedPage entityid={oktaprofile.organization} /> : ''
+            }
+
+
+
+            {
+              role === 'Administrator' ?
+                  <div style={{maxWidth: "100%"}}>
+                      <MaterialTable
+                          isLoading={loading}
+                          actions={isAdmin === true ? [
+                              {
+                                  icon: 'add',
+                                  tooltip: props.tooltip ? props.tooltip : 'Add User',
+                                  isFreeAction: true,
+                                  onClick: (event) => {
+                                      if (props.redirect) {
+                                          history.push(props.url);
+                                      }
+                                  }
+                              }
+                          ] : ''}
+                          title={props.title !== '' ? props.title : ''}
+                          columns={settingData.columns}
+                          data={settingData.data}
+                          options={{
+                              grouping: true
+                          }}
+                          editable={isAdmin ? {
+                              onRowUpdate: (newData, oldData) =>
+                                  new Promise(resolve => {
+                                      setTimeout(() => {
+                                          resolve();
+                                          handleUpdate(newData)
+                                          if (oldData) {
+                                              setState(prevState => {
+                                                  const data = [...prevState.data];
+                                                  data[data.indexOf(oldData)] = newData;
+                                                  return {...prevState, data};
+                                              });
+                                          }
+                                      }, 600);
+                                  }),
+                              onRowDelete: oldData =>
+                                  new Promise(resolve => {
+                                      setTimeout(() => {
+                                          resolve();
+                                          setState(prevState => {
+                                              const data = [...prevState.data];
+                                              data.splice(data.indexOf(oldData), 1);
+                                              return {...prevState, data};
+                                          });
+                                      }, 600);
+                                  }),
+                          } : ''}
+                      />
+                  </div> : ''
+
+            }
+
+
         </Grid>
 
     )

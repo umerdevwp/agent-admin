@@ -36,11 +36,21 @@ import MailIcon from '@material-ui/icons/Mail';
 import Container from "@material-ui/core/Container";
 import Link from "@material-ui/core/Link";
 import {useHistory} from "react-router-dom";
-import {entityDetail} from '../../crud/enitity.crud';
+import {entityDetail, selfEntityDetail} from '../../crud/enitity.crud';
 import {OktaUserContext} from '../../context/OktaUserContext';
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
 import Typography from "@material-ui/core/Typography";
-
+import PropTypes from 'prop-types';
+import ErrorIcon from '@material-ui/icons/Error';
+import InfoIcon from '@material-ui/icons/Info';
+import CloseIcon from '@material-ui/icons/Close';
+import {amber, green} from '@material-ui/core/colors';
+import IconButton from '@material-ui/core/IconButton';
+import Snackbar from '@material-ui/core/Snackbar';
+import SnackbarContent from '@material-ui/core/SnackbarContent';
+import WarningIcon from '@material-ui/icons/Warning';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import clsx from 'clsx';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -64,9 +74,68 @@ const useStyles = makeStyles(theme => ({
     },
     listItem: {
         marginBottom: '5px'
-    }
+    },
+
+    errorMessage: {
+        marginBottom: '5px'
+    },
+    success: {
+        backgroundColor: green[600],
+    },
+    error: {
+        backgroundColor: theme.palette.error.dark,
+    },
+    info: {
+        backgroundColor: theme.palette.primary.main,
+    },
+    warning: {
+        backgroundColor: amber[700],
+    },
+
 }));
 
+
+const variantIcon = {
+    success: CheckCircleIcon,
+    warning: WarningIcon,
+    error: ErrorIcon,
+    info: InfoIcon,
+};
+
+
+function MySnackbarContentWrapper(props) {
+    const classes = useStyles();
+    const {className, message, onClose, variant, ...other} = props;
+    const Icon = variantIcon[variant];
+
+    return (
+        <SnackbarContent
+
+            elevation={6} variant="filled"
+            className={clsx(classes[variant], className)}
+            aria-describedby="client-snackbar"
+            message={
+                <span id="client-snackbar" className={classes.message}>
+          <Icon className={clsx(classes.icon, classes.iconVariant)}/>
+                    {message}
+        </span>
+            }
+            action={[
+                <IconButton key="close" aria-label="Close" color="inherit" onClick={onClose}>
+                    <CloseIcon className={classes.icon}/>
+                </IconButton>,
+            ]}
+            {...other}
+        />
+    );
+}
+
+MySnackbarContentWrapper.propTypes = {
+    className: PropTypes.string,
+    message: PropTypes.node,
+    onClose: PropTypes.func,
+    variant: PropTypes.oneOf(['success', 'warning', 'error', 'info']).isRequired,
+}
 
 const EntityDetailedPage = (props) => {
 
@@ -75,7 +144,7 @@ const EntityDetailedPage = (props) => {
     const breadcrumbs_show = !props.breadcrumbz ? props.breadcrumbz : true;
     const HOST = process.env.REACT_APP_SERVER_API_URL;
 
-    const {oktaprofile, isAdmin} = useContext(OktaUserContext);
+    const {oktaprofile, isAdmin, addError, errorList, role} = useContext(OktaUserContext);
     const classes = useStyles();
     const history = useHistory();
     const [entitydetail, setEntitydetail] = React.useState()
@@ -85,17 +154,36 @@ const EntityDetailedPage = (props) => {
 
     const [loading, setLoading] = React.useState(true)
     useEffect(() => {
+
         fetchDetailedProfile();
     }, [])
 
 
     const fetchDetailedProfile = async () => {
-        const detailedView = await entityDetail(oktaprofile.organization, oktaprofile.email, entity_id);
-        setEntitydetail(detailedView.result)
-        setContactList(detailedView.result.contacts);
-        setAttachmentList(detailedView.result.attachments)
-        setTaskList(detailedView.result.tasks)
-        setLoading(false);
+        // {"errors":{"status":401,"detail":"Invalid detail request"}}
+        var detailedView = '';
+        if (role === 'Parent Organization' || role === 'Administrator' ) {
+            detailedView = await entityDetail(entity_id);
+        }
+
+        if (role === 'Child Entity') {
+            detailedView = await selfEntityDetail();
+        }
+
+
+        if (detailedView.result) {
+            setEntitydetail(detailedView.result)
+            setContactList(detailedView.result.contacts);
+            setAttachmentList(detailedView.result.attachments)
+            setTaskList(detailedView.result.tasks)
+            setLoading(false);
+
+        }
+
+        if (detailedView.errors) {
+            errorList(detailedView.detail)
+        }
+
     }
 
 
@@ -172,6 +260,10 @@ const EntityDetailedPage = (props) => {
 
 
             {entitydetail ? <Title title={entitydetail.entity.name}/> : <Title title={''}/>}
+            {errorList?.map((value, index) => (
+                <MySnackbarContentWrapper className={classes.errorMessage} spacing={1} index={index} variant="error"
+                                          message={value}/>
+            ))}
 
             <Grid container spacing={1}>
                 <Grid item xs={12} sm={4}>

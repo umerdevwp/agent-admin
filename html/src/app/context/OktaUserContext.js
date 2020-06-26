@@ -1,4 +1,4 @@
-import React, {createContext, useState, useEffect, useLayoutEffect} from 'react'
+import React, {createContext, useState, useEffect, useLayoutEffect, useCallback, useMemo} from 'react'
 import {userInfoAPI, fetchUserProfile} from "../crud/auth.crud";
 import {checkAdmin, entityList, checkRole} from '../crud/enitity.crud';
 import {withAuth} from '@okta/okta-react';
@@ -6,10 +6,12 @@ import {withAuth} from '@okta/okta-react';
 export const OktaUserContext = createContext(
     {
         oktaprofile: {},
-        isAdmin: false,
+        isAdmin: {isAdmin: false},
         loading: {},
-        entityDashboardList: {},
-        hasChild: false
+        hasChild: false,
+        errorList: [],
+        organization_parent: ''
+
 
     }
 );
@@ -30,7 +32,7 @@ function OktaUserContextProvider(props) {
     const [hasChild, setHasChild] = useState({});
     const [entityDashboardList, setEntityDashboardList] = useState([]);
     const [role, setRole] = useState({});
-
+    const [errorList, setErrorList] = useState([]);
     const [loading, setLoading] = useState({
         loading: true
     })
@@ -41,42 +43,37 @@ function OktaUserContextProvider(props) {
         const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
         const data = await fetchUserProfile(okta.idToken.claims.sub);
         setOktaprofile({...oktaprofile, oktaprofile: data.profile});
-        checkifAdmin(data.profile);
+        // checkifAdmin(data.profile);
         await getUserRole();
         setLoading({...loading, loading: false});
 
     }
 
-    const getEntityListing = async () => {
-        const entity_list = await entityList();
-
-        if (entity_list.data) {
-            const results = entity_list.data.results;
-
-            if (results.length > 0) {
-                localStorage.setItem('hasChild', true);
-                setHasChild({...hasChild, hasChild: true});
-                setEntityDashboardList({...entityDashboardList, entityDashboardList: results});
-            } else {
-                setHasChild({...hasChild, hasChild: false});
+    const getUserRole = async () => {
+        const get_role = await checkRole();
+        if (get_role) {
+            if (get_role.status === true) {
+                setRole({...role, role: get_role.data.role});
             }
-
+            if (get_role.status === false) {
+                setErrorList({...errorList, errorList: get_role.message})
+            }
         }
     }
-
-
-    const getUserRole = async () =>{
-        const get_role = await checkRole();
-       if(get_role){
-           setRole({...role, role: get_role.role});
-       }
-    }
-
 
 
     const checkifAdmin = async (profile) => {
         const response = await checkAdmin(profile.organization, profile.email);
         setisAdmin({...isAdmin, isAdmin: response});
+    }
+
+    const organization_parent = async (profile) => {
+        setErrorList({...errorList, errorList: profile});
+    }
+
+
+    const addError = (data) => {
+       setErrorList(errorList => [...errorList, data])
     }
 
 
@@ -86,7 +83,9 @@ function OktaUserContextProvider(props) {
                 ...oktaprofile,
                 ...isAdmin,
                 ...loading,
-                ...role
+                ...role,
+                errorList,
+                addError
             }}>
             {props.children}
         </OktaUserContext.Provider>
