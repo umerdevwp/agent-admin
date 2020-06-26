@@ -95,13 +95,15 @@ export default function IntegrationDownshift(props) {
 
 
     function renderInput(inputProps) {
-        const {disabled, required, error, className} = props
+        const {disabled, required, error, className, helperText} = props
         const {InputProps, classes, ref, ...other} = inputProps;
         return (
             <TextField
                 className={className}
                 disabled={disabled}
                 required
+                error={error}
+                helperText={helperText}
                 onChange={(event) => smartyHandler(event)}
                 InputProps={{
                     inputRef: ref,

@@ -28,7 +28,7 @@ import CustomFileInput from "reactstrap/es/CustomFileInput";
 import CircularProgress from '@material-ui/core/CircularProgress';
 // import {StateRegion} from '../../StaticData/Static';
 import {withAuth} from '@okta/okta-react';
-
+import FormHelperText from '@material-ui/core/FormHelperText';
 import PropTypes from 'prop-types';
 import ErrorIcon from '@material-ui/icons/Error';
 import InfoIcon from '@material-ui/icons/Info';
@@ -156,6 +156,12 @@ const useStyles = makeStyles(theme => ({
     success: {
         backgroundColor: green[600],
     },
+
+    fileError:{
+        color: '#fd397a'
+    },
+
+
     error: {
         backgroundColor: theme.palette.error.dark,
     },
@@ -341,6 +347,9 @@ const AddEntityForm = (props) => {
     const fileChange = async (e) => {
         if(e.target.files[0]) {
             setLoading(true);
+            setInputFiling({...inputFiling, value: '', success: ' '});
+            setInputFileSize({...inputFileSize, value: ''});
+            setInputFileName({...inputFileName, value: ''});
             let formData = new FormData();
             formData.append('file', e.target.files[0]);
             const filename = e.target.files[0].name;
@@ -354,6 +363,7 @@ const AddEntityForm = (props) => {
                     setLoading(false);
                 }
             } else {
+                setInputFiling({...inputFiling, error: response.message.file[0]});
                 setLoading(false);
             }
         } else {
@@ -367,6 +377,9 @@ const AddEntityForm = (props) => {
     const handleOnSubmit = async (event) => {
         var formsubmit = true;
         setLoading(true);
+        setInputFiling({...inputFiling, value: '', success: ' ', error:' '});
+        setInputFileSize({...inputFileSize, value: ''});
+        setInputFileName({...inputFileName, value: ''});
         setInputName({...inputName, error: ' '})
         setInputComplianceOnly({...inputComplianceOnly, error: ' '})
         setInputFillingState({...inputFillingState, error: ' '})
@@ -374,7 +387,7 @@ const AddEntityForm = (props) => {
         // setInputLastName({...inputLastName, error: ' '})
         setInputFillingStructure({...inputFillingStructure, error: ' '})
         setInputFormationDate({...inputFormationDate, error: ' '})
-        setInputFiscalDate({...inputFormationDate, error: ' '})
+        setInputFiscalDate({...inputFormationDate,value: fiscal, error: ' '})
         setInputNotificationEmail({...inputNotificationEmail, error: ' '})
         setInputNotificationPhone({...inputNotificationPhone, error: ' '})
         setInputNotificationAddress({...inputNotificationAddress, error: ' '})
@@ -405,8 +418,17 @@ const AddEntityForm = (props) => {
             formData.append('inputNotificationAddress', addressObject)
         }
         formData.append('inputEIN', inputEIN.value)
-        formData.append('inputNotificationCity', inputNotificationCity.value);
-        formData.append('inputNotificationState', inputNotificationState.value);
+
+        if(inputNotificationCity.value) {
+            formData.append('inputNotificationCity', inputNotificationCity.value);
+        } else{
+            formData.append('inputNotificationCity', '');
+        }
+        if(inputNotificationState.value) {
+            formData.append('inputNotificationState', inputNotificationState.value);
+        } else {
+            formData.append('inputNotificationState', '');
+        }
         formData.append('inputNotificationZip', inputNotificationZip.value);
         formData.append('inputFileId', inputFiling.value);
         formData.append('inputFileName', inputFileName.value);
@@ -419,12 +441,32 @@ const AddEntityForm = (props) => {
                   if(value.toString().length == 9){
                       formsubmit = true;
                   } else {
+                      setLoading(false);
                       formsubmit = false;
-                      setInputEIN({...inputEIN, error: "Please enter 9 digit number"})
+                      setInputEIN({...inputEIN, error: "Please enter 9 digits number"})
                   }
             } else {
+                setLoading(false);
                 formsubmit = false;
-                setInputEIN({...inputEIN, error: "Please enter 9 digit number"})
+                setInputEIN({...inputEIN, error: "Please enter 9 digits number"})
+            }
+        }
+
+
+        if(inputNotificationZip.value){
+            var zip = parseInt(inputNotificationZip.value);
+            if(typeof zip === 'number'){
+                if(zip.toString().length == 5){
+                    formsubmit = true;
+                } else {
+                    setLoading(false);
+                    formsubmit = false;
+                    setInputNotificationZip({...inputNotificationZip, error: "Please enter 5 digits zip code"})
+                }
+            } else {
+                setLoading(false);
+                formsubmit = false;
+                setInputNotificationZip({...inputNotificationZip, error: "Please enter 5 digits zip code"})
             }
         }
         if(formsubmit) {
@@ -488,7 +530,8 @@ const AddEntityForm = (props) => {
                     }
 
                     if (key === 'inputFiscalDate') {
-                        setInputFiscalDate({...inputFiscalDate, error: response.field_error[key]})
+                        // setInputFiscalDate(inputFiscalDate => ...inputFiscalDate, error:response.field_error[key])
+                        setInputFiscalDate({...inputFiscalDate, value: fiscal, error: response.field_error[key]})
                     }
 
 
@@ -505,9 +548,9 @@ const AddEntityForm = (props) => {
 
 
 
-        // for (var pair of formData.entries()) {
-        //     console.log(pair[0] + ', ' + pair[1]);
-        // }
+        for (var pair of formData.entries()) {
+            console.log(pair[0] + ', ' + pair[1]);
+        }
 
         // setTimeout(() => {
         //     setInputName({...inputName, error: 'Field is required'})
@@ -597,7 +640,7 @@ const AddEntityForm = (props) => {
                                         </div>
 
                                         <div className={'col-md-6'}>
-                                            <FormControl className={clsx(classes.selectField)}>
+                                            <FormControl className={clsx(classes.selectField)} error={inputFillingState.error !== ' '}>
                                                 <InputLabel    className={clsx(classes.label)} htmlFor="age-native-simple">Entity State</InputLabel>
                                                 <Select
                                                     disabled={loading}
@@ -618,10 +661,11 @@ const AddEntityForm = (props) => {
                                                                                                          value={anObjectMapped.code}>{anObjectMapped.name}</option>)}
 
                                                 </Select>
+                                                <FormHelperText>{inputFillingState.error}</FormHelperText>
                                             </FormControl>
                                         </div>
                                         <div className={'col-md-6'}>
-                                            <FormControl className={clsx(classes.selectField)}>
+                                            <FormControl className={clsx(classes.selectField)} error={inputFillingStructure.error !== ' '}>
                                                 <InputLabel htmlFor="age-native-simple">Entity Structure</InputLabel>
                                                 <Select
                                                     disabled={loading}
@@ -643,6 +687,7 @@ const AddEntityForm = (props) => {
                                                         value={anObjectMapped.code}>{anObjectMapped.name}</option>)}
 
                                                 </Select>
+                                                <FormHelperText>{inputFillingStructure.error}</FormHelperText>
                                             </FormControl>
                                         </div>
                                         <div className={'col-md-6'}>
@@ -870,7 +915,7 @@ const AddEntityForm = (props) => {
                                             />
                                         </div>
                                         <div className={'col-md-4'}>
-                                            <FormControl className={clsx(classes.selectField)}>
+                                            <FormControl className={clsx(classes.selectField)}  error={inputNotificationState.error !== ' '}>
                                                 <InputLabel
                                                     htmlFor="state-native-simple">State/Region/Province</InputLabel>
                                                 <Select
@@ -894,6 +939,7 @@ const AddEntityForm = (props) => {
                                                                                                          value={anObjectMapped.code}>{anObjectMapped.name}</option>)}
 
                                                 </Select>
+                                                <FormHelperText>{inputNotificationState.error}</FormHelperText>
                                             </FormControl>
                                         </div>
                                         <div className={'col-md-6'}>
@@ -911,6 +957,7 @@ const AddEntityForm = (props) => {
                                                     id: 'inputNotificationZip',
                                                 }}
                                                 error={inputNotificationZip.error !== ' '}
+                                                helperText={inputNotificationZip.error}
                                                 label="Postal / Zip Code"
                                                 className={clsx(classes.textFieldtwofield, classes.dense)}
                                                 margin="dense"
@@ -929,12 +976,13 @@ const AddEntityForm = (props) => {
                                                 invalid={inputFiling.error !== ' '}
                                                 valid={inputFiling.success !== ' '}
                                             />
-                                            <span>{inputFiling.success !== ' ' ? inputFiling.success : ' '}</span>
+                                            {inputFiling.success !== ' ' ? (<span>{inputFiling.success}</span>) : ' '}
+                                            {inputFiling.error !== ' ' ? (<span className={clsx(classes.fileError)}>{inputFiling.error}</span>) : ' '}
                                         </div>
                                         <div className={'col-md-12'}>
                                             <TextField
                                                 id="standard-full-width"
-
+                                                disabled={loading}
                                                 placeholder="Business Purpose"
                                                 error={inputBusinessPurpose.error !== ' '}
                                                 helperText={inputBusinessPurpose.error}
