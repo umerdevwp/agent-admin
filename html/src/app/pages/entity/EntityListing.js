@@ -15,7 +15,7 @@ import Grid from "@material-ui/core/Grid";
 import {OktaUserContext} from "../../context/OktaUserContext";
 import {entityList, entityListingAxios} from "../../crud/enitity.crud";
 import {fetchUserProfile} from "../../crud/auth.crud";
-
+import EntityDetailedPage from "./EntityDetailedPage";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -29,26 +29,26 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function EntityListing(props) {
-    const {oktaprofile, isAdmin} = useContext(OktaUserContext);
+    const {oktaprofile, isAdmin, entityDashboardList, hasChild} = useContext(OktaUserContext);
     const [state, setState] = React.useState('');
     const [entitydata, setEntityData] = React.useState([]);
     const [loading, setLoading] = React.useState(true);
     const history = useHistory();
     const classes = useStyles();
-
-
     useEffect(() => {
-            asyncDataFetch();
+        asyncDataFetch();
     }, [])
 
     const asyncDataFetch = async () => {
-            await fetchData();
-            setLoading(false);
+        await fetchData();
     }
 
     const fetchData = async () => {
-        const data = await entityList(oktaprofile.organization, oktaprofile.email).then(response => {
-            setEntityData(response);
+        const data = await entityList().then(response => {
+            if (response.data) {
+                setEntityData(response.data.results);
+                setLoading(false);
+            }
         })
     }
 
@@ -64,10 +64,10 @@ function EntityListing(props) {
                     <VisibilityIcon/>
                 </Link>
             },
-            {title: 'Name', field: 'account_name'},
-            {title: 'Entity Structure', field: 'entity_type'},
-            {title: 'Filing State', field: 'filing_state'},
-            {title: 'Formation Date', field: 'created_time'},
+            {title: 'Name', field: 'name'},
+            {title: 'Entity Structure', field: 'entityStructure'},
+            {title: 'Filing State', field: 'filingState'},
+            {title: 'Formation Date', field: 'formationDate'},
         ],
         data: entitydata,
     };
@@ -81,68 +81,56 @@ function EntityListing(props) {
     return (
 
         <Grid item xs={12}>
-            <MaterialTable
-                isLoading={loading}
-                actions={ isAdmin ? [
-                    {
-                        icon: 'add',
-                        tooltip: props.tooltip ? props.tooltip : 'Add User',
-                        isFreeAction: true,
-                        onClick: (event) => {
-                            if (props.redirect) {
-                                history.push(props.url);
+            <div style={{maxWidth: "100%"}}>
+                {hasChild ? <MaterialTable
+                    isLoading={loading}
+                    actions={isAdmin === true ? [
+                        {
+                            icon: 'add',
+                            tooltip: props.tooltip ? props.tooltip : 'Add User',
+                            isFreeAction: true,
+                            onClick: (event) => {
+                                if (props.redirect) {
+                                    history.push(props.url);
+                                }
                             }
                         }
-                    }
-                ] : ''}
-                title={props.title !== '' ? props.title : ''}
-                columns={settingData.columns}
-                data={settingData.data}
-                options={{
-                    grouping: true
-                }}
-                editable={isAdmin ? {
-                    // onRowAdd: newData =>
-                    //     new Promise(resolve => {
-                    //         setTimeout(() => {
-                    //             resolve();
-                    //             setState(prevState => {
-                    //                 const data = [...prevState.data];
-                    //                 data.push(newData);
-                    //                 return {...prevState, data};
-                    //             });
-                    //
-                    //
-                    //
-                    //         }, 600);
-                    //     }),
-                    onRowUpdate: (newData, oldData) =>
-                        new Promise(resolve => {
-                            setTimeout(() => {
-                                resolve();
-                                handleUpdate(newData)
-                                if (oldData) {
+                    ] : ''}
+                    title={props.title !== '' ? props.title : ''}
+                    columns={settingData.columns}
+                    data={settingData.data}
+                    options={{
+                        grouping: true
+                    }}
+                    editable={isAdmin ? {
+                        onRowUpdate: (newData, oldData) =>
+                            new Promise(resolve => {
+                                setTimeout(() => {
+                                    resolve();
+                                    handleUpdate(newData)
+                                    if (oldData) {
+                                        setState(prevState => {
+                                            const data = [...prevState.data];
+                                            data[data.indexOf(oldData)] = newData;
+                                            return {...prevState, data};
+                                        });
+                                    }
+                                }, 600);
+                            }),
+                        onRowDelete: oldData =>
+                            new Promise(resolve => {
+                                setTimeout(() => {
+                                    resolve();
                                     setState(prevState => {
                                         const data = [...prevState.data];
-                                        data[data.indexOf(oldData)] = newData;
+                                        data.splice(data.indexOf(oldData), 1);
                                         return {...prevState, data};
                                     });
-                                }
-                            }, 600);
-                        }),
-                    onRowDelete: oldData =>
-                        new Promise(resolve => {
-                            setTimeout(() => {
-                                resolve();
-                                setState(prevState => {
-                                    const data = [...prevState.data];
-                                    data.splice(data.indexOf(oldData), 1);
-                                    return {...prevState, data};
-                                });
-                            }, 600);
-                        }),
-                } : ''}
-            />
+                                }, 600);
+                            }),
+                    } : ''}
+                /> : <EntityDetailedPage breadcrumbz={false} entityid={oktaprofile.organization} />}
+            </div>
         </Grid>
 
     )

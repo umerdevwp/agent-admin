@@ -36,25 +36,12 @@ function Layout({
     // window.scrollTo(0, 0);
 
     const [isAdmin, setisAdmin] = useState(false);
-    const [profile, setProfile] = useState({});
     const contentCssClasses = htmlClassService.classes.content.join(" ");
-
-    React.useEffect(() =>{
-            getUsefullinfo();
-    },[]);
-
-    const getUsefullinfo = async () => {
-
-        const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
-        setProfile(okta.idToken.claims);
-        const response = await checkAdmin(profile.organization, profile.email);
-        setisAdmin(response);
-    }
 
     return selfLayout !== "blank" ? (
         <UserContextProvider>
             <LayoutInitializer
-                menuConfig={!isAdmin ? MenuConfig : MenuConfigForAdmin}
+                menuConfig={ isAdmin ? MenuConfigForAdmin : MenuConfig}
                 layoutConfig={LayoutConfig}
                 htmlClassService={htmlClassService}
             >

@@ -1,13 +1,15 @@
 import React, {createContext, useState, useEffect, useLayoutEffect} from 'react'
 import {userInfoAPI, fetchUserProfile} from "../crud/auth.crud";
-import {checkAdmin} from '../crud/enitity.crud';
+import {checkAdmin, entityList} from '../crud/enitity.crud';
 import {withAuth} from '@okta/okta-react';
 
 export const OktaUserContext = createContext(
     {
         oktaprofile: {},
-        isAdmin: {},
-        loading: {}
+        isAdmin: false,
+        loading: {},
+        entityDashboardList: {},
+        hasChild: false
 
     }
 );
@@ -25,6 +27,8 @@ function OktaUserContextProvider(props) {
 
     const [oktaprofile, setOktaprofile] = useState({});
     const [isAdmin, setisAdmin] = useState({});
+    const [hasChild, setHasChild] = useState({});
+    const [entityDashboardList, setEntityDashboardList] = useState([]);
     const [loading, setLoading] = useState({
         loading: true
     })
@@ -35,15 +39,33 @@ function OktaUserContextProvider(props) {
         const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
         const data = await fetchUserProfile(okta.idToken.claims.sub);
         setOktaprofile({...oktaprofile, oktaprofile: data.profile});
-        checkifAdmin(data.profile)
-
+        await checkifAdmin(data.profile);
+        await getEntityListing();
+        setLoading({...loading, loading: false});
 
     }
 
+    const getEntityListing = async () => {
+        const entity_list = await entityList();
+
+        if (entity_list.data) {
+            const results = entity_list.data.results;
+
+            if (results.length > 0) {
+                localStorage.setItem('hasChild', true);
+                return Promise.resolve(setHasChild({...hasChild, hasChild: true}));
+
+            } else {
+                return Promise.resolve(setHasChild({...hasChild, hasChild: false}));
+            }
+
+        }
+    }
+
+
     const checkifAdmin = async (profile) => {
         const response = await checkAdmin(profile.organization, profile.email);
-        setisAdmin({...isAdmin, isAdmin: response});
-        setLoading({...loading, loading: false});
+        return Promise.resolve(setisAdmin({...isAdmin, isAdmin: response}));
     }
 
 
@@ -52,7 +74,9 @@ function OktaUserContextProvider(props) {
             value={{
                 ...oktaprofile,
                 ...isAdmin,
-                ...loading
+                ...loading,
+                ...entityDashboardList,
+                ...hasChild
             }}>
             {props.children}
         </OktaUserContext.Provider>

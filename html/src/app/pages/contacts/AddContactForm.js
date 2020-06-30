@@ -43,7 +43,40 @@ import {useHistory} from "react-router-dom";
 import {ContactTypeList, EntitytypesList, StateRegionList} from "../../crud/enitity.crud";
 import {createContact} from "../../crud/contact.crud";
 import {OktaUserContext} from "../../context/OktaUserContext";
+import Breadcrumbs from "@material-ui/core/Breadcrumbs";
+import Link from "@material-ui/core/Link";
+import * as SmartyStreetsSDK from "smartystreets-javascript-sdk";
+import utils from 'smartystreets-javascript-sdk-utils';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 
+
+let SmartyStreetsCore = SmartyStreetsSDK.core;
+const Lookup = SmartyStreetsSDK.usStreet.Lookup;
+let authId = 'ab6e6801-757b-82dd-780c-14133922362c';
+let authToken = 'YJvhhSXmjDLC3WfhXO6O';
+
+const smartyStreetsSharedCredentials = new SmartyStreetsSDK.core.SharedCredentials(1486038472569752);
+const clientBuilder = new SmartyStreetsSDK.core.ClientBuilder(smartyStreetsSharedCredentials);
+let client = clientBuilder.buildUsStreetApiClient();
+
+
+// function handleSuccess(response) {
+//
+//     // Is lookup1 valid?
+//     console.log('Valid', utils.isValid(response.lookups[0]));
+//
+//     // Is lookup1 invalid?
+//     console.log('Invalid', utils.isInvalid(response.lookups[0]));
+//
+// }
+
+function handleError(response) {
+    console.log(response);
+}
 
 const useStylesFacebook = makeStyles({
     root: {
@@ -225,7 +258,7 @@ const AddContactForm = (props) => {
     const [addressValue, setAddressValue] = React.useState('');
     const [loading, setLoading] = React.useState(false)
     const [contactType, setContactType] = React.useState([]);
-    const [successMessage, setSuccessMessage] = React.useState(false);
+    const [successMessage, setSuccessMessage] = React.useState(' ');
     const [StateRegion, setStateRegion] = React.useState([])
     //form state
 
@@ -239,7 +272,27 @@ const AddContactForm = (props) => {
     const [inputContactCity, setInputNotificationCity] = React.useState({value: '', error: ' '});
     const [inputContactState, setInputNotificationState] = React.useState({value: '', error: ' '});
     const [inputContactZipcode, setInputNotificationZip] = React.useState({value: '', error: ' '});
+    const [open, setOpen] = React.useState(false);
+    const [userAgree, setUserAgree] = React.useState(false);
+    const [isValidAddress, setIsValidAddress] = React.useState(false);
+    const [errorMessage, setErrorMessage] = React.useState(' ');
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
 
+    const handleClose = () => {
+        setUserAgree(false);
+        setOpen(false);
+    };
+
+    const iAgree = async (event) => {
+        setUserAgree(true);
+        setOpen(false);
+        localStorage.setItem('iAgree', true);
+        handleOnSubmit(event)
+
+
+    };
 
     function FacebookProgress(props) {
         const classes = useStylesFacebook();
@@ -282,6 +335,7 @@ const AddContactForm = (props) => {
     React.useEffect(() => {
         fetchDataforDropdownsContactTypeList();
         fetchDataforDropdownsStateRegion();
+        localStorage.setItem('iAgree', false);
     }, [])
 
 
@@ -306,16 +360,41 @@ const AddContactForm = (props) => {
         setAddressValue(value);
     }
 
-    const handleClose = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
+
+    const resetForm = () => {
+        setInputContactFirstName({error: ' ', value: ''})
+        setInputLastName({error: ' ', value: ''})
+        setInputNotificationEmail({error: ' ', value: ''})
+        setInputNotificationPhone({error: ' ', value: ''})
+        setInputNotificationAddress({error: ' ', value: ''})
+        setInputNotificationContactType({error: ' ', value: ''})
+        setInputNotificationCity({error: ' ', value: ''})
+        setInputNotificationState({error: ' ', value: ''})
+        setInputNotificationZip({error: ' ', value: ''})
+        setAddressObject('');
+        setAddressValue('');
     }
+
 
     const handleOnSubmit = async (event) => {
         event.preventDefault();
-        let formData = new FormData();
+        setLoading(true);
+        const userResponse = localStorage.getItem('iAgree');
+        console.log('iAgree', userResponse);
+        if (userResponse === 'false') {
+            await addressCheck();
+        }
 
+        if (userResponse === 'true') {
+            contactsCreate();
+        }
+
+    }
+
+
+    const contactsCreate = async (valid = null) => {
+
+        let formData = new FormData();
         setInputContactFirstName({...inputContactFirstName, error: ' '})
         setInputLastName({...inputContactLastName, error: ' '})
         setInputNotificationEmail({...inputContactEmail, error: ' '})
@@ -332,18 +411,27 @@ const AddContactForm = (props) => {
         formData.append('inputContactLastName', inputContactLastName.value)
         formData.append('inputContactEmail', inputContactEmail.value)
         formData.append('inputContactPhone', inputContactPhone.value)
-        formData.append('inputContactStreet', addressObject.text)
+        formData.append('inputContactStreet', addressObject.streetLine)
+        if(addressObject.streetLine) {
+            formData.append('inputContactStreet', addressObject.streetLine)
+        } else {
+            formData.append('inputContactStreet', addressObject)
+        }
         formData.append('inputContactType', inputContactType.value)
         formData.append('inputContactCity', inputContactCity.value)
         formData.append('inputContactState', inputContactState.value)
         formData.append('inputContactZipcode', inputContactZipcode.value)
-
-
+        formData.append('inputAddressIsValid', valid ? valid : isValidAddress)
+        formData.append('acceptInvalidAddress', userAgree)
         const response = await createContact(formData);
         if (response.field_error) {
 
-
+            setLoading(false);
+            localStorage.setItem('iAgree', false);
+            setIsValidAddress(false);
+            setUserAgree(false);
             Object.keys(response.field_error).forEach((key, index) => {
+
                 if (key === 'inputContactFirstName') {
                     setInputContactFirstName({...inputContactFirstName, error: response.field_error[key]})
                 }
@@ -381,9 +469,22 @@ const AddContactForm = (props) => {
         }
 
 
-        if (response) {
-            if (response.status) {
-                setSuccessMessage(true);
+        if (response.data) {
+            if (response.data.type === 'ok') {
+                setLoading(false);
+                localStorage.setItem('iAgree', false);
+                setSuccessMessage(response.data.results);
+                // setTimeout(() => {
+                //     history.goBack();
+                // }, 4000)
+            }
+
+            if (response.data) {
+                if (response.data.type === 'error') {
+                    setLoading(false);
+                    setErrorMessage(response.data.results);
+                    localStorage.setItem('iAgree', false);
+                }
             }
         }
 
@@ -402,9 +503,80 @@ const AddContactForm = (props) => {
 
     }
 
+
+    const addressCheck = async () => {
+        if (!userAgree && !isValidAddress && addressObject && inputContactCity.value && inputContactState.value && inputContactZipcode.value) {
+            let lookup1 = new Lookup();
+            lookup1.street = addressObject.streetLine ? addressObject.streetLine : addressObject;
+            lookup1.city = inputContactCity.value;
+            lookup1.state = inputContactState.value;
+            lookup1.zipCode = inputContactZipcode.value;
+            client.send(lookup1).then(response => {
+                const valid = utils.isValid(response.lookups[0]);
+                setIsValidAddress(valid);
+                response.lookups.map(lookup => console.log(lookup.result));
+
+                // Is lookup1 valid?
+                console.log('Is lookup1 valid?', utils.isValid(response.lookups[0]));
+
+                // Is lookup1 invalid?
+                console.log('Is lookup1 invalid?', utils.isInvalid(response.lookups[0]));
+
+                // Is lookup1 ambiguous?
+                console.log('// Is lookup1 ambiguous?', utils.isAmbiguous(response.lookups[0]));
+
+                // Is lookup1 missing a secondary address?
+                console.log('// Is lookup1 missing a secondary address?', utils.isMissingSecondary(response.lookups[0]));
+                if (valid === false) {
+                    setOpen(true);
+                    setLoading(false);
+                } else {
+                    contactsCreate(valid);
+                }
+            });
+        }
+    }
+
     return (
 
         <div className={classes.root}>
+            <h3>Navigation</h3>
+            <Breadcrumbs aria-label="breadcrumb">
+                <Link color="inherit" href="/">
+                    Dashboard
+                </Link>
+                <Link color="inherit" onClick={(e) => {
+                    history.goBack()
+                }}>
+                    Entity
+                </Link>
+                <Typography color="textPrimary">Add Contact</Typography>
+            </Breadcrumbs>
+
+
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{"We are unable to validate your address"}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Please make sure that you have entered it correctly.
+                        If you proceed and we are unable to validate your address it may cause delays
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={(event) => iAgree(event)} color="primary" autoFocus>
+                        Accept
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
             <Title title={'Contact'}/>
             <Grid container spacing={1}>
                 <Grid item xs={12}>
@@ -412,11 +584,18 @@ const AddContactForm = (props) => {
                         <PortletHeader icon={<PermIdentityIcon className={classes.adjustment}/>}
                                        title="Add new contact"/>
                         <PortletBody>
-                            {successMessage ? (
+                            {successMessage !== ' ' ? (
                                 <MySnackbarContentWrapper
-                                    onClose={handleClose}
                                     variant="success"
-                                    message="Contact has been added"
+                                    message={successMessage}
+                                />
+                            ) : ''}
+
+
+                            {errorMessage !== ' ' ? (
+                                <MySnackbarContentWrapper
+                                    variant="error"
+                                    message={errorMessage}
                                 />
                             ) : ''}
                             <div className="row">
@@ -630,10 +809,10 @@ const AddContactForm = (props) => {
                                                             <FacebookProgress/>
                                                         </div>)
                                                     : null}
-                                                <input className={clsx('btn btn-primary', classes.restButton)}
-                                                       type="submit" value="Reset"/>
+                                                {/*<input className={clsx('btn btn-primary', classes.restButton)}*/}
+                                                {/*       type="reset" onClick={(e) => {resetForm()}} value="Reset"/>*/}
 
-                                                <input className={clsx('btn btn-primary', classes.restButton)}
+                                                <input  disabled={loading} className={clsx('btn btn-primary', classes.restButton)}
                                                        type="submit" value="Add new Contact"/>
                                             </div>
                                         </div>

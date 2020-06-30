@@ -29,7 +29,7 @@ class Admin_api extends RestController
     {
 
         $email = $this->get('email');
-        $zoho_id = $this->get('zoho_id');
+        $zoho_id = $this->get('eid');
         //check if the parameters are not empty
         if (empty($email) or empty($zoho_id)) {
             $this->response([
@@ -54,7 +54,7 @@ class Admin_api extends RestController
     {
 
         $email = $this->get('email');
-        $zoho_id = $this->get('zoho_id');
+        $zoho_id = $this->get('eid');
         //check if the parameters are not empty
         if (empty($email) or empty($zoho_id)) {
             $this->response([

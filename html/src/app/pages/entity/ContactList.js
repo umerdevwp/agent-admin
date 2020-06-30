@@ -33,7 +33,6 @@ function ContactList(props) {
     const [state, setState] = React.useState(props.data);
     const history = useHistory();
     const classes = useStyles();
-    console.log(props.data);
 
 
     const handleUpdate = (newData) => {
