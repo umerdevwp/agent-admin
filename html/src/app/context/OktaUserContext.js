@@ -40,23 +40,37 @@ function OktaUserContextProvider(props) {
 
     const getUsefullinfo = async () => {
 
-        const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
-        const data = await fetchUserProfile(okta.idToken.claims.sub);
-        setOktaprofile({...oktaprofile, oktaprofile: data.profile});
-        // checkifAdmin(data.profile);
-        await getUserRole();
+        const profile_data = await profileDetails()
+        await getUserRole(profile_data);
         setLoading({...loading, loading: false});
 
     }
 
-    const getUserRole = async () => {
-        const get_role = await checkRole();
+
+    const profileDetails = async () => {
+        const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
+        const data = await fetchUserProfile(okta.idToken.claims.sub);
+        setOktaprofile({...oktaprofile, oktaprofile: data.profile})
+        return Promise.resolve(data.profile);
+    }
+
+
+    const getUserRole = async (profile) => {
+        console.log(profile);
+        var organization_parent = '';
+        if(profile.organization_parent) {
+            const bit = profile.organization_parent.toLowerCase();
+            if(bit === 'yes'){
+                organization_parent = 1;
+            }
+        }
+        const get_role = await checkRole(profile.organization, organization_parent ? organization_parent : 0);
         if (get_role) {
             if (get_role.status === true) {
-                setRole({...role, role: get_role.data.role});
+                return Promise.resolve(setRole({...role, role: get_role.data.role}));
             }
             if (get_role.status === false) {
-                setErrorList({...errorList, errorList: get_role.message})
+                return Promise.resolve(setErrorList({...errorList, errorList: get_role.message}));
             }
         }
     }
@@ -73,7 +87,7 @@ function OktaUserContextProvider(props) {
 
 
     const addError = (data) => {
-       setErrorList(errorList => [...errorList, data])
+        setErrorList(errorList => [...errorList, data])
     }
 
 

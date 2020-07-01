@@ -33,17 +33,31 @@ export const entityList = async () => {
     }
 }
 
-export const checkRole = async () => {
+export const checkRole = async (eid,bit) => {
     const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
-
+    var response = ''
     if(okta) {
-        const response = await fetch(`${ENTITY}/entity/role`, {
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Authorization': okta.accessToken.accessToken,
+        if(bit === 1) {
+           response = await fetch(`${ENTITY}/entity/role?eid=${eid}&bit=${bit}`, {
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Authorization': okta.accessToken.accessToken,
 
-            }
-        });
+                }
+            });
+        }
+        if(bit === 0) {
+         response = await fetch(`${ENTITY}/entity/role?eid=${eid}`, {
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Authorization': okta.accessToken.accessToken,
+
+                }
+            });
+        }
+
+
+
         return Promise.resolve(response.json());
     }
 }

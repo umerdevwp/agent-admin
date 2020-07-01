@@ -387,7 +387,7 @@ const AddEntityForm = (props) => {
         // setInputLastName({...inputLastName, error: ' '})
         setInputFillingStructure({...inputFillingStructure, error: ' '})
         setInputFormationDate({...inputFormationDate, error: ' '})
-        setInputFiscalDate({...inputFormationDate,value: fiscal, error: ' '})
+        setInputFiscalDate({...inputFiscalDate, error: ' '})
         setInputNotificationEmail({...inputNotificationEmail, error: ' '})
         setInputNotificationPhone({...inputNotificationPhone, error: ' '})
         setInputNotificationAddress({...inputNotificationAddress, error: ' '})
