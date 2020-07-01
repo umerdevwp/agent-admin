@@ -140,9 +140,16 @@ class Entity extends RestController
                 ], 200);
             }
         } else {
-            $this->response([
-                'errors' => ['status' => 404, 'detail' => 'Record not found']
-            ], 404);
+            if(!$bIsParentValid && $iParentId > 0)
+            {
+                $this->response([
+                    'errors' => ['status' => 401, 'detail' => 'Invalid detail request']
+                ], 401);
+            } else {
+                $this->response([
+                    'errors' => ['status' => 404, 'detail' => 'Record not found']
+                ], 404);
+            }
         }
         $this->response([
             'errors' => ['status' => 404, 'detail' => 'This will never appear']

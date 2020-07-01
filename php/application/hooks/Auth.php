@@ -16,7 +16,10 @@ class Auth
             $oToken = $this->hasToken($token);
             $sToken = $oToken->token;
             $_SESSION['eid'] = "not set yet";
+            
+            
             if ($sToken) {
+                
                 $_SESSION['eid'] = $oToken->entity_id;
                 return $sToken;
             }
@@ -38,9 +41,11 @@ class Auth
                         echo json_encode($returnResponse);
                         die();
                     } else {
-
+                        if($CI->input->get('eid')>0)
+                        {
                         $this->deletePreviousToken($response->sub);
                         $this->addToken($response->sub, $response->email , $token);
+                        
 
 //                        $email = $CI->input->get('email');
 //                        if(!empty($email)){
@@ -51,7 +56,8 @@ class Auth
 //                            }
 //                        }
 
-                        $_SESSION['eid'] = $this->getEntityId($response->email);
+                        $_SESSION['eid'] = $CI->input->get('eid');
+                        }
                         $returnResponse = ['status' => 200, 'message' => "Success", NULL];
                     }
                 } else {
@@ -108,8 +114,8 @@ class Auth
             $aEntityData = $CI->Entity_model->getEmailId($email);
             $eid = $CI->input->get('eid');
 
-            if($aEntityData['type']=='ok')
-                $eid = $aEntityData['results']->id;
+//            if($aEntityData['type']=='ok')
+//                $eid = $aEntityData['results']->id;
 
             // not found, search in admins
             if($eid==0)
