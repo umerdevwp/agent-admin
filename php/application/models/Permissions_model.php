@@ -51,13 +51,26 @@ class Permissions_model extends CI_Model
         
     }
 
+    public function roleExist($iEntityId)
+    {
+        $oData = null;
+        if($iEntityId>0)
+        {
+            $this->db->from($this->table_entity_role);
+            $this->db->where("entity_id",$iEntityId);
+            $oResult = $this->db->get();
+            $oData = $oResult->row_object();
+        }
+        return $oData;
+    }
+
     public function getRoleId($sRoleName="")
     {
         $oData = null;
         if($sRoleName!="")
         {
             $this->db->from($this->table_role);
-            $this->db->where("role_name",$sRoleName);
+            $this->db->where("role_name",$this->aRole[$sRoleName]);
             $oResult = $this->db->get();
             $oData = $oResult->row_object();
         }

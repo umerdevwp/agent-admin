@@ -286,7 +286,7 @@ HC;
         $this->form_validation->set_rules('inputNotificationAddress', 'Shipping Street', 'required');
         $this->form_validation->set_rules('inputNotificationCity', 'Shipping City', 'required');
         $this->form_validation->set_rules('inputNotificationState', 'Shipping State', 'required');
-        $this->form_validation->set_rules('inputNotificationZip', 'Shipping Code', 'required');
+        $this->form_validation->set_rules('inputNotificationZip', 'Shipping Code', 'required|exact_length[5]',['exact_lengt'=>"Must contain 5 digits"]);
         $this->form_validation->set_rules('inputBusinessPurpose', 'Business purpose', 'required');
 
         if ($this->form_validation->run() === FALSE) {
@@ -386,7 +386,8 @@ HC;
             $this->response([
                 'status' => true,
                 'id' => $aResponse['id'],
-                'message' => $aResponse['message']
+                'message' => $aResponse['message'],
+                'parent'  => $_SESSION['eid'],
             ], 200);
         }
     }
@@ -761,8 +762,8 @@ HC;
         // tag call needs account id instance, added below after attachments
         if (isDev()) {
             $oApi->setFieldValue("RA", "3743841000000932064");//sandbox id
-            $oApi->setFieldValue("Parent_Account", "3743841000000932091");//sandbox id
-            $oApi->setFieldValue("Layout", "3743841000000983988");// sandbox id = Customer layout
+            //$oApi->setFieldValue("Parent_Account", "3743841000001424031");//sandbox id
+            //$oApi->setFieldValue("Layout", "3743841000000983988");// sandbox id = Customer layout
         } else {
             // push the RA id data to zoho
             $oApi->setFieldValue("RA", $iRAId);
@@ -833,7 +834,7 @@ HC;
         // tag call needs account id instance, added below after attachments
         if (isDev()) {
             $oApi->setFieldValue("RA", "3743841000000932064");//sandbox id
-            $oApi->setFieldValue("Parent_Account", "3743841000000932091");//sandbox id
+            $oApi->setFieldValue("Parent_Account", $_SESSION['eid']);//sandbox id
             $oApi->setFieldValue("Layout", "3743841000000983988");// sandbox id = Customer layout
         } else {
             // push the RA id data to zoho

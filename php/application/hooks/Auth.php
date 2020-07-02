@@ -12,12 +12,15 @@ class Auth
         $CI =& get_instance();
         if (in_array(strtolower($CI->router->class), $this->auth)) {
             $token = $CI->input->get_request_header('Authorization');
+            // TODO: check email exist in admin
 
+            // to allow functionality of login as for admin
             $oToken = $this->hasToken($token);
             $sToken = $oToken->token;
             $_SESSION['eid'] = "not set yet";
             if ($sToken) {
                 $_SESSION['eid'] = $oToken->entity_id;
+                
                 return $sToken;
             }
 
@@ -38,20 +41,25 @@ class Auth
                         echo json_encode($returnResponse);
                         die();
                     } else {
+                        // zoho_id should be in the request else don't save token
+                        if(!empty($CI->input->get('eid')))
+                        {
+                            $this->deletePreviousToken($response->sub);
+                            $this->addToken($response->sub, $response->email , $token);
 
-                        $this->deletePreviousToken($response->sub);
-                        $this->addToken($response->sub, $response->email , $token);
-
-//                        $email = $CI->input->get('email');
-//                        if(!empty($email)){
-//                            if($response->email !== $response){
-//                                $returnResponse = ['status' => 401, 'message' => "Invalid Email", NULL];
-//                                echo json_encode($returnResponse);
-//                                die();
-//                            }
-//                        }
-
-                        $_SESSION['eid'] = $this->getEntityId($response->email);
+                            $_SESSION['eid'] = $CI->input->get('eid');
+                            // check parent entity logging in 1st time
+                            if((int)$CI->input->get("bit")==1)
+                            {
+                                $CI->load->model("Permissions_model");
+                                $oDataPermission = $CI->Permissions_model->roleExist($_SESSION["eid"]);
+                                
+                                if(!$oDataPermission)
+                                {
+                                    $CI->Permissions_model->add($_SESSION["eid"],"parent");
+                                }
+                            }
+                        }
                         $returnResponse = ['status' => 200, 'message' => "Success", NULL];
                     }
                 } else {
@@ -59,8 +67,7 @@ class Auth
                     echo json_encode($returnResponse);
                     die();
                 }
-            } catch
-            (Exception $e) {
+            } catch(Exception $e) {
                 $response = ['status' => 401, 'message' => $e->getMessage(), NULL];
                 echo json_encode($response);
                 die();
@@ -104,21 +111,21 @@ class Auth
         if(!empty($expired_on)) {
             // search in entity table
             //$email = "chboyce@unitedagentservices.com";
-            $CI->load->model("Entity_model");
-            $aEntityData = $CI->Entity_model->getEmailId($email);
+            //$CI->load->model("Entity_model");
+            //$aEntityData = $CI->Entity_model->getEmailId($email);
             $eid = $CI->input->get('eid');
 
-            if($aEntityData['type']=='ok')
-                $eid = $aEntityData['results']->id;
+            //if($aEntityData['type']=='ok')
+            //    $eid = $aEntityData['results']->id;
 
             // not found, search in admins
-            if($eid==0)
+            /*if($eid==0)
             {
                 $CI->load->model("Admin_model");
                 $aAdminData = $CI->Admin_model->checkAdminExist($email);
                 if(count($aAdminData))
                     $eid = $aAdminData[0]->zoho_id;
-            }
+            }*/
 
             // set data to store token
             $data = array(
