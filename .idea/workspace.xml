@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="eb69915d-9c16-41d5-b70a-bc9daf9ea19a" name="Default Changelist" comment="Re-commit, added Super User functionality, also configured Google SSO on the OKTA login widget." />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings" doNotAsk="true" synchronizationState="SYNCHRONIZE">
+    <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
+    <execution>
+      <executable />
+    </execution>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="zoho-add-entity-omer-local" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration">
+    <include_path>
+      <path value="$PROJECT_DIR$/vendor/symfony/yaml" />
+      <path value="$PROJECT_DIR$/vendor/symfony/var-dumper" />
+      <path value="$PROJECT_DIR$/vendor/zohocrm/php-sdk" />
+      <path value="$PROJECT_DIR$/vendor/vlucas/phpdotenv" />
+      <path value="$PROJECT_DIR$/vendor/nesbot/carbon" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-ctype" />
+      <path value="$PROJECT_DIR$/vendor/symfony/options-resolver" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php72" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-mbstring" />
+      <path value="$PROJECT_DIR$/vendor/symfony/translation-contracts" />
+      <path value="$PROJECT_DIR$/vendor/symfony/translation" />
+      <path value="$PROJECT_DIR$/vendor/cache/adapter-common" />
+      <path value="$PROJECT_DIR$/vendor/okta/sdk" />
+      <path value="$PROJECT_DIR$/vendor/cache/tag-interop" />
+      <path value="$PROJECT_DIR$/vendor/cache/filesystem-adapter" />
+      <path value="$PROJECT_DIR$/vendor/kenjis/ci-phpunit-test" />
+      <path value="$PROJECT_DIR$/vendor/nikic/php-parser" />
+      <path value="$PROJECT_DIR$/vendor/league/flysystem-memory" />
+      <path value="$PROJECT_DIR$/vendor/league/flysystem" />
+      <path value="$PROJECT_DIR$/vendor/psr/cache" />
+      <path value="$PROJECT_DIR$/vendor/psr/log" />
+      <path value="$PROJECT_DIR$/vendor/psr/http-message" />
+      <path value="$PROJECT_DIR$/vendor/clue/stream-filter" />
+      <path value="$PROJECT_DIR$/vendor/psr/simple-cache" />
+      <path value="$PROJECT_DIR$/vendor/php-http/message-factory" />
+      <path value="$PROJECT_DIR$/vendor/php-http/message" />
+      <path value="$PROJECT_DIR$/vendor/phpoption/phpoption" />
+      <path value="$PROJECT_DIR$/vendor/php-http/promise" />
+      <path value="$PROJECT_DIR$/vendor/composer" />
+      <path value="$PROJECT_DIR$/vendor/tightenco/collect" />
+      <path value="$PROJECT_DIR$/vendor/ralouphie/getallheaders" />
+      <path value="$PROJECT_DIR$/vendor/smartystreets/phpsdk" />
+      <path value="$PROJECT_DIR$/vendor/guzzlehttp/psr7" />
+      <path value="$PROJECT_DIR$/vendor/php-http/curl-client" />
+      <path value="$PROJECT_DIR$/vendor/php-http/client-common" />
+      <path value="$PROJECT_DIR$/vendor/php-http/httplug" />
+      <path value="$PROJECT_DIR$/vendor/php-http/discovery" />
+      <path value="$PROJECT_DIR$/vendor/okta/jwt-verifier" />
+      <path value="$PROJECT_DIR$/vendor/firebase/php-jwt" />
+      <path value="$PROJECT_DIR$/vendor/chriskacerguis/codeigniter-restserver" />
+    </include_path>
+  </component>
+  <component name="ProjectId" id="1VWhjRDkQabFQnCfcX4O3nPJzLY" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="Git.Branch.Popup.ShowAllRemotes" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/application/controllers" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Bitnami\wampstack\apache2\htdocs\application\controllers" />
+      <recent name="C:\Bitnami\wampstack\apache2\htdocs\application\libraries" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Bitnami\wampstack\apache2\htdocs\application\controllers" />
+      <recent name="C:\Bitnami\wampstack\apache2\htdocs\application\libraries" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="runrun.php" type="PhpLocalRunConfigurationType" factoryName="PHP Console" temporary="true" path="$PROJECT_DIR$/runrun.php">
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="PHP Script.runrun.php" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="eb69915d-9c16-41d5-b70a-bc9daf9ea19a" name="Default Changelist" comment="" />
+      <created>1577374892431</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1577374892431</updated>
+      <workItem from="1577374893542" duration="1255000" />
+      <workItem from="1577380082331" duration="25241000" />
+      <workItem from="1577731474619" duration="242000" />
+      <workItem from="1577731911277" duration="30413000" />
+      <workItem from="1577986166719" duration="2269000" />
+      <workItem from="1577990335645" duration="6522000" />
+      <workItem from="1578057341470" duration="1144000" />
+      <workItem from="1578071252103" duration="9744000" />
+      <workItem from="1580403492405" duration="22000" />
+      <workItem from="1580403586151" duration="517000" />
+      <workItem from="1580404143092" duration="26000" />
+      <workItem from="1580404205903" duration="3937000" />
+      <workItem from="1581095472316" duration="27160000" />
+      <workItem from="1581426231890" duration="805000" />
+      <workItem from="1581427390754" duration="4022000" />
+      <workItem from="1581510598599" duration="599000" />
+      <workItem from="1581606816418" duration="599000" />
+      <workItem from="1582049138524" duration="2531000" />
+      <workItem from="1582138027312" duration="598000" />
+      <workItem from="1582206216867" duration="1198000" />
+      <workItem from="1582575307508" duration="105575000" />
+      <workItem from="1584102800128" duration="5975000" />
+      <workItem from="1584112474224" duration="673000" />
+      <workItem from="1584116336945" duration="17000" />
+      <workItem from="1585073451923" duration="2515000" />
+      <workItem from="1585139507742" duration="18100000" />
+      <workItem from="1585851354095" duration="15523000" />
+      <workItem from="1586792935644" duration="2138000" />
+      <workItem from="1586872564566" duration="5940000" />
+      <workItem from="1589827829712" duration="3594000" />
+    </task>
+    <task id="LOCAL-00001" summary="Implemented Super user functionality, also configured google SSO on the OKTA login widget.">
+      <created>1577820400791</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1577820400791</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Changes in the side bar. Added check on the redirection for Super User.">
+      <created>1577821403448</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1577821403448</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Re-commit, added Super User functionality, also configured Google SSO on the OKTA login widget.">
+      <created>1577822647825</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1577822647825</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Re-commit, added Super User functionality, also configured Google SSO on the OKTA login widget.">
+      <created>1577970694535</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1577970694535</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Implemented Super user functionality, also configured google SSO on the OKTA login widget." />
+    <MESSAGE value="Changes in the side bar. Added check on the redirection for Super User." />
+    <MESSAGE value="Re-commit, added Super User functionality, also configured Google SSO on the OKTA login widget." />
+    <option name="LAST_COMMIT_MESSAGE" value="Re-commit, added Super User functionality, also configured Google SSO on the OKTA login widget." />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="263" y="24" key="#CLI_Interpreters" timestamp="1583341499045">
+      <screen x="0" y="0" width="1366" height="738" />
+    </state>
+    <state x="263" y="24" key="#CLI_Interpreters/0.0.1366.738/1366.0.1280.738@0.0.1366.738" timestamp="1583341499045" />
+    <state x="390" y="0" key="#PHP" timestamp="1583341461773">
+      <screen x="0" y="0" width="1366" height="738" />
+    </state>
+    <state x="390" y="0" key="#PHP/0.0.1366.738/1366.0.1280.738@0.0.1366.738" timestamp="1583341461773" />
+    <state x="0" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1583249993568">
+      <screen x="0" y="0" width="1366" height="738" />
+    </state>
+    <state x="0" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1366.738/1366.0.1280.738@0.0.1366.738" timestamp="1583249993568" />
+    <state x="402" y="57" key="#runrun.php" timestamp="1583341618418">
+      <screen x="0" y="0" width="1366" height="738" />
+    </state>
+    <state x="402" y="57" key="#runrun.php/0.0.1366.738/1366.0.1280.738@0.0.1366.738" timestamp="1583341618418" />
+    <state x="163" y="0" key="CommitChangelistDialog2" timestamp="1589827847211">
+      <screen x="0" y="0" width="1366" height="738" />
+    </state>
+    <state x="163" y="0" key="CommitChangelistDialog2/0.0.1366.738@0.0.1366.738" timestamp="1589827847211" />
+    <state x="92" y="92" width="1182" height="554" maximized="true" key="DiffContextDialog" timestamp="1584026081912">
+      <screen x="0" y="0" width="1366" height="738" />
+    </state>
+    <state x="92" y="92" width="1182" height="554" maximized="true" key="DiffContextDialog/0.0.1366.738@0.0.1366.738" timestamp="1584026081912" />
+    <state x="97" y="53" key="MergeDialog" timestamp="1586882201343">
+      <screen x="0" y="0" width="1366" height="738" />
+    </state>
+    <state x="97" y="53" key="MergeDialog/0.0.1366.738@0.0.1366.738" timestamp="1586882201343" />
+    <state x="363" y="82" key="MultipleFileMergeDialog" timestamp="1586886264066">
+      <screen x="0" y="0" width="1366" height="738" />
+    </state>
+    <state x="363" y="82" key="MultipleFileMergeDialog/0.0.1366.738@0.0.1366.738" timestamp="1586886264066" />
+    <state x="385" y="208" key="NewPhpClassDialog" timestamp="1583435625736">
+      <screen x="0" y="0" width="1366" height="738" />
+    </state>
+    <state x="385" y="208" key="NewPhpClassDialog/0.0.1366.738/1366.0.1280.738@0.0.1366.738" timestamp="1583435625736" />
+    <state x="517" y="292" key="NewPhpFileDialog" timestamp="1583341386022">
+      <screen x="0" y="0" width="1366" height="738" />
+    </state>
+    <state x="517" y="292" key="NewPhpFileDialog/0.0.1366.738/1366.0.1280.738@0.0.1366.738" timestamp="1583341386022" />
+    <state x="92" y="92" width="1182" height="554" key="com.intellij.history.integration.ui.views.DirectoryHistoryDialog" timestamp="1584032739628">
+      <screen x="0" y="0" width="1366" height="738" />
+    </state>
+    <state x="92" y="92" width="1182" height="554" key="com.intellij.history.integration.ui.views.DirectoryHistoryDialog/0.0.1366.738@0.0.1366.738" timestamp="1584032739628" />
+    <state x="92" y="92" width="1182" height="554" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1584040734393">
+      <screen x="0" y="0" width="1366" height="738" />
+    </state>
+    <state x="92" y="92" width="1182" height="554" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1366.738@0.0.1366.738" timestamp="1584040734393" />
+    <state x="467" y="245" key="com.intellij.ide.util.TipDialog" timestamp="1586872562397">
+      <screen x="0" y="0" width="1366" height="738" />
+    </state>
+    <state x="467" y="245" key="com.intellij.ide.util.TipDialog/0.0.1366.738@0.0.1366.738" timestamp="1586872562397" />
+    <state x="656" y="348" key="com.intellij.ide.util.TipDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1584116338733" />
+    <state x="379" y="101" width="607" height="536" key="find.popup" timestamp="1583327609321">
+      <screen x="0" y="0" width="1366" height="738" />
+    </state>
+    <state x="379" y="101" width="607" height="536" key="find.popup/0.0.1366.738/1366.0.1280.738@0.0.1366.738" timestamp="1583327609321" />
+  </component>
+</project>

@@ -29,7 +29,11 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function EntityListing(props) {
+<<<<<<< HEAD
     const {oktaprofile, isAdmin, entityDashboardList, role} = useContext(OktaUserContext);
+=======
+    const {oktaprofile, isAdmin, entityDashboardList, hasChild} = useContext(OktaUserContext);
+>>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
     const [state, setState] = React.useState('');
     const [entitydata, setEntityData] = React.useState([]);
     const [loading, setLoading] = React.useState(true);
@@ -49,12 +53,15 @@ function EntityListing(props) {
                 setEntityData(response.data.results);
                 setLoading(false);
             }
+<<<<<<< HEAD
 
             if(response.error){
                 entityDashboardList(response.error.message)
             }
 
 
+=======
+>>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
         })
     }
 
@@ -84,9 +91,14 @@ function EntityListing(props) {
     return (
 
         <Grid item xs={12}>
+<<<<<<< HEAD
             { role === 'Parent Organization' ?
             <div style={{maxWidth: "100%"}}>
                 <MaterialTable
+=======
+            <div style={{maxWidth: "100%"}}>
+                {hasChild ? <MaterialTable
+>>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
                     isLoading={loading}
                     actions={isAdmin === true ? [
                         {
@@ -133,6 +145,7 @@ function EntityListing(props) {
                                 }, 600);
                             }),
                     } : ''}
+<<<<<<< HEAD
                 />
             </div> : '' }
 
@@ -199,6 +212,10 @@ function EntityListing(props) {
             }
 
 
+=======
+                /> : <EntityDetailedPage breadcrumbz={false} entityid={oktaprofile.organization} />}
+            </div>
+>>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
         </Grid>
 
     )

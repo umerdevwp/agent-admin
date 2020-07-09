@@ -347,9 +347,12 @@ const AddEntityForm = (props) => {
     const fileChange = async (e) => {
         if(e.target.files[0]) {
             setLoading(true);
+<<<<<<< HEAD
             setInputFiling({...inputFiling, value: '', success: ' '});
             setInputFileSize({...inputFileSize, value: ''});
             setInputFileName({...inputFileName, value: ''});
+=======
+>>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
             let formData = new FormData();
             formData.append('file', e.target.files[0]);
             const filename = e.target.files[0].name;
@@ -363,7 +366,10 @@ const AddEntityForm = (props) => {
                     setLoading(false);
                 }
             } else {
+<<<<<<< HEAD
                 setInputFiling({...inputFiling, error: response.message.file[0]});
+=======
+>>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
                 setLoading(false);
             }
         } else {
@@ -375,6 +381,7 @@ const AddEntityForm = (props) => {
 
 
     const handleOnSubmit = async (event) => {
+<<<<<<< HEAD
         var formsubmit = true;
         setLoading(true);
         setInputFiling({...inputFiling, value: '', success: ' ', error:' '});
@@ -388,6 +395,18 @@ const AddEntityForm = (props) => {
         setInputFillingStructure({...inputFillingStructure, error: ' '})
         setInputFormationDate({...inputFormationDate, error: ' '})
         setInputFiscalDate({...inputFiscalDate, error: ' '})
+=======
+
+        setLoading(true);
+        setInputName({...inputName, error: ' '})
+        setInputComplianceOnly({...inputComplianceOnly, error: ' '})
+        setInputFillingState({...inputFillingState, error: ' '})
+        setInputFirstName({...inputFirstName, error: ' '})
+        setInputLastName({...inputLastName, error: ' '})
+        setInputFillingStructure({...inputFillingStructure, error: ' '})
+        setInputFormationDate({...inputFormationDate, error: ' '})
+        setInputFiscalDate({...inputFormationDate, error: ' '})
+>>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
         setInputNotificationEmail({...inputNotificationEmail, error: ' '})
         setInputNotificationPhone({...inputNotificationPhone, error: ' '})
         setInputNotificationAddress({...inputNotificationAddress, error: ' '})
@@ -395,7 +414,11 @@ const AddEntityForm = (props) => {
         setInputNotificationState({...inputNotificationState, error: ' '})
         setInputNotificationZip({...inputNotificationZip, error: ' '})
         setInputBusinessPurpose({...inputBusinessPurpose, error: ' '})
+<<<<<<< HEAD
         setInputEIN({...inputEIN, error: ' '})
+=======
+        setInputNotificationContactType({...inputNotificationContactType, error: ' '})
+>>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
         setInputForeign({...inputForeign, error: ' '});
         setInputFileSize({...inputFileSize, error: ' '})
         event.preventDefault();
@@ -408,6 +431,7 @@ const AddEntityForm = (props) => {
         formData.append('inputFillingStructure', inputFillingStructure.value)
         formData.append('inputFormationDate', inputFormationDate.value)
         formData.append('inputFiscalDate', inputFiscalDate.value)
+<<<<<<< HEAD
         // formData.append('inputFirstName', inputFirstName.value)
         // formData.append('inputLastName', inputLastName.value)
         formData.append('inputNotificationEmail', inputNotificationEmail.value)
@@ -429,12 +453,23 @@ const AddEntityForm = (props) => {
         } else {
             formData.append('inputNotificationState', '');
         }
+=======
+        formData.append('inputFirstName', inputFirstName.value)
+        formData.append('inputLastName', inputLastName.value)
+        formData.append('inputNotificationEmail', inputNotificationEmail.value)
+        formData.append('inputNotificationPhone', inputNotificationPhone.value)
+        formData.append('inputNotificationAddress', addressObject.streetLine)
+        formData.append('inputNotificationContactType', inputNotificationContactType.value)
+        formData.append('inputNotificationCity', inputNotificationCity.value);
+        formData.append('inputNotificationState', inputNotificationState.value);
+>>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
         formData.append('inputNotificationZip', inputNotificationZip.value);
         formData.append('inputFileId', inputFiling.value);
         formData.append('inputFileName', inputFileName.value);
         formData.append('inputBusinessPurpose', inputBusinessPurpose.value)
         formData.append('inputFileSize', inputFileSize.value);
 
+<<<<<<< HEAD
         if(inputEIN.value){
             var value = parseInt(inputEIN.value)
             if(typeof value === 'number'){
@@ -451,6 +486,61 @@ const AddEntityForm = (props) => {
                 setInputEIN({...inputEIN, error: "Please enter 9 digits number"})
             }
         }
+=======
+        const response = await createEntity(formData);
+        if (response.field_error) {
+            setLoading(false);
+            Object.keys(response.field_error).forEach((key, index) => {
+                if (key === 'inputName') {
+                    setInputName({...inputName, error: response.field_error[key]})
+                }
+
+                if (key === 'inputComplianceOnly') {
+                    setInputComplianceOnly({...inputComplianceOnly, error: response.field_error[key]})
+                }
+
+                if (key === 'inputFillingState') {
+                    setInputFillingState({...inputFillingState, error: response.field_error[key]})
+                }
+
+                if (key === 'inputFirstName') {
+                    setInputFirstName({...inputFirstName, error: response.field_error[key]})
+                }
+
+                if (key === 'inputLastName') {
+                    setInputLastName({...inputLastName, error: response.field_error[key]})
+                }
+                if (key === 'inputFillingStructure') {
+                    setInputFillingStructure({...inputFillingStructure, error: response.field_error[key]})
+                }
+                if (key === 'inputFormationDate') {
+                    setInputFormationDate({...inputFormationDate, error: response.field_error[key]})
+                }
+                if (key === 'inputNotificationEmail') {
+                    setInputNotificationEmail({...inputNotificationEmail, error: response.field_error[key]})
+                }
+                if (key === 'inputNotificationPhone') {
+                    setInputNotificationPhone({...inputNotificationPhone, error: response.field_error[key]})
+                }
+                if (key === 'inputNotificationAddress') {
+                    setInputNotificationAddress({...inputNotificationAddress, error: response.field_error[key]})
+                }
+                if (key === 'inputNotificationCity') {
+                    setInputNotificationCity({...inputNotificationCity, error: response.field_error[key]})
+                }
+
+                if (key === 'inputNotificationState') {
+                    setInputNotificationState({...inputNotificationState, error: response.field_error[key]})
+                }
+
+                if (key === 'inputNotificationZip') {
+                    setInputNotificationZip({...inputNotificationZip, error: response.field_error[key]})
+                }
+
+                if (key === 'inputBusinessPurpose') {
+                    setInputBusinessPurpose({...inputBusinessPurpose, error: response.field_error[key]})
+                }
+>>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
 
 
         if(inputNotificationZip.value){
@@ -463,11 +553,21 @@ const AddEntityForm = (props) => {
                     formsubmit = false;
                     setInputNotificationZip({...inputNotificationZip, error: "Please enter 5 digits zip code"})
                 }
+<<<<<<< HEAD
             } else {
                 setLoading(false);
                 formsubmit = false;
                 setInputNotificationZip({...inputNotificationZip, error: "Please enter 5 digits zip code"})
             }
+=======
+
+                if (key === 'inputFiscalDate') {
+                    setInputFiscalDate({...inputFiscalDate, error: response.field_error[key]})
+                }
+
+
+            })
+>>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
         }
         if(formsubmit) {
             const response = await createEntity(formData);
@@ -538,19 +638,32 @@ const AddEntityForm = (props) => {
                 })
             }
 
+<<<<<<< HEAD
             if (response) {
                 if (response.status) {
                     setLoading(false);
                     setSuccessMessage(true);
                 }
+=======
+        if (response) {
+            if (response.status) {
+                setLoading(false);
+                setSuccessMessage(true);
+>>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
             }
         }
 
 
+<<<<<<< HEAD
 
         for (var pair of formData.entries()) {
             console.log(pair[0] + ', ' + pair[1]);
         }
+=======
+        // for (var pair of formData.entries()) {
+        //     console.log(pair[0] + ', ' + pair[1]);
+        // }
+>>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
 
         // setTimeout(() => {
         //     setInputName({...inputName, error: 'Field is required'})
@@ -634,13 +747,17 @@ const AddEntityForm = (props) => {
                                                 value={inputComplianceOnly}
                                                 control={<Checkbox color="primary"/>}
                                                 label="Compliance Only"
-                                                className={clsx(classes.textField, classes.checkbox)}
+                                                className={clsx(classes.textField, classes.checkbox, 'hellllallsldsald')}
                                                 labelPlacement="start"
                                             />
                                         </div>
 
                                         <div className={'col-md-6'}>
+<<<<<<< HEAD
                                             <FormControl className={clsx(classes.selectField)} error={inputFillingState.error !== ' '}>
+=======
+                                            <FormControl className={clsx(classes.selectField)}>
+>>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
                                                 <InputLabel    className={clsx(classes.label)} htmlFor="age-native-simple">Entity State</InputLabel>
                                                 <Select
                                                     disabled={loading}
@@ -665,7 +782,11 @@ const AddEntityForm = (props) => {
                                             </FormControl>
                                         </div>
                                         <div className={'col-md-6'}>
+<<<<<<< HEAD
                                             <FormControl className={clsx(classes.selectField)} error={inputFillingStructure.error !== ' '}>
+=======
+                                            <FormControl className={clsx(classes.selectField)}>
+>>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
                                                 <InputLabel htmlFor="age-native-simple">Entity Structure</InputLabel>
                                                 <Select
                                                     disabled={loading}
@@ -716,6 +837,36 @@ const AddEntityForm = (props) => {
                                             />
                                         </div>
 
+<<<<<<< HEAD
+=======
+                                        <div className={'col-md-6'}>
+                                            <TextField
+                                                disabled={loading}
+                                                required
+                                                label="Fiscal Date"
+                                                defaultValue={inputFiscalDate.value}
+                                                error={inputFiscalDate.error !== ' '}
+                                                value={inputFiscalDate.value}
+                                                onChange={e => setInputFiscalDate({
+                                                    ...inputFormationDate,
+                                                    value: e.target.value
+                                                })}
+                                                inputProps={{
+                                                    name: 'inputFiscalDate',
+                                                    id: 'inputFiscalDate',
+                                                }}
+
+                                                InputLabelProps={{
+                                                    shrink: true,
+                                                }}
+                                                type="date"
+                                                className={clsx(classes.textFieldOther, classes.dense)}
+
+                                            />
+                                        </div>
+
+
+>>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
                                         <div className={'col-md-6'}>
                                             <TextField
                                                 disabled={loading}
@@ -847,6 +998,7 @@ const AddEntityForm = (props) => {
                                                 className={clsx(classes.dense)}
                                             />
                                         </div>
+<<<<<<< HEAD
                                         <div className={clsx(classes.textFieldCity, 'col-md-4')}>
                                             <TextField
                                                 disabled={loading}
@@ -865,6 +1017,34 @@ const AddEntityForm = (props) => {
                                                 className={clsx(classes.textFieldtwofield, classes.dense)}
                                                 margin="dense"
                                             />
+=======
+
+                                        <div className={'col-md-4'}>
+                                            <FormControl className={clsx(classes.selectField)}>
+                                                <InputLabel htmlFor="age-native-simple">Contact Type</InputLabel>
+                                                <Select
+                                                    disabled={loading}
+                                                    native
+                                                    value={inputNotificationContactType.value}
+                                                    error={inputNotificationContactType.error !== ' '}
+                                                    helperText={inputNotificationContactType.error}
+                                                    onChange={e => setInputNotificationContactType({
+                                                        ...inputNotificationContactType,
+                                                        value: e.target.value
+                                                    })}
+                                                    inputProps={{
+                                                        name: 'inputNotificationContactType',
+                                                        id: 'inputNotificationContactType',
+                                                    }}
+
+                                                >
+                                                    <option value=""/>
+                                                    {contactType?.map((anObjectMapped, index) => <option key={index}
+                                                                                                         value={anObjectMapped.code}>{anObjectMapped.name}</option>)}
+
+                                                </Select>
+                                            </FormControl>
+>>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
                                         </div>
                                         {/*<div className={'col-md-4'}>*/}
                                         {/*    <FormControl className={clsx(classes.selectField)}>*/}
@@ -982,7 +1162,11 @@ const AddEntityForm = (props) => {
                                         <div className={'col-md-12'}>
                                             <TextField
                                                 id="standard-full-width"
+<<<<<<< HEAD
                                                 disabled={loading}
+=======
+
+>>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
                                                 placeholder="Business Purpose"
                                                 error={inputBusinessPurpose.error !== ' '}
                                                 helperText={inputBusinessPurpose.error}
