@@ -218,12 +218,14 @@ class Entity_model extends CI_Model
             ];
             $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
         }
-        foreach($aMyColumns as $k=>$v)
-            $this->db->select("$v as `$k`");
+//        foreach($aMyColumns as $k=>$v)
+//            $this->db->select("$v as `$k`");
 
-        $query = $this->db->get_where($this->table, $data);
+//        $query = $this->db->get_where($this->table, $data);
+        $sQ = "CALL getParentSet($id);";
+        $query = $this->db->query($sQ);
         $result = $query->result();
-
+        $this->db->close();
         if (!is_array($result)) {
             return ['message' => 'Entities not found.', 'type' => 'error'];
         }

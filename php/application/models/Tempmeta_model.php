@@ -167,7 +167,7 @@ class Tempmeta_model extends CI_Model
 HC;
 
         $oResponse = $this->db->query($query);
-        $row = $oResponse->row();
+        if($oResponse) $row = $oResponse->row();
         //$row = (object)["last_synch_seconds"=>110];
         //echo $this->db->last_query();die;
 

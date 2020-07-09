@@ -386,8 +386,7 @@ HC;
             $this->response([
                 'status' => true,
                 'id' => $aResponse['id'],
-                'message' => $aResponse['message'],
-                'parent'  => $_SESSION['eid'],
+                'message' => $aResponse['message']
             ], 200);
         }
     }
@@ -615,6 +614,17 @@ HC;
             }
 
         $aMyData = $aDataChild;
+
+        // remove parentid attr from active entity
+        foreach($aMyData['results'] as $obj)
+        {
+            if($obj->id==$_SESSION['eid'])
+            {
+                unset($obj->parentId);
+                break;
+            }
+        }
+
         $this->response([
             'status' => true,
             'data' => $aMyData
@@ -940,7 +950,6 @@ HC;
     public function role_get()
     {
         $sid = $_SESSION["eid"];
-
         if (empty($sid)) {
             responseJson(['type'=>'error','message'=>'Login is not define']);
         }
