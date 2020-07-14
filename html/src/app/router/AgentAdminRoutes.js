@@ -34,6 +34,7 @@ const AgentAdminRoutes = withRouter(({history}) => {
 
                 <OktaUserContextProvider>
                     <SecureRoute exact path='/dashboard' component={CustomLayoutForAgentAdmin}/>
+                    <Route exact path='/dashboard/table-sample' component={CustomLayoutForAgentAdmin}/>
                     <Route exact path='/dashboard/entity/:id' component={CustomLayoutForAgentAdmin}/>
                     <Route exact={true} path='/dashboard/entity/form/add' component={CustomLayoutForAgentAdmin}/>
                     <Route exact={true} path='/dashboard/admins' component={CustomLayoutForAgentAdmin}/>

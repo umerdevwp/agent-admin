@@ -68,7 +68,7 @@ export const checkAdmin = async (zoho_id, email) => {
     const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
 
     if(okta) {
-        const response = await fetch(`${ENTITY}/admin_api/checkadmin/?eid=${zoho_id}&email=${email}`, {
+        const response = await fetch(`${ENTITY}/admin_api/checkadmin/?zoho_id=${zoho_id}&email=${email}`, {
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Authorization': okta.accessToken.accessToken,
@@ -100,11 +100,7 @@ export const selfEntityDetail = async () => {
     const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
 
     if(okta) {
-<<<<<<< HEAD
         const response = await fetch(`${ENTITY}/entity/entityview`, {
-=======
-        const response = await fetch(`${ENTITY}/entity/entityview/?eid=${entity}`, {
->>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Authorization': okta.accessToken.accessToken,

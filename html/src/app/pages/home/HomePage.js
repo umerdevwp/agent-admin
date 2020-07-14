@@ -12,7 +12,7 @@ import Attachments from '../attachments/Attachments';
 import AddContactForm from '../contacts/AddContactForm';
 import AddAttachmentForm from '../attachments/AddAttachmentForm';
 import RegisteredAgents from '../ra/RegisteredAgents';
-
+import DatatableListing from '../entity/DatatableListing';
 import {BrowserRouter as Router, Redirect, Route, Switch, withRouter} from 'react-router-dom';
 import {Security, SecureRoute, ImplicitCallback} from '@okta/okta-react';
 import {withAuth} from '@okta/okta-react';
@@ -32,21 +32,20 @@ function HomePage(props) {
         const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
         const userData = await fetchUserProfile(okta.idToken.claims.sub);
         const dataofUser = await setprofileforUser(userData.profile);
-        const isadminfecth = await checkAdmin(userData.profile.organization, userData.profile.email);
-        if (userData.profile.organization === '999999999') {
-            const id = userData.profile.organization;
-            localStorage.setItem('isAdmin', isadminfecth);
-        }
+        // const isadminfecth = await checkAdmin(userData.profile.organization, userData.profile.email);
+        // if (userData.profile.organization === '999999999') {
+        //     const id = userData.profile.organization;
+        //     localStorage.setItem('isAdmin', isadminfecth);
+        // }
     }
 
 
-    return (!localStorage.getItem('isAdmin') && organizationabc === '999999999' ?
-            <Redirect to={{pathname: '/error'}}/> :
-
+    return (
             <Suspense fallback={<LayoutSplashScreen/>}>
                 <Switch>
 
                         <SecureRoute exact path="/dashboard" component={Dashboard}/>
+                        <SecureRoute exact path="/dashboard/table-sample" component={DatatableListing}/>
                         <SecureRoute exact path="/dashboard/entity/:id" component={EntityDetailedPage}/>
                         <SecureRoute exact path="/dashboard/entity/form/add" component={AddEntityForm}/>
                         <SecureRoute exact path="/dashboard/admins" component={Admins}/>

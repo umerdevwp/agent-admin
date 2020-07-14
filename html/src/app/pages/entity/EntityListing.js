@@ -29,11 +29,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function EntityListing(props) {
-<<<<<<< HEAD
     const {oktaprofile, isAdmin, entityDashboardList, role} = useContext(OktaUserContext);
-=======
-    const {oktaprofile, isAdmin, entityDashboardList, hasChild} = useContext(OktaUserContext);
->>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
     const [state, setState] = React.useState('');
     const [entitydata, setEntityData] = React.useState([]);
     const [loading, setLoading] = React.useState(true);
@@ -53,20 +49,22 @@ function EntityListing(props) {
                 setEntityData(response.data.results);
                 setLoading(false);
             }
-<<<<<<< HEAD
 
             if(response.error){
                 entityDashboardList(response.error.message)
             }
 
 
-=======
->>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
         })
     }
 
     const settingData = {
         columns: [
+
+            {title: 'Name', field: 'name'},
+            {title: 'Entity Structure', field: 'entityStructure'},
+            {title: 'Filing State', field: 'filingState'},
+            {title: 'Formation Date', field: 'formationDate'},
             {
                 render: rowData => <Link
                     component="button"
@@ -77,10 +75,6 @@ function EntityListing(props) {
                     <VisibilityIcon/>
                 </Link>
             },
-            {title: 'Name', field: 'name'},
-            {title: 'Entity Structure', field: 'entityStructure'},
-            {title: 'Filing State', field: 'filingState'},
-            {title: 'Formation Date', field: 'formationDate'},
         ],
         data: entitydata,
     };
@@ -91,14 +85,10 @@ function EntityListing(props) {
     return (
 
         <Grid item xs={12}>
-<<<<<<< HEAD
             { role === 'Parent Organization' ?
             <div style={{maxWidth: "100%"}}>
                 <MaterialTable
-=======
-            <div style={{maxWidth: "100%"}}>
-                {hasChild ? <MaterialTable
->>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
+                    parentChildData={(row, rows) => rows.find(a => a.id === row.parentId)}
                     isLoading={loading}
                     actions={isAdmin === true ? [
                         {
@@ -116,7 +106,7 @@ function EntityListing(props) {
                     columns={settingData.columns}
                     data={settingData.data}
                     options={{
-                        grouping: true
+                        // grouping: true
                     }}
                     editable={isAdmin ? {
                         onRowUpdate: (newData, oldData) =>
@@ -145,7 +135,6 @@ function EntityListing(props) {
                                 }, 600);
                             }),
                     } : ''}
-<<<<<<< HEAD
                 />
             </div> : '' }
 
@@ -160,6 +149,7 @@ function EntityListing(props) {
               role === 'Administrator' ?
                   <div style={{maxWidth: "100%"}}>
                       <MaterialTable
+                          parentChildData={(row, rows) => rows.find(a => a.id === row.parentId)}
                           isLoading={loading}
                           actions={isAdmin === true ? [
                               {
@@ -177,7 +167,7 @@ function EntityListing(props) {
                           columns={settingData.columns}
                           data={settingData.data}
                           options={{
-                              grouping: true
+                              // grouping: true
                           }}
                           editable={isAdmin ? {
                               onRowUpdate: (newData, oldData) =>
@@ -212,10 +202,6 @@ function EntityListing(props) {
             }
 
 
-=======
-                /> : <EntityDetailedPage breadcrumbz={false} entityid={oktaprofile.organization} />}
-            </div>
->>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
         </Grid>
 
     )

@@ -261,22 +261,11 @@ const AddAttachmentForm = (props) => {
     }
 
 
-<<<<<<< HEAD
-=======
-
-
-
-
->>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
     const handleClose = (event, reason) => {
         setError(false);
     }
 
-<<<<<<< HEAD
     const handleOnSubmit = async (event) => {
-=======
-    const handleOnSubmit = async(event) => {
->>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
         event.preventDefault();
         setLoading(true);
         let formData = new FormData();
@@ -289,19 +278,11 @@ const AddAttachmentForm = (props) => {
         formData.append('inputFileId', inputFiling.value);
         formData.append('inputFileName', inputFileName.value);
         formData.append('inputFileSize', inputFileSize.value);
-<<<<<<< HEAD
 
 
         const response = await attachFiles(formData);
         if (response) {
             if (response.status == true) {
-=======
-
-
-        const response = await attachFiles(formData);
-        if(response){
-            if(response.status == true){
->>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
                 setSuccessMessage(true);
                 setLoading(false);
             }
@@ -341,13 +322,9 @@ const AddAttachmentForm = (props) => {
                 <Link color="inherit" href="/">
                     Dashboard
                 </Link>
-<<<<<<< HEAD
                 <Link color="inherit" onClick={(e) => {
                     history.goBack()
                 }}>
-=======
-                <Link color="inherit" onClick={(e) => {history.goBack()}}>
->>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
                     Entity
                 </Link>
                 <Typography color="textPrimary">Add Attachment</Typography>
@@ -372,11 +349,7 @@ const AddAttachmentForm = (props) => {
                                     variant="success"
                                     message="File is attached"
                                 />
-<<<<<<< HEAD
                             ) : ''}
-=======
-                            ) : '' }
->>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
 
                             <div className="row">
                                 <form className={classes.formStyle} onSubmit={handleOnSubmit} noValidate
@@ -406,12 +379,8 @@ const AddAttachmentForm = (props) => {
                                                         </div>)
                                                     : null}
 
-<<<<<<< HEAD
                                                 <input disabled={loading}
                                                        className={clsx('btn btn-primary', classes.restButton)}
-=======
-                                                <input disabled={loading} className={clsx('btn btn-primary', classes.restButton)}
->>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
                                                        type="submit" value="Add attachment"/>
 
                                             </div>

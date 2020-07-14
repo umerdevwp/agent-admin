@@ -40,7 +40,6 @@ import {entityDetail, selfEntityDetail} from '../../crud/enitity.crud';
 import {OktaUserContext} from '../../context/OktaUserContext';
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
 import Typography from "@material-ui/core/Typography";
-<<<<<<< HEAD
 import PropTypes from 'prop-types';
 import ErrorIcon from '@material-ui/icons/Error';
 import InfoIcon from '@material-ui/icons/Info';
@@ -52,9 +51,6 @@ import SnackbarContent from '@material-ui/core/SnackbarContent';
 import WarningIcon from '@material-ui/icons/Warning';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import clsx from 'clsx';
-=======
-
->>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -148,11 +144,7 @@ const EntityDetailedPage = (props) => {
     const breadcrumbs_show = !props.breadcrumbz ? props.breadcrumbz : true;
     const HOST = process.env.REACT_APP_SERVER_API_URL;
 
-<<<<<<< HEAD
     const {oktaprofile, isAdmin, addError, errorList, role} = useContext(OktaUserContext);
-=======
-    const {oktaprofile, isAdmin} = useContext(OktaUserContext);
->>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
     const classes = useStyles();
     const history = useHistory();
     const [entitydetail, setEntitydetail] = React.useState()
@@ -168,7 +160,6 @@ const EntityDetailedPage = (props) => {
 
 
     const fetchDetailedProfile = async () => {
-<<<<<<< HEAD
         // {"errors":{"status":401,"detail":"Invalid detail request"}}
         var detailedView = '';
         if (role === 'Parent Organization' || role === 'Administrator' ) {
@@ -193,14 +184,6 @@ const EntityDetailedPage = (props) => {
             errorList(detailedView.detail)
         }
 
-=======
-        const detailedView = await entityDetail(oktaprofile.organization, oktaprofile.email, entity_id);
-        setEntitydetail(detailedView.result)
-        setContactList(detailedView.result.contacts);
-        setAttachmentList(detailedView.result.attachments)
-        setTaskList(detailedView.result.tasks)
-        setLoading(false);
->>>>>>> 9400987a155f3a0a079c8ab996efdb562d72857d
     }
 
 
