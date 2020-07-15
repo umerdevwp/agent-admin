@@ -544,7 +544,8 @@ HC;
             "shippingCode" => $this->input->post("inputNotificationZip"),
             "email" => $this->input->post("inputNotificationEmail"),
             "type" => $this->input->post("inputNotificationContactType"),
-            "agentId"   =>  $iAgentId
+            "agentId"   =>  $iAgentId,
+            "parentId"  =>  $_SESSION['eid']
         ];
         $this->Tempmeta_model->appendRow($_SESSION['eid'], $this->Tempmeta_model->slugNewEntity, $aDataEntity);
 

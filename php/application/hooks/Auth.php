@@ -18,7 +18,10 @@ class Auth
             $oToken = $this->hasToken($token);
             $sToken = $oToken->token;
             $_SESSION['eid'] = "not set yet";
+            
+            
             if ($sToken) {
+                
                 $_SESSION['eid'] = $oToken->entity_id;
 
                 return $sToken;
@@ -41,14 +44,14 @@ class Auth
                         echo json_encode($returnResponse);
                         die();
                     } else {
+
                         // zoho_id should be in the request else don't save token
+
+
                         if(!empty($CI->input->get('eid')))
                         {
                             $this->deletePreviousToken($response->sub);
                             $this->addToken($response->sub, $response->email , $token);
-
-                            $_SESSION['eid'] = $CI->input->get('eid');
-                            // check parent entity logging in 1st time
                             if((int)$CI->input->get("bit")==1)
                             {
                                 $CI->load->model("Permissions_model");
@@ -59,6 +62,7 @@ class Auth
                                     $CI->Permissions_model->add($_SESSION["eid"],"parent");
                                 }
                             }
+                        $_SESSION['eid'] = $CI->input->get('eid');
                         }
                         $returnResponse = ['status' => 200, 'message' => "Success", NULL];
                     }
@@ -115,8 +119,8 @@ class Auth
             //$aEntityData = $CI->Entity_model->getEmailId($email);
             $eid = $CI->input->get('eid');
 
-            //if($aEntityData['type']=='ok')
-            //    $eid = $aEntityData['results']->id;
+//            if($aEntityData['type']=='ok')
+//                $eid = $aEntityData['results']->id;
 
             // not found, search in admins
             /*if($eid==0)

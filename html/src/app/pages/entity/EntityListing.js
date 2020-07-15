@@ -60,6 +60,11 @@ function EntityListing(props) {
 
     const settingData = {
         columns: [
+
+            {title: 'Name', field: 'name'},
+            {title: 'Entity Structure', field: 'entityStructure'},
+            {title: 'Filing State', field: 'filingState'},
+            {title: 'Formation Date', field: 'formationDate'},
             {
                 render: rowData => <Link
                     component="button"
@@ -70,10 +75,6 @@ function EntityListing(props) {
                     <VisibilityIcon/>
                 </Link>
             },
-            {title: 'Name', field: 'name'},
-            {title: 'Entity Structure', field: 'entityStructure'},
-            {title: 'Filing State', field: 'filingState'},
-            {title: 'Formation Date', field: 'formationDate'},
         ],
         data: entitydata,
     };
@@ -87,6 +88,7 @@ function EntityListing(props) {
             { role === 'Parent Organization' ?
             <div style={{maxWidth: "100%"}}>
                 <MaterialTable
+                    parentChildData={(row, rows) => rows.find(a => a.id === row.parentId)}
                     isLoading={loading}
                     actions={isAdmin === true ? [
                         {
@@ -104,7 +106,7 @@ function EntityListing(props) {
                     columns={settingData.columns}
                     data={settingData.data}
                     options={{
-                        grouping: true
+                        // grouping: true
                     }}
                     editable={isAdmin ? {
                         onRowUpdate: (newData, oldData) =>
@@ -147,6 +149,7 @@ function EntityListing(props) {
               role === 'Administrator' ?
                   <div style={{maxWidth: "100%"}}>
                       <MaterialTable
+                          parentChildData={(row, rows) => rows.find(a => a.id === row.parentId)}
                           isLoading={loading}
                           actions={isAdmin === true ? [
                               {
@@ -164,7 +167,7 @@ function EntityListing(props) {
                           columns={settingData.columns}
                           data={settingData.data}
                           options={{
-                              grouping: true
+                              // grouping: true
                           }}
                           editable={isAdmin ? {
                               onRowUpdate: (newData, oldData) =>
