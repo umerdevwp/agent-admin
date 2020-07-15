@@ -12,7 +12,6 @@ class AuthVendor
             $username = $CI->input->get_request_header('username');
             $password = $CI->input->get_request_header('password');
 
-
             $url = getenv("OKTA_BASE_URL") . '/api/v1/authn';
             $okta_token = 'SSWS ' . getenv('OKTA_API_TOKEN');
             $curl = curl_init();
@@ -54,16 +53,15 @@ class AuthVendor
                     ),
                 ));
 
-                $responseJson_UserInfo = json_decode(curl_exec($curl2));;
-                if ($responseJson_UserInfo->profile->organization_apihost == $CI->input->ip_address()) {
-                    //passing control to controller
+                $responseJson_UserInfo = json_decode(curl_exec($curl2));
+                $host_list = explode(";",$responseJson_UserInfo->profile->organization_apihost);
+                if (in_array(strtolower($CI->input->ip_address()), $host_list)) {
                     $_SESSION['eid'] = $responseJson_UserInfo->profile->organization;
                 } else {
                     $returnResponse = ['status' => 401, 'message' => "Host not is unauthorized", NULL];
                     echo json_encode($returnResponse);
                     die();
                 }
-
             } else {
                 echo $response;
                 die();
