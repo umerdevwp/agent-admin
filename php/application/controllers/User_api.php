@@ -25,26 +25,8 @@ class User_api extends RestController
 
     public function role_get()
     {
-//        $id = $this->get('id');
-        $id = $_SESSION["eid"];
-
-        $this->load->model('Entity_model');
-        $checkSuperUser = $this->Entity_model->checkRole($id);
-
-        if (!empty($checkSuperUser)) {
-            foreach ($checkSuperUser as $value) {
-                if (!empty($value->parent_account)) {
-                    $this->response([ 'status' => true, 'role' => 'child'], 200);
-                } else {
-                    $this->response([ 'status' => true, 'role' => 'parent'], 200);
-                }
-            }
-        } else {
-            $this->response([
-                'status' => false,
-                'message' => 'User does not exist'
-            ], 401);
-        }
+//
+        $this->response([ 'status' => true, 'eid' => $_SESSION['eid']], 200);
 
     }
 

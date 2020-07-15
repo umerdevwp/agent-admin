@@ -19,3 +19,12 @@ $hook['post_controller_constructor'] = array(
     'filepath' => 'hooks',
     'params'   => ""
 );
+
+
+$hook['post_controller_constructor'] = array(
+    'class'    => 'AuthVendor',
+    'function' => 'basicAuth',
+    'filename' => 'AuthVendor.php',
+    'filepath' => 'hooks',
+    'params'   => ""
+);

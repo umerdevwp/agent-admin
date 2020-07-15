@@ -6,7 +6,7 @@ class Auth
 {
 //    add a class name here to secure for api
     //private $auth = ['api', 'example_api', 'entity_api'];
-    private $auth = ['api', 'user_api','portal','entitytypes','contacts','states','contacttypes', 'entity', 'registeragents', 'attachments', 'admin_api'];
+    private $auth = ['api','portal','entitytypes','contacts','states','contacttypes', 'entity', 'registeragents', 'attachments', 'admin_api'];
     public function myFunction()
     {
         $CI =& get_instance();
@@ -20,7 +20,7 @@ class Auth
             $_SESSION['eid'] = "not set yet";
             if ($sToken) {
                 $_SESSION['eid'] = $oToken->entity_id;
-                
+
                 return $sToken;
             }
 
@@ -53,7 +53,7 @@ class Auth
                             {
                                 $CI->load->model("Permissions_model");
                                 $oDataPermission = $CI->Permissions_model->roleExist($_SESSION["eid"]);
-                                
+
                                 if(!$oDataPermission)
                                 {
                                     $CI->Permissions_model->add($_SESSION["eid"],"parent");
