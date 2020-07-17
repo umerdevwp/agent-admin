@@ -381,12 +381,14 @@ HC;
                 'status' => true,
                 'id' => $aResponse['id'],
                 'message' => $aResponse['message'],
+                'agentAddress' => $_SESSION['oRegisterAgentAddress'],
             ], 200);
         } else {
             $this->response([
                 'status' => true,
                 'id' => $aResponse['id'],
-                'message' => $aResponse['message']
+                'message' => $aResponse['message'],
+                'agentAddress' => $_SESSION['oRegisterAgentAddress'],
             ], 200);
         }
     }
@@ -839,6 +841,7 @@ HC;
         $iRAId = "";
         if ($row->id > 0) {
             $iRAId = $row->id;
+            $_SESSION['oRegisterAgentAddress'] = $row;
         }
 
         // additional detail as default values for new entity
