@@ -155,4 +155,37 @@ class LoraxAttachments_model extends CI_Model
 
         return $iId;
     }
+    /**
+     * Upload the file from $_FILES variable to lorax storage
+     * 
+     * @param String $sInputTmpName variable from $_FILES['inputName']['tmp_name'] 
+     * @param String $sInputFileName variable from $_FILES['inputName']['name']
+     * @param String $sInputFileName variable from $_FILES['inputName']['type']
+     * 
+     * @return Mixed Error details or Uploaded file details 
+     */
+    public function upload($sInputTmpName,$sInputFileName,$sInputFileType)
+    {
+        $token = "3cJe5YXiSBGUAqYd0uFC2cKYvgfBIUswmXTudN3HQfvzIGvddfVYjPmakGOkGVM9g5YRKJR2FF9iYuZQ0GsbGw";
+        $cFile = curl_file_create($sInputTmpName,
+                                 $sInputFileType,
+                                 $sInputFileName
+                              );
+        $curl = curl_init();
+        curl_setopt_array($curl, [
+            "CURLOPT_URL" => "http://lorax-server.local/api/v1/upload",
+            "CURLOPT_RETURNTRANSFER" => true,
+            "CURLOPT_REFERER" => "https://api.youragentservices.com",
+            "CURLOPT_FOLLOWLOCATION" => true,
+            "CURLOPT_HTTP_VERSION" => CURL_HTTP_VERSION_1_1,
+            "CURLOPT_CUSTOMREQUEST" => 'POST',
+            "CURLOPT_POSTFIELDS" => ['file' => $cFile],
+            "CURLOPT_HTTPHEADER" => ['authorization: ' . $token],
+        ]);
+        
+        $response = curl_exec($curl);
+        
+        curl_close($curl);
+        return $response;
+    }
 }

@@ -30,10 +30,21 @@ class RegisterAgents_model extends CI_Model
         $this->load->database();
     }
 
-    public function find($arData)
+    public function find($arData,$aColumns=[])
     {
+        $aMyColumns = [];
         if(count($arData)>0)
         {
+            if(count($aColumns)>0){
+                $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
+            } else {
+                $aMyColumns = [
+                    "id","name","email","phone","fileAs","address","address2","state","city","zipcode"
+                ];
+            }
+
+            foreach($aMyColumns as $v)
+                $this->db->select("{$this->aColumns[$v]} as `$v`");
 
             $this->db->limit(1);
 
@@ -58,8 +69,8 @@ class RegisterAgents_model extends CI_Model
             $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
         }
         
-        foreach($aMyColumns as $k=>$v)
-            $this->db->select("$v as `$k`");
+        foreach($aMyColumns as $v)
+            $this->db->select("{$this->aColumns[$v]} as `$v`");
 
             $this->db->from($this->table);
 
