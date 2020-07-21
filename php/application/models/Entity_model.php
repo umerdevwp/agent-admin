@@ -307,13 +307,12 @@ class Entity_model extends CI_Model
 
     public function getRoleStatus($id)
     {
-        $this->db->from($this->table. " e");
-        $this->db->join("entity_roles er", "er.entity_id = e.id","left");
-        $this->db->join("entitymeta em", "er.entity_id = e.id","left");
+        $this->db->from("entity_roles er");
+        $this->db->join("entitymeta em", "er.entity_id = em.zoho_accounts_id","left");
         $this->db->join("roles r","r.id=er.role_id","left");
         
-        $this->db->select("e.id, r.role_name role, em.entity_status status");
-        $this->db->where("e.id",$id);
+        $this->db->select("er.entity_id id, r.role_name role, em.entity_status status");
+        $this->db->where("er.entity_id",$id);
 
         $oResult = $this->db->get();
 
