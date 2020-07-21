@@ -40,7 +40,9 @@ class Entity extends RestController
         $sid = $_SESSION["eid"];
 
         if (empty($sid)) {
-            responseJson(['type'=>'error','message'=>'Login is not define']);           
+            $this->response([
+                'result' => ['type'=>'error','message'=>'Login is not define']
+            ], 200);        
         }
 
         $this->load->model('entity_model');
@@ -272,6 +274,20 @@ HC;
             } else {
                 $_POST["inputFormationDate"] = $strFormationDate;
             }
+        }
+
+        if ($this->input->post("inputFiscalDate") != "") {
+            $strFiscalDate = str_replace("  ", " ", $this->input->post("inputFiscalDate"));
+            $strFiscalDate = str_replace(" ", "-", $strFiscalDate);
+            $strFiscalDate = date("Y-m-d", strtotime($strFiscalDate));
+
+            if ($strFiscalDate == "1970-01-01") {
+                //$_POST["inputFormationDate"] = "0000 00 00";
+            } else {
+                $_POST["inputFiscalDate"] = $strFiscalDate;
+            }
+        } else {
+            $_POST["inputFiscalDate"] = date("Y-12-31");
         }
 
         $this->form_validation->set_rules('inputName', 'Account Name', 'required|regex_match[/[a-zA-Z\s]+/]', ["regex_match" => "Only alphabets and spaces allowed."]);
@@ -848,7 +864,7 @@ HC;
         // tag call needs account id instance, added below after attachments
         if (isDev()) {
             $oApi->setFieldValue("RA", "3743841000000932064");//sandbox id
-            $oApi->setFieldValue("Parent_Account", $_SESSION['eid']);//sandbox id
+            $oApi->setFieldValue("Parent_Account", "3743841000001424031");//sandbox id
             $oApi->setFieldValue("Layout", "3743841000000983988");// sandbox id = Customer layout
         } else {
             // push the RA id data to zoho

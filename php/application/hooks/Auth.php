@@ -10,71 +10,73 @@ class Auth
     public function myFunction()
     {
         $CI =& get_instance();
-        if (in_array(strtolower($CI->router->class), $this->auth)) {
-            $token = $CI->input->get_request_header('Authorization');
-            // TODO: check email exist in admin
 
-            // to allow functionality of login as for admin
-            $oToken = $this->hasToken($token);
-            $sToken = $oToken->token;
-            $_SESSION['eid'] = "not set yet";
-            
-            
-            if ($sToken) {
+        if(empty($_SERVER['PHP_AUTH_USER']) && empty($_SERVER['PHP_AUTH_PW']))  {
+           
+            if (in_array(strtolower($CI->router->class), $this->auth)) {
+
+                $token = $CI->input->get_request_header('Authorization');
+                // TODO: check email exist in admin
+
+                // to allow functionality of login as for admin
+                $oToken = $this->hasToken($token);
+                $sToken = $oToken->token;
+                $_SESSION['eid'] = "not set yet";   
                 
-                $_SESSION['eid'] = $oToken->entity_id;
+                if ($sToken) {
+                    
+                    $_SESSION['eid'] = $oToken->entity_id;
+                    return $sToken;
+                }
 
-                return $sToken;
-            }
+                try {
+                    if ($token != NULL) {
+                        $url = getenv('OKTA_BASE_URL') . "oauth2/default/v1/userinfo";
+                        $ch = curl_init($url);
+                        $headers = array(
+                            'Authorization: Bearer ' . $token,
+                        );
+                        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                        curl_setopt($ch, CURLOPT_HEADER, 0);
+                        curl_setopt($ch, CURLOPT_POST, 1);
+                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                        $response = json_decode(curl_exec($ch));
+                        if (empty($response->sub)) {
+                            $returnResponse = ['status' => 401, 'message' => "No response from okta", NULL];
+                            echo json_encode($returnResponse);
+                            die();
+                        } else {
 
-            try {
-                if ($token != NULL) {
-                    $url = getenv('OKTA_BASE_URL') . "oauth2/default/v1/userinfo";
-                    $ch = curl_init($url);
-                    $headers = array(
-                        'Authorization: Bearer ' . $token,
-                    );
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-                    curl_setopt($ch, CURLOPT_HEADER, 0);
-                    curl_setopt($ch, CURLOPT_POST, 1);
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                    $response = json_decode(curl_exec($ch));
-                    if (empty($response->sub)) {
-                        $returnResponse = ['status' => 401, 'message' => "No response from okta", NULL];
+                            // zoho_id should be in the request else don't save token
+                            if(!empty($CI->input->get('eid')))
+                            {
+                                $this->deletePreviousToken($response->sub);
+                                $this->addToken($response->sub, $response->email , $token);
+
+                                $_SESSION['eid'] = $CI->input->get('eid');
+                                if($CI->input->get("bit")==1)
+                                {
+                                    $CI->load->model("Permissions_model");
+                                    $oDataPermission = $CI->Permissions_model->roleExist($_SESSION["eid"]);
+                                    if(empty($oDataPermission))
+                                    {
+                                        $CI->Permissions_model->add($_SESSION["eid"],"parent");
+                                    }
+                                }
+                            
+                            }
+                            $returnResponse = ['status' => 200, 'message' => "Success", NULL];
+                        }
+                    } else {
+                        $returnResponse = ['status' => 401, 'message' => "Auth Failed", NULL];
                         echo json_encode($returnResponse);
                         die();
-                    } else {
-
-                        // zoho_id should be in the request else don't save token
-
-
-                        if(!empty($CI->input->get('eid')))
-                        {
-                            $this->deletePreviousToken($response->sub);
-                            $this->addToken($response->sub, $response->email , $token);
-                            if((int)$CI->input->get("bit")==1)
-                            {
-                                $CI->load->model("Permissions_model");
-                                $oDataPermission = $CI->Permissions_model->roleExist($_SESSION["eid"]);
-
-                                if(!$oDataPermission)
-                                {
-                                    $CI->Permissions_model->add($_SESSION["eid"],"parent");
-                                }
-                            }
-                        $_SESSION['eid'] = $CI->input->get('eid');
-                        }
-                        $returnResponse = ['status' => 200, 'message' => "Success", NULL];
                     }
-                } else {
-                    $returnResponse = ['status' => 401, 'message' => "Auth Failed", NULL];
-                    echo json_encode($returnResponse);
+                } catch(Exception $e) {
+                    $response = ['status' => 401, 'message' => $e->getMessage(), NULL];
+                    echo json_encode($response);
                     die();
                 }
-            } catch(Exception $e) {
-                $response = ['status' => 401, 'message' => $e->getMessage(), NULL];
-                echo json_encode($response);
-                die();
             }
         }
     }

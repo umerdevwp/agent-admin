@@ -12,19 +12,18 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |
 */
 
-$hook['post_controller_constructor'] = array(
-    'class'    => 'Auth',
+$hook['post_controller_constructor'][] = array(
+    'class' => 'Auth',
     'function' => 'myFunction',
     'filename' => 'Auth.php',
     'filepath' => 'hooks',
-    'params'   => ""
-);
-
-
-$hook['post_controller_constructor'] = array(
-    'class'    => 'AuthVendor',
+    'params' => ""
+    );
+    
+    
+    $hook['post_controller_constructor'][] = array(
+    'class' => 'AuthVendor',
     'function' => 'basicAuth',
     'filename' => 'AuthVendor.php',
     'filepath' => 'hooks',
-    'params'   => ""
-);
+    );
