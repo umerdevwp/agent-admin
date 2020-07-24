@@ -335,4 +335,30 @@ class Entity_model extends CI_Model
         }
 
     }
+
+    public function getWhere($aWhereData,$aColumns=['id'])
+    {
+        $this->db->select($aColumns);
+        $this->db->from($this->table);
+        $this->db->where(replaceColumnKeys($aWhereData,$this->aColumns));
+        $this->db->limit(1);
+        $oResult = $this->db->get();
+
+        if($oResult)
+        {
+            $oRow = $oResult->row_object();
+            if(!empty($oRow))
+            {
+                return ['type'=>'ok','data'=>$oRow];
+            } else {
+                return ['type'=>'error','message'=>'No record found'];                
+            }
+        } else {
+            $er = $this->db->error();
+            error_log($this->db->error());
+            return ['type'=>'error','message'=>'Unable to fetch records'];
+        }
+    }
+
+
 }

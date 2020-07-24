@@ -63,6 +63,14 @@ class Tasks_model extends CI_Model
         return $result;
     }
 
+    /**
+     * Get task with task id, owned by entity id
+     * 
+     * @param Integer $id unique id of task
+     * @param Integer $entityid Entity id to whom task belongs to
+     * 
+     * @return Array Record row / Error message no row found
+     */
     public function getOne($id,$entityid="")
     {
         $data = [
@@ -78,12 +86,20 @@ class Tasks_model extends CI_Model
         $result = $query->row();
 
         if (!$result) {
-            return ['msg'=>'No tasks available','msg_type'=>'error'];
+            return ['message'=>'No tasks available','type'=>'error'];
         }
 
         return $result;
     }
 
+    /**
+     * Get task with task id, and exist under parent entity id
+     * 
+     * @param Integer $id unique id of task
+     * @param Integer $parentid Entity id who is the parent of task owner (entity)
+     * 
+     * @return Array Record row / Error message no row found
+     */
     public function getOneParentId($id,$parentid)
     {
         //SELECT * FROM zoho_accounts za LEFT JOIN zoho_tasks zt ON za.id=zt.related_to WHERE za.parent_entity=4071993000000411118 AND zt.id=4071993000001296114
@@ -96,7 +112,7 @@ class Tasks_model extends CI_Model
         //var_dump($result);die;
         //echo $this->db->last_query();die;
         if (!$result) {
-            return ['msg'=>'No tasks available','msg_type'=>'error'];
+            return ['message'=>'No tasks available','type'=>'error'];
         }
 
         return $result;

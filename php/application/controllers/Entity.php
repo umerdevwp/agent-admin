@@ -216,44 +216,80 @@ HC;
             $_POST['inputFormationDate'] = date("Y-m-d", strtotime($this->input->post("inputFormationDate")));
             $_POST['inputFiscalDate'] = date("Y-m-d", strtotime($this->input->post("inputFiscalDate")));
 
-            $aResponseZoho = $this->zohoCreateEntity($_SESSION['eid'], $bTagSmartyValidated);
+//            $bEntityExist = $this->checkEntityExist($this->input->post("inputName"),$this->input->post("inputFillingState"));
+            
+            // entity not found
+            //if(!$bEntityExist)
+            //{
+                $aResponseZoho = $this->zohoCreateEntity($_SESSION['eid'], $bTagSmartyValidated);
 
-            // succcess redirect to dashboard
-            if ($aResponseZoho["type"] == 'ok') {
-                // allow without file, else check type and size
-                $iZohoId = $aResponseZoho['id'];
-                //$this->zohoAddAttachment($iZohoId);
+                // succcess redirect to dashboard
+                if ($aResponseZoho["type"] == 'ok') {
+                    // allow without file, else check type and size
+                    $iZohoId = $aResponseZoho['id'];
+                    //$this->zohoAddAttachment($iZohoId);
 
-                // check address is valid from smarty is not needed, validation is at interface
-                $sSmartyAddress = '';//$this->validateSmartyStreet();
-                
-                // add a note if smarty validated address successfuly
-                if ($sSmartyAddress != '') {
-                    $aResponseNote = $this->ZoHo_Account->newZohoNote("Accounts", $iZohoId, "Smartystreet has replaced following", $sSmartyAddress);
-                    if($aResponseNote['type']=='error')
-                    {
-                        $aResponseZoho['type'] = 'error';
-                        if(!empty($aResponseZoho['message']))
-                        $aResponseZoho['message'] .= "," . $aResponseNote['message'];
-                        else
-                        $aResponseZoho['message'] = $aResponseNote['message'];
-                        
+                    // check address is valid from smarty is not needed, validation is at interface
+                    $sSmartyAddress = '';//$this->validateSmartyStreet();
+                    
+                    // add a note if smarty validated address successfuly
+                    if ($sSmartyAddress != '') {
+                        $aResponseNote = $this->ZoHo_Account->newZohoNote("Accounts", $iZohoId, "Smartystreet has replaced following", $sSmartyAddress);
+                        if($aResponseNote['type']=='error')
+                        {
+                            $aResponseZoho['type'] = 'error';
+                            if(!empty($aResponseZoho['message']))
+                            $aResponseZoho['message'] .= "," . $aResponseNote['message'];
+                            else
+                            $aResponseZoho['message'] = $aResponseNote['message'];
+                            
+                        }
                     }
+
+                    $this->addPermission($iZohoId);
+
+                    $this->redirectAfterAdd($aResponseZoho);
+
+                    // redirect to form, show error
+                } else {
+                    $this->response([
+                        'status' => false,
+                        'error' => $aResponseZoho['message']
+                    ], 400);
                 }
-
-                $this->addPermission($iZohoId);
-
-                $this->redirectAfterAdd($aResponseZoho);
-
-                // redirect to form, show error
-            } else {
+            /*} else {            // entity already exist
                 $this->response([
                     'status' => false,
-                    'error' => $aResponseZoho['message']
+                    'error' => "Entity with the name: " . $this->input->post("inputName").", state: ".$this->input->post("inputFillingState")." already exist"
                 ], 400);
-            }
-
+            }*/
         }
+    }
+
+    public function checkEntityExist($sInput)
+    {
+        $this->load->model("Entity_model");
+        $this->load->model("Tempmeta_model");
+
+        $sEntityName = $this->input->post("inputName");
+        $sFilingState = $this->input->post("inputFillingState");
+
+        $aDataWhereTemp = ['json_name'=>$sEntityName,'json_filingState'=>$sFilingState];
+
+        $bRowExist = $this->Tempmeta_model->checkRowExistInJson($aDataWhereTemp);
+        
+        if(!$bRowExist)
+        {
+            $aDataWhere = ['name'=>$sEntityName,'filingState'=>$sFilingState];
+        
+            $aRow = $this->Entity_model->getWhere($aDataWhere);    
+            if($aRow["type"]=="ok")
+            {
+                $bRowExist = true;
+            }
+        }
+        // if record found return false for form_vaidator
+        return ($bRowExist?false:true);
     }
 
     private function validateForm()
@@ -293,7 +329,7 @@ HC;
         $this->form_validation->set_rules('inputName', 'Account Name', 'required|regex_match[/[a-zA-Z\s]+/]', ["regex_match" => "Only alphabets and spaces allowed."]);
 
         $this->form_validation->set_rules('inputEIN', 'EIN', 'numeric|exact_length[9]',["numeric" => "Only numbers are allowed.","exact_length"=>"Must contain 9 digits"]);
-        $this->form_validation->set_rules('inputFillingState', 'Filing State', 'required|alpha|exact_length[2]');
+        $this->form_validation->set_rules('inputFillingState', 'Filing State', 'required|alpha|exact_length[2]|callback_checkEntityExist',["checkEntityExist"=>"Entitysssss: ".$this->input->post('inputName').", ".$this->input->post("inputFillingState")." already exist"]);
         $this->form_validation->set_rules('inputFillingStructure', 'Entity Type', 'required|regex_match[/[A-Z\-]+/]');
         $this->form_validation->set_rules('inputFormationDate', 'Formation Date', 'required|regex_match[/[0-9]{4,}\-[0-9]{2,}\-[0-9]{2,}/]', ["regex_match" => "Allowed %s format: 2019-01-01"]);
         $this->form_validation->set_rules('inputFiscalDate', 'Fiscal Date', 'required|regex_match[/[0-9]{4,}\-[0-9]{2,}\-[0-9]{2,}/]', ["regex_match" => "Allowed %s format: 2019-01-01"]);
@@ -303,6 +339,7 @@ HC;
         $this->form_validation->set_rules('inputNotificationCity', 'Shipping City', 'required');
         $this->form_validation->set_rules('inputNotificationState', 'Shipping State', 'required');
         $this->form_validation->set_rules('inputNotificationZip', 'Shipping Code', 'required|exact_length[5]',['exact_lengt'=>"Must contain 5 digits"]);
+        $this->form_validation->set_rules('inputBusinessPurpose', 'Business purpose', 'required');
         $this->form_validation->set_rules('inputBusinessPurpose', 'Business purpose', 'required');
 
         if ($this->form_validation->run() === FALSE) {

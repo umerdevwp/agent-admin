@@ -421,3 +421,19 @@ function getInputFields($sQueryName="fields")
     
     return $aColumns;
 }
+
+/**
+ * Replace column alias name with real table column names
+ * @param Array $aRequestColumn Array of alias based columns required
+ * @param Array $aColumnAlias Array of real and alias names, Assoc array alias=>real name
+ */
+function replaceColumnKeys($aRequestColumn,$aColumnAlias)
+{
+    $aNewAssocData = [];
+    
+    foreach($aRequestColumn as $k=>$v)
+    {
+        $aNewAssocData[$aColumnAlias[$k]] = $v;
+    }
+    return $aNewAssocData;
+}
