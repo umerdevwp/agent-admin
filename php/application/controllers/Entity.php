@@ -230,11 +230,11 @@ HC;
                     //$this->zohoAddAttachment($iZohoId);
 
                     // check address is valid from smarty is not needed, validation is at interface
-                    $sSmartyAddress = '';//$this->validateSmartyStreet();
+                    $sSmartyAddress = $this->input->post("inputSmartyResult");
                     
                     // add a note if smarty validated address successfuly
                     if ($sSmartyAddress != '') {
-                        $aResponseNote = $this->ZoHo_Account->newZohoNote("Accounts", $iZohoId, "Smartystreet has replaced following", $sSmartyAddress);
+                        $aResponseNote = $this->ZoHo_Account->newZohoNote("Accounts", $iZohoId, "Smartystreet suggested following", $sSmartyAddress);
                         if($aResponseNote['type']=='error')
                         {
                             $aResponseZoho['type'] = 'error';
