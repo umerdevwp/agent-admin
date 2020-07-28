@@ -137,10 +137,9 @@ MySnackbarContentWrapper.propTypes = {
     variant: PropTypes.oneOf(['success', 'warning', 'error', 'info']).isRequired,
 }
 
-const EntityDetailedPage = (props) => {
+const SelfDetailedPage = (props) => {
 
 
-    const entity_id = props.entityid ? props.entityid : props.match.params.id;
     const breadcrumbs_show = !props.breadcrumbz ? props.breadcrumbz : true;
     const HOST = process.env.REACT_APP_SERVER_API_URL;
 
@@ -151,9 +150,10 @@ const EntityDetailedPage = (props) => {
     const [contactList, setContactList] = React.useState([])
     const [attachmentList, setAttachmentList] = React.useState([])
     const [taskList, setTaskList] = React.useState([])
-
+    const entity_id = oktaprofile.organization;
     const [loading, setLoading] = React.useState(true)
     useEffect(() => {
+
         fetchDetailedProfile();
     }, [])
 
@@ -161,21 +161,25 @@ const EntityDetailedPage = (props) => {
     const fetchDetailedProfile = async () => {
         // {"errors":{"status":401,"detail":"Invalid detail request"}}
         var detailedView = '';
-        if (role === 'Parent Organization' || role === 'Administrator' ) {
-            detailedView = await entityDetail(entity_id);
-        }
-
-        if (role === 'Child Entity') {
+        if (role === 'Parent Organization' || role === 'Administrator') {
             detailedView = await selfEntityDetail();
+            // new Promise((resolve, reject) => {
+            //     setEntitydetail(detailedView);
+            // });
+
         }
 
 
         if (detailedView.result) {
-            setEntitydetail(detailedView.result)
-            setContactList(detailedView.result.contacts);
-            setAttachmentList(detailedView.result.attachments)
-            setTaskList(detailedView.result.tasks)
-            setLoading(false);
+            new Promise((resolve, reject) => {
+                setEntitydetail(detailedView.result)
+                setContactList(detailedView.result.contacts);
+                setAttachmentList(detailedView.result.attachments)
+                setTaskList(detailedView.result.tasks);
+                setLoading(false);
+                resolve();
+
+            });
 
         }
 
@@ -200,10 +204,19 @@ const EntityDetailedPage = (props) => {
         ],
         data: contactList,
     };
-
+    // const [state, setState] = React.useState({
+    //     columns: [
+    //         {title: 'id', field: 'id'},
+    //         {title: 'Name', field: 'subject'},
+    //         {title: 'Due Date', field: 'dueDate'},
+    //         {title: 'Status', field: 'status'},
+    //     ],
+    //     data: taskList,
+    // });
 
     const taskData = {
         columns: [
+            {title: 'id', field: 'id'},
             {title: 'Name', field: 'subject'},
             {title: 'Due Date', field: 'dueDate'},
             {title: 'Status', field: 'status'},
@@ -361,9 +374,9 @@ const EntityDetailedPage = (props) => {
             <Grid container spacing={5}>
 
                 <Grid item xs={12}>
-                    <ContactList loading={loading} tooltip={'Add New Contact'} redirect={true}
-                                 url={`/dashboard/contact/form/add/${entity_id}`} data={taskData}
-                                 title={'Compliance Tasks'}/>
+                    <ContactList loading={loading} tooltip={'Add New Contact'}
+                                        url={`/dashboard/contact/form/add/${entity_id}`} data={taskData}
+                                        title={'Compliance Tasks'}/>
                 </Grid>
             </Grid>
 
@@ -387,5 +400,5 @@ const EntityDetailedPage = (props) => {
     )
 }
 
-export default withAuth(EntityDetailedPage);
+export default withAuth(SelfDetailedPage);
 
