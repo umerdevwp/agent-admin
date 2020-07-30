@@ -35,8 +35,14 @@ class ZoHo_Account extends CI_Model
 			"redirect_uri" => getenv("ZOHO_REDIRECT_URI"),
 			"currentUserEmail"=> "cboyce@unitedagentservices.com",
 			"token_persistence_path" => "zohoauth",
-			"accounts_url" => getenv("ZOHO_ACCOUNTS_URL"),
             "sandbox"=>(isDev()?"true":"false"),
+            "apiVersion"=>"v2",
+            "accounts_url"=>"accounts.zoho.com",
+            "applicationLogFilePath"=>"zohoauth",
+            "apiBaseUrl"=>"www.zohoapis.com",
+
+
+
         ];
         
         ZCRMRestClient::initialize($configuration);
@@ -45,7 +51,8 @@ class ZoHo_Account extends CI_Model
         // scopes2: ZohoCRM.modules.ALL,aaaserver.profile.READ,ZohoCRM.settings.all
         // https://accounts.zoho.com/oauth/v2/auth?scope=ZohoCRM.modules.ALL,aaaserver.profile.READ,ZohoCRM.settings.all&client_id=1000.CF9P2PV0P6H66EY284HQZ8G1HVMU3H&response_type=code&access_type=online&redirect_uri=http://api.agentadmin.loc/
         $sGrantToken = getenv("ZOHO_GRANT_TOKEN");
-        if(!empty($sGrantToken))
+        
+        if(!empty($sGrantToken) && strpos(getenv("DEVELOPER_IP"),$_SERVER['REMOTE_ADDR'])!==false)
         {
             echo "Token exist::-- ";
             $oAuthClient = ZohoOAuth::getClientInstance();
