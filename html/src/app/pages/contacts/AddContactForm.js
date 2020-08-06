@@ -52,6 +52,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import FormHelperText from "@material-ui/core/FormHelperText";
 
 
 let SmartyStreetsCore = SmartyStreetsSDK.core;
@@ -256,6 +257,7 @@ const AddContactForm = (props) => {
     const [labelWidth, setLabelWidth] = React.useState(0);
     const [addressObject, setAddressObject] = React.useState([]);
     const [addressValue, setAddressValue] = React.useState('');
+    const [addressReset, setAddressReset] = React.useState('');
     const [loading, setLoading] = React.useState(false)
     const [contactType, setContactType] = React.useState([]);
     const [successMessage, setSuccessMessage] = React.useState(' ');
@@ -281,15 +283,19 @@ const AddContactForm = (props) => {
     };
 
     const handleClose = () => {
+        setLoading(false);
         setUserAgree(false);
         setOpen(false);
     };
 
     const iAgree = async (event) => {
-        setUserAgree(true);
-        setOpen(false);
-        localStorage.setItem('iAgree', true);
-        handleOnSubmit(event)
+        Promise.resolve(setTimeout(() => {
+            setUserAgree(true)
+        }, 3000));
+        Promise.resolve(setOpen(false));
+        if (userAgree === true) {
+            handleOnSubmit(event, true)
+        }
 
 
     };
@@ -324,8 +330,8 @@ const AddContactForm = (props) => {
     React.useEffect(() => {
         if (addressObject) {
             if (typeof addressObject === 'object') {
-                setInputNotificationCity({...inputContactCity, value: addressObject.city})
-                setInputNotificationState({...inputContactState, value: addressObject.state})
+                setInputNotificationCity({...inputContactCity, error: ' ', value: addressObject.city})
+                setInputNotificationState({...inputContactState, error: ' ', value: addressObject.state})
             }
         }
 
@@ -356,43 +362,77 @@ const AddContactForm = (props) => {
         setAddressObject(value);
     }
 
-    const addressValueChangeHandler = (value) => {
-        setAddressValue(value);
+    const addressValueChangeHandler = async (value) => {
+        return Promise.resolve(setAddressValue(value));
     }
 
 
-    const resetForm = () => {
-        setInputContactFirstName({error: ' ', value: ''})
-        setInputLastName({error: ' ', value: ''})
-        setInputNotificationEmail({error: ' ', value: ''})
-        setInputNotificationPhone({error: ' ', value: ''})
-        setInputNotificationAddress({error: ' ', value: ''})
-        setInputNotificationContactType({error: ' ', value: ''})
-        setInputNotificationCity({error: ' ', value: ''})
-        setInputNotificationState({error: ' ', value: ''})
-        setInputNotificationZip({error: ' ', value: ''})
-        setAddressObject('');
-        setAddressValue('');
+    const resetForm = async () => {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve();
+                setInputContactFirstName({error: ' ', value: ''})
+                setInputLastName({error: ' ', value: ''})
+                setInputNotificationEmail({error: ' ', value: ''})
+                setInputNotificationPhone({error: ' ', value: ''})
+                setInputNotificationAddress({error: ' ', value: ''})
+                setInputNotificationContactType({error: ' ', value: ''})
+                setInputNotificationCity({error: ' ', value: ''})
+                setInputNotificationState({error: ' ', value: ''})
+                setInputNotificationZip({error: ' ', value: ''});
+                setAddressObject('');
+                setAddressReset('reset')
+                setAddressValue('');
+            }, 600);
+        });
+
+
     }
 
 
-    const handleOnSubmit = async (event) => {
+    const handleOnSubmit = async (event, userResponse = false) => {
         event.preventDefault();
         setLoading(true);
-        const userResponse = localStorage.getItem('iAgree');
-        console.log('iAgree', userResponse);
-        if (userResponse === 'false') {
-            await addressCheck();
+        setAddressReset('');
+        // if (userResponse === 'false') {
+        //     await addressCheck();
+        // }
+
+
+        var formsubmit = true;
+        if (inputContactZipcode.value) {
+            var zip = parseInt(inputContactZipcode.value);
+            if (typeof zip === 'number') {
+                if (zip.toString().length == 5) {
+                    formsubmit = true;
+                } else {
+                    setLoading(false);
+                    formsubmit = false;
+                    setInputNotificationZip({...inputContactZipcode, error: "Please enter 5 digits zip code"})
+                }
+            } else {
+                setLoading(false);
+                formsubmit = false;
+                setInputNotificationZip({...inputContactZipcode, error: "Please enter 5 digits zip code"})
+            }
         }
 
-        if (userResponse === 'true') {
-            contactsCreate();
+
+        if (formsubmit === true) {
+            if (userAgree === false) {
+                if ((addressObject || addressObject.streetLine) && inputContactCity.value && inputContactState.value && inputContactZipcode.value !== '') {
+                    await addressCheck();
+                }
+            }
+            contactsCreate(event,userResponse);
         }
+
 
     }
 
 
-    const contactsCreate = async (valid = null) => {
+    const contactsCreate = async (event, valid = null) => {
+
 
         let formData = new FormData();
         setInputContactFirstName({...inputContactFirstName, error: ' '})
@@ -412,22 +452,34 @@ const AddContactForm = (props) => {
         formData.append('inputContactEmail', inputContactEmail.value)
         formData.append('inputContactPhone', inputContactPhone.value)
         formData.append('inputContactStreet', addressObject.streetLine)
-        if(addressObject.streetLine) {
+        if (addressObject.streetLine) {
             formData.append('inputContactStreet', addressObject.streetLine)
         } else {
             formData.append('inputContactStreet', addressObject)
         }
         formData.append('inputContactType', inputContactType.value)
-        formData.append('inputContactCity', inputContactCity.value)
-        formData.append('inputContactState', inputContactState.value)
+
+        if (inputContactCity.value) {
+            formData.append('inputContactCity', inputContactCity.value);
+        } else {
+            formData.append('inputContactCity', '');
+        }
+        if (inputContactState.value) {
+            formData.append('inputContactState', inputContactState.value);
+        } else {
+            formData.append('inputContactState', '');
+        }
+
         formData.append('inputContactZipcode', inputContactZipcode.value)
+
+
         formData.append('inputAddressIsValid', valid ? valid : isValidAddress)
         formData.append('acceptInvalidAddress', userAgree)
+
         const response = await createContact(formData);
         if (response.field_error) {
 
             setLoading(false);
-            localStorage.setItem('iAgree', false);
             setIsValidAddress(false);
             setUserAgree(false);
             Object.keys(response.field_error).forEach((key, index) => {
@@ -467,27 +519,33 @@ const AddContactForm = (props) => {
 
             })
         }
-
-
         if (response.data) {
             if (response.data.type === 'ok') {
-                setLoading(false);
-                localStorage.setItem('iAgree', false);
-                setSuccessMessage(response.data.results);
-                // setTimeout(() => {
-                //     history.goBack();
-                // }, 4000)
+
+                new Promise(resolve => {
+                    setTimeout(() => {
+                        resolve();
+                        inputContactFirstName.reset();
+                        setUserAgree(false);
+                        setLoading(false);
+                        setSuccessMessage(response.data.results);
+                        resetForm();
+                        window.scrollTo(0, 0)
+                    }, 600);
+                });
+
             }
 
             if (response.data) {
                 if (response.data.type === 'error') {
-                    setLoading(false);
-                    setErrorMessage(response.data.results);
-                    localStorage.setItem('iAgree', false);
+                    await updateStates(response.data.results);
+
+                    // console.log(addressObject);
                 }
             }
         }
 
+        //
         // for (var pair of formData.entries()) {
         //     console.log(pair[0] + ', ' + pair[1]);
         // }
@@ -504,37 +562,50 @@ const AddContactForm = (props) => {
     }
 
 
+    const updateStates = async (data) => {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve();
+                setUserAgree(false);
+                setLoading(false);
+                setErrorMessage(data);
+                window.scrollTo(0, 0)
+            }, 600);
+        });
+
+
+    }
+
+
     const addressCheck = async () => {
-        if (!userAgree && !isValidAddress && addressObject && inputContactCity.value && inputContactState.value && inputContactZipcode.value) {
-            let lookup1 = new Lookup();
-            lookup1.street = addressObject.streetLine ? addressObject.streetLine : addressObject;
-            lookup1.city = inputContactCity.value;
-            lookup1.state = inputContactState.value;
-            lookup1.zipCode = inputContactZipcode.value;
-            client.send(lookup1).then(response => {
-                const valid = utils.isValid(response.lookups[0]);
-                setIsValidAddress(valid);
-                response.lookups.map(lookup => console.log(lookup.result));
+        let lookup1 = new Lookup();
+        lookup1.street = addressObject.streetLine ? addressObject.streetLine : addressObject;
+        lookup1.city = inputContactCity.value;
+        lookup1.state = inputContactState.value;
+        lookup1.zipCode = inputContactZipcode.value;
+        client.send(lookup1).then(response => {
+            const valid = utils.isValid(response.lookups[0]);
+            setIsValidAddress(valid);
+            response.lookups.map(lookup => console.log(lookup.result));
 
-                // Is lookup1 valid?
-                console.log('Is lookup1 valid?', utils.isValid(response.lookups[0]));
+            // // Is lookup1 valid?
+            // console.log('Is lookup1 valid?', utils.isValid(response.lookups[0]));
+            //
+            // // Is lookup1 invalid?
+            // console.log('Is lookup1 invalid?', utils.isInvalid(response.lookups[0]));
+            //
+            // // Is lookup1 ambiguous?
+            // console.log('// Is lookup1 ambiguous?', utils.isAmbiguous(response.lookups[0]));
+            //
+            // // Is lookup1 missing a secondary address?
+            // console.log('// Is lookup1 missing a secondary address?', utils.isMissingSecondary(response.lookups[0]));
+            if (valid === false) {
+                setOpen(true);
+            } else {
+                return true;
+            }
+        });
 
-                // Is lookup1 invalid?
-                console.log('Is lookup1 invalid?', utils.isInvalid(response.lookups[0]));
-
-                // Is lookup1 ambiguous?
-                console.log('// Is lookup1 ambiguous?', utils.isAmbiguous(response.lookups[0]));
-
-                // Is lookup1 missing a secondary address?
-                console.log('// Is lookup1 missing a secondary address?', utils.isMissingSecondary(response.lookups[0]));
-                if (valid === false) {
-                    setOpen(true);
-                    setLoading(false);
-                } else {
-                    contactsCreate(valid);
-                }
-            });
-        }
     }
 
     return (
@@ -599,7 +670,7 @@ const AddContactForm = (props) => {
                                 />
                             ) : ''}
                             <div className="row">
-                                <form className={classes.container} onSubmit={handleOnSubmit} noValidate
+                                <form id={"create-course-form"} className={classes.container} onSubmit={handleOnSubmit} noValidate
                                       autoComplete="off">
                                     <FormGroup row>
 
@@ -696,6 +767,7 @@ const AddContactForm = (props) => {
                                                 width={''}
                                                 addressObject={addressObjectChangeHandler}
                                                 addressValue={addressValueChangeHandler}
+                                                reset={addressReset}
                                                 inputProps={{
                                                     name: 'inputContactStreet',
                                                     id: 'inputContactStreet',
@@ -707,7 +779,8 @@ const AddContactForm = (props) => {
                                         </div>
 
                                         <div className={'col-md-4'}>
-                                            <FormControl className={clsx(classes.selectField)}>
+                                            <FormControl className={clsx(classes.selectField)}
+                                                         error={inputContactType.error !== ' '}>
                                                 <InputLabel htmlFor="age-native-simple">Contact Type</InputLabel>
                                                 <Select
                                                     disabled={loading}
@@ -729,6 +802,8 @@ const AddContactForm = (props) => {
                                                                                                          value={anObjectMapped.code}>{anObjectMapped.name}</option>)}
 
                                                 </Select>
+                                                <FormHelperText>{inputContactType.error}</FormHelperText>
+
                                             </FormControl>
                                         </div>
 
@@ -753,9 +828,11 @@ const AddContactForm = (props) => {
                                                 margin="dense"
 
                                             />
+
                                         </div>
                                         <div className={'col-md-4'}>
-                                            <FormControl className={clsx(classes.selectField)}>
+                                            <FormControl className={clsx(classes.selectField)}
+                                                         error={inputContactState.error !== ' '}>
                                                 <InputLabel
                                                     htmlFor="state-native-simple">State/Region/Province</InputLabel>
                                                 <Select
@@ -779,6 +856,7 @@ const AddContactForm = (props) => {
                                                                                                          value={anObjectMapped.code}>{anObjectMapped.name}</option>)}
 
                                                 </Select>
+                                                <FormHelperText>{inputContactState.error}</FormHelperText>
                                             </FormControl>
                                         </div>
                                         <div className={'col-md-6'}>
@@ -796,6 +874,7 @@ const AddContactForm = (props) => {
                                                     id: 'inputContactZipcode',
                                                 }}
                                                 error={inputContactZipcode.error !== ' '}
+                                                helperText={inputContactZipcode.error}
                                                 label="Postal / Zip Code"
                                                 className={clsx(classes.textFieldtwofield, classes.dense)}
                                                 margin="dense"
@@ -812,7 +891,8 @@ const AddContactForm = (props) => {
                                                 {/*<input className={clsx('btn btn-primary', classes.restButton)}*/}
                                                 {/*       type="reset" onClick={(e) => {resetForm()}} value="Reset"/>*/}
 
-                                                <input  disabled={loading} className={clsx('btn btn-primary', classes.restButton)}
+                                                <input disabled={loading}
+                                                       className={clsx('btn btn-primary', classes.restButton)}
                                                        type="submit" value="Add new Contact"/>
                                             </div>
                                         </div>

@@ -34,17 +34,18 @@ const AgentAdminRoutes = withRouter(({history}) => {
 
                 <OktaUserContextProvider>
                     <SecureRoute exact path='/dashboard' component={CustomLayoutForAgentAdmin}/>
-                    <Route exact path='/dashboard/table-sample' component={CustomLayoutForAgentAdmin}/>
-                    <Route exact path='/dashboard/entity/:id' component={CustomLayoutForAgentAdmin}/>
-                    <Route exact={true} path='/dashboard/entity/form/add' component={CustomLayoutForAgentAdmin}/>
-                    <Route exact={true} path='/dashboard/admins' component={CustomLayoutForAgentAdmin}/>
-                    <Route exact={true} path='/dashboard/contacts' component={CustomLayoutForAgentAdmin}/>
-                    <Route exact={true} path='/dashboard/contact/form/add/:id' component={CustomLayoutForAgentAdmin}/>
-                    <Route exact={true} path='/dashboard/attachments' component={CustomLayoutForAgentAdmin}/>
-                    <Route exact={true} path='/dashboard/attachment/form/add/:id'
+                    <SecureRoute exact path='/dashboard/table-sample' component={CustomLayoutForAgentAdmin}/>
+                    <Route exact={true} path='/dashboard/entity' component={CustomLayoutForAgentAdmin}/>
+                    <SecureRoute exact path='/dashboard/entity/:id' component={CustomLayoutForAgentAdmin}/>
+                    <SecureRoute exact={true} path='/dashboard/entity/form/add' component={CustomLayoutForAgentAdmin}/>
+                    <SecureRoute exact={true} path='/dashboard/admins' component={CustomLayoutForAgentAdmin}/>
+                    <SecureRoute exact={true} path='/dashboard/contacts' component={CustomLayoutForAgentAdmin}/>
+                    <SecureRoute exact={true} path='/dashboard/contact/form/add/:id' component={CustomLayoutForAgentAdmin}/>
+                    <SecureRoute exact={true} path='/dashboard/attachments' component={CustomLayoutForAgentAdmin}/>
+                    <SecureRoute exact={true} path='/dashboard/attachment/form/add/:id'
                            component={CustomLayoutForAgentAdmin}/>
-                    <Route exact={true} path='/dashboard/agents' component={CustomLayoutForAgentAdmin}/>
-                    <Route exact={true} path='/test' component={CustomLayoutForAgentAdmin}/>
+                    <SecureRoute exact={true} path='/dashboard/agents' component={CustomLayoutForAgentAdmin}/>
+                    <SecureRoute exact={true} path='/test' component={CustomLayoutForAgentAdmin}/>
                 </OktaUserContextProvider>
                 <Route path='/implicit/callback' component={ImplicitCallback}/>
                 <Route path="/error" component={ErrorsPage}/>

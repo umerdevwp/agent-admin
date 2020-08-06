@@ -57,8 +57,23 @@ export default function IntegrationDownshift(props) {
         sendDatatoParent();
     },[getFinal,value])
 
+    React.useEffect(() => {
+        resetState();
+    },[props.reset])
+
+    const resetState = () => {
+        if(props.reset == 'reset') {
+            setValue('');
+            setGetFinal([]);
+        }
+    }
 
     const sendDatatoParent = () => {
+        // if(props.reset == 'reset') {
+        //     setSuggestions([]);
+        //     setValue('');
+        //     setGetFinal([]);
+        // }
         // const [addressobject, addressvalue] = props;
         if(getFinal !== undefined && getFinal.length !== 0) {
             props.addressObject(getFinal)
@@ -88,7 +103,6 @@ export default function IntegrationDownshift(props) {
         autoCompleteClient.send(lookup)
             .then(response => {
                 const add = response.result
-                console.log(add);
                 setSuggestions(add);
             })
     }
@@ -99,6 +113,7 @@ export default function IntegrationDownshift(props) {
         const {InputProps, classes, ref, ...other} = inputProps;
         return (
             <TextField
+
                 className={className}
                 disabled={disabled}
                 required

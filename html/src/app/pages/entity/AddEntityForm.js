@@ -39,6 +39,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import SnackbarContent from '@material-ui/core/SnackbarContent';
 import WarningIcon from '@material-ui/icons/Warning';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+
 import {
     ContactTypeList,
     EntitytypesList,
@@ -232,12 +233,14 @@ MySnackbarContentWrapper.propTypes = {
 const AddEntityForm = (props) => {
 
 
+
     const {oktaprofile, isAdmin} = useContext(OktaUserContext);
     const classes = useStyles();
     const inputLabel = React.useRef(null);
     const [labelWidth, setLabelWidth] = React.useState(0);
     const [addressObject, setAddressObject] = React.useState([]);
     const [addressValue, setAddressValue] = React.useState('');
+    const [addressReset, setAddressReset] = React.useState('');
     const [loading, setLoading] = React.useState(false)
     const [error, setError] = React.useState(false)
     const [contactType, setContactType] = React.useState([]);
@@ -249,7 +252,7 @@ const AddEntityForm = (props) => {
 
     //form state
     const [inputName, setInputName] = React.useState({value: '', error: ' ',});
-    const [inputComplianceOnly, setInputComplianceOnly] = React.useState({value: '', error: ' '});
+    const [inputComplianceOnly, setInputComplianceOnly] = React.useState({value: false, error: ' '});
     const [inputFillingState, setInputFillingState] = React.useState({value: '', error: ' '});
     const [inputFillingStructure, setInputFillingStructure] = React.useState({value: '', error: ' '});
     const [inputFormationDate, setInputFormationDate] = React.useState({value: '', error: ' '});
@@ -266,7 +269,7 @@ const AddEntityForm = (props) => {
     const [inputNotificationZip, setInputNotificationZip] = React.useState({value: '', error: ' '});
     const [inputFiling, setInputFiling] = React.useState({value: '', error: ' ', success: ' '});
     const [inputBusinessPurpose, setInputBusinessPurpose] = React.useState({value: '', error: ' '});
-    const [inputForeign, setInputForeign] = React.useState({value: '', error: ' '});
+    const [inputForeign, setInputForeign] = React.useState({value: false, error: ' '});
     const [inputFileName, setInputFileName] = React.useState({value: '', error: ' '});
     const [inputFileSize, setInputFileSize] = React.useState({value: '', error: ' ', success: ' '});
 
@@ -374,9 +377,45 @@ const AddEntityForm = (props) => {
     }
 
 
+    const resetForm = async () => {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve();
+
+                setInputComplianceOnly({value: false, error: ' '})
+                setInputFillingState({value: '', error: ' '});
+                setInputFillingStructure({value: '', error: ' '});
+                setInputFormationDate({value: '', error: ' '});
+                setInputFiscalDate({value: fiscal, error: ' '});
+                setInputName({value: '', error: ' '});
+                setInputNotificationEmail({value: '', error: ' '});
+                setInputNotificationPhone({value: '', error: ' '});
+                setInputNotificationAddress({value: '', error: ' '});
+                setInputNotificationCity({value: '', error: ' '});
+                setInputNotificationState({value: '', error: ' '});
+                setInputNotificationZip({value: '', error: ' '});
+                setInputEIN({value: '', error: ' ', success: ' '});
+                setInputFiling({value: '', error: ' ', success: ' '})
+                setInputBusinessPurpose({value: '', error: ' '})
+                setInputForeign({value: false, error: ' '});
+                setInputFileName({value: '', error: ' ', success: ' '});
+                setInputFileSize({value: '', error: ' ', success: ' '});
+
+                setAddressObject('');
+                setAddressReset('reset')
+                setAddressValue('');
+            }, 600);
+        });
+
+
+    }
+
+
+
     const handleOnSubmit = async (event) => {
         var formsubmit = true;
         setLoading(true);
+        setAddressReset('');
         setInputFiling({...inputFiling, value: '', success: ' ', error:' '});
         setInputFileSize({...inputFileSize, value: ''});
         setInputFileName({...inputFileName, value: ''});
@@ -540,8 +579,10 @@ const AddEntityForm = (props) => {
 
             if (response) {
                 if (response.status) {
+                    await resetForm();
                     setLoading(false);
                     setSuccessMessage(true);
+                    window.scrollTo(0, 0);
                 }
             }
         }
@@ -596,6 +637,7 @@ const AddEntityForm = (props) => {
                                     <FormGroup row>
                                         <div className={'col-md-6'}>
                                             <TextField
+                                                value={inputName.value}
                                                 disabled={loading}
                                                 required
                                                 error={inputName.error !== ' '}
@@ -615,7 +657,7 @@ const AddEntityForm = (props) => {
                                                     ...inputForeign,
                                                     value: e.target.checked
                                                 })}
-                                                value={inputForeign}
+                                                checked={inputForeign.value}
                                                 control={<Checkbox color="primary"/>}
                                                 label="Foreign Qualified"
                                                 className={clsx(classes.textField, classes.checkbox)}
@@ -631,7 +673,7 @@ const AddEntityForm = (props) => {
                                                     ...inputComplianceOnly,
                                                     value: e.target.checked
                                                 })}
-                                                value={inputComplianceOnly}
+                                                checked={inputComplianceOnly.value}
                                                 control={<Checkbox color="primary"/>}
                                                 label="Compliance Only"
                                                 className={clsx(classes.textField, classes.checkbox)}
@@ -834,6 +876,7 @@ const AddEntityForm = (props) => {
                                                 width={''}
                                                 addressObject={addressObjectChangeHandler}
                                                 addressValue={addressValueChangeHandler}
+                                                reset={addressReset}
                                                 onChange={e => setAddressValue({
                                                     ...addressValue,
                                                     value: e.target.value
@@ -984,6 +1027,7 @@ const AddEntityForm = (props) => {
                                                 id="standard-full-width"
                                                 disabled={loading}
                                                 placeholder="Business Purpose"
+                                                value={inputBusinessPurpose.value}
                                                 error={inputBusinessPurpose.error !== ' '}
                                                 helperText={inputBusinessPurpose.error}
                                                 onChange={e => setInputBusinessPurpose({
