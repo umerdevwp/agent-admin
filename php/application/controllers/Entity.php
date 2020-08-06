@@ -329,7 +329,7 @@ HC;
         $this->form_validation->set_rules('inputName', 'Account Name', 'required|regex_match[/[a-zA-Z\s]+/]', ["regex_match" => "Only alphabets and spaces allowed."]);
 
         $this->form_validation->set_rules('inputEIN', 'EIN', 'numeric|exact_length[9]',["numeric" => "Only numbers are allowed.","exact_length"=>"Must contain 9 digits"]);
-        $this->form_validation->set_rules('inputFillingState', 'Filing State', 'required|alpha|exact_length[2]|callback_checkEntityExist',["checkEntityExist"=>"Entitysssss: ".$this->input->post('inputName').", ".$this->input->post("inputFillingState")." already exist"]);
+        $this->form_validation->set_rules('inputFillingState', 'Filing State', 'required|alpha|exact_length[2]|callback_checkEntityExist',["checkEntityExist"=>"Entity: ".$this->input->post('inputName').", ".$this->input->post("inputFillingState")." already exist"]);
         $this->form_validation->set_rules('inputFillingStructure', 'Entity Type', 'required|regex_match[/[A-Z\-]+/]');
         $this->form_validation->set_rules('inputFormationDate', 'Formation Date', 'required|regex_match[/[0-9]{4,}\-[0-9]{2,}\-[0-9]{2,}/]', ["regex_match" => "Allowed %s format: 2019-01-01"]);
         $this->form_validation->set_rules('inputFiscalDate', 'Fiscal Date', 'required|regex_match[/[0-9]{4,}\-[0-9]{2,}\-[0-9]{2,}/]', ["regex_match" => "Allowed %s format: 2019-01-01"]);

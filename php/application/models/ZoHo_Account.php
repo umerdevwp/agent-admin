@@ -37,7 +37,7 @@ class ZoHo_Account extends CI_Model
 			"token_persistence_path" => "zohoauth",
             "sandbox"=>(isDev()?"true":"false"),
             "apiVersion"=>"v2",
-            "accounts_url"=>"accounts.zoho.com",
+            "accounts_url"=>"https://accounts.zoho.com",
             "applicationLogFilePath"=>"zohoauth",
             "apiBaseUrl"=>"www.zohoapis.com",
 
