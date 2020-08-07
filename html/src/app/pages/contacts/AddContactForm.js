@@ -525,7 +525,6 @@ const AddContactForm = (props) => {
                 new Promise(resolve => {
                     setTimeout(() => {
                         resolve();
-                        inputContactFirstName.reset();
                         setUserAgree(false);
                         setLoading(false);
                         setSuccessMessage(response.data.results);
