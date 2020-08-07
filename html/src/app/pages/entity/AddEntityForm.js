@@ -440,6 +440,7 @@ const AddEntityForm = (props) => {
         event.preventDefault();
         let formData = new FormData();
 
+        
         formData.append('inputName', inputName.value)
         formData.append('inputComplianceOnly', inputComplianceOnly.value)
         formData.append('inputForeign', inputForeign.value)
