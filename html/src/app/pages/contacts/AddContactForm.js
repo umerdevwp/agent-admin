@@ -290,13 +290,10 @@ const AddContactForm = (props) => {
 
     const iAgree = async (event) => {
         Promise.resolve(setTimeout(() => {
-            setUserAgree(true)
+            setUserAgree(true);
         }, 3000));
         Promise.resolve(setOpen(false));
-        if (userAgree === true) {
-            handleOnSubmit(event, true)
-        }
-
+        handleOnSubmit(event, true)
 
     };
 
@@ -391,6 +388,7 @@ const AddContactForm = (props) => {
 
 
     const handleOnSubmit = async (event, userResponse = false) => {
+
         event.preventDefault();
         setLoading(true);
         setAddressReset('');
@@ -419,11 +417,15 @@ const AddContactForm = (props) => {
 
 
         if (formsubmit === true) {
-            if (userAgree === false) {
+            if (userAgree === false && userResponse === false) {
                 if ((addressObject || addressObject.streetLine) && inputContactCity.value && inputContactState.value && inputContactZipcode.value !== '') {
-                    await addressCheck();
+                    formsubmit = false;
+                    const response = await addressCheck(event);
+
                 }
             }
+        }
+        if (formsubmit === true) {
             contactsCreate(event,userResponse);
         }
 
@@ -576,16 +578,17 @@ const AddContactForm = (props) => {
     }
 
 
-    const addressCheck = async () => {
+    const addressCheck = async (event) => {
+        var valid;
         let lookup1 = new Lookup();
         lookup1.street = addressObject.streetLine ? addressObject.streetLine : addressObject;
         lookup1.city = inputContactCity.value;
         lookup1.state = inputContactState.value;
         lookup1.zipCode = inputContactZipcode.value;
-        client.send(lookup1).then(response => {
-            const valid = utils.isValid(response.lookups[0]);
+        const responseFromSmarty = client.send(lookup1).then(response => {
+          valid = utils.isValid(response.lookups[0]);
             setIsValidAddress(valid);
-            response.lookups.map(lookup => console.log(lookup.result));
+            // response.lookups.map(lookup => console.log(lookup.result));
 
             // // Is lookup1 valid?
             // console.log('Is lookup1 valid?', utils.isValid(response.lookups[0]));
@@ -600,8 +603,10 @@ const AddContactForm = (props) => {
             // console.log('// Is lookup1 missing a secondary address?', utils.isMissingSecondary(response.lookups[0]));
             if (valid === false) {
                 setOpen(true);
-            } else {
-                return true;
+            }
+
+            if(valid === true){
+                contactsCreate(event,false);
             }
         });
 
