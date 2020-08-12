@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="eb69915d-9c16-41d5-b70a-bc9daf9ea19a" name="Default Changelist" comment="Re-commit, added Super User functionality, also configured Google SSO on the OKTA login widget." />
+    <list default="true" id="eb69915d-9c16-41d5-b70a-bc9daf9ea19a" name="Default Changelist" comment="Re-commit, added Super User functionality, also configured Google SSO on the OKTA login widget.">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/php/.htaccess" beforeDir="false" afterPath="$PROJECT_DIR$/php/.htaccess" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -144,6 +147,7 @@
       <workItem from="1586792935644" duration="2138000" />
       <workItem from="1586872564566" duration="5940000" />
       <workItem from="1589827829712" duration="3594000" />
+      <workItem from="1597160925183" duration="2438000" />
     </task>
     <task id="LOCAL-00001" summary="Implemented Super user functionality, also configured google SSO on the OKTA login widget.">
       <created>1577820400791</created>

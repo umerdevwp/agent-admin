@@ -9,7 +9,7 @@ import Paper from '@material-ui/core/Paper';
 import MenuItem from '@material-ui/core/MenuItem';
 import * as SmartyStreetsSDK from "smartystreets-javascript-sdk";
 
-const smartyStreetsSharedCredentials = new SmartyStreetsSDK.core.SharedCredentials(1486038472569752);
+const smartyStreetsSharedCredentials = new SmartyStreetsSDK.core.SharedCredentials(process.env.REACT_APP_SMARTYSTREET_KEY);
 const autoCompleteClientBuilder = new SmartyStreetsSDK.core.ClientBuilder(smartyStreetsSharedCredentials);
 const autoCompleteClient = autoCompleteClientBuilder.buildUsAutocompleteClient();
 
