@@ -237,6 +237,55 @@ class Notifications extends RestController
         error_log("Notify Mail cron succeed: {$iMailsSent} sent");
     }
 
+
+    public function notifyForAttachments_get($key="")
+    {
+        //if($key!=getenv("CRON_KEY")) redirectSession();
+
+        $this->load->model("NotificationAttachments_model");
+        $this->load->model("Messenger_model");
+        $this->load->model("entity_model");
+        
+        $aDataNotify = $this->NotificationAttachments_model->getAllWhere(['status'=>'pending']);
+        $iMailsSent = 0;
+        $iToday = strtotime(date("Y-m-d"));
+        foreach($aDataNotify['results'] as $oRow)
+        {
+            if(strtotime($oRow->duedate)<=$iToday)
+            {
+                $aDataEntity = $this->entity_model->getOne($oRow->entity_id,['id','name','email','type','filingState','entityStructure']);
+                if($aDataEntity['type']=='ok' && $aDataEntity['results']->id>0)
+                {
+                    $oEntity = $aDataEntity['results'];
+                    /*$this->Messenger_model->sendTemplateEmail(
+                        "d-2a672857adad4bd79e7f421636b77f6b",
+                        ['name'=>$oEntity->name,'entity_name'=>$oEntity->filingState],
+                        $oEntity->id,
+                        $oEntity->email,
+                        $oEntity->name,
+                        "Attachment available"
+                    );*/
+                    $this->Messenger_model->sendEmail(
+                        $oEntity->id,
+                        $oEntity->email,
+                        $oEntity->name,
+                        "Attachment available",
+                        "Some content"
+                    );
+                    $iMailsSent++;
+                }
+                
+            }
+            // var_dump($oRule);
+            // var_dump($aResult);
+            // var_dump($oSubs);
+            // var_dump($oEntity);
+             
+            //
+
+        }
+        error_log("Notify For Attacchment Cron Succeed: {$iMailsSent} sent");
+    }
     /**
      * Send mail using sendgrid API
      * 
@@ -601,9 +650,29 @@ HC;
 
     public function najm_get()
     {
-
+        $sMsgId = "";
+        $sToEmail = "";
+        $sResult = $this->sgGetStatus(['msg_id LIKE "'.$sMsgId.'%"', 'to_email LIKE "'.$sToEmail.'"']);
+        $oJson = json_decode($sResult);
+        print_r($oJson);
+        if(count($oJson->messages)>0)
+        {
+            //$this->Notifications_model->updateMailLog($v->id, $oJson->messages[0]->status,$sResult);
+            //$iRecordsUpdated++;
+        }
+        die;
         $this->response([
             'data' => []
         ], 200);
+    }
+
+    public function sendgridStatus_get()
+    {
+        $sMsgId = "";
+        $sToEmail = "";
+        $sResult = $this->sgGetStatus(['msg_id LIKE "'.$sMsgId.'%"', 'to_email LIKE "'.$sToEmail.'"']);
+        $oJson = json_decode($sResult);
+        print_r($oJson);
+        die;
     }
 }

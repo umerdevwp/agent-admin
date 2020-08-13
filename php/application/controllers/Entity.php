@@ -8,6 +8,7 @@ use zcrmsdk\crm\crud\ZCRMTag;
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 use chriskacerguis\RestServer\RestController;
+use GuzzleHttp\Psr7\FnStream;
 use zcrmsdk\crm\exception\ZCRMException;
 
 include APPPATH . '/libraries/CommonDbTrait.php';
@@ -184,7 +185,6 @@ class Entity extends RestController
 
     public function create_post()
     {
-
         $this->checkPermission("ADD", $this->sModule);
 
         $bTagSmartyValidated = true;
@@ -454,15 +454,20 @@ HC;
         $this->load->model('ZoHo_Account');
         $this->load->model("entity_model");
         $this->load->model("RegisterAgents_model");
-
+        
         $aZohoResponse = $this->zohoAddEntity();
         $iZohoId = $aZohoResponse['entityId'];
         $iAgentId = $aZohoResponse['agentId'];
 
         if ($iZohoId > 0) {
             $aErrorAttachment = ['type'=>'ok'];
-            if (!empty($this->input->post("inputFileId")))
+            if (!empty($this->input->post("inputFileId"))){
                 $aErrorAttachment = $this->zohoAddAttachment($iZohoId);
+                if($aErrorAttachment['type']=='ok')
+                {
+                    $this->addAttachmentNotification($iZohoId);
+                }
+            }
             // contact with entity is skipped 24/6/2020
             //$iContactId = $this->zohoAddContact($iZohoId);
 
@@ -494,7 +499,26 @@ HC;
 
         return $aResponse;
     }
-    
+
+    /**
+     * Add attachment notification row for next notifying cron for attachments available
+     * */
+    private function addAttachmentNotification($iEntityId)
+    {
+        $this->load->model("NotificationAttachments_model");
+        $aData = [
+            "duedate"=>date("Y-m-d"),
+            "created_by"=>$_SESSION['eid']
+        ];
+        $aResponse = $this->NotificationAttachments_model->addAttachmentNotification($iEntityId,$aData);
+        if($aResponse['type']=='ok')
+        {
+            return $aResponse['id'];
+        } else {
+            return false;
+        }
+    }
+
     private function processTags($iZohoId,$bTagSmartyValidated)
     {
         // no error occur, tags success
@@ -504,9 +528,12 @@ HC;
         try {
             $sComplianceOnly = ($this->input->post("inputComplianceOnly") ?? 0);
             $sForeign = ($this->input->post("inputForeign") ?? 0);
-
+            
+            $aTags = [];
+            // don't store onboard on tester accounts, as they are not real
+            if($_SESSION['accountType']!='tester')
             $aTags = ["name" => "OnBoard"];
-
+            
             if ($sComplianceOnly) {
                 $aTags["ComplianceOnly"] = "Compliance Only";
             }

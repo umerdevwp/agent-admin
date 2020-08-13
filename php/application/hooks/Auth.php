@@ -6,7 +6,7 @@ class Auth
 {
 //    add a class name here to secure for api
     //private $auth = ['api', 'example_api', 'entity_api'];
-    private $auth = ['api','portal','entitytypes','contacts','states','contacttypes', 'entity', 'registeragents', 'attachments', 'admin_api'];
+    private $auth = ['api','portal','entitytypes','contacts','states','contacttypes', 'entity', 'registeragents', 'attachments', 'admin_api','notifications'];
     public function myFunction()
     {
         $CI =& get_instance();
@@ -22,10 +22,12 @@ class Auth
                 $oToken = $this->hasToken($token);
                 $sToken = $oToken->token;
                 $_SESSION['eid'] = "not set yet";   
-                
+
+                // on token found return it after setting session
                 if ($sToken) {
-                    
-                    $_SESSION['eid'] = $oToken->entity_id;
+                    $iEid = $oToken->entity_id;
+                    $sAccountType = unserialize($oToken->meta)['accountType'];
+                    $this->setSession($iEid,$sAccountType);
                     return $sToken;
                 }
 
@@ -53,7 +55,13 @@ class Auth
                                 $this->deletePreviousToken($response->sub);
                                 $this->addToken($response->sub, $response->email , $token);
 
-                                $_SESSION['eid'] = $CI->input->get('eid');
+                                $iEid = $CI->input->get('eid');
+                                $sAccountType = "";
+                                // on token not found set session
+                                if($CI->input->get("account")=='tester') $sAccountType = 'tester';
+                                $this->setSession($iEid,$sAccountType);
+
+                                // to make role assignment if user has parent attribute, okta organization_type
                                 if($CI->input->get("bit")==1)
                                 {
                                     $CI->load->model("Permissions_model");
@@ -120,7 +128,7 @@ class Auth
             //$CI->load->model("Entity_model");
             //$aEntityData = $CI->Entity_model->getEmailId($email);
             $eid = $CI->input->get('eid');
-
+            $sAccountType = $CI->input->get("account");
 //            if($aEntityData['type']=='ok')
 //                $eid = $aEntityData['results']->id;
 
@@ -138,6 +146,7 @@ class Auth
                 'sub' => $sub,
                 'email' => $email,
                 'token' => $token,
+                'meta'=> serialize(['accountType'=>$sAccountType]),
                 'expired_on' => date('Y-m-d H:i:s',$expired_on),
                 "entity_id" =>  $eid
             );
@@ -178,6 +187,12 @@ class Auth
             $eid = $aEntityData['results']->id;
 
         return $eid;
+    }
+
+    private function setSession($iEid,$sAccountType="")
+    {
+        $_SESSION['eid'] = $iEid;
+        $_SESSION['accountType'] = $sAccountType;
     }
 
 }
