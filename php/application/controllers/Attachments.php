@@ -72,4 +72,67 @@ class Attachments extends RestController
             'data' => $data
         ], 200);
     }
+
+
+    
+    public function download_get(int $iAttachmentId=0)
+    {
+        $this->checkPermission("VIEW",$this->sModule);
+
+        $this->load->model("LoraxAttachments_model");
+
+        $row = $this->LoraxAttachments_model->checkOwnership($_SESSION['eid'],$iAttachmentId);
+
+        if($row->id==$iAttachmentId)
+        {
+            $this->LoraxAttachments_model->download($row->file_id);
+            $this->response([
+                'status' => true,
+                'message' => 'Downloading ...'
+            ], 200);
+        } else {
+            $this->response([
+                'status' => false,
+                'message' => 'File not found'
+            ], 200);
+        }        
+    }
+
+    function attachment_post()
+    {
+        if(!empty($this->input->post("inputFileId")) && !empty($this->input->post("name")) && !empty($this->input->post("entityId")))
+        {
+            $data = array(
+                'file_id' => $this->input->post("inputFileId"),
+                'entity_id' => $$this->input->post("entityId"),
+                'name' => $this->input->post("inputFileName"),
+                'file_size' =>  $this->input->post("inputFileSize"),
+            );
+            $this->load->model("LoraxAttachments_model");
+            $id = $this->LoraxAttachments_model->insert($data);
+            if(!empty($id)) {
+                $this->response([
+                    'status' => true,
+                    'message' => 'File is attached'
+                ], 200);
+            } else {
+                $this->response([
+                    'status' => false,
+                    'message' => 'Unable to store file, please try again.'
+                ], 400);
+            }
+        } else {
+            if(empty($this->input->post("entityId"))){
+                $this->response([
+                    'status' => false,
+                    'message' => 'Entity information is missing'
+                ], 400);
+            } else {
+                $this->response([
+                    'status' => false,
+                    'message' => 'File field cannot be empty'
+                ], 400);
+            }
+        }
+    }
 }

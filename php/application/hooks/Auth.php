@@ -7,12 +7,18 @@ class Auth
 //    add a class name here to secure for api
     //private $auth = ['api', 'example_api', 'entity_api'];
     private $auth = ['api','portal','entitytypes','contacts','states','contacttypes', 'entity', 'registeragents', 'attachments', 'admin_api','notifications'];
+    private $skipRoute = ['notifications/logMailStatus','notifications/notify','notifications/notifyForAttachments','notifications/sendgridStatus'];
     public function myFunction()
     {
         $CI =& get_instance();
 
-        if(empty($_SERVER['PHP_AUTH_USER']) && empty($_SERVER['PHP_AUTH_PW']))  {
-           
+        if(in_array(strtolower($CI->router->class)."/{$CI->router->method}",$this->skipRoute))
+        {
+            return "it is a cron call";
+        }
+
+        if(empty($_SERVER['PHP_AUTH_USER']) && empty($_SERVER['PHP_AUTH_PW']) )  {
+
             if (in_array(strtolower($CI->router->class), $this->auth)) {
 
                 $token = $CI->input->get_request_header('Authorization');

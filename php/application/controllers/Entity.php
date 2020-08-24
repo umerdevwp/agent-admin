@@ -463,10 +463,6 @@ HC;
             $aErrorAttachment = ['type'=>'ok'];
             if (!empty($this->input->post("inputFileId"))){
                 $aErrorAttachment = $this->zohoAddAttachment($iZohoId);
-                if($aErrorAttachment['type']=='ok')
-                {
-                    $this->addAttachmentNotification($iZohoId);
-                }
             }
             // contact with entity is skipped 24/6/2020
             //$iContactId = $this->zohoAddContact($iZohoId);
@@ -500,24 +496,6 @@ HC;
         return $aResponse;
     }
 
-    /**
-     * Add attachment notification row for next notifying cron for attachments available
-     * */
-    private function addAttachmentNotification($iEntityId)
-    {
-        $this->load->model("NotificationAttachments_model");
-        $aData = [
-            "duedate"=>date("Y-m-d"),
-            "created_by"=>$_SESSION['eid']
-        ];
-        $aResponse = $this->NotificationAttachments_model->addAttachmentNotification($iEntityId,$aData);
-        if($aResponse['type']=='ok')
-        {
-            return $aResponse['id'];
-        } else {
-            return false;
-        }
-    }
 
     private function processTags($iZohoId,$bTagSmartyValidated)
     {
@@ -602,7 +580,7 @@ HC;
         }
 
         if (!is_numeric($id)) {
-            error_log("Subscription failed to insert new entity record");
+            error_log("Subscription failed to insert new entity record: " . $iEntityId);
         }
 
         return $id;
@@ -1020,6 +998,25 @@ HC;
         return $sSmartyAddress;
     }
 
+    /**
+     * Add attachment notification row for next notifying cron for attachments available
+     * */
+    private function addAttachmentNotification($iEntityId,$iAttachmentId)
+    {
+        $this->load->model("NotificationAttachments_model");
+        $aData = [
+            "duedate"=>date("Y-m-d"),
+            "created_by"=>$_SESSION['eid'],
+            "attachment_id"=>$iAttachmentId
+        ];
+        $aResponse = $this->NotificationAttachments_model->addAttachmentNotification($iEntityId,$aData);
+        if($aResponse['type']=='ok')
+        {
+            return $aResponse['id'];
+        } else {
+            return false;
+        }
+    }
 
     public function attachment_get($sLoraxFileId)
     {

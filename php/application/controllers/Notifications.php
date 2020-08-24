@@ -245,7 +245,7 @@ class Notifications extends RestController
         $this->load->model("NotificationAttachments_model");
         $this->load->model("Messenger_model");
         $this->load->model("entity_model");
-        
+        $this->load->model("contacts_model");
         $aDataNotify = $this->NotificationAttachments_model->getAllWhere(['status'=>'pending']);
         $iMailsSent = 0;
         $iToday = strtotime(date("Y-m-d"));
@@ -257,32 +257,30 @@ class Notifications extends RestController
                 if($aDataEntity['type']=='ok' && $aDataEntity['results']->id>0)
                 {
                     $oEntity = $aDataEntity['results'];
-                    /*$this->Messenger_model->sendTemplateEmail(
+                    $sDownloadUrl = getenv("SITE_MAIN_URL") . "attachments/download/" . $oRow->attachment_id;
+
+                    $oDataContact = $this->contacts_model->getEntityProfileContact($oEntity->id);
+                    //$this->Messenger_model->sendCurlTemplate();
+                    //$this->Messenger_model->testKitchenSinkExampleWithObjectsAndLegacyTemplate();
+                    $this->Messenger_model->sendTemplateEmail(
                         "d-2a672857adad4bd79e7f421636b77f6b",
-                        ['name'=>$oEntity->name,'entity_name'=>$oEntity->filingState],
-                        $oEntity->id,
+                        ['contact_name'=>($oDataContact->name?:"Customer"),'entity_name'=>$oEntity->name,'download_url'=>$sDownloadUrl],
                         $oEntity->email,
                         $oEntity->name,
-                        "Attachment available"
-                    );*/
+                        $oEntity->id,
+                        "Template loc Attachment available"
+                    );/*
                     $this->Messenger_model->sendEmail(
                         $oEntity->id,
                         $oEntity->email,
                         $oEntity->name,
                         "Attachment available",
-                        "Some content"
-                    );
+                        $this->load->view("email/attachment-available",['name'=>($oDataContact->name?:"Customer"),'entity_name'=>$oEntity->name,'download_url'=>$sDownloadUrl],true)
+                    );*/
                     $iMailsSent++;
                 }
                 
             }
-            // var_dump($oRule);
-            // var_dump($aResult);
-            // var_dump($oSubs);
-            // var_dump($oEntity);
-             
-            //
-
         }
         error_log("Notify For Attacchment Cron Succeed: {$iMailsSent} sent");
     }
@@ -650,9 +648,11 @@ HC;
 
     public function najm_get()
     {
-        $sMsgId = "";
-        $sToEmail = "";
-        $sResult = $this->sgGetStatus(['msg_id LIKE "'.$sMsgId.'%"', 'to_email LIKE "'.$sToEmail.'"']);
+        $sMsgId = ['msg_id LIKE "%"'];
+        $sToEmail = ['to_email LIKE "najm.a@allshorestaffing.com"'];
+        $sFromEmail = ['from_email LIKE "agentadmin@youragentservices.com"'];
+        $sOpenCount = ['opens_count LIKE "0"'];
+        $sResult = $this->sgGetStatus($sOpenCount);
         $oJson = json_decode($sResult);
         print_r($oJson);
         if(count($oJson->messages)>0)
@@ -668,9 +668,12 @@ HC;
 
     public function sendgridStatus_get()
     {
-        $sMsgId = "";
-        $sToEmail = "";
-        $sResult = $this->sgGetStatus(['msg_id LIKE "'.$sMsgId.'%"', 'to_email LIKE "'.$sToEmail.'"']);
+
+        $sMsgId = ['msg_id LIKE "'.$_GET['msgid'].'%"'];
+        $sToEmail = ['to_email LIKE "najm.a@allshorestaffing.com"'];
+        $sFromEmail = ['from_email LIKE "agentadmin@youragentservices.com"'];
+        $sOpenCount = ['open_count=0'];
+        $sResult = $this->sgGetStatus($sMsgId);
         $oJson = json_decode($sResult);
         print_r($oJson);
         die;
