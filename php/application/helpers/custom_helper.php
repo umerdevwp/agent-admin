@@ -96,7 +96,7 @@ function isSessionValid($action,$aData)
     }
 
     if(!$aData){
-        responseJson(['type'=>'error','message'=>'Login is not define']);
+        responseJson(['type'=>'error','message'=>'Please login and try again']);
     } else {
         responseJson(['type'=>'error','message'=>'Access not allowed']);
     }
