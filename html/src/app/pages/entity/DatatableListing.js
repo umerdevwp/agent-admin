@@ -53,7 +53,7 @@ function DatatableListing(props) {
                 entityStructure: 'Corporation',
                 filingState: 'WV',
                 formationDate: '2018-06-30',
-                cellStyle: { minWidth: 100 }
+                cellStyle: {minWidth: 100}
             },
 
             {
@@ -102,18 +102,19 @@ function DatatableListing(props) {
         return Promise.resolve(console.log(newData));
     }
     return (
-                  <div style={{maxWidth: "100%"}}>
-                      <MaterialTable
-                          className={'sss'}
-                          parentChildData={(row, rows) => rows.find(a => a.id === row.parentId)}
-                          title={props.title !== '' ? props.title : ''}
-                          columns={settingData.columns}
-                          data={settingData.data}
-                          options={{
-                            childernStyle: { backgroundColor: "gray" }
-                          }}
-                      />
-                  </div>
+        <div style={{maxWidth: "100%"}}>
+            <MaterialTable
+                className={'sss'}
+                parentChildData={(row, rows) => rows.find(a => a.id === row.parentId)}
+                title={props.title !== '' ? props.title : ''}
+                columns={settingData.columns}
+                data={settingData.data}
+                options={{
+                    defaultExpanded: true,
+                    childernStyle: {backgroundColor: "gray"}
+                }}
+            />
+        </div>
 
     )
 }

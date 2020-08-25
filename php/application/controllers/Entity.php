@@ -42,7 +42,7 @@ class Entity extends RestController
         if (empty($sid)) {
             $this->response([
                 'result' => ['type'=>'error','message'=>'Login is not define']
-            ], 200);        
+            ], 200);
         }
 
         $this->load->model('entity_model');
@@ -190,9 +190,9 @@ class Entity extends RestController
         $bTagSmartyValidated = true;
         $aError = [];
 
-        $aError = $this->validateForm(); 
+        $aError = $this->validateForm();
         if (is_array($aError)) {
-            
+
             $this->response([
                 'status' => false,
                 'field_error' => $aError
@@ -226,7 +226,7 @@ HC;
 
                 // check address is valid from smarty is not needed, validation is at interface
                 $sSmartyAddress = '';//$this->validateSmartyStreet();
-                
+
                 // add a note if smarty validated address successfuly
                 if ($sSmartyAddress != '') {
                     $aResponseNote = $this->ZoHo_Account->newZohoNote("Accounts", $iZohoId, "Smartystreet has replaced following", $sSmartyAddress);
@@ -237,7 +237,7 @@ HC;
                         $aResponseZoho['message'] .= "," . $aResponseNote['message'];
                         else
                         $aResponseZoho['message'] = $aResponseNote['message'];
-                        
+
                     }
                 }
 
@@ -318,7 +318,7 @@ HC;
     public function edit_post()
     {
         $this->checkPermission("EDIT", $this->sModule);
-        
+
         $this->load->model("Entity_model");
 
         // is user editing his child or own profile
@@ -327,7 +327,7 @@ HC;
         // edit request is for child user? check valid parent
         if($_SESSION['eid']!=$this->input->post("eid"))
         $bValidateParent = $this->Entity_model->isParent($this->input->post("eid"),$_SESSION['eid']);
-        
+
         // parent is valid
         if($bValidateParent)
             $bAllowEdit = true;
@@ -339,7 +339,7 @@ HC;
         {
             // return true or error list
             $aError = $this->validateForm();
-        
+
             if (is_array($aError)) {
 
                 $this->response([
@@ -366,7 +366,7 @@ HC;
                 if ($aResponse["entityId"] > 0) {
                     $aResponse['message'] = 'Edit successfully.';
                     $aResponse['id'] = $aResponse['entityId'];
-                    
+
                     $this->redirectAfterAdd($aResponse);// $response['data']['id']);
 
                     // redirect to form, show error
@@ -385,7 +385,7 @@ HC;
             $this->response([
                 'status' => false,
                 'message' => 'Invalid edit request'
-            ], 401);            
+            ], 401);
         }
     }
 
@@ -443,7 +443,7 @@ HC;
             return ['type'=>'error', 'message' => $aZohoResponse['message']];
         }
         $aResponse = ['type' => 'ok', 'message' => "Entity created successfully.", 'id' => $iZohoId];
-        
+
         if ($aErrorTag['type']=='error' && $aErrorAttachment['type']=='error') {
             $sErrorMessage = $aErrorTag['message'] . ", " . $aErrorAttachment['message'];
             $aResponse['message'] = $sErrorMessage;
@@ -457,7 +457,7 @@ HC;
 
         return $aResponse;
     }
-    
+
     private function processTags($iZohoId,$bTagSmartyValidated)
     {
         // no error occur, tags success
@@ -598,7 +598,7 @@ HC;
                         "days_visited" => '0',
                         "visitor_score" => '0'
             ];
-        
+
             $response_contact = $this->Contacts_model->addContact($data);
 
         }
@@ -743,7 +743,7 @@ HC;
         if ($id > 0) {
             $bAttachmentDone = true;
         }
-        
+
         if (!$bAttachmentDone) {
             return ['type' => 'error', 'message' => $sError];
         }
@@ -971,13 +971,15 @@ HC;
     {
         $sid = $_SESSION["eid"];
         if (empty($sid)) {
-            responseJson(['type'=>'error','message'=>'Login is not define']);
+            $this->response([
+                'status' => false,
+                'message' => 'Login is not define'
+            ], 400);
         }
-
         $this->load->model('entity_model');
 
         $aData = $this->entity_model->getRoleStatus($sid);
-        
+
         $this->response([
             'status' => true,
             'data' => $aData

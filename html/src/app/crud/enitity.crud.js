@@ -79,6 +79,24 @@ export const checkAdmin = async (zoho_id, email) => {
     }
 }
 
+
+export const taskUpdate = async (eid, data) => {
+    const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
+
+    if(okta) {
+        const response = await fetch(`${ENTITY}/Tasks/completeTaskInZoho/${eid}`, {
+            method: 'put',
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': okta.accessToken.accessToken,
+
+            },
+            body: data
+        });
+        return Promise.resolve(response.json());
+    }
+}
+
 export const entityDetail = async (entity) => {
     const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
 
@@ -174,9 +192,9 @@ export const createEntity = async (data) => {
 export const lorexFileUpload = async (data) => {
 
 
-    console.log('LOREX_TOKEN',LOREX_TOKEN);
-    console.log('LOREX_URL',`${LOREX_API_HOST}/api/v1/upload`);
-    console.log('LOREX_URL',HOST);
+    // console.log('LOREX_TOKEN',LOREX_TOKEN);
+    // console.log('LOREX_URL',`${LOREX_API_HOST}/api/v1/upload`);
+    // console.log('LOREX_URL',HOST);
     const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
     if(okta) {
         const response = await fetch(`${LOREX_API_HOST}/api/v1/upload`, {

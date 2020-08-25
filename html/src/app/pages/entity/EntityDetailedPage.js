@@ -11,6 +11,7 @@ import ViewListIcon from '@material-ui/icons/ViewList';
 import ContactsIcon from '@material-ui/icons/Contacts';
 import EntityListing from '../entity/EntityListing';
 import ContactList from '../entity/ContactList';
+import ComplianceTaskList from '../entity/ComplianceTaskList';
 import {metronic} from "../../../_metronic";
 import QuickStatsChart from "../../widgets/QuickStatsChart";
 import OrderStatisticsChart from "../../widgets/OrderStatisticsChart";
@@ -154,7 +155,6 @@ const EntityDetailedPage = (props) => {
 
     const [loading, setLoading] = React.useState(true)
     useEffect(() => {
-
         fetchDetailedProfile();
     }, [])
 
@@ -162,7 +162,7 @@ const EntityDetailedPage = (props) => {
     const fetchDetailedProfile = async () => {
         // {"errors":{"status":401,"detail":"Invalid detail request"}}
         var detailedView = '';
-        if (role === 'Parent Organization' || role === 'Administrator' ) {
+        if (role === 'Parent Organization' || role === 'Administrator') {
             detailedView = await entityDetail(entity_id);
         }
 
@@ -172,11 +172,16 @@ const EntityDetailedPage = (props) => {
 
 
         if (detailedView.result) {
-            setEntitydetail(detailedView.result)
-            setContactList(detailedView.result.contacts);
-            setAttachmentList(detailedView.result.attachments)
-            setTaskList(detailedView.result.tasks)
-            setLoading(false);
+            new Promise((resolve, reject) => {
+                setEntitydetail(detailedView.result)
+                setContactList(detailedView.result.contacts);
+                setAttachmentList(detailedView.result.attachments)
+                setAttachmentList(detailedView.result.tasks);
+                setLoading(false);
+                resolve();
+
+            });
+
 
         }
 
@@ -185,6 +190,7 @@ const EntityDetailedPage = (props) => {
         }
 
     }
+
 
 
     const contactData = {
@@ -205,12 +211,24 @@ const EntityDetailedPage = (props) => {
 
     const taskData = {
         columns: [
+            {title: 'Name', field: 'subject', editable: 'never'},
+            {title: 'Due Date', field: 'dueDate', editable: 'never'},
+            {title: 'Status', field: 'status', lookup: {'Completed': 'Completed', 'Incomplete': 'Incomplete'}},
+        ],
+        data: taskList,
+    };
+
+
+    const [state, setState] = React.useState({
+        columns: [
+            {title: 'id', field: 'id'},
             {title: 'Name', field: 'subject'},
             {title: 'Due Date', field: 'dueDate'},
             {title: 'Status', field: 'status'},
         ],
         data: taskList,
-    };
+    });
+
 
     const formatBytes = (bytes, decimals = 2) => {
         if (bytes === 0) return '0 Bytes';
@@ -237,6 +255,7 @@ const EntityDetailedPage = (props) => {
             },
             {title: 'Date', field: 'created'},
             {title: 'Size', field: 'fileSize'},
+
         ],
         data: attachmentList,
     };
@@ -362,9 +381,9 @@ const EntityDetailedPage = (props) => {
             <Grid container spacing={5}>
 
                 <Grid item xs={12}>
-                    <ContactList loading={loading} tooltip={'Add New Contact'} redirect={true}
-                                 url={`/dashboard/contact/form/add/${entity_id}`} data={taskData}
-                                 title={'Compliance Tasks'}/>
+                    <ComplianceTaskList loading={loading} tooltip={'Add New Contact'} redirect={true}
+                                        url={`/dashboard/contact/form/add/${entity_id}`} data={taskData}
+                                        title={'Compliance Tasks'}/>
                 </Grid>
             </Grid>
 

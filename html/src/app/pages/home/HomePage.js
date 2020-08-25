@@ -2,6 +2,7 @@ import React, {Suspense, lazy, useContext, useEffect, useState} from "react";
 import Builder from "./Builder";
 import Dashboard from "./Dashboard";
 import EntityDetailedPage from '../entity/EntityDetailedPage';
+import SelfDetailedPage from '../entity/SelfDetailedPage';
 import DocsPage from "./docs/DocsPage";
 import {LayoutSplashScreen} from "../../../_metronic";
 import AddEntityForm from '../entity/AddEntityForm';
@@ -46,6 +47,7 @@ function HomePage(props) {
 
                         <SecureRoute exact path="/dashboard" component={Dashboard}/>
                         <SecureRoute exact path="/dashboard/table-sample" component={DatatableListing}/>
+                        <SecureRoute exact path='/dashboard/entity' component={SelfDetailedPage}/>
                         <SecureRoute exact path="/dashboard/entity/:id" component={EntityDetailedPage}/>
                         <SecureRoute exact path="/dashboard/entity/form/add" component={AddEntityForm}/>
                         <SecureRoute exact path="/dashboard/admins" component={Admins}/>
