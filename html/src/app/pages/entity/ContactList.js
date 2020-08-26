@@ -29,8 +29,10 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function ContactList(props) {
-    const {oktaprofile, isAdmin} = useContext(OktaUserContext);
+    const {oktaprofile} = useContext(OktaUserContext);
+    const [isAdmin, setIsAdmin] = React.useState(false);
     const [state, setState] = React.useState(props.data);
+    const [loading, setLoading] = React.useState(false);
     const history = useHistory();
     const classes = useStyles();
 
@@ -43,7 +45,7 @@ function ContactList(props) {
 
         <Grid item xs={12}>
             <MaterialTable
-                isLoading={props.loading}
+                isLoading={loading ? loading : props.loading}
                 actions={  props.action ? [
                     {
                         icon: 'add',
@@ -105,6 +107,4 @@ function ContactList(props) {
 
     )
 }
-
-
 export default withRouter(ContactList);

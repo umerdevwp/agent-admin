@@ -67,6 +67,7 @@ function OktaUserContextProvider(props) {
         const get_role = await checkRole(profile.organization, organization_parent ? organization_parent : 0);
         if (get_role) {
             if (get_role.status === true) {
+                localStorage.setItem('role',get_role.data.role);
                 return Promise.resolve(setRole({...role, role: get_role.data.role}));
             }
             if (get_role.status === false) {
@@ -75,15 +76,6 @@ function OktaUserContextProvider(props) {
         }
     }
 
-
-    const checkifAdmin = async (profile) => {
-        const response = await checkAdmin(profile.organization, profile.email);
-        setisAdmin({...isAdmin, isAdmin: response});
-    }
-
-    const organization_parent = async (profile) => {
-        setErrorList({...errorList, errorList: profile});
-    }
 
 
     const addError = (data) => {

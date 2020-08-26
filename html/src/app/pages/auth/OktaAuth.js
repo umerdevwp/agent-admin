@@ -26,7 +26,7 @@ export default withAuth(class OktaAuth extends Component {
     static contextType = OktaUserContext
 
     async checkAuthentication() {
-        const checkifAdmin = this.context
+
         const authenticated = await this.props.auth.isAuthenticated();
         const token = await this.props.auth.getAccessToken();
 

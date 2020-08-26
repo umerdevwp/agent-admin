@@ -12,6 +12,7 @@ import HTMLClassService from "./HTMLClassService";
 import LayoutConfig from "./LayoutConfig";
 import MenuConfig from "./MenuConfig";
 import MenuConfigForAdmin from "./MenuConfigForAdmin";
+import MenuConfigForChild from "./MenuConfigForChild";
 import LayoutInitializer from "./LayoutInitializer";
 import QuickPanel from "../../app/partials/layout/QuickPanel";
 import KtContent from "./KtContent";
@@ -36,12 +37,28 @@ function Layout({
     // window.scrollTo(0, 0);
 
     const [isAdmin, setisAdmin] = useState(false);
+    var menu = '';
+    const get_role = localStorage.getItem('role');
+    if(get_role === 'Parent Organization'){
+        menu = MenuConfig
+    }
+
+
+    if(get_role === 'Child Entity'){
+        menu = MenuConfigForChild
+    }
+
+
+    if(get_role === 'Administrator'){
+        menu = MenuConfig
+    }
+
     const contentCssClasses = htmlClassService.classes.content.join(" ");
 
     return selfLayout !== "blank" ? (
         <UserContextProvider>
             <LayoutInitializer
-                menuConfig={ isAdmin ? MenuConfigForAdmin : MenuConfig}
+                menuConfig={ menu }
                 layoutConfig={LayoutConfig}
                 htmlClassService={htmlClassService}
             >

@@ -40,54 +40,60 @@ function EntityListing(props) {
     }, [])
 
     const asyncDataFetch = async () => {
-        await fetchData();
+        if (role === 'Parent Organization' || role === 'Administrator') {
+            await fetchData();
+        }
     }
 
     const fetchData = async () => {
-        const data = await entityList().then(response => {
-            if (response.data) {
-                setEntityData(response.data.results);
-                setLoading(false);
-            }
+            const data = await entityList().then(response => {
+                if (response.data) {
+                    setEntityData(response.data.results);
+                    setLoading(false);
+                }
 
-            if(response.error){
-                entityDashboardList(response.error.message)
-            }
+                if (response.error) {
+                    entityDashboardList(response.error.message)
+                }
+        }
+    )
+}
 
+const settingData = {
+    columns: [
 
-        })
-    }
-
-    const settingData = {
-        columns: [
-
-            {title: 'Name', field: 'name'},
-            {title: 'Entity Structure', field: 'entityStructure'},
-            {title: 'Filing State', field: 'filingState'},
-            {title: 'Formation Date', field: 'formationDate'},
-            {
-                render: rowData => <Link
-                    component="button"
-                    variant="body2"
-                    onClick={() => {
+        {title: 'Name', field: 'name'},
+        {title: 'Entity Structure', field: 'entityStructure'},
+        {title: 'Filing State', field: 'filingState'},
+        {title: 'Formation Date', field: 'formationDate'},
+        {
+            render: rowData => <Link
+                component="button"
+                variant="body2"
+                onClick={() => {
+                    if(rowData.id !== oktaprofile.organization) {
                         history.push(`/dashboard/entity/${rowData.id}`);
-                    }}>
-                    <VisibilityIcon/>
-                </Link>
-            },
-        ],
-        data: entitydata,
-    };
+                    } else {
+                        history.push(`/dashboard/entity`);
+                    }
+                }}>
+                <VisibilityIcon/>
+            </Link>
+        },
+    ],
+    data: entitydata,
+};
 
-    const handleUpdate = (newData) => {
-        return Promise.resolve(console.log(newData));
-    }
-    return (
+const handleUpdate = (newData) => {
+    return Promise.resolve(console.log(newData));
+}
+return (
 
-        <Grid item xs={12}>
-            { role === 'Parent Organization' ?
+    <Grid item xs={12}>
+        {role === 'Parent Organization' ?
             <div style={{maxWidth: "100%"}}>
                 <MaterialTable
+
                     parentChildData={(row, rows) => rows.find(a => a.id === row.parentId)}
                     isLoading={loading}
                     actions={isAdmin === true ? [
@@ -106,7 +112,7 @@ function EntityListing(props) {
                     columns={settingData.columns}
                     data={settingData.data}
                     options={{
-                        // grouping: true
+                        defaultExpanded: true,
                     }}
                     editable={isAdmin ? {
                         onRowUpdate: (newData, oldData) =>
@@ -136,75 +142,74 @@ function EntityListing(props) {
                             }),
                     } : ''}
                 />
-            </div> : '' }
+            </div> : ''}
 
-            {
-                role === 'Child Entity' ?
-                    <EntityDetailedPage entityid={oktaprofile.organization} /> : ''
-            }
-
-
-
-            {
-              role === 'Administrator' ?
-                  <div style={{maxWidth: "100%"}}>
-                      <MaterialTable
-                          parentChildData={(row, rows) => rows.find(a => a.id === row.parentId)}
-                          isLoading={loading}
-                          actions={isAdmin === true ? [
-                              {
-                                  icon: 'add',
-                                  tooltip: props.tooltip ? props.tooltip : 'Add User',
-                                  isFreeAction: true,
-                                  onClick: (event) => {
-                                      if (props.redirect) {
-                                          history.push(props.url);
-                                      }
-                                  }
-                              }
-                          ] : ''}
-                          title={props.title !== '' ? props.title : ''}
-                          columns={settingData.columns}
-                          data={settingData.data}
-                          options={{
-                              // grouping: true
-                          }}
-                          editable={isAdmin ? {
-                              onRowUpdate: (newData, oldData) =>
-                                  new Promise(resolve => {
-                                      setTimeout(() => {
-                                          resolve();
-                                          handleUpdate(newData)
-                                          if (oldData) {
-                                              setState(prevState => {
-                                                  const data = [...prevState.data];
-                                                  data[data.indexOf(oldData)] = newData;
-                                                  return {...prevState, data};
-                                              });
-                                          }
-                                      }, 600);
-                                  }),
-                              onRowDelete: oldData =>
-                                  new Promise(resolve => {
-                                      setTimeout(() => {
-                                          resolve();
-                                          setState(prevState => {
-                                              const data = [...prevState.data];
-                                              data.splice(data.indexOf(oldData), 1);
-                                              return {...prevState, data};
-                                          });
-                                      }, 600);
-                                  }),
-                          } : ''}
-                      />
-                  </div> : ''
-
-            }
+        {
+            role === 'Child Entity' ?
+                <EntityDetailedPage entityid={oktaprofile.organization}/> : ''
+        }
 
 
-        </Grid>
+        {
+            role === 'Administrator' ?
+                <div style={{maxWidth: "100%"}}>
+                    <MaterialTable
+                        parentChildData={(row, rows) => rows.find(a => a.id === row.parentId)}
+                        isLoading={loading}
+                        actions={isAdmin === true ? [
+                            {
+                                icon: 'add',
+                                tooltip: props.tooltip ? props.tooltip : 'Add User',
+                                isFreeAction: true,
+                                onClick: (event) => {
+                                    if (props.redirect) {
+                                        history.push(props.url);
+                                    }
+                                }
+                            }
+                        ] : ''}
+                        title={props.title !== '' ? props.title : ''}
+                        columns={settingData.columns}
+                        data={settingData.data}
+                        options={{
+                            defaultExpanded: true,
+                        }}
+                        editable={isAdmin ? {
+                            onRowUpdate: (newData, oldData) =>
+                                new Promise(resolve => {
+                                    setTimeout(() => {
+                                        resolve();
+                                        handleUpdate(newData)
+                                        if (oldData) {
+                                            setState(prevState => {
+                                                const data = [...prevState.data];
+                                                data[data.indexOf(oldData)] = newData;
+                                                return {...prevState, data};
+                                            });
+                                        }
+                                    }, 600);
+                                }),
+                            onRowDelete: oldData =>
+                                new Promise(resolve => {
+                                    setTimeout(() => {
+                                        resolve();
+                                        setState(prevState => {
+                                            const data = [...prevState.data];
+                                            data.splice(data.indexOf(oldData), 1);
+                                            return {...prevState, data};
+                                        });
+                                    }, 600);
+                                }),
+                        } : ''}
+                    />
+                </div> : ''
 
-    )
+        }
+
+
+    </Grid>
+
+)
 }
 
 

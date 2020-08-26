@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useContext} from "react";
 import {Route, Switch, withRouter} from 'react-router-dom';
 import {Security, SecureRoute, ImplicitCallback} from '@okta/okta-react';
 import {I18nProvider, LayoutContextProvider, LayoutSplashScreen, ThemeProvider} from "../../_metronic";
@@ -12,12 +12,14 @@ import ErrorsPage from "../pages/errors/ErrorsPage";
 import OktaUserContextProvider from '../context/OktaUserContext';
 // import Middleware from '../pages/home/Middleware';
 import Privacy from '../pages/privacy/privacy';
+// import {OktaUserContext} from "../context/OktaUserContext";
 
 function onAuthRequired({history}) {
     history.push('/');
 }
 
 const AgentAdminRoutes = withRouter(({history}) => {
+
     return (
         <>
 
@@ -33,8 +35,13 @@ const AgentAdminRoutes = withRouter(({history}) => {
                 <Route exact path='/privacy-policy' component={Privacy}/>
 
                 <OktaUserContextProvider>
+
+
+
+
                     <SecureRoute exact path='/dashboard' component={CustomLayoutForAgentAdmin}/>
                     <Route exact path='/dashboard/table-sample' component={CustomLayoutForAgentAdmin}/>
+                    <Route exact path='/dashboard/entity' component={CustomLayoutForAgentAdmin}/>
                     <Route exact path='/dashboard/entity/:id' component={CustomLayoutForAgentAdmin}/>
                     <Route exact={true} path='/dashboard/entity/form/add' component={CustomLayoutForAgentAdmin}/>
                     <Route exact={true} path='/dashboard/admins' component={CustomLayoutForAgentAdmin}/>
