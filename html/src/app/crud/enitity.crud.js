@@ -61,22 +61,22 @@ export const checkRole = async (eid,bit) => {
         return Promise.resolve(response.json());
     }
 }
-export const taskUpdate = async (eid, data) => {
-    const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
-
-    if(okta) {
-        const response = await fetch(`${ENTITY}/Tasks/completeTaskInZoho/${eid}`, {
-            method: 'put',
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Authorization': okta.accessToken.accessToken,
-
-            },
-            body: data
-        });
-        return Promise.resolve(response.json());
-    }
-}
+// export const taskUpdate = async (eid, data) => {
+//     const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
+//
+//     if(okta) {
+//         const response = await fetch(`${ENTITY}/Tasks/completeTaskInZoho/${eid}`, {
+//             method: 'put',
+//             headers: {
+//                 'Access-Control-Allow-Origin': '*',
+//                 'Authorization': okta.accessToken.accessToken,
+//
+//             },
+//             body: data
+//         });
+//         return Promise.resolve(response.json());
+//     }
+// }
 
 
 export const checkAdmin = async (zoho_id, email) => {

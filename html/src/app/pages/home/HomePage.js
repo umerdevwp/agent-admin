@@ -48,7 +48,7 @@ function HomePage(props) {
                 <SecureRoute exact path="/dashboard" component={Dashboard}/>
                 {/*<SecureRoute exact path="/dashboard/table-sample" component={DatatableListing}/>*/}
                 <SecureRoute exact path='/dashboard/entity' component={SelfDetailedPage}/>
-                <SecureRoute exact path="/dashboard/entity/:id" component={EntityDetailedPage}/>
+                <route exact path="/dashboard/entity/:id" component={EntityDetailedPage}/>
                 <SecureRoute exact path="/dashboard/entity/form/add" component={AddEntityForm}/>
                 <SecureRoute exact path="/dashboard/admins" component={Admins}/>
                 <SecureRoute exact path="/dashboard/contacts" component={Contacts}/>
