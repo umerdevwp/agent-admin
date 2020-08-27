@@ -183,7 +183,7 @@ const EntityDetailedPage = (props) => {
         }
 
         if (detailedView.errors) {
-            errorList(detailedView.detail)
+            addError(detailedView.errors.detail);
         }
 
     }

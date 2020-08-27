@@ -77,7 +77,6 @@ function OktaUserContextProvider(props) {
     }
 
 
-
     const addError = (data) => {
         setErrorList(errorList => [...errorList, data])
     }

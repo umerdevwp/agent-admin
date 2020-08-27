@@ -185,7 +185,7 @@ const SelfDetailedPage = (props) => {
         }
 
         if (detailedView.errors) {
-            errorList(detailedView.detail)
+            addError(detailedView.errors.detail);
         }
 
     }
@@ -376,7 +376,7 @@ const SelfDetailedPage = (props) => {
 
                 <Grid item xs={12}>
                     <ComplianceTaskList loading={loading} tooltip={'Add New Contact'}
-                                        url={`/dashboard/contact/form/add/${entity_id}`} taskList={taskData}
+                                        url={`/dashboard/contact/form/add/${entity_id}`} data={taskData}
                                         title={'Compliance Tasks'}/>
                 </Grid>
             </Grid>

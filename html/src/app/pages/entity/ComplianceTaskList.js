@@ -31,7 +31,7 @@ const useStyles = makeStyles(theme => ({
 function ComplianceTaskList(props) {
     const {oktaprofile, isAdmin} = useContext(OktaUserContext);
     const [loading, setLoading] = React.useState(false);
-    const [data, setData] = React.useState(props.data)
+    const [data, setData] = React.useState()
     const history = useHistory();
     const classes = useStyles();
 
@@ -77,8 +77,8 @@ function ComplianceTaskList(props) {
                     selection: props.selection ? props.selection : false,
                     actionsColumnIndex: -1
                 }}
-                columns={props.taskList.columns}
-                data={props.taskList.data}
+                columns={props.data.columns}
+                data={props.data.data}
                 // editable={{
                 //     onRowUpdate: (newData, oldData) =>
                 //         new Promise((resolve, reject) => {
