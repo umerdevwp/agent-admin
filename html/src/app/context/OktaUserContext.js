@@ -77,15 +77,6 @@ function OktaUserContextProvider(props) {
     }
 
 
-    const checkifAdmin = async (profile) => {
-        const response = await checkAdmin(profile.organization, profile.email);
-        setisAdmin({...isAdmin, isAdmin: response});
-    }
-
-    const organization_parent = async (profile) => {
-        setErrorList({...errorList, errorList: profile});
-    }
-
 
     const addError = (data) => {
         setErrorList(errorList => [...errorList, data])
