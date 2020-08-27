@@ -79,19 +79,19 @@ function findPageConfig(currentPage, items, breadcrumbs) {
  * Used to lazily create initial layout state.
  */
 function init({ pathname, menuConfig }) {
-  const currentPage = pathname.slice(1 /* Remove leading slash. */);
-  let breadcrumbs = [];
-  const pageConfig =
-      findPageConfig(currentPage, menuConfig.aside.items, breadcrumbs) ||
-      findPageConfig(currentPage, menuConfig.header.items, breadcrumbs);
+  // const currentPage = pathname.slice(1 /* Remove leading slash. */);
+  // let breadcrumbs = [];
+  // const pageConfig =
+  //     findPageConfig(currentPage, menuConfig.aside.items, breadcrumbs) ||
+  //     findPageConfig(currentPage, menuConfig.header.items, breadcrumbs);
 
-  breadcrumbs.reverse();
+  // breadcrumbs.reverse();
   const state = { subheader: { title: "", breadcrumb: [], description: "" }, splashScreen: { refs: {} } };
-  if (pageConfig) {
-    breadcrumbs.push(pageConfig);
-    state.subheader.title = pageConfig.title;
-    state.subheader.breadcrumb = breadcrumbs;
-  }
+  // if (pageConfig) {
+  //   breadcrumbs.push(pageConfig);
+  //   state.subheader.title = pageConfig.title;
+  //   state.subheader.breadcrumb = breadcrumbs;
+  // }
 
   return state;
 }

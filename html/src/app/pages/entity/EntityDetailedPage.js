@@ -10,6 +10,8 @@ import AttachmentIcon from '@material-ui/icons/Attachment';
 import ViewListIcon from '@material-ui/icons/ViewList';
 import ContactsIcon from '@material-ui/icons/Contacts';
 import EntityListing from '../entity/EntityListing';
+import ComplianceTaskList from '../entity/ComplianceTaskList';
+
 import ContactList from '../entity/ContactList';
 import {metronic} from "../../../_metronic";
 import QuickStatsChart from "../../widgets/QuickStatsChart";
@@ -362,7 +364,7 @@ const EntityDetailedPage = (props) => {
             <Grid container spacing={5}>
 
                 <Grid item xs={12}>
-                    <ContactList loading={loading} tooltip={'Add New Contact'} redirect={true}
+                    <ComplianceTaskList loading={loading} tooltip={'Add New Contact'} redirect={true}
                                  url={`/dashboard/contact/form/add/${entity_id}`} data={taskData}
                                  title={'Compliance Tasks'}/>
                 </Grid>

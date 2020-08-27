@@ -70,7 +70,11 @@ function EntityListing(props) {
                     component="button"
                     variant="body2"
                     onClick={() => {
-                        history.push(`/dashboard/entity/${rowData.id}`);
+                        if(rowData.id !== oktaprofile.organization) {
+                            history.push(`/dashboard/entity/${rowData.id}`);
+                        } else {
+                            history.push(`/dashboard/entity`);
+                        }
                     }}>
                     <VisibilityIcon/>
                 </Link>
@@ -78,7 +82,6 @@ function EntityListing(props) {
         ],
         data: entitydata,
     };
-
     const handleUpdate = (newData) => {
         return Promise.resolve(console.log(newData));
     }

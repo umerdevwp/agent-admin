@@ -2,6 +2,7 @@ import React, {Suspense, lazy, useContext, useEffect, useState} from "react";
 import Builder from "./Builder";
 import Dashboard from "./Dashboard";
 import EntityDetailedPage from '../entity/EntityDetailedPage';
+import SelfDetailedPage from '../entity/SelfDetailedPage';
 import DocsPage from "./docs/DocsPage";
 import {LayoutSplashScreen} from "../../../_metronic";
 import AddEntityForm from '../entity/AddEntityForm';
@@ -41,23 +42,24 @@ function HomePage(props) {
 
 
     return (
-            <Suspense fallback={<LayoutSplashScreen/>}>
-                <Switch>
+        <Suspense fallback={<LayoutSplashScreen/>}>
+            <Switch>
 
-                        <SecureRoute exact path="/dashboard" component={Dashboard}/>
-                        <SecureRoute exact path="/dashboard/table-sample" component={DatatableListing}/>
-                        <SecureRoute exact path="/dashboard/entity/:id" component={EntityDetailedPage}/>
-                        <SecureRoute exact path="/dashboard/entity/form/add" component={AddEntityForm}/>
-                        <SecureRoute exact path="/dashboard/admins" component={Admins}/>
-                        <SecureRoute exact path="/dashboard/contacts" component={Contacts}/>
-                        <SecureRoute exact path="/dashboard/attachments" component={Attachments}/>
-                        <SecureRoute exact path="/dashboard/contact/form/add/:id" component={AddContactForm}/>
-                        <SecureRoute exact path="/dashboard/attachment/form/add/:id" component={AddAttachmentForm}/>
-                        <SecureRoute exact path="/dashboard/agents" component={RegisteredAgents}/>
-                        <SecureRoute exact path="/test" component={Test}/>
+                <SecureRoute exact path="/dashboard" component={Dashboard}/>
+                {/*<SecureRoute exact path="/dashboard/table-sample" component={DatatableListing}/>*/}
+                <SecureRoute exact path='/dashboard/entity' component={SelfDetailedPage}/>
+                <SecureRoute exact path="/dashboard/entity/:id" component={EntityDetailedPage}/>
+                <SecureRoute exact path="/dashboard/entity/form/add" component={AddEntityForm}/>
+                <SecureRoute exact path="/dashboard/admins" component={Admins}/>
+                <SecureRoute exact path="/dashboard/contacts" component={Contacts}/>
+                <SecureRoute exact path="/dashboard/attachments" component={Attachments}/>
+                <SecureRoute exact path="/dashboard/contact/form/add/:id" component={AddContactForm}/>
+                <SecureRoute exact path="/dashboard/attachment/form/add/:id" component={AddAttachmentForm}/>
+                <SecureRoute exact path="/dashboard/agents" component={RegisteredAgents}/>
+                {/*<SecureRoute exact path="/test" component={Test}/>*/}
 
-                </Switch>
-            </Suspense>
+            </Switch>
+        </Suspense>
     )
 
 }

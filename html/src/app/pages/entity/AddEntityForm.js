@@ -39,6 +39,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import SnackbarContent from '@material-ui/core/SnackbarContent';
 import WarningIcon from '@material-ui/icons/Warning';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+
 import {
     ContactTypeList,
     EntitytypesList,
@@ -47,7 +48,23 @@ import {
     lorexFileUpload
 } from "../../crud/enitity.crud";
 import {OktaUserContext} from '../../context/OktaUserContext';
+import utils from "smartystreets-javascript-sdk-utils";
+import Dialog from "@material-ui/core/Dialog";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogActions from "@material-ui/core/DialogActions";
+import * as SmartyStreetsSDK from "smartystreets-javascript-sdk";
 
+
+let SmartyStreetsCore = SmartyStreetsSDK.core;
+const Lookup = SmartyStreetsSDK.usStreet.Lookup;
+let authId = process.env.REACT_APP_SMARTYSTREET_AUTH_ID;
+let authToken = process.env.REACT_APP_SMARTYSTREET_TOKEN;
+
+const smartyStreetsSharedCredentials = new SmartyStreetsSDK.core.SharedCredentials(process.env.REACT_APP_SMARTYSTREET_KEY);
+const clientBuilder = new SmartyStreetsSDK.core.ClientBuilder(smartyStreetsSharedCredentials);
+let client = clientBuilder.buildUsStreetApiClient();
 
 
 const useStylesFacebook = makeStyles({
@@ -232,12 +249,17 @@ MySnackbarContentWrapper.propTypes = {
 const AddEntityForm = (props) => {
 
 
+
     const {oktaprofile, isAdmin} = useContext(OktaUserContext);
     const classes = useStyles();
     const inputLabel = React.useRef(null);
+    const [open, setOpen] = React.useState(false);
+    const [userAgree, setUserAgree] = React.useState(false);
     const [labelWidth, setLabelWidth] = React.useState(0);
     const [addressObject, setAddressObject] = React.useState([]);
     const [addressValue, setAddressValue] = React.useState('');
+    const [addressReset, setAddressReset] = React.useState('');
+    const [isValidAddress, setIsValidAddress] = React.useState(false);
     const [loading, setLoading] = React.useState(false)
     const [error, setError] = React.useState(false)
     const [contactType, setContactType] = React.useState([]);
@@ -249,7 +271,7 @@ const AddEntityForm = (props) => {
 
     //form state
     const [inputName, setInputName] = React.useState({value: '', error: ' ',});
-    const [inputComplianceOnly, setInputComplianceOnly] = React.useState({value: '', error: ' '});
+    const [inputComplianceOnly, setInputComplianceOnly] = React.useState({value: false, error: ' '});
     const [inputFillingState, setInputFillingState] = React.useState({value: '', error: ' '});
     const [inputFillingStructure, setInputFillingStructure] = React.useState({value: '', error: ' '});
     const [inputFormationDate, setInputFormationDate] = React.useState({value: '', error: ' '});
@@ -266,9 +288,33 @@ const AddEntityForm = (props) => {
     const [inputNotificationZip, setInputNotificationZip] = React.useState({value: '', error: ' '});
     const [inputFiling, setInputFiling] = React.useState({value: '', error: ' ', success: ' '});
     const [inputBusinessPurpose, setInputBusinessPurpose] = React.useState({value: '', error: ' '});
-    const [inputForeign, setInputForeign] = React.useState({value: '', error: ' '});
+    const [inputForeign, setInputForeign] = React.useState({value: false, error: ' '});
     const [inputFileName, setInputFileName] = React.useState({value: '', error: ' '});
     const [inputFileSize, setInputFileSize] = React.useState({value: '', error: ' ', success: ' '});
+
+
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setLoading(false);
+        setUserAgree(false);
+        setOpen(false);
+    };
+
+    const iAgree = async (event) => {
+        Promise.resolve(setTimeout(() => {
+            setUserAgree(true);
+        }, 3000));
+        Promise.resolve(setOpen(false));
+        handleOnSubmit(event, true)
+
+    };
+
+
+
 
     function FacebookProgress(props) {
         const classes = useStylesFacebook();
@@ -317,20 +363,38 @@ const AddEntityForm = (props) => {
 
 
     const fetchDataforDropdownsContactTypeList = async () => {
-        const response = await ContactTypeList(oktaprofile.organization, oktaprofile.email);
-        setContactType(response.data);
+        var ContactTypeListLocal = await JSON.parse(localStorage.getItem("ContactTypeList"));
+        if(ContactTypeListLocal){
+            setContactType(ContactTypeListLocal);
+        } else {
+            const response = await ContactTypeList(oktaprofile.organization, oktaprofile.email);
+            localStorage.setItem("ContactTypeList", JSON.stringify(response.data));
+            setContactType(response.data);
+        }
+
     }
 
     const fetchDataforDropdownsFillingStructureData = async () => {
-        const response = await EntitytypesList(oktaprofile.organization, oktaprofile.email);
-        setFillingStructureData(response.data);
 
+        var EntitytypesListLocal = await JSON.parse(localStorage.getItem("EntitytypesList"));
+        if(EntitytypesListLocal){
+            setFillingStructureData(EntitytypesListLocal);
+        } else {
+            const response = await EntitytypesList(oktaprofile.organization, oktaprofile.email);
+            localStorage.setItem("EntitytypesList", JSON.stringify(response.data));
+            setFillingStructureData(response.data);
+        }
     }
 
     const fetchDataforDropdownsStateRegion = async () => {
-        const response = await StateRegionList(oktaprofile.organization, oktaprofile.email);
-        setStateRegion(response.data);
-
+        var StateRegionListLocal = await JSON.parse(localStorage.getItem("StateRegionList"));
+        if(StateRegionListLocal){
+            setStateRegion(StateRegionListLocal);
+        } else {
+            const response = await StateRegionList(oktaprofile.organization, oktaprofile.email);
+            localStorage.setItem("StateRegionList", JSON.stringify(response.data));
+            setStateRegion(response.data);
+        }
     }
 
 
@@ -374,9 +438,135 @@ const AddEntityForm = (props) => {
     }
 
 
-    const handleOnSubmit = async (event) => {
-        var formsubmit = true;
+    const resetForm = async () => {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve();
+
+                setInputComplianceOnly({value: false, error: ' '})
+                setInputFillingState({value: '', error: ' '});
+                setInputFillingStructure({value: '', error: ' '});
+                setInputFormationDate({value: '', error: ' '});
+                setInputFiscalDate({value: fiscal, error: ' '});
+                setInputName({value: '', error: ' '});
+                setInputNotificationEmail({value: '', error: ' '});
+                setInputNotificationPhone({value: '', error: ' '});
+                setInputNotificationAddress({value: '', error: ' '});
+                setInputNotificationCity({value: '', error: ' '});
+                setInputNotificationState({value: '', error: ' '});
+                setInputNotificationZip({value: '', error: ' '});
+                setInputEIN({value: '', error: ' ', success: ' '});
+                setInputFiling({value: '', error: ' ', success: ' '})
+                setInputBusinessPurpose({value: '', error: ' '})
+                setInputForeign({value: false, error: ' '});
+                setInputFileName({value: '', error: ' ', success: ' '});
+                setInputFileSize({value: '', error: ' ', success: ' '});
+
+                setAddressObject('');
+                setAddressReset('reset')
+                setAddressValue('');
+            }, 600);
+        });
+
+
+    }
+
+    const addressCheck = async (event) => {
+
+
+        var valid;
+        let lookup1 = new Lookup();
+        lookup1.street = addressObject.streetLine ? addressObject.streetLine : addressObject;
+        lookup1.city = inputNotificationCity.value;
+        lookup1.state = inputNotificationState.value;
+        lookup1.zipCode = inputNotificationZip.value;
+        const responseFromSmarty = client.send(lookup1).then(response => {
+            valid = utils.isValid(response.lookups[0]);
+            setIsValidAddress(valid);
+            // response.lookups.map(lookup => console.log(lookup.result));
+
+            // // Is lookup1 valid?
+            // console.log('Is lookup1 valid?', utils.isValid(response.lookups[0]));
+            //
+            // // Is lookup1 invalid?
+            // console.log('Is lookup1 invalid?', utils.isInvalid(response.lookups[0]));
+            //
+            // // Is lookup1 ambiguous?
+            // console.log('// Is lookup1 ambiguous?', utils.isAmbiguous(response.lookups[0]));
+            //
+            // // Is lookup1 missing a secondary address?
+            // console.log('// Is lookup1 missing a secondary address?', utils.isMissingSecondary(response.lookups[0]));
+            if (valid === false) {
+                setOpen(true);
+            }
+
+            if(valid === true){
+                createEntitysubmit(event,false);
+            }
+        });
+
+    }
+
+    const handleOnSubmit = async (event, userResponse = false) => {
+        event.preventDefault();
         setLoading(true);
+        setAddressReset('');
+        var formsubmit = true;
+        if(inputEIN.value){
+            var value = parseInt(inputEIN.value)
+            if(typeof value === 'number'){
+                if(value.toString().length == 9){
+                    formsubmit = true;
+                } else {
+                    setLoading(false);
+                    formsubmit = false;
+                    setInputEIN({...inputEIN, error: "Please enter 9 digits number"})
+                }
+            } else {
+                setLoading(false);
+                formsubmit = false;
+                setInputEIN({...inputEIN, error: "Please enter 9 digits number"})
+            }
+        }
+
+
+        if(inputNotificationZip.value){
+            var zip = parseInt(inputNotificationZip.value);
+            if(typeof zip === 'number'){
+                if(zip.toString().length == 5){
+                    formsubmit = true;
+                } else {
+                    setLoading(false);
+                    formsubmit = false;
+                    setInputNotificationZip({...inputNotificationZip, error: "Please enter 5 digits zip code"})
+                }
+            } else {
+                setLoading(false);
+                formsubmit = false;
+                setInputNotificationZip({...inputNotificationZip, error: "Please enter 5 digits zip code"})
+            }
+        }
+
+
+        if (formsubmit === true) {
+            if (userAgree === false && userResponse === false) {
+                if ((addressObject || addressObject.streetLine) && inputNotificationCity.value && inputNotificationState.value && inputNotificationZip.value !== '') {
+                    formsubmit = false;
+                    const response = addressCheck(event);
+
+                }
+            }
+        }
+        if (formsubmit === true) {
+            createEntitysubmit(event,userResponse);
+        }
+    }
+
+
+    const createEntitysubmit = async (event) => {
+
+        setLoading(true);
+        setAddressReset('');
         setInputFiling({...inputFiling, value: '', success: ' ', error:' '});
         setInputFileSize({...inputFileSize, value: ''});
         setInputFileName({...inputFileName, value: ''});
@@ -398,7 +588,6 @@ const AddEntityForm = (props) => {
         setInputEIN({...inputEIN, error: ' '})
         setInputForeign({...inputForeign, error: ' '});
         setInputFileSize({...inputFileSize, error: ' '})
-        event.preventDefault();
         let formData = new FormData();
 
         formData.append('inputName', inputName.value)
@@ -435,122 +624,124 @@ const AddEntityForm = (props) => {
         formData.append('inputBusinessPurpose', inputBusinessPurpose.value)
         formData.append('inputFileSize', inputFileSize.value);
 
-        if(inputEIN.value){
-            var value = parseInt(inputEIN.value)
-            if(typeof value === 'number'){
-                  if(value.toString().length == 9){
-                      formsubmit = true;
-                  } else {
-                      setLoading(false);
-                      formsubmit = false;
-                      setInputEIN({...inputEIN, error: "Please enter 9 digits number"})
-                  }
-            } else {
-                setLoading(false);
-                formsubmit = false;
-                setInputEIN({...inputEIN, error: "Please enter 9 digits number"})
-            }
-        }
+        // if(inputEIN.value){
+        //     var value = parseInt(inputEIN.value)
+        //     if(typeof value === 'number'){
+        //         if(value.toString().length == 9){
+        //             formsubmit = true;
+        //         } else {
+        //             setLoading(false);
+        //             formsubmit = false;
+        //             setInputEIN({...inputEIN, error: "Please enter 9 digits number"})
+        //         }
+        //     } else {
+        //         setLoading(false);
+        //         formsubmit = false;
+        //         setInputEIN({...inputEIN, error: "Please enter 9 digits number"})
+        //     }
+        // }
 
 
-        if(inputNotificationZip.value){
-            var zip = parseInt(inputNotificationZip.value);
-            if(typeof zip === 'number'){
-                if(zip.toString().length == 5){
-                    formsubmit = true;
-                } else {
-                    setLoading(false);
-                    formsubmit = false;
-                    setInputNotificationZip({...inputNotificationZip, error: "Please enter 5 digits zip code"})
+        // if(inputNotificationZip.value){
+        //     var zip = parseInt(inputNotificationZip.value);
+        //     if(typeof zip === 'number'){
+        //         if(zip.toString().length == 5){
+        //             formsubmit = true;
+        //         } else {
+        //             setLoading(false);
+        //             formsubmit = false;
+        //             setInputNotificationZip({...inputNotificationZip, error: "Please enter 5 digits zip code"})
+        //         }
+        //     } else {
+        //         setLoading(false);
+        //         formsubmit = false;
+        //         setInputNotificationZip({...inputNotificationZip, error: "Please enter 5 digits zip code"})
+        //     }
+        // }
+
+        const response = await createEntity(formData);
+        if (response.field_error) {
+            setLoading(false);
+            Object.keys(response.field_error).forEach((key, index) => {
+                if (key === 'inputName') {
+                    setInputName({...inputName, error: response.field_error[key]})
                 }
-            } else {
-                setLoading(false);
-                formsubmit = false;
-                setInputNotificationZip({...inputNotificationZip, error: "Please enter 5 digits zip code"})
-            }
-        }
-        if(formsubmit) {
-            const response = await createEntity(formData);
-            if (response.field_error) {
-                setLoading(false);
-                Object.keys(response.field_error).forEach((key, index) => {
-                    if (key === 'inputName') {
-                        setInputName({...inputName, error: response.field_error[key]})
-                    }
 
-                    if (key === 'inputComplianceOnly') {
-                        setInputComplianceOnly({...inputComplianceOnly, error: response.field_error[key]})
-                    }
-
-                    if (key === 'inputFillingState') {
-                        setInputFillingState({...inputFillingState, error: response.field_error[key]})
-                    }
-
-                    // if (key === 'inputFirstName') {
-                    //     setInputFirstName({...inputFirstName, error: response.field_error[key]})
-                    // }
-                    //
-                    // if (key === 'inputLastName') {
-                    //     setInputLastName({...inputLastName, error: response.field_error[key]})
-                    // }
-                    if (key === 'inputFillingStructure') {
-                        setInputFillingStructure({...inputFillingStructure, error: response.field_error[key]})
-                    }
-                    if (key === 'inputFormationDate') {
-                        setInputFormationDate({...inputFormationDate, error: response.field_error[key]})
-                    }
-                    if (key === 'inputNotificationEmail') {
-                        setInputNotificationEmail({...inputNotificationEmail, error: response.field_error[key]})
-                    }
-                    if (key === 'inputNotificationPhone') {
-                        setInputNotificationPhone({...inputNotificationPhone, error: response.field_error[key]})
-                    }
-                    if (key === 'inputNotificationAddress') {
-                        setInputNotificationAddress({...inputNotificationAddress, error: response.field_error[key]})
-                    }
-                    if (key === 'inputNotificationCity') {
-                        setInputNotificationCity({...inputNotificationCity, error: response.field_error[key]})
-                    }
-
-                    if (key === 'inputNotificationState') {
-                        setInputNotificationState({...inputNotificationState, error: response.field_error[key]})
-                    }
-
-                    if (key === 'inputNotificationZip') {
-                        setInputNotificationZip({...inputNotificationZip, error: response.field_error[key]})
-                    }
-
-                    if (key === 'inputBusinessPurpose') {
-                        setInputBusinessPurpose({...inputBusinessPurpose, error: response.field_error[key]})
-                    }
-
-
-                    if (key === 'inputEIN') {
-                        setInputEIN({...inputEIN, error: response.field_error[key]})
-                    }
-
-                    if (key === 'inputFiscalDate') {
-                        // setInputFiscalDate(inputFiscalDate => ...inputFiscalDate, error:response.field_error[key])
-                        setInputFiscalDate({...inputFiscalDate, value: fiscal, error: response.field_error[key]})
-                    }
-
-
-                })
-            }
-
-            if (response) {
-                if (response.status) {
-                    setLoading(false);
-                    setSuccessMessage(true);
+                if (key === 'inputComplianceOnly') {
+                    setInputComplianceOnly({...inputComplianceOnly, error: response.field_error[key]})
                 }
+
+                if (key === 'inputFillingState') {
+                    setInputFillingState({...inputFillingState, error: response.field_error[key]})
+                }
+
+                // if (key === 'inputFirstName') {
+                //     setInputFirstName({...inputFirstName, error: response.field_error[key]})
+                // }
+                //
+                // if (key === 'inputLastName') {
+                //     setInputLastName({...inputLastName, error: response.field_error[key]})
+                // }
+                if (key === 'inputFillingStructure') {
+                    setInputFillingStructure({...inputFillingStructure, error: response.field_error[key]})
+                }
+                if (key === 'inputFormationDate') {
+                    setInputFormationDate({...inputFormationDate, error: response.field_error[key]})
+                }
+                if (key === 'inputNotificationEmail') {
+                    setInputNotificationEmail({...inputNotificationEmail, error: response.field_error[key]})
+                }
+                if (key === 'inputNotificationPhone') {
+                    setInputNotificationPhone({...inputNotificationPhone, error: response.field_error[key]})
+                }
+                if (key === 'inputNotificationAddress') {
+                    setInputNotificationAddress({...inputNotificationAddress, error: response.field_error[key]})
+                }
+                if (key === 'inputNotificationCity') {
+                    setInputNotificationCity({...inputNotificationCity, error: response.field_error[key]})
+                }
+
+                if (key === 'inputNotificationState') {
+                    setInputNotificationState({...inputNotificationState, error: response.field_error[key]})
+                }
+
+                if (key === 'inputNotificationZip') {
+                    setInputNotificationZip({...inputNotificationZip, error: response.field_error[key]})
+                }
+
+                if (key === 'inputBusinessPurpose') {
+                    setInputBusinessPurpose({...inputBusinessPurpose, error: response.field_error[key]})
+                }
+
+
+                if (key === 'inputEIN') {
+                    setInputEIN({...inputEIN, error: response.field_error[key]})
+                }
+
+                if (key === 'inputFiscalDate') {
+                    // setInputFiscalDate(inputFiscalDate => ...inputFiscalDate, error:response.field_error[key])
+                    setInputFiscalDate({...inputFiscalDate, value: fiscal, error: response.field_error[key]})
+                }
+
+
+            })
+        }
+
+        if (response) {
+            if (response.status) {
+                await resetForm();
+                setLoading(false);
+                setSuccessMessage(true);
+                window.scrollTo(0, 0);
             }
         }
 
 
 
-        for (var pair of formData.entries()) {
-            console.log(pair[0] + ', ' + pair[1]);
-        }
+
+        // for (var pair of formData.entries()) {
+        //     console.log(pair[0] + ', ' + pair[1]);
+        // }
 
         // setTimeout(() => {
         //     setInputName({...inputName, error: 'Field is required'})
@@ -565,7 +756,28 @@ const AddEntityForm = (props) => {
 
         <div className={classes.root}>
 
-
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{"We are unable to validate your address"}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Please make sure that you have entered it correctly.
+                        If you proceed and we are unable to validate your address it may cause delays
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={(event) => iAgree(event)} color="primary" autoFocus>
+                        Accept
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
             <Title title={'Add New Entity'}/>
 
@@ -596,6 +808,7 @@ const AddEntityForm = (props) => {
                                     <FormGroup row>
                                         <div className={'col-md-6'}>
                                             <TextField
+                                                value={inputName.value}
                                                 disabled={loading}
                                                 required
                                                 error={inputName.error !== ' '}
@@ -615,7 +828,7 @@ const AddEntityForm = (props) => {
                                                     ...inputForeign,
                                                     value: e.target.checked
                                                 })}
-                                                value={inputForeign}
+                                                checked={inputForeign.value}
                                                 control={<Checkbox color="primary"/>}
                                                 label="Foreign Qualified"
                                                 className={clsx(classes.textField, classes.checkbox)}
@@ -631,7 +844,7 @@ const AddEntityForm = (props) => {
                                                     ...inputComplianceOnly,
                                                     value: e.target.checked
                                                 })}
-                                                value={inputComplianceOnly}
+                                                checked={inputComplianceOnly.value}
                                                 control={<Checkbox color="primary"/>}
                                                 label="Compliance Only"
                                                 className={clsx(classes.textField, classes.checkbox)}
@@ -834,6 +1047,7 @@ const AddEntityForm = (props) => {
                                                 width={''}
                                                 addressObject={addressObjectChangeHandler}
                                                 addressValue={addressValueChangeHandler}
+                                                reset={addressReset}
                                                 onChange={e => setAddressValue({
                                                     ...addressValue,
                                                     value: e.target.value
@@ -984,6 +1198,7 @@ const AddEntityForm = (props) => {
                                                 id="standard-full-width"
                                                 disabled={loading}
                                                 placeholder="Business Purpose"
+                                                value={inputBusinessPurpose.value}
                                                 error={inputBusinessPurpose.error !== ' '}
                                                 helperText={inputBusinessPurpose.error}
                                                 onChange={e => setInputBusinessPurpose({
