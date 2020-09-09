@@ -5,6 +5,7 @@ use zcrmsdk\crm\crud\ZCRMModule;
 use zcrmsdk\crm\crud\ZCRMRecord;
 use zcrmsdk\crm\crud\ZCRMNote;
 use zcrmsdk\crm\crud\ZCRMTag;
+use zcrmsdk\crm\exception\ZCRMException;
 use zcrmsdk\oauth\ZohoOAuth;
 /**
  * ZoHo_Account class contains all logic to pull data from ZoHo
@@ -693,8 +694,8 @@ class ZoHo_Account extends CI_Model
                 $oApiTags = $this->ZoHo_Account->getInstance("Tags");
                 $oResponseTags = $oApiTags->createTags($aTagsNonExist);
             }
-        } catch(Exception $e){
-            return ['type'=>'error','message'=>$e->getMessage()];
+        } catch(ZCRMException $e){
+            throw $e;
         }
 
         return ['type'=>'ok','results'=>true];

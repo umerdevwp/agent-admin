@@ -134,17 +134,23 @@ class Entity_model extends CI_Model
      * 
      * @return Bool Bolean false or true
      */
-    public function isParent($iEntityId,$iParentId){
-        //make sure the entity belongs to right parent or not.
-        $this->db->select('id');
-        $this->db->from($this->table);
-        $this->db->where('id', $iEntityId);
-        $this->db->where(Self::$parent_entity, $iParentId);
-        $query = $this->db->get();
-        $aData = $query->row();
-        
-        if(isset($aData->id)) return true;
-        else return false;
+    public function isParentOf(int $iEntityId,int $iParentId){
+        // if GET request eid is given and login is eid, as self access is allowed
+        if($iEntityId==$iParentId)
+        {
+            return true;
+        } else {
+            //make sure the entity belongs to right parent or not.
+            $this->db->select('id');
+            $this->db->from($this->table);
+            $this->db->where('id', $iEntityId);
+            $this->db->where(Self::$parent_entity, $iParentId);
+            $query = $this->db->get();
+            $aData = $query->row();
+            
+            if(isset($aData->id)) return true;
+            else return false;
+        }
     }
 
     public function getOne($id,$aColumns=[])

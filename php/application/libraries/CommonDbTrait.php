@@ -8,13 +8,19 @@ trait CommonDbTrait{
      */
     public function checkPermission($sMethodName="VIEW",$sRoute="ENTITY")
     {
-        $this->load->model("Permissions_model");
-        
-        $aData = $this->Permissions_model->getPermissionsEntityRow($_SESSION['eid'],$sRoute);
-        // check method is allowed, else response permission denied
-        if(!isSessionValid($sMethodName,$aData)) exit();
-        
-        return true;
+        if($_SESSION['eid'])
+        {
+            $this->load->model("Permissions_model");
+            
+            $aData = $this->Permissions_model->getPermissionsEntityRow($_SESSION['eid'],$sRoute);
+            // check method is allowed, else response permission denied
+            if(!isSessionValid($sMethodName,$aData['results'])) exit();
+
+            return true;
+        } else {
+            responseJson(['type'=>'error','message'=>'Please login and try again']);
+            exit();
+        }
     }
 
 }

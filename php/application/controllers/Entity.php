@@ -8,6 +8,7 @@ use zcrmsdk\crm\crud\ZCRMTag;
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 use chriskacerguis\RestServer\RestController;
+use GuzzleHttp\Psr7\FnStream;
 use zcrmsdk\crm\exception\ZCRMException;
 
 include APPPATH . '/libraries/CommonDbTrait.php';
@@ -59,7 +60,7 @@ class Entity extends RestController
         $id = $this->input->get("eid") ?: $sid;
 
         $aColumns = getInputFields();
-        $bIsParentValid = $this->entity_model->isParent($id, $iParentId);
+        $bIsParentValid = $this->entity_model->isParentOf($id, $iParentId);
         $aDataTempEntity = null;
 
         if (!$bIsParentValid) {
@@ -190,7 +191,7 @@ class Entity extends RestController
         $bTagSmartyValidated = true;
         $aError = [];
 
-        $aError = $this->validateForm(); 
+        $aError = $this->validateForm();
         if (is_array($aError)) {
             
             $this->response([
@@ -326,7 +327,7 @@ HC;
 
         // edit request is for child user? check valid parent
         if($_SESSION['eid']!=$this->input->post("eid"))
-        $bValidateParent = $this->Entity_model->isParent($this->input->post("eid"),$_SESSION['eid']);
+        $bValidateParent = $this->Entity_model->isParentOf($this->input->post("eid"),$_SESSION['eid']);
         
         // parent is valid
         if($bValidateParent)
@@ -467,6 +468,7 @@ HC;
         try {
             $sComplianceOnly = ($this->input->post("inputComplianceOnly") ?? 0);
             $sForeign = ($this->input->post("inputForeign") ?? 0);
+            $sNewService = ($this->input->post("inputService") ?? 0);
 
             $aTags = ["name" => "OnBoard"];
 
@@ -481,16 +483,29 @@ HC;
             if (!$bTagSmartyValidated) {
                 $aTags["InvalidatedAddress"] = "Invalidated Address";
             }
-            // TODO: zoho enable on production server
 
-            $this->ZoHo_Account->zohoCreateNewTags($iZohoId, $aTags);
+            if($sNewService)
+            {
+				//BC-RA, BC-RAC, UAS-RA, UAS-RAC
+                $aTags[$sNewService] = $sNewService;
+            }
+
+
+            // TODO: zoho enable on production server
+            try {
+                $this->ZoHo_Account->zohoCreateNewTags($iZohoId, $aTags);
+            } catch(ZCRMException $e) 
+            {
+                logToAdmin("Unable to create tags: ",print_r($aTags,true));
+            }
 
             $oResponseTags = $oApi->addTags($aTags);
 
             $oData = $oResponseTags->getData();
             $aResponse = ['type'=>'ok','message'=>'Tags added successfully'];
-        } catch (Exception $e) {
-            $aResponse = ['type'=>'error','message'=>"User created successfully, tags failed (" . $e->getMessage() . ")."];
+        } catch (ZCRMException $e) {
+            logToAdmin("Apply Tags failed","Exception: " . $e->getMessage());
+            $aResponse = ['type'=>'error','message'=>"User created successfully, tags failed."];
         }
 
         return $aResponse;
@@ -529,8 +544,8 @@ HC;
 
             $id = $this->Notifications_model->add($aData);
         } else {
-            error_log("Subscription failed unable to find duedate "
-                . " state: " . $this->input->post("inputFillingState")
+            logToAdmin("File ruling subscription failed unable to find duedate ",
+                " state: " . $this->input->post("inputFillingState")
                 . " structure: " . $this->input->post("inputFillingStructure")
                 . " formed: " . $this->input->post("inputFormationDate")
                 . "fiscal: " . $this->input->post("inputFiscalDate")
@@ -538,7 +553,7 @@ HC;
         }
 
         if (!is_numeric($id)) {
-            error_log("Subscription failed to insert new entity record");
+            logToAdmin("File ruling subscription failed to insert record","Entity ID: " . $iEntityId . "\n\n" . print_r($_POST,true));
         }
 
         return $id;
@@ -685,7 +700,7 @@ HC;
         );
 
         if ($aResponse['type'] == 'error') {
-            error_log("Unknown  server error, contact creation failed.");
+            logToAdmin("Zoho contact creation failed","For entity ID: " . $iEntityId ."\n\n " .$aResponse['message']);
             return ['status' => '500', 'detail' => "Unknown server error, contact creation failed."];
         }
 
@@ -719,8 +734,8 @@ HC;
         );
 
         if ($aResponse['type'] == 'error') {
-            error_log("Unknown  server error, contact creation failed.");
-            return $aResponse;
+                        logToAdmin("Zoho contact update failed","Contcat ID: " . $iContactId ."\n\n " .$aResponse['message']);
+            return ['status' => '500', 'detail' => "Unknown server error, contact update failed."];
         }
         // id of the contact updated
         return $aResponse['id'];
@@ -888,7 +903,7 @@ HC;
             $oApi->setFieldValue("Billing_Street", $oParent->billingStreet);
             $oApi->setFieldValue("Billing_Street_2", $oParent->billingStreet2);
         } else {
-            error_log("Parent billing address not found for child profile");
+            logToAdmin("Parent billing address not found for child entity",print_r($_POST,true));
         }
 
         $trigger = array();//triggers to include
@@ -906,7 +921,8 @@ HC;
         } catch (ZCRMException $oError) {
             // message
             $sError = "code: " . $oError->getCode() . ", api error: " . $oError->getExceptionCode() . ", name: " . $oError->getExceptionDetails()['api_name'] . ", message: " . $oError->getMessage();
-            $aResponse = ['type'=>'error','message'=>$sError];
+            logToAdmin("Create Entity Failed: ",$sError);
+            $aResponse = ['type'=>'error','message'=>"Unable to register entity, please try again."];
         }
 
         return $aResponse;
