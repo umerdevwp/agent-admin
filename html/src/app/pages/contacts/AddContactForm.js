@@ -57,10 +57,10 @@ import FormHelperText from "@material-ui/core/FormHelperText";
 
 let SmartyStreetsCore = SmartyStreetsSDK.core;
 const Lookup = SmartyStreetsSDK.usStreet.Lookup;
-let authId = 'ab6e6801-757b-82dd-780c-14133922362c';
-let authToken = 'YJvhhSXmjDLC3WfhXO6O';
+let authId = process.env.REACT_APP_SMARTYSTREET_AUTH_ID;
+let authToken = process.env.REACT_APP_SMARTYSTREET_TOKEN;
 
-const smartyStreetsSharedCredentials = new SmartyStreetsSDK.core.SharedCredentials(1486038472569752);
+const smartyStreetsSharedCredentials = new SmartyStreetsSDK.core.SharedCredentials(process.env.REACT_APP_SMARTYSTREET_KEY);
 const clientBuilder = new SmartyStreetsSDK.core.ClientBuilder(smartyStreetsSharedCredentials);
 let client = clientBuilder.buildUsStreetApiClient();
 

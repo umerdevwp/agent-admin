@@ -23,16 +23,16 @@ import {checkAdmin} from '../../crud/enitity.crud';
 
 function HomePage(props) {
 
-    const {setprofileforUser} = useContext(UserContext);
-    const {organizationabc, setOrganizationabc} = useState(0);
-    useEffect(() => {
-        initialcalltoAPIs();
-    }, [])
+    // const {setprofileforUser} = useContext(UserContext);
+    // const {organizationabc, setOrganizationabc} = useState(0);
+    // useEffect(() => {
+    //     initialcalltoAPIs();
+    // }, [])
 
     const initialcalltoAPIs = async () => {
-        const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
-        const userData = await fetchUserProfile(okta.idToken.claims.sub);
-        const dataofUser = await setprofileforUser(userData.profile);
+        // const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
+        // const userData = await fetchUserProfile(okta.idToken.claims.sub);
+        // const dataofUser = await setprofileforUser(userData.profile);
         // const isadminfecth = await checkAdmin(userData.profile.organization, userData.profile.email);
         // if (userData.profile.organization === '999999999') {
         //     const id = userData.profile.organization;
