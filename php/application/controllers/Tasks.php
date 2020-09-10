@@ -11,6 +11,13 @@ class Tasks extends RestController
     use CommonDbTrait;
 
     private $sModule = "TASKS";
+
+    public function index_get()
+    {
+        $this->response([
+            'errors' => ['status' => false, 'message'=>'Request not found']
+        ], 404);
+    }
     /**
      * Get zoho code if user has not granted zoho access
      */
