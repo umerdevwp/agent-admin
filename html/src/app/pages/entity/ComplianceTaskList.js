@@ -57,17 +57,16 @@ function ComplianceTaskList(props) {
                         tooltip: 'Mark this task as complete',
                         position: 'row',
                         onClick: (event, rowData) => {
-                            new Promise(resolve => {
-                                setTimeout(() => {
-                                    setLoading(true);
-                                    let formData = new FormData();
-                                    formData.append('status', 1);
-                                    taskUpdate(rowData.id, formData);
-                                    resolve();
-                                    setLoading(false);
-                                    history.go();
-                                }, 600);
-                            })
+                            let formData = new FormData();
+                            formData.append('status', 1);
+                            formData.append('eid', props.eid);
+                            console.log(rowData);
+                            taskUpdate(rowData.id, formData).then(response => {
+                                console.log(response);
+                                if(response == 'success') {
+                                    window.location.reload(false)
+                                }
+                            });
                         }
                     }
 

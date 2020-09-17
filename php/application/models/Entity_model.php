@@ -135,13 +135,24 @@ class Entity_model extends CI_Model
      * @return Bool Bolean false or true
      */
     public function isParent($iEntityId,$iParentId){
-        //make sure the entity belongs to right parent or not.
-        $this->db->select('id');
-        $this->db->from($this->table);
-        $this->db->where('id', $iEntityId);
-        $this->db->where(Self::$parent_entity, $iParentId);
-        $query = $this->db->get();
-        $aData = $query->row();
+        // if login user is himself return true
+        if($iParentId==$iEntityId)
+        {
+            return true;
+        } else {
+            //make sure the entity belongs to right parent or not.
+            $this->db->select('id');
+            $this->db->from($this->table);
+            $this->db->where('id', $iEntityId);
+            $this->db->where(Self::$parent_entity, $iParentId);
+            $query = $this->db->get();
+            if($query)
+            {
+            $aData = $query->row();
+            } else {
+                error_log("Error in isParent() query: eid=" . $iEntityId . ", parent=" . $iParentId);
+            }
+        }
         
         if(isset($aData->id)) return true;
         else return false;

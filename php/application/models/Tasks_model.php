@@ -56,6 +56,7 @@ class Tasks_model extends CI_Model
         $query = $this->db->get_where($this->table, $data);
         $result = $query->result_object();
         //var_dump($result);die;
+
         if (! is_array($result)) {
             return ['msg'=>'No tasks available','msg_type'=>'error'];
         }
@@ -79,7 +80,7 @@ class Tasks_model extends CI_Model
 
         if($entityid>0)
         {
-            $data['who_id'] = $entityid;
+            $data['what_id'] = $entityid;
         }
 
         $query = $this->db->get_where($this->table, $data);

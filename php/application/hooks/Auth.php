@@ -6,7 +6,7 @@ class Auth
 {
 //    add a class name here to secure for api
     //private $auth = ['api', 'example_api', 'entity_api'];
-    private $auth = ['api','portal','entitytypes','contacts','states','contacttypes', 'entity', 'registeragents', 'attachments', 'admin_api','notifications'];
+    private $auth = ['api','portal','entitytypes','contacts','states','contacttypes', 'entity', 'registeragents', 'attachments', 'admin_api','notifications','tasks'];
     private $skipRoute = ['notifications/logMailStatus','notifications/notify','notifications/notifyForAttachments','notifications/sendgridStatus'];
     public function myFunction()
     {
@@ -27,8 +27,8 @@ class Auth
                 // to allow functionality of login as for admin
                 $oToken = $this->hasToken($token);
                 $sToken = $oToken->token;
-                $_SESSION['eid'] = "not set yet";   
-
+//                $_SESSION['eid'] = "4071993000003468001";   
+//                return "eyJraWQiOiJhbHZ5TV9rQ05rOURCZjJ0QS0zaGVZTXY2S25pVDhjdlI2TzcwRENDSVFnIiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULmM1cFNZTEJNV2RyRTd5T0pqSUNyR3czRE5BeHhSaUxiUGVlZFpUUjBudzQiLCJpc3MiOiJodHRwczovL2Rldi02MTIwNjkub2t0YS5jb20vb2F1dGgyL2RlZmF1bHQiLCJhdWQiOiJhcGk6Ly9kZWZhdWx0IiwiaWF0IjoxNTg1NzYzMTY2LCJleHAiOjE1ODU3NjY3NjYsImNpZCI6IjBvYTFsOTcxNXhxSDBhMmdCMzU3IiwidWlkIjoiMDB1Mm0xY3dlYVVWb1BJaDUzNTciLCJzY3AiOlsiZW1haWwiLCJhZGRyZXNzIiwib3BlbmlkIiwicHJvZmlsZSIsInBob25lIl0sInN1YiI6Im15b3JnQG1lLmNvbSJ9.2HPNmIMKKwUfkr8NCChlaPOL7mngmPirSQKxbx5J2YUwqoEX4I2T0XW3x2E3PuPISki3rKKpOZEISOFkNLd15rQ-THuNTPshkvqbkZXK21PQ5BEWmKBi38afWiuOMAn01KPnhTOpWCWr3F5Dw3BxQiNA4r6riMUicO1gfb1MkgUOmqFul7A0CZXcy28oiW8kSn55V3fgnSvJvN8vtqr5Ek3x4SMF2VGy1F-Q0nmJvyavW8WlMED8ngZXPOT002L7uqNcK5-cxpPDFAyZMalsJD5sv4dtLjhfsv8pfwU4D-uMxPhtlqP43wpAKZsL_vgfH4aP3h0O7kmcQBgR9gBB0Q";
                 // on token found return it after setting session
                 if ($sToken) {
                     $iEid = $oToken->entity_id;

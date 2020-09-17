@@ -39,7 +39,7 @@ class ZoHo_Account extends CI_Model
             "apiVersion"=>"v2",
             "accounts_url"=>"https://accounts.zoho.com",
             "applicationLogFilePath"=>"zohoauth",
-            "apiBaseUrl"=>"www.zohoapis.com",
+            "apiBaseUrl"=>(isDev()?"https://sandbox.zohoapis.com":"https://www.zohoapis.com"),
 
 
 

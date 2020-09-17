@@ -364,7 +364,7 @@ const EntityDetailedPage = (props) => {
             <Grid container spacing={5}>
 
                 <Grid item xs={12}>
-                    <ComplianceTaskList loading={loading} tooltip={'Add New Contact'} redirect={true}
+                    <ComplianceTaskList loading={loading} tooltip={'Add New Contact'} redirect={true} eid={entity_id}
                                  url={`/dashboard/contact/form/add/${entity_id}`} data={taskData}
                                  title={'Compliance Tasks'}/>
                 </Grid>
