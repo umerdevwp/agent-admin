@@ -2,7 +2,7 @@
   "name": "agentadmin",
   "version": "6.1.5",
   "private": true,
-  "homepage": "https://devtest.youragentservices.com",
+  "homepage": "https://agentadmin.loc",
   "scripts": {
     "serve": "cp-cli build _site/app && serve",
     "start": "react-scripts start",

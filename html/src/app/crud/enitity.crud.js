@@ -98,7 +98,8 @@ export const checkAdmin = async (zoho_id, email) => {
 export const taskUpdate = async (eid, data) => {
     const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
 
-    if(okta) {
+    if (okta) {
+
         const response = await fetch(`${ENTITY}/Tasks/completeTaskInZoho/${eid}`, {
             method: 'put',
             headers: {
