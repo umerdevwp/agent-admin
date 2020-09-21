@@ -240,7 +240,7 @@ class Notifications extends RestController
 
     public function notifyForAttachments_get($key="")
     {
-        //if($key!=getenv("CRON_KEY")) redirectSession();
+        if($key!=getenv("CRON_KEY")) redirectSession();
 
         $this->load->model("NotificationAttachments_model");
         $this->load->model("Messenger_model");
@@ -262,14 +262,26 @@ class Notifications extends RestController
                     $oDataContact = $this->contacts_model->getEntityProfileContact($oEntity->id);
                     //$this->Messenger_model->sendCurlTemplate();
                     //$this->Messenger_model->testKitchenSinkExampleWithObjectsAndLegacyTemplate();
-                    $this->Messenger_model->sendTemplateEmail(
-                        "d-2a672857adad4bd79e7f421636b77f6b",
-                        ['contact_name'=>($oDataContact->name?:"Customer"),'entity_name'=>$oEntity->name,'download_url'=>$sDownloadUrl],
-                        $oEntity->email,
-                        $oEntity->name,
-                        $oEntity->id,
-                        "Template loc Attachment available"
-                    );/*
+                    if(filter_var($oEntity->email,FILTER_VALIDATE_EMAIL))
+                    {
+                        $bSent = $this->Messenger_model->sendTemplateEmail(
+                            "d-2a672857adad4bd79e7f421636b77f6b",
+                            ['contact_name'=>($oDataContact->name?:"Customer"),'entity_name'=>$oEntity->name,'download_url'=>$sDownloadUrl],
+                            $oEntity->email,
+                            $oEntity->name,
+                            $oEntity->id,
+                            "Template loc Attachment available"
+                        );
+                        if($bSent)
+                        {
+                            $this->NotificationAttachments_model->updateStatus($oRow->id,"sent");
+                            $iMailsSent++;
+                        }
+                    } else {
+                        $this->NotificationAttachments_model->updateStatus($oRow->id,"no-email");
+                        error_log("Email not found for Attacchment notification, eid: " . $oEntity->id);
+                    }
+                /*
                     $this->Messenger_model->sendEmail(
                         $oEntity->id,
                         $oEntity->email,
@@ -277,7 +289,7 @@ class Notifications extends RestController
                         "Attachment available",
                         $this->load->view("email/attachment-available",['name'=>($oDataContact->name?:"Customer"),'entity_name'=>$oEntity->name,'download_url'=>$sDownloadUrl],true)
                     );*/
-                    $iMailsSent++;
+                    
                 }
                 
             }

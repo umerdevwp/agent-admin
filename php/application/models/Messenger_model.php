@@ -65,12 +65,19 @@ class Messenger_model extends CI_Model {
             //   print $response->statusCode() . "\n";
             //   print_r($aHeaders);
             //   print $response->body() . "\n";
-
+            
             $this->logMailResponse($iEntityIdForLog,$iMessageId,$sEmailAddress,$sSubjectForLog,"Template ID: " . $sTemplateId . " Data: " . print_r($aTemplateFields,true));
+            if($iMessageId)
+            {
+                return true;
+            } else {
+                return false;
+            }
         } catch (Exception $e) {
             $sMessage = 'Caught exception: '. $e->getMessage() ."\n";
-            debug($e);
+            //debug($e);
             error_log($sMessage);
+            return false;
         }
     }
 

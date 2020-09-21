@@ -100,17 +100,19 @@ class Attachments extends RestController
 
     function attachment_post()
     {
-        if(!empty($this->input->post("inputFileId")) && !empty($this->input->post("name")) && !empty($this->input->post("entityId")))
+        if(!empty($this->input->post("inputFileId")) && !empty($this->input->post("inputFileName")) && !empty($this->input->post("entityId")))
         {
             $data = array(
                 'file_id' => $this->input->post("inputFileId"),
-                'entity_id' => $$this->input->post("entityId"),
+                'entity_id' => $this->input->post("entityId"),
                 'name' => $this->input->post("inputFileName"),
                 'file_size' =>  $this->input->post("inputFileSize"),
             );
             $this->load->model("LoraxAttachments_model");
-            $id = $this->LoraxAttachments_model->insert($data);
-            if(!empty($id)) {
+            $iId = $this->LoraxAttachments_model->insert($data);
+            if(!empty($iId)) {
+                $this->load->model("NotificationAttachments_model");
+                $iNotifyId = $this->NotificationAttachments_model->addAttachmentNotification($this->input->post('entityId'),$iId);
                 $this->response([
                     'status' => true,
                     'message' => 'File is attached'

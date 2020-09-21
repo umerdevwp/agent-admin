@@ -1004,12 +1004,7 @@ HC;
     private function addAttachmentNotification($iEntityId,$iAttachmentId)
     {
         $this->load->model("NotificationAttachments_model");
-        $aData = [
-            "duedate"=>date("Y-m-d"),
-            "created_by"=>$_SESSION['eid'],
-            "attachment_id"=>$iAttachmentId
-        ];
-        $aResponse = $this->NotificationAttachments_model->addAttachmentNotification($iEntityId,$aData);
+        $aResponse = $this->NotificationAttachments_model->addAttachmentNotification($iEntityId,$iAttachmentId);
         if($aResponse['type']=='ok')
         {
             return $aResponse['id'];

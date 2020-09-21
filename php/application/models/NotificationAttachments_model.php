@@ -23,12 +23,17 @@ class NotificationAttachments_model extends CI_Model {
     }
 
 
-    public function addAttachmentNotification($iEntityId,$aColumnData=[])
+    public function addAttachmentNotification(int $iEntityId,int $iAttachmentId)
     {
-        if($iEntityId>0)
+        if($iEntityId>0 && $_SESSION['eid']!=$iEntityId)
         {
-            $aData = ['entity_id'=>$iEntityId];
-            $aData = array_merge($aData,$aColumnData);
+            $aData = [
+                'entity_id'=>$iEntityId,
+                "duedate"=>date("Y-m-d"),
+                "created_by"=>$_SESSION['eid'],
+                "attachment_id"=>$iAttachmentId
+            ];
+
             $bResult = $this->db->insert($this->table,$aData);
 
             if($bResult)
@@ -39,7 +44,24 @@ class NotificationAttachments_model extends CI_Model {
                 return ['type'=>'error','message'=>'Unable to insert attachment notification'];
             }
         } else {
-            return ['type'=>'error','message'=>'Entity id is not valid'];
+            if($_SESSION['eid']!=$iEntityId) return ['type'=>'error','message'=>'Entity id is not valid'];
         }
+    }
+    public function updateStatus(int $iId, string $sStatus)
+    {
+
+
+            !empty($sStatus) ? $this->db->set('status', $sStatus):'';
+
+            $this->db->where('id', $iId);
+            $this->db->update($this->table);
+
+            if ($this->db->affected_rows() > 0) {
+                return TRUE;
+            } else {
+                return FALSE;
+            }
+
+
     }
 }

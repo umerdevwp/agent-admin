@@ -233,7 +233,6 @@ const AddAttachmentForm = (props) => {
     const [inputFileSize, setInputFileSize] = React.useState({value: '', error: ' ', success: ' '});
     const [successMessage, setSuccessMessage] = React.useState(false);
 
-
     function FacebookProgress(props) {
         const classes = useStylesFacebook();
 
@@ -285,6 +284,9 @@ const AddAttachmentForm = (props) => {
             if (response.status == true) {
                 setSuccessMessage(true);
                 setLoading(false);
+            } else {
+                setLoading(false);
+                setError(true);
             }
         }
 
