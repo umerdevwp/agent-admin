@@ -23,7 +23,7 @@ class NotificationAttachments_model extends CI_Model {
     }
 
 
-    public function addAttachmentNotification(int $iEntityId,int $iAttachmentId)
+    public function addAttachmentNotification(int $iEntityId,string $sLoraxFileId)
     {
         if($iEntityId>0 && $_SESSION['eid']!=$iEntityId)
         {
@@ -31,7 +31,8 @@ class NotificationAttachments_model extends CI_Model {
                 'entity_id'=>$iEntityId,
                 "duedate"=>date("Y-m-d"),
                 "created_by"=>$_SESSION['eid'],
-                "attachment_id"=>$iAttachmentId
+                "lorax_id"=>$sLoraxFileId,
+                "token"=>sha1(uniqid(time(), true))
             ];
 
             $bResult = $this->db->insert($this->table,$aData);
@@ -47,21 +48,44 @@ class NotificationAttachments_model extends CI_Model {
             if($_SESSION['eid']!=$iEntityId) return ['type'=>'error','message'=>'Entity id is not valid'];
         }
     }
-    public function updateStatus(int $iId, string $sStatus)
+    public function updateDataArray(int $iId, array $aData)
     {
+            if($iId>0 && count($aData)>0)
+            {
+                $this->db->set($aData);
+                $this->db->where('id', $iId);
+                $this->db->update($this->table);
 
-
-            !empty($sStatus) ? $this->db->set('status', $sStatus):'';
-
-            $this->db->where('id', $iId);
-            $this->db->update($this->table);
-
-            if ($this->db->affected_rows() > 0) {
-                return TRUE;
-            } else {
-                return FALSE;
+                if ($this->db->affected_rows() > 0) {
+                    return TRUE;
+                } else {
+                    return FALSE;
+                }
             }
 
+    }
+
+        /**
+     * Get notification with where array
+     * 
+     * @param Array $aWhere columns criterea
+     * 
+     * @return Array Record row / Error message no row found
+     */
+    public function getOne(array $aWhere=[])
+    {
+        if(count($aWhere)>0)
+        {
+            $query = $this->db->get_where($this->table, $aWhere);
+            $result = $query->row();
+
+            if (!$result) {
+                return ['message'=>'No such record found','type'=>'error'];
+            }
+            return $result;
+        } else {
+            return ['message'=>'Incomplete arguments','type'=>'error'];
+        }
 
     }
 }

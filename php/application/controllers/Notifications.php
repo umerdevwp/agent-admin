@@ -257,7 +257,7 @@ class Notifications extends RestController
                 if($aDataEntity['type']=='ok' && $aDataEntity['results']->id>0)
                 {
                     $oEntity = $aDataEntity['results'];
-                    $sDownloadUrl = getenv("SITE_MAIN_URL") . "attachments/download/" . $oRow->attachment_id;
+                    $sDownloadUrl = getenv("SITE_URL") . "download/file/" . $oRow->lorax_id . "?token=" . $oRow->token. "&name=doc-" . date("d-m-y") . ".pdf";
 
                     $oDataContact = $this->contacts_model->getEntityProfileContact($oEntity->id);
                     //$this->Messenger_model->sendCurlTemplate();
@@ -274,7 +274,7 @@ class Notifications extends RestController
                         );
                         if($bSent)
                         {
-                            $this->NotificationAttachments_model->updateStatus($oRow->id,"sent");
+                            $this->NotificationAttachments_model->updateDataArray($oRow->id,['status'=>'sent']);
                             $iMailsSent++;
                         }
                     } else {

@@ -16,6 +16,19 @@ class Download extends CI_Controller
 {
     public function file($sLoraxFileId)
     {
+        $oNotificationRow = null;
+        if(!empty($this->input->get('token')))
+        {
+            $this->load->model("NotificationAttachments_model");
+            $oNotificationRow = $this->NotificationAttachments_model->getOne(['token'=>$this->input->get('token'),'status'=>'sent']);
+            if(!$oNotificationRow->id)
+            {
+                echo "Download expired, please login to access document.";
+                die;
+            }
+            // TODO: secure logged in users download action using session token or similar token
+        }
+
         $sFileName = $this->input->get('name');
 
         $aParams = [
@@ -49,6 +62,11 @@ class Download extends CI_Controller
             //curl_setopt($cURLConnection, CURLOPT_FILE, $fileOpen);
             $fileData = curl_exec($cURLConnection);
             $contentType = curl_getinfo($cURLConnection, CURLINFO_CONTENT_TYPE);
+
+            if($oNotificationRow->id>0)
+            {
+                $aDownloadStatus = $this->NotificationAttachments_model->updateDataArray($oNotificationRow->id,['status'=>'downloaded']);
+            }
 
             header('Content-Description: File Transfer');
             header('Content-Type: application/pdf');
