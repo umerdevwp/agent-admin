@@ -99,9 +99,7 @@ $route['api/states'] = 'States/index';
 //$route['api/users/(:num)'] = 'users/$1';
 
 
-
-$route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
-$route['404_override'] = '';
+$route['404_override'] = 'Control404/index';
 $route['translate_uri_dashes'] = FALSE;

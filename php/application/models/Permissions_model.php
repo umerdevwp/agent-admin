@@ -25,10 +25,15 @@ class Permissions_model extends CI_Model
         $this->db->join($this->table_entity_role . " er","er.role_id=vp.role_id");
         $this->db->where($aWhere);
         $oResult = $this->db->get();
+        if($oResult)
+        {
+            $aData = $oResult->row_object();
+        } else {
+            logToAdmin('Permission Query Failed',$this->db->last_query(),'DB');
+            return ['type'=>'error', 'message'=>'Unable to process query'];
+        }
         
-        $aData = $oResult->row_object();
-
-        return $aData;
+        return ['type'=>'ok','results'=>$aData];
     }
 
     public function add($iEntityId,$sRoleName="entity")

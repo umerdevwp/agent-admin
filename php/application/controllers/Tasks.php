@@ -11,13 +11,14 @@ class Tasks extends RestController
     use CommonDbTrait;
 
     private $sModule = "TASKS";
-    
+
     public function index_get()
     {
         $this->response([
             'errors' => ['status' => false, 'message'=>'Request not found']
         ], 404);
-    }    /**
+    }
+    /**
      * Get zoho code if user has not granted zoho access
      */
     public function getZohoCode()
@@ -108,4 +109,70 @@ class Tasks extends RestController
         }
     }
 
+    public function list_get(int $eid=0)
+    {
+        $this->checkPermission("VIEW", $this->sModule);
+
+        $this->load->model('Tasks_model');
+        $this->load->model('Entity_model');
+        $iLoginId = $_SESSION['eid'];
+
+        // eid must be valid
+        if($eid>0)
+        {
+            // login id must be parent of entity id: eid
+            if($this->Entity_model->isParentOf($eid,$iLoginId))
+            {
+                // TODO: check parent is allowed to access specific entity tasks
+                $aDataTasks = $this->Tasks_model->getAll($eid);
+
+                // $aTasksCompleted = $this->Tempmeta_model->getOne($eid, $this->Tempmeta_model->slugTasksComplete);
+
+                // if (is_object($aTasksCompleted['results']))
+                //     $data['tasks_completed'] = json_decode($aTasksCompleted['results']->json_data);
+                // else
+                //     $data['tasks_completed'] = [];
+                
+                // TODO: loop to mark the task completed recently then list
+                // foreach($aDataTasks['res'])
+
+                // update getAll calls on other classes, as now it is return array of type=ok and result=result
+                if(count($aDataTasks['results']))
+                {
+                    $this->response([
+                        'status'  => true,
+                        'data' => $aDataTasks['results']
+                    ], 200);
+                } else {
+                    $this->response([
+                        'status'  => true,
+                        'data' => []
+                    ], 200);
+                }
+            } else {
+                $this->response([
+                    'errors' => ['status' => false, 'message'=>'Entity access denied.']
+                ], 404);
+            }
+        } else {
+            $this->response([
+                'errors' => ['status' => false, 'message'=>'Invalid entity id given.']
+            ], 404);
+
+            // get all the tasks under parent related entities
+//             $aDataTasks = $this->Tasks_model->getAllUnderParent($iLoginId);
+// //            $aDataTasks = $this->Tasks_model->getAllUnderParent($iLoginId);
+//             if($aDataTasks['type']=='ok')
+//             {
+//                 $this->response([
+//                     'status'=>true,
+//                     'data'=>$aDataTasks['results']
+//                 ],200);
+//             } else {
+//                 $this->response([
+//                     'errors' => ['status' => false, 'message'=>'No tasks found.']
+//                 ], 404);
+//             }
+        }
+    }
 }

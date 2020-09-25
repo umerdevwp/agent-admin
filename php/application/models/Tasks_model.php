@@ -34,10 +34,9 @@ class Tasks_model extends CI_Model
 
     public function getAll($id,$aColumns=[])
     {
-        // TODO: remove fake id
+
         $data = [
             'what_id' => $id,
-            //'task_owner'    =>  '4071993000000224013', // fake id
         ];
 
         $aMyColumns = [];
@@ -54,14 +53,18 @@ class Tasks_model extends CI_Model
         $this->db->select("$v as `$k`");
 
         $query = $this->db->get_where($this->table, $data);
-        $result = $query->result_object();
-        //var_dump($result);die;
 
-        if (! is_array($result)) {
-            return ['msg'=>'No tasks available','msg_type'=>'error'];
+        if($query)
+        {
+            $result = $query->result_object();
+            if (! is_array($result)) {
+                return ['message'=>'No tasks available','type'=>'error'];
+            }
+        } else {
+            logToAdmin("Tasks Query Error",$this->db->last_query(),"DB");
         }
 
-        return $result;
+        return ['type'=>'ok','results'=>$result];
     }
 
     /**
@@ -119,7 +122,30 @@ class Tasks_model extends CI_Model
         return $result;
     }
 
+    /**
+     * Get all tasks lies under entities that have same parent entity id
+     * 
+     * @param Integer $parentid Entity id who is the parent of task owner/entity
+     * 
+     * @return Array Record row / Error message no row found
+     */
+    public function getAllUnderParent($iParentId)
+    {
+        //SELECT * FROM zoho_accounts za LEFT JOIN zoho_tasks zt ON za.id=zt.related_to WHERE za.parent_entity=4071993000000411118 AND zt.id=4071993000001296114
+        $this->db->select("zt.id as id");
+        $this->db->from("zoho_accounts za");
+        $this->db->join("zoho_tasks zt","za.id=zt.who_id","left");
+        $this->db->where(["za." . Entity_model::$parent_entity =>$iParentId]);
+        $query = $this->db->get();
+        $result = $query->row();
+        //var_dump($result);die;
+        //echo $this->db->last_query();die;
+        if (!$result) {
+            return ['message'=>'No tasks found.','type'=>'error'];
+        }
 
+        return ['type'=>'ok','results'=>$result];
+    }
 
     public function getAllNotifications()
     {

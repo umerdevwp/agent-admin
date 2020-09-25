@@ -156,7 +156,6 @@ const EntityDetailedPage = (props) => {
 
     const [loading, setLoading] = React.useState(true)
     useEffect(() => {
-
         fetchDetailedProfile();
     }, [])
 

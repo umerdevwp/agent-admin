@@ -95,7 +95,7 @@ function isSessionValid($action,$aData)
         }
     }
 
-    if(!$aData){
+    if(empty($_SESSION['eid'])){
         responseJson(['type'=>'error','message'=>'Please login and try again']);
     } else {
         responseJson(['type'=>'error','message'=>'Access not allowed']);
@@ -497,4 +497,17 @@ function parsePutRequest()
 
     }
     return $data;
+}
+
+/**
+ * log the error to apache error log file, also send report the error as an email
+ * 
+ * @param String $sTitle the common label of error
+ * @param String $sContent detail or any valueable info on error
+ * @param String $sType to distinguish among error type for log or mail sepration purpose
+ */
+function logToAdmin(string $sTitle,string $sContent,string $sType="CODE")
+{
+    error_log("SESSION: " . $_SESSION['eid'] . "Type: " . $sType . ", Title: " . $sTitle. ", Content: " . $sContent);
+    mailto("najm.a@allshorestaffing.com",$sTitle,"SESSION: " . $_SESSION['eid'] . "\n\n" . $sContent);
 }

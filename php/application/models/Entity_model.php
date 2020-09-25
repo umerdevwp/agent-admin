@@ -134,9 +134,9 @@ class Entity_model extends CI_Model
      * 
      * @return Bool Bolean false or true
      */
-    public function isParent($iEntityId,$iParentId){
-        // if login user is himself return true
-        if($iParentId==$iEntityId)
+    public function isParentOf(int $iEntityId,int $iParentId){
+        // if GET request eid is given and login is eid, as self access is allowed
+        if($iEntityId==$iParentId)
         {
             return true;
         } else {
@@ -146,16 +146,11 @@ class Entity_model extends CI_Model
             $this->db->where('id', $iEntityId);
             $this->db->where(Self::$parent_entity, $iParentId);
             $query = $this->db->get();
-            if($query)
-            {
             $aData = $query->row();
-            } else {
-                error_log("Error in isParent() query: eid=" . $iEntityId . ", parent=" . $iParentId);
-            }
+            
+            if(isset($aData->id)) return true;
+            else return false;
         }
-        
-        if(isset($aData->id)) return true;
-        else return false;
     }
 
     public function getOne($id,$aColumns=[])
