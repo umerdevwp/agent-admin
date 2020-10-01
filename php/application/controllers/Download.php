@@ -17,23 +17,36 @@ class Download extends CI_Controller
     public function file($sLoraxFileId)
     {
         $oNotificationRow = null;
-        if(!empty($this->input->get('token')))
+        if(!empty($this->input->get('code')))
         {
             $this->load->model("NotificationAttachments_model");
-            $oNotificationRow = $this->NotificationAttachments_model->getOne(['token'=>$this->input->get('token'),'status'=>'sent']);
-            if(!$oNotificationRow->id)
+            $oNotificationRow = $this->NotificationAttachments_model->getOne(['token'=>$this->input->get('code'),'status'=>'sent']);
+            if($oNotificationRow->id>0)
             {
-                echo "Download expired, please login to access document.";
+                $aDownloadStatus = $this->NotificationAttachments_model->updateDataArray($oNotificationRow->id,['status'=>'downloaded']);
+            } else {
+                echo "Download expired, please request new download link.";
+                die;
+            }
+            // TODO: secure logged in users download action using session token or similar token
+        } else if(!empty($this->input->get('token')))
+        {
+            $this->load->model("LoraxAttachments_model");
+            $aWhereData = ['token'=>$this->input->get('token'),'file_id'=>$sLoraxFileId];
+            $oNotificationRow = $this->LoraxAttachments_model->getOne($aWhereData);
+            if($oNotificationRow->id>0)
+            {
+                $this->LoraxAttachments_model->updateToken($aWhereData);
+            } else {
+                echo "Download expired, please request new download link.";
                 die;
             }
             // TODO: secure logged in users download action using session token or similar token
         }
-
         $sFileName = $this->input->get('name');
 
         $aParams = [
             "expire_url_in_mins"    =>  120,// between 5 - 120 minutes
-
         ];
         $sLoraxUrl = "https://lorax-api-sandbox.filemystuff.com/api/v1/download/" . $sLoraxFileId;
 
@@ -63,10 +76,6 @@ class Download extends CI_Controller
             $fileData = curl_exec($cURLConnection);
             $contentType = curl_getinfo($cURLConnection, CURLINFO_CONTENT_TYPE);
 
-            if($oNotificationRow->id>0)
-            {
-                $aDownloadStatus = $this->NotificationAttachments_model->updateDataArray($oNotificationRow->id,['status'=>'downloaded']);
-            }
 
             header('Content-Description: File Transfer');
             header('Content-Type: application/pdf');

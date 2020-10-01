@@ -16,6 +16,7 @@ class LoraxAttachments_model extends CI_Model
         "name"=>        "name",
         "created"=> "added",
         "fileSize"  =>  "file_size",
+        "token"     => "token",
     ];
 
     public function __construct()
@@ -55,42 +56,64 @@ class LoraxAttachments_model extends CI_Model
         return ['type'=>'ok','results'=>$result];
     }
 
+    private function refreshTokens($whereEntityId)
+    {
+        // update the download tokens 1st
+        $this->db->set('token','md5(concat(rand(),"",file_id))',false);
+        
+        if(is_array($whereEntityId)) $this->db->where_in($whereEntityId);
+        else $this->db->where($aWhereData);
+        
+        $this->db->update($this->table);
+    }
+
     public function getAllFromEntityId($id,$aColumns=[])
     {
-        $data = [
-            'entity_id' => $id,
-        ];
-
-        if(count($aColumns)>0)
-            $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
-        else {
-            $aMyColumns = [
-                "id","name","fid","eid",'fileSize',"created"
+        if($id>0)
+        {
+            $data = [
+                'entity_id' => $id,
             ];
-            $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
+
+            $this->refreshTokens($id);
+            
+            // get the rows
+            if(count($aColumns)>0)
+                $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
+            else {
+                $aMyColumns = [
+                    "id","name","fid","eid",'fileSize',"created","token"
+                ];
+                $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
+            }
+
+            foreach($aMyColumns as $k=>$v){
+                $this->db->select("$v as `$k`");
+            }
+
+            $query = $this->db->get_where($this->table,$data);
+
+            $result = $query->result_object();
+
+            if (! is_array($result)) {
+                return ['message'=>'No attachments available','type'=>'error'];
+            }
+            
+            return ['type'=>'ok','results'=>$result];
+        } else {
+            return ['message'=>'Input id is missing','type'=>'error'];
         }
-
-        foreach($aMyColumns as $k=>$v){
-            $this->db->select("$v as `$k`");
-        }
-
-        $query = $this->db->get_where($this->table,$data);
-        $result = $query->result_object();
-
-        if (! is_array($result)) {
-            return ['message'=>'No attachments available','type'=>'error'];
-        }
-
-        return ['type'=>'ok','results'=>$result];
     }
 
     public function getAllFromEntityList($aCommaIds,$aColumns=[])
     {
+        $this->refreshTokens($aCommaIds);
+
         if(count($aColumns)>0)
             $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
         else {
             $aMyColumns = [
-                "id","name","fid","eid","fileSize","created"
+                "id","name","fid","eid","fileSize","created","token"
             ];
             $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
         }
@@ -240,5 +263,50 @@ class LoraxAttachments_model extends CI_Model
         curl_close($cURLConnection);
 
         return $sResponse;
+    }
+
+     /**
+     * Get notification with where array
+     * 
+     * @param Array $aWhere columns criterea
+     * 
+     * @return Array Record row / Error message no row found
+     */
+    public function getOne(array $aWhere=[])
+    {
+        if(count($aWhere)>0)
+        {
+            $query = $this->db->get_where($this->table, $aWhere);
+            $result = $query->row();
+
+            if (!$result) {
+                return ['message'=>'No such record found','type'=>'error'];
+            }
+            return $result;
+        } else {
+            return ['message'=>'Incomplete arguments','type'=>'error'];
+        }
+    }
+
+    /**
+     * Get notification with where array
+     * 
+     * @param Array $aWhere columns criterea
+     * 
+     * @return Array Record row / Error message no row found
+     */
+    public function updateToken(array $aWhere=[])
+    {
+        if(count($aWhere)>0)
+        {
+            $this->db->set('token','');
+            $this->db->where($aWhere);
+            $this->db->update($this->table);
+
+            if($this->db->affected_rows()!=1)
+            {
+                logToAdmin("Document token refresh fail","File clause: " . print_r($aWhere,true));
+            }
+        }
     }
 }

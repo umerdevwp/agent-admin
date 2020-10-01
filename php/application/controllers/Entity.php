@@ -340,7 +340,6 @@ HC;
         $this->form_validation->set_rules('inputNotificationState', 'Shipping State', 'required');
         $this->form_validation->set_rules('inputNotificationZip', 'Shipping Code', 'required|exact_length[5]',['exact_lengt'=>"Must contain 5 digits"]);
         $this->form_validation->set_rules('inputBusinessPurpose', 'Business purpose', 'required');
-        $this->form_validation->set_rules('inputBusinessPurpose', 'Business purpose', 'required');
 
         if ($this->form_validation->run() === FALSE) {
             return $this->form_validation->error_array();

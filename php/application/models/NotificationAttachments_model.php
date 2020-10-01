@@ -32,7 +32,7 @@ class NotificationAttachments_model extends CI_Model {
                 "duedate"=>date("Y-m-d"),
                 "created_by"=>$_SESSION['eid'],
                 "lorax_id"=>$sLoraxFileId,
-                "token"=>sha1(uniqid(time(), true))
+                "token"=>generateToken()
             ];
 
             $bResult = $this->db->insert($this->table,$aData);
@@ -86,6 +86,5 @@ class NotificationAttachments_model extends CI_Model {
         } else {
             return ['message'=>'Incomplete arguments','type'=>'error'];
         }
-
     }
 }

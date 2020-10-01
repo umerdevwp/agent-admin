@@ -17,7 +17,6 @@ class Attachments extends RestController
         $this->load->model("attachments_model");
         $this->load->model("entity_model");
         $this->load->model("Tempmeta_model");
-        $this->load->model('LoraxAttachments_model');
         $id = $_SESSION['eid'];
 
         if($id == getenv("SUPER_USER")){
@@ -56,24 +55,48 @@ class Attachments extends RestController
         // add parent id as well
         $arCommaIds[] = (int)$id;
 
-        $aDataAttachment = $this->LoraxAttachments_model->getAllFromEntityList($arCommaIds);
-                
-        if ($aDataAttachment['type'] == 'ok') {
-            $data['attachments'] = $aDataAttachment['results'];
-            //$aDataAttachment = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugNewAttachment);
-        } else {
-            $data['attachments'] = [];
-        }
-
-        //$data['attachments'] = $this->attachments_model->getAllFromEntityList($arCommaIds);
-
+        $data = $this->getIdIn($arCommaIds);
 
         $this->response([
+            'status'=>true,
             'data' => $data
         ], 200);
     }
 
+    private function getIdIn(array $arCommaIds=[])
+    {
 
+        $this->load->model('LoraxAttachments_model');
+        $aDataAttachment = $this->LoraxAttachments_model->getAllFromEntityList($arCommaIds);
+        $data['attachments'] = [];
+
+        if ($aDataAttachment['type'] == 'ok') {
+            $data['attachments'] = $aDataAttachment['results'];
+            //$aDataAttachment = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugNewAttachment);
+        }
+
+        return $data;
+    }
+
+    public function entity_get(int $id=null)
+    {
+        if($id>0)
+        {
+            $arCommaIds[] = $id;
+            
+            $data = $this->getIdIn($arCommaIds);
+
+            $this->response([
+                'status'=>true,
+                'data' => $data
+            ], 200);
+        } else {
+            $this->response([
+                'status'=>false,
+                'message' => 'Request must contain numeric ID'
+            ], 200);
+        }
+    } 
     
     public function download_get(int $iAttachmentId=0)
     {

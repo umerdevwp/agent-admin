@@ -3,7 +3,7 @@ header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
 class AuthVendor
 {
-    private $auth = ['user_api','entity','tasks'];
+    private $auth = ['user_api','entity','tasks','documents'];
 
     public function basicAuth()
     {
@@ -70,7 +70,7 @@ class AuthVendor
                     die();
                 }
             } else {
-                $returnResponse = ['status' => 401, 'message' => "Unauthorized request"];
+                $returnResponse = ['status' => 401, 'message' => "Invalid request"];
                 echo json_encode($returnResponse);
                 die();
             }

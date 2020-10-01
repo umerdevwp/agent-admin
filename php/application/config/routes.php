@@ -69,7 +69,7 @@ $route['notification/status/(:any)'] = 'notifications/logMailStatus/$1';
 $route['notification/logs'] = 'notifications/showEmailLogs';
 
 $route['notification/calendar'] = 'notifications/planCalendar';
-
+$route['download/(:any)'] = 'download/file/$1';
 
 // actions
 //$route['zoho'] = 'tasks/getZohoCode';

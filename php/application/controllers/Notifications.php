@@ -257,7 +257,7 @@ class Notifications extends RestController
                 if($aDataEntity['type']=='ok' && $aDataEntity['results']->id>0)
                 {
                     $oEntity = $aDataEntity['results'];
-                    $sDownloadUrl = getenv("SITE_URL") . "download/file/" . $oRow->lorax_id . "?token=" . $oRow->token. "&name=doc-" . date("d-m-y") . ".pdf";
+                    $sDownloadUrl = getenv("SITE_URL") . "download/" . $oRow->lorax_id . "?code=" . $oRow->token. "&name=doc-" . date("d-m-y") . ".pdf";
 
                     $oDataContact = $this->contacts_model->getEntityProfileContact($oEntity->id);
                     //$this->Messenger_model->sendCurlTemplate();

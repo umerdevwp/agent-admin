@@ -6,7 +6,7 @@ class Auth
 {
 //    add a class name here to secure for api
     //private $auth = ['api', 'example_api', 'entity_api'];
-    private $auth = ['api','portal','entitytypes','contacts','states','contacttypes', 'entity', 'registeragents', 'attachments', 'admin_api','notifications','tasks'];
+    private $auth = ['api','portal','entitytypes','contacts','states','contacttypes', 'entity', 'registeragents', 'documents', 'admin_api','notifications','tasks'];
     private $skipRoute = ['notifications/logMailStatus','notifications/notify','notifications/notifyForAttachments','notifications/sendgridStatus'];
     public function myFunction()
     {
