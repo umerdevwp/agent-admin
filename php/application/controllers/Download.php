@@ -42,6 +42,9 @@ class Download extends CI_Controller
                 die;
             }
             // TODO: secure logged in users download action using session token or similar token
+        } else {
+            echo "Invalid request, missing token";
+            die;
         }
         $sFileName = $this->input->get('name');
 
@@ -54,7 +57,7 @@ class Download extends CI_Controller
 
         $aGoogleFile = json_decode($sResponse,true);
 
-        if($aGoogleFile['error'])
+        if($aGoogleFile['error'] || !$sResponse)
         {
             echo "Sorry, unable to process download";
             error_log("Download Lorax: " . $aGoogleFile['message']);
