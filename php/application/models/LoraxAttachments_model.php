@@ -62,7 +62,8 @@ class LoraxAttachments_model extends CI_Model
         $this->db->set('token','md5(concat(rand(),"",file_id))',false);
         
         if(is_array($whereEntityId)) $this->db->where_in($whereEntityId);
-        else $this->db->where($aWhereData);
+        else $this->db->where('entity_id',$whereEntityId);
+
         
         $this->db->update($this->table);
     }
