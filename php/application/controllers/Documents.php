@@ -56,7 +56,7 @@ class Documents extends RestController
         $arCommaIds[] = (int)$id;
 
         $data = $this->getIdIn($arCommaIds);
-
+//        $data['attachments'] = $data['documents'];
         $this->response([
             
             'status'=>true,
@@ -89,7 +89,7 @@ class Documents extends RestController
 
             $this->response([
                 'status'=>true,
-                'data' => $data
+                'data' => $data['documents']
             ], 200);
         } else {
             $this->response([
