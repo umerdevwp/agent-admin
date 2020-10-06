@@ -54,7 +54,7 @@ class Entity extends RestController
         $this->load->model("RegisterAgents_model");
 
         // use login entity id
-        $iParentId = ($this->input->get("eid") ? $sid : null);
+        $iParentId = $sid;
 
         // entity id is session id, when requesting as parent
         $id = $this->input->get("eid") ?: $sid;
@@ -74,7 +74,7 @@ class Entity extends RestController
         }
 
         // if session is parent then get entity ID from url
-        if ($bIsParentValid || $iParentId == null) {
+        if ($bIsParentValid) {
             // fetch data from DB
             $aDataEntity = $this->entity_model->getOne($id, $aColumns);
 
