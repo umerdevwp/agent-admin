@@ -111,13 +111,11 @@ class Contacts_model extends CI_Model
         }
         foreach($aMyColumns as $k=>$v)
             $this->db->select("$v as `$k`");
-
-        $this->db->from($this->table);
-        $this->db->where_in('account_name',$arCommaIds);
-        $query = $this->db->get();
-        $result = $query->result_object();
-        //echo $this->db->last_query();
-        //var_dump($result);die;
+            
+            $query = $this->db->get_where($this->table,"account_name IN (".implode(",",$arCommaIds).")");
+            $result = $query->result();
+//        echo $this->db->last_query();
+ //       var_dump($result);die;
         if (!is_array($result)) {
             return ['msg' => 'No contacts available', 'msg_type' => 'error'];
         }
