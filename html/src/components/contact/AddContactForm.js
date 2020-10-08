@@ -2,37 +2,27 @@ import React, {useContext} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
-
-import PermIdentityIcon from '@material-ui/icons/PermIdentity';
 import clsx from 'clsx';
 import TextField from '@material-ui/core/TextField';
 import FormGroup from '@material-ui/core/FormGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
-import Checkbox from '@material-ui/core/Checkbox';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
-
 import Autocomplete from "../entity/TestAutocomplete";
-
 import CircularProgress from '@material-ui/core/CircularProgress';
 import {withOktaAuth} from '@okta/okta-react';
-
 import PropTypes from 'prop-types';
 import ErrorIcon from '@material-ui/icons/Error';
 import InfoIcon from '@material-ui/icons/Info';
 import CloseIcon from '@material-ui/icons/Close';
 import {amber, green} from '@material-ui/core/colors';
 import IconButton from '@material-ui/core/IconButton';
-import Snackbar from '@material-ui/core/Snackbar';
 import SnackbarContent from '@material-ui/core/SnackbarContent';
 import WarningIcon from '@material-ui/icons/Warning';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import {useHistory} from "react-router-dom";
-import {ContactTypeList, EntitytypesList, StateRegionList} from "../api/enitity.crud";
+import {ContactTypeList, StateRegionList} from "../api/enitity.crud";
 import {createContact} from "../api/contact.crud";
 import {UserContext} from "../context/UserContext";
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
@@ -288,7 +278,7 @@ const AddContactForm = (props) => {
             setUserAgree(true);
         }, 3000));
         Promise.resolve(setOpen(false));
-        handleOnSubmit(event, true)
+        handleOnSubmit(event, true);
 
     };
 
@@ -455,12 +445,12 @@ const AddContactForm = (props) => {
         setInputNotificationZip({...inputContactZipcode, error: ' '})
 
 
-        formData.append('entityId', props.match.params.id)
-        formData.append('inputContactFirstName', inputContactFirstName.value)
-        formData.append('inputContactLastName', inputContactLastName.value)
-        formData.append('inputContactEmail', inputContactEmail.value)
-        formData.append('inputContactPhone', inputContactPhone.value)
-        formData.append('inputContactStreet', addressObject.streetLine)
+        formData.append('entityId', props.match.params.id ? props.match.params.id : '' );
+        formData.append('inputContactFirstName', inputContactFirstName.value);
+        formData.append('inputContactLastName', inputContactLastName.value);
+        formData.append('inputContactEmail', inputContactEmail.value);
+        formData.append('inputContactPhone', inputContactPhone.value);
+        formData.append('inputContactStreet', addressObject.streetLine);
         if (addressObject.streetLine) {
             formData.append('inputContactStreet', addressObject.streetLine)
         } else {
@@ -936,7 +926,6 @@ const AddContactForm = (props) => {
                                     </FormGroup>
                                 </form>
                             </Grid>
-
             </Paper>
         </Layout>
     )

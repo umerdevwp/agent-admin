@@ -165,18 +165,16 @@ const EntityDetailedPage = (props) => {
         if (checkRole === 'Parent Organization' || checkRole === 'Administrator' ) {
             detailedView = await entityDetail(entity_id);
             if(detailedView.result) {
-                addTitle('Entity - '.detailedView.result.entity.name);
+                addTitle('Entity - ' + detailedView.result.entity.name);
             }
         }
 
         if (checkRole === 'Child Entity') {
             detailedView = await selfEntityDetail();
-            if(detailedView.result) {
-                addTitle('Entity - '.detailedView.result.entity.name);
-            }
         }
 
         if (detailedView.result) {
+            addTitle('Entity - '+ detailedView.result.entity.name);
             setEntitydetail(detailedView.result)
             setContactList(detailedView.result.contacts);
             setAttachmentList(detailedView.result.attachments)
@@ -196,6 +194,11 @@ const EntityDetailedPage = (props) => {
             updateComplianceTable()
         }
     },[compliance]);
+
+
+    const UpdateComplainceState = () => {
+        setComplainace(compliance + 1);
+    }
 
     const updateComplianceTable = async() => {
         var detailedView = '';
@@ -449,7 +452,7 @@ const EntityDetailedPage = (props) => {
 
                 <Grid container spacing={5}>
                     <Grid item xs={12}>
-                        <ComplianceTaskList loading={componentLoading} tooltip={'Add New Contact'} data={taskData}
+                        <ComplianceTaskList update={UpdateComplainceState} loading={componentLoading} tooltip={'Add New Contact'} data={taskData}
                                             title={'Compliance Tasks'} eid={entity_id}/>
                     </Grid>
                 </Grid>

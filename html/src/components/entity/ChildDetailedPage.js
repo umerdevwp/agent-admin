@@ -152,8 +152,6 @@ const ChildDetailedPage = (props) => {
     const [componentLoading, setComponentLoading] = React.useState(true);
     useEffect(() => {
         if (loading === true) {
-            console.log('here');
-            addTitle('Dashboard');
             fetchDetailedProfile();
         }
     }, [loading])
@@ -167,6 +165,7 @@ const ChildDetailedPage = (props) => {
              detailedView = await entityDetail(attributes.organization);
         }
         if (detailedView.result) {
+            addTitle('Dashboard ' +' - '+ detailedView.result.entity.name);
             new Promise((resolve, reject) => {
                 setEntitydetail(detailedView.result)
                 setContactList(detailedView.result.contacts);

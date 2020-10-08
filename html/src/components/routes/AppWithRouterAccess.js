@@ -37,11 +37,13 @@ export default withRouter(class AppWithRouterAccess extends Component {
                     <SecureRoute exact={true} path='/entity' component={SelfDetailedPage}/>
                     <SecureRoute exact={true} path='/entity/:id' component={EntityDetailedPage}/>
                     <SecureRoute exact={true} path='/entity/new/add' component={AddEntity}/>
+                    <SecureRoute exact={true} path='/contact/form/add' component={AddContactForm}/>
                     <SecureRoute exact={true} path='/contact/form/add/:id'
                                  component={AddContactForm}/>
                     <SecureRoute exact={true} path='/attachments' component={Attachments}/>
                     <SecureRoute exact={true} path='/contacts' component={Contacts}/>
-                    <SecureRoute exact path="/attachment/form/add/:id" component={AddAttachmentForm}/>
+                    <SecureRoute exact={true} path="/attachment/form/add" component={AddAttachmentForm}/>
+                    <SecureRoute exact={true} path="/attachment/form/add/:id" component={AddAttachmentForm}/>
                 </UserContextProvider>
                 <Route exact={true} path='/login'
                        render={() => <Login baseUrl={process.env.REACT_APP_OKTA_BASE_URL}/>}/>
