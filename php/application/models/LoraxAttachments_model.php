@@ -11,8 +11,8 @@ class LoraxAttachments_model extends CI_Model
 
     private $aColumns = [
         "id"    =>  "id",
-        "fid"     =>  "file_id",
-        "eid"   =>        "entity_id",
+        "fleId"     =>  "file_id",
+        "entityId"   =>        "entity_id",
         "name"=>        "name",
         "created"=> "added",
         "fileSize"  =>  "file_size",
@@ -34,7 +34,7 @@ class LoraxAttachments_model extends CI_Model
             $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
         else {
             $aMyColumns = [
-                "id","name","fid","eid","fileSize","created"
+                "id","name","fleId","entityId","fileSize","created"
             ];
             $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
         }
@@ -83,7 +83,7 @@ class LoraxAttachments_model extends CI_Model
                 $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
             else {
                 $aMyColumns = [
-                    "id","name","fid","eid",'fileSize',"created","token"
+                    "id","name","fileId","entityId",'fileSize',"created","token"
                 ];
                 $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
             }
@@ -114,7 +114,7 @@ class LoraxAttachments_model extends CI_Model
             $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
         else {
             $aMyColumns = [
-                "id","name","fid","eid","fileSize","created","token"
+                "id","name","fleId","entityId","fileSize","created","token"
             ];
             $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
         }
@@ -311,3 +311,4 @@ class LoraxAttachments_model extends CI_Model
         }
     }
 }
+

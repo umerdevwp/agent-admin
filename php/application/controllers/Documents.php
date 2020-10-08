@@ -10,10 +10,14 @@ class Documents extends RestController
 
     private $sModule = "ATTACHMENTS";
 
-    public function list_get()
+    public function list_get($id=null)
     {
         $this->checkPermission("VIEW",$this->sModule);
-
+        if($id>0)
+        {
+            $this->entity_get($id);
+            die;
+        }
         $this->load->model("attachments_model");
         $this->load->model("entity_model");
         $this->load->model("Tempmeta_model");
