@@ -1054,6 +1054,23 @@ HC;
             'data' => $aData
         ], 200);
     }
+
+    public function comboList_get()
+    {
+        $aColumns = (
+            explode(",",$this->input->get('fields'))
+            ?:
+            ['id','name']
+        );
+
+        $this->load->model("entity_model");
+        $aResult = $this->entity_model->getAll(['id','name'],$aWhere);
+
+        $this->response([
+            'status' => true,
+            'data' => $aResult['results']
+        ], 200);
+    }
 }
 
 

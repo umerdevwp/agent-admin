@@ -56,7 +56,7 @@ class AuthVendor
 
                     $responseJson_UserInfo = json_decode(curl_exec($curl2));
                     $host_list = explode(";",$responseJson_UserInfo->profile->organization_apihost);
-                    error_log("vendor ip login: " . $CI->input->ip_address());
+                    //error_log("vendor ip login: " . $CI->input->ip_address());
                     if (in_array(strtolower($CI->input->ip_address()), $host_list) || isDev()) {
                         $_SESSION['eid'] = $responseJson_UserInfo->profile->organization;
                     } else {

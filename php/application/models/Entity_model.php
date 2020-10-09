@@ -256,28 +256,53 @@ class Entity_model extends CI_Model
         return false;
     }
 
-    public function getAll()
+    public function getAll($aColumns=null)
     {
+        if(count($aColumns)>0)
+            $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
+        else {
+            $aMyColumns = [
+                "id","name","type","filingState","formationDate","agentId","entityStructure"
+            ];
+            $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
+        }
+
+       foreach($aMyColumns as $k=>$v)
+       {
+            if($v=='id')
+                $this->db->select("$this->table.$v as `$k`");
+            else
+                $this->db->select("$v as `$k`");
+       }
+
+
         // $query = $this->db->get('zoho_accounts');
         // $result = $query->result_object();
         // if (!$result) {
         //     return ['msg' => 'No such account found', 'msg_type' => 'error'];
         // }
         // return $result;
-
-        $this->db->select('zoho_accounts.*, entitymeta.entity_status');
+        if($aMyColumns==null)
+        {
+            $this->db->select('zoho_accounts.*, entitymeta.entity_status');
+        }
         $this->db->from('zoho_accounts');
         $this->db->join('entitymeta','entitymeta.zoho_accounts_id=zoho_accounts.id', 'left');
         // $this->db->where(["entitymeta.zoho_accounts_id", "zoho_accounts.id"]);
         $query = $this->db->get();
-        $result = $query->result_object();
-
-
-        if (! is_array($result)) {
-            return ['msg'=>'No contacts available','msg_type'=>'error'];
+        if($query)
+        {
+            $result = $query->result_object();
+        } else {
+            error_log("Entity getAll() failed ". $this->db->error(). " query: ". $this->db->last_query());
+            //echo print_r($this->db->error());die;
         }
 
-        return $result;
+        if (! is_array($result)) {
+            return ['message'=>'No records available','type'=>'error'];
+        }
+
+        return ['type'=>'ok','results'=>$result];
 
 
     }
