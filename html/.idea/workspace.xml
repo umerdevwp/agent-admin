@@ -2,52 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d9398c1c-af28-4f73-920d-6f1f684f34d9" name="Default Changelist" comment="Merge branch 'master-notification-react' of https://github.com/United-Agent-Services/agentadmin into local-omer&#10;&#10;# Conflicts:&#10;#&#9;application/controllers/Contacts.php&#10;#&#9;application/controllers/Entity.php&#10;#&#9;application/controllers/Login.php&#10;#&#9;application/controllers/Portal.php&#10;#&#9;application/hooks/Auth.php&#10;#&#9;application/models/Accounts_model.php&#10;#&#9;application/models/Contacts_model.php&#10;#&#9;application/models/Entity_model.php&#10;#&#9;application/views/entity-add.php&#10;#&#9;application/views/entity.php&#10;#&#9;application/views/header.php&#10;#&#9;application/views/portal.php">
-      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.test.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/api/OKTA.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/api/attachment.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/api/contact.crud.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/api/enitity.crud.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/attachment/AddAttachmentForm.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/attachment/Attachments.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/contact/AddContactForm.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/contact/Contacts.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/context/UserContext.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/dashboard/Dashboard.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/entity/AddEntity.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/entity/ChildDetailedPage.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/entity/ComplianceTaskList.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/entity/ContactList.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/entity/EntityDetailedPage.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/entity/EntityListing.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/entity/SelfDetailedPage.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/entity/TestAutocomplete.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/layout/Footer.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/layout/Layout.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/layout/newlayout.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/okta/Home.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/okta/Login.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/okta/OktaSignInWidget.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/okta/Protected.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/okta/login-backup.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/routes/AppWithRouterAccess.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/routes/ChildListItems.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/routes/ParentListItems.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/routes/listItems.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/index.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/index.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/logo.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/serviceWorker.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/setupTests.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../php/.htaccess" beforeDir="false" afterPath="$PROJECT_DIR$/../php/.htaccess" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
