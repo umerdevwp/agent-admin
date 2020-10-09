@@ -53,7 +53,7 @@ class Tasks extends RestController
         $iEntityId = $aPutData['eid'];
 
         // validate that user as parent or entity are authority to update it        
-        if(!$this->entity_model->isParent($iEntityId,$loginId))
+        if(!$this->entity_model->isParentOf($iEntityId,$loginId))
         {
                 $this->response([
                     'errors' => ['message'=> "Permission denied"]

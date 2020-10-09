@@ -1,0 +1,51 @@
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+button:focus {
+    border: unset !important;
+}
+
+button:focus {
+    outline: 0 !important;
+}
+
+
+.paperContainer{
+    background: #282c34;
+    position:fixed;
+    padding:0;
+    margin:0;
+    top:0;
+    left:0;
+    width: 100%;
+    height: 100%;
+
+}
+
+.copyright{
+    color: white !important;
+}
+
+
+
+
+
+/*body{*/
+/*    font-family: 'Poppins', sans-serif !important;*/
+/*}*/
+
+/*.okta-custom{*/
+/*    transform: scale(0.8, 0.8);*/
+
+/*}*/
