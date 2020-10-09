@@ -171,6 +171,7 @@ const EntityDetailedPage = (props) => {
 
 
         if (detailedView.result) {
+            localStorage.setItem('entityTitle',detailedView.entity.name);
             setEntitydetail(detailedView.result)
             setContactList(detailedView.result.contacts);
             setAttachmentList(detailedView.result.attachments)

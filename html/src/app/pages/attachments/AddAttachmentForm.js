@@ -232,7 +232,7 @@ const AddAttachmentForm = (props) => {
     const [inputFiling, setInputFiling] = React.useState({value: '', error: ' ', success: ' '});
     const [inputFileSize, setInputFileSize] = React.useState({value: '', error: ' ', success: ' '});
     const [successMessage, setSuccessMessage] = React.useState(false);
-
+    const entityName = localStorage.getItem('entityTitle') ? localStorage.getItem('entityTitle') : '';
 
     function FacebookProgress(props) {
         const classes = useStylesFacebook();
@@ -282,7 +282,7 @@ const AddAttachmentForm = (props) => {
 
         const response = await attachFiles(formData);
         if (response) {
-            if (response.status == true) {
+            if (response.status === true) {
                 setSuccessMessage(true);
                 setLoading(false);
             }
@@ -330,7 +330,7 @@ const AddAttachmentForm = (props) => {
                 <Typography color="textPrimary">Add Attachment</Typography>
             </Breadcrumbs>
 
-            <Title title={'Attachment'}/>
+            <Title title={'Attachment - '+entityName}/>
             <Grid container spacing={1}>
                 <Grid item xs={12}>
                     <Portlet>
