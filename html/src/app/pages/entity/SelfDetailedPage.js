@@ -172,7 +172,7 @@ const SelfDetailedPage = (props) => {
 
         if (detailedView.result) {
             new Promise((resolve, reject) => {
-                localStorage.setItem('entityTitle',detailedView.entity.name);
+                localStorage.setItem('entityTitle',detailedView.result.entity.name);
                 setEntitydetail(detailedView.result)
                 setContactList(detailedView.result.contacts);
                 setAttachmentList(detailedView.result.attachments)
