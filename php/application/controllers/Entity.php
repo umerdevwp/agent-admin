@@ -34,6 +34,14 @@ class Entity extends RestController
 
     }
 
+    public function index_get()
+    {
+        $this->response([
+            'errors' => ['status' => false, 'message'=>'Request not found']
+        ], 404);
+    }
+
+
     public function entityview_get()
     {
         $this->checkPermission("VIEW", $this->sModule);
@@ -104,15 +112,21 @@ class Entity extends RestController
                 } else {
                     $data['registerAgent'] = [];
                 }
-
-                $data['tasks'] = $this->Tasks_model->getAll($id);
+                $aDataTasks = $this->Tasks_model->getAll($id);
+                if($aDataTasks['type']=='ok') $data['tasks'] = $aDataTasks['results'];
 
                 $aTasksCompleted = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugTasksComplete);
+                if($aTasksCompleted['type']=='ok' && $aDataTasks['type']=='ok')
+                {
+                    $aTasksCompleted = json_decode($aTasksCompleted['results']->json_data);
 
-                if (is_object($aTasksCompleted['results']))
-                    $data['tasks_completed'] = json_decode($aTasksCompleted['results']->json_data);
-                else
-                    $data['tasks_completed'] = [];
+                    foreach($data['tasks'] as $k=>$v)
+                    {
+                        $iUpdateKey = array_search($v->id,$aTasksCompleted);
+                        if($iUpdateKey!==false)
+                            $v->status = "Completed";
+                    }
+                }
 
                 $contact_data = $this->Contacts_model->getAllFromEntityId($id);
                 $aContactMeta = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugNewContact);
