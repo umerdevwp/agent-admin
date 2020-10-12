@@ -34,6 +34,14 @@ class Entity extends RestController
 
     }
 
+    public function index_get()
+    {
+        $this->response([
+            'errors' => ['status' => false, 'message'=>'Request not found']
+        ], 404);
+    }
+
+
     public function entityview_get()
     {
         $this->checkPermission("VIEW", $this->sModule);
