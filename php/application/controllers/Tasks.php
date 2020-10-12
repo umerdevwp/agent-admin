@@ -56,7 +56,7 @@ class Tasks extends RestController
         if(!$this->entity_model->isParentOf($iEntityId,$loginId))
         {
                 $this->response([
-                    'errors' => ['message'=> "Permission denied"]
+                    'status' => false,'message'=> "Permission denied"
                 ], 403);
                 exit();
         }
@@ -76,35 +76,43 @@ class Tasks extends RestController
                     $oZohoApi->setFieldValue("Status","Not Started");
 
                 $resp = $oZohoApi->update();
-                
+                $sDataResp = $resp->getCode();
                 // dump into temp for later logins,
                 // fetch temp records into session
                 // push new records into temp
                 // update session with new records
-                $_SESSION[$this->Tempmeta_model->slugTasksComplete][] = $id;
+                //$_SESSION[$this->Tempmeta_model->slugTasksComplete][] = $id;
                                 
                 // update temp table as well
-                $this->Tempmeta_model->update($iEntityId,$this->Tempmeta_model->slugTasksComplete,json_encode($_SESSION[$this->Tempmeta_model->slugTasksComplete]));
-                if($iEntityId>0)
+                if($sDataResp=='SUCCESS')
                 {
-                    $aData = ['id'=>$id,'status'=>$iStatus];
+                    $aData = $id;
                     $this->Tempmeta_model->appendRow($iEntityId,$this->Tempmeta_model->slugTasksComplete,$aData);
-                } 
-                $this->response([
-                    'result'=>[
-                    'message' => "Task updated successfully",
-                    "id"=>$id]
-                ], 200);
+                    
+                    $this->response([
+                        'status'=> true,
+                        'message' => "Task updated successfully",
+                        "id"=>$id
+                    ], 200);
+                } else {
+                    $this->response([
+                        'status' => false,
+                        'message'=> "Internal server error, please try again later"
+                    ], 500);
+                    error_log("error","Zoho Tasks API errror: " . print_r($resp,true));
+                }
             } catch(Exception $e)
             {
                 $this->response([
-                    'errors' => ['message'=> "Internal server error, please try again"]
+                    'status' => false,
+                    'message'=> "Internal server error, please try again"
                 ], 500);
-                error_log("error","Zoho server errror: " . $e->getMessage());
+                error_log("error","Zoho Tasks API errror: " . $e->getMessage());
             }
         } else {
                 $this->response([
-                    'errors' => ['message'=> "No such tasks exist"]
+                    'status' => false,
+                    'message'=> "No such tasks exist"
                 ], 500);
         }
     }
