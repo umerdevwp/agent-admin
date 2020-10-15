@@ -12,6 +12,7 @@ import AddContactForm from "../contact/AddContactForm";
 import Attachments from "../attachment/Attachments";
 import Contacts from "../contact/Contacts";
 import AddAttachmentForm from "../attachment/AddAttachmentForm";
+import Privacy from "../privacy/Privacy";
 
 export default withRouter(class AppWithRouterAccess extends Component {
     constructor(props) {
@@ -48,6 +49,7 @@ export default withRouter(class AppWithRouterAccess extends Component {
                 <Route exact={true} path='/login'
                        render={() => <Login baseUrl={process.env.REACT_APP_OKTA_BASE_URL}/>}/>
                 <Route exact={true} path='/implicit/callback' component={LoginCallback}/>
+                <Route exact={true} path='/privacy-policy' component={Privacy}/>
             </Security>
         );
     }
