@@ -37,7 +37,7 @@ class Tasks extends RestController
      * Mark task complete in ZOHO CRM
      * 
      */
-    public function completeTaskInZoho($id)
+    public function completeTaskInZoho_put($id)
     {
         $this->checkPermission("EDIT", $this->sModule);
 
@@ -46,20 +46,22 @@ class Tasks extends RestController
         $this->load->model("entity_model");
         $this->load->model("Tempmeta_model");
         
-        $loginId = $this->session->user["zohoId"];
-        $iStatus = $this->input->get('status')??1;
+        $loginId = $_SESSION["eid"];
 
-        if(!empty($this->input->get('eid')))
+        $aPutData = parsePutRequest();
+        $iStatus = $aPutData['status']??1;
+        $iEntityId = $aPutData['eid'];
+
+        // validate that user as parent or entity are authority to update it        
+        if(!$this->entity_model->isParentOf($iEntityId,$loginId))
         {
-            $iEntityId = $this->input->get('eid');
+                $this->response([
+                    'status' => false,'message'=> "Permission denied"
+                ], 403);
+                exit();
         }
-        
-        // validate that user as parent or entity are authority to update it
-        if($this->session->user["child"]>0){
-            $row = $this->Tasks_model->getOneParentId($id,$loginId);
-        } else {
-            $row = $this->Tasks_model->getOne($id,$loginId);
-        }
+        // get task details
+        $row = $this->Tasks_model->getOne($id,$iEntityId);
 
         // if valid authority found
         if($row->id>0)
@@ -68,40 +70,54 @@ class Tasks extends RestController
                 // real id
                 $oZohoApi = $this->ZoHo_Account->getInstance("Tasks",$id);
 
-                //$oZohoApi->setFieldValue("percent_complete",100);
-                $oZohoApi->setFieldValue("Status","Completed");
-
                 if($iStatus==1)
                     $oZohoApi->setFieldValue("Status","Completed");
                 else
                     $oZohoApi->setFieldValue("Status","Not Started");
 
                 $resp = $oZohoApi->update();
-                $this->session->set_flashdata("ok","Task updated successfully");
-                
+                $sDataResp = $resp->getCode();
                 // dump into temp for later logins,
                 // fetch temp records into session
                 // push new records into temp
                 // update session with new records
-                
+                //$_SESSION[$this->Tempmeta_model->slugTasksComplete][] = $id;
+                                
                 // update temp table as well
-                //$this->Tempmeta_model->update($this->session->user["zohoId"],$sTempSlug,json_encode($this->session->temp[$sTempSlug]));
-                if($iEntityId>0)
+                if($sDataResp=='SUCCESS')
                 {
-                    $aData = ['id'=>$id,'status'=>$iStatus];
+                    $aData = $id;
+                    
+                    if($iStatus)
                     $this->Tempmeta_model->appendRow($iEntityId,$this->Tempmeta_model->slugTasksComplete,$aData);
+                    else
+                    $this->Tempmeta_model->deduceRow($iEntityId,$this->Tempmeta_model->slugTasksComplete,$aData);
 
-                } 
-
-                redirect($_SERVER["HTTP_REFERER"]);
+                    $this->response([
+                        'status'=> true,
+                        'message' => "Task updated successfully",
+                        "id"=>$id
+                    ], 200);
+                } else {
+                    $this->response([
+                        'status' => false,
+                        'message'=> "Internal server error, please try again later"
+                    ], 500);
+                    error_log("error","Zoho Tasks API errror: " . print_r($resp,true));
+                }
             } catch(Exception $e)
             {
-                log_message("error","Zoho server errror: " . $e->getMessage());
-                redirect($_SERVER["HTTP_REFERER"]);
+                $this->response([
+                    'status' => false,
+                    'message'=> "Internal server error, please try again"
+                ], 500);
+                error_log("error","Zoho Tasks API errror: " . $e->getMessage());
             }
         } else {
-            $this->session->set_flashdata("error","Permission denied, no such tasks found");
-            redirect($_SERVER["HTTP_REFERER"]);
+                $this->response([
+                    'status' => false,
+                    'message'=> "No such tasks exist"
+                ], 500);
         }
     }
 

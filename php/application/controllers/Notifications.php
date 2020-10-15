@@ -237,6 +237,65 @@ class Notifications extends RestController
         error_log("Notify Mail cron succeed: {$iMailsSent} sent");
     }
 
+
+    public function notifyForAttachments_get($key="")
+    {
+        if($key!=getenv("CRON_KEY")) redirectSession();
+
+        $this->load->model("NotificationAttachments_model");
+        $this->load->model("Messenger_model");
+        $this->load->model("entity_model");
+        $this->load->model("contacts_model");
+        $aDataNotify = $this->NotificationAttachments_model->getAllWhere(['status'=>'pending']);
+        $iMailsSent = 0;
+        $iToday = strtotime(date("Y-m-d"));
+        foreach($aDataNotify['results'] as $oRow)
+        {
+            if(strtotime($oRow->duedate)<=$iToday)
+            {
+                $aDataEntity = $this->entity_model->getOne($oRow->entity_id,['id','name','email','type','filingState','entityStructure']);
+                if($aDataEntity['type']=='ok' && $aDataEntity['results']->id>0)
+                {
+                    $oEntity = $aDataEntity['results'];
+                    $sDownloadUrl = getenv("SITE_URL") . "download/" . $oRow->lorax_id . "?code=" . $oRow->token. "&name=doc-" . date("d-m-y") . ".pdf";
+
+                    $oDataContact = $this->contacts_model->getEntityProfileContact($oEntity->id);
+                    //$this->Messenger_model->sendCurlTemplate();
+                    //$this->Messenger_model->testKitchenSinkExampleWithObjectsAndLegacyTemplate();
+                    if(filter_var($oEntity->email,FILTER_VALIDATE_EMAIL))
+                    {
+                        $bSent = $this->Messenger_model->sendTemplateEmail(
+                            "d-2a672857adad4bd79e7f421636b77f6b",
+                            ['contact_name'=>($oDataContact->name?:"Customer"),'entity_name'=>$oEntity->name,'download_url'=>$sDownloadUrl],
+                            $oEntity->email,
+                            $oEntity->name,
+                            $oEntity->id,
+                            "Template loc Attachment available"
+                        );
+                        if($bSent)
+                        {
+                            $this->NotificationAttachments_model->updateDataArray($oRow->id,['status'=>'sent']);
+                            $iMailsSent++;
+                        }
+                    } else {
+                        $this->NotificationAttachments_model->updateStatus($oRow->id,"no-email");
+                        error_log("Email not found for Attacchment notification, eid: " . $oEntity->id);
+                    }
+                /*
+                    $this->Messenger_model->sendEmail(
+                        $oEntity->id,
+                        $oEntity->email,
+                        $oEntity->name,
+                        "Attachment available",
+                        $this->load->view("email/attachment-available",['name'=>($oDataContact->name?:"Customer"),'entity_name'=>$oEntity->name,'download_url'=>$sDownloadUrl],true)
+                    );*/
+                    
+                }
+                
+            }
+        }
+        error_log("Notify For Attacchment Cron Succeed: {$iMailsSent} sent");
+    }
     /**
      * Send mail using sendgrid API
      * 
@@ -601,9 +660,34 @@ HC;
 
     public function najm_get()
     {
-
+        $sMsgId = ['msg_id LIKE "%"'];
+        $sToEmail = ['to_email LIKE "najm.a@allshorestaffing.com"'];
+        $sFromEmail = ['from_email LIKE "agentadmin@youragentservices.com"'];
+        $sOpenCount = ['opens_count LIKE "0"'];
+        $sResult = $this->sgGetStatus($sOpenCount);
+        $oJson = json_decode($sResult);
+        print_r($oJson);
+        if(count($oJson->messages)>0)
+        {
+            //$this->Notifications_model->updateMailLog($v->id, $oJson->messages[0]->status,$sResult);
+            //$iRecordsUpdated++;
+        }
+        die;
         $this->response([
             'data' => []
         ], 200);
+    }
+
+    public function sendgridStatus_get()
+    {
+
+        $sMsgId = ['msg_id LIKE "'.$_GET['msgid'].'%"'];
+        $sToEmail = ['to_email LIKE "najm.a@allshorestaffing.com"'];
+        $sFromEmail = ['from_email LIKE "agentadmin@youragentservices.com"'];
+        $sOpenCount = ['open_count=0'];
+        $sResult = $this->sgGetStatus($sMsgId);
+        $oJson = json_decode($sResult);
+        print_r($oJson);
+        die;
     }
 }

@@ -6,13 +6,19 @@ class Auth
 {
 //    add a class name here to secure for api
     //private $auth = ['api', 'example_api', 'entity_api'];
-    private $auth = ['api','portal','entitytypes','contacts','states','contacttypes', 'entity', 'registeragents', 'attachments', 'admin_api','tasks'];
+    private $auth = ['api','portal','entitytypes','contacts','states','contacttypes', 'entity', 'registeragents', 'documents', 'admin_api','notifications','tasks'];
+    private $skipRoute = ['notifications/logMailStatus','notifications/notify','notifications/notifyForAttachments','notifications/sendgridStatus'];
     public function myFunction()
     {
         $CI =& get_instance();
 
-        if(empty($_SERVER['PHP_AUTH_USER']) && empty($_SERVER['PHP_AUTH_PW']))  {
-           
+        if(in_array(strtolower($CI->router->class)."/{$CI->router->method}",$this->skipRoute))
+        {
+            return "it is a cron call";
+        }
+
+        if(empty($_SERVER['PHP_AUTH_USER']) && empty($_SERVER['PHP_AUTH_PW']) )  {
+
             if (in_array(strtolower($CI->router->class), $this->auth)) {
 
                 $token = $CI->input->get_request_header('Authorization');
@@ -21,11 +27,13 @@ class Auth
                 // to allow functionality of login as for admin
                 $oToken = $this->hasToken($token);
                 $sToken = $oToken->token;
-                $_SESSION['eid'] = "not set yet";   
-                
+//                $_SESSION['eid'] = "4071993000003468001";   
+//                return "eyJraWQiOiJhbHZ5TV9rQ05rOURCZjJ0QS0zaGVZTXY2S25pVDhjdlI2TzcwRENDSVFnIiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULmM1cFNZTEJNV2RyRTd5T0pqSUNyR3czRE5BeHhSaUxiUGVlZFpUUjBudzQiLCJpc3MiOiJodHRwczovL2Rldi02MTIwNjkub2t0YS5jb20vb2F1dGgyL2RlZmF1bHQiLCJhdWQiOiJhcGk6Ly9kZWZhdWx0IiwiaWF0IjoxNTg1NzYzMTY2LCJleHAiOjE1ODU3NjY3NjYsImNpZCI6IjBvYTFsOTcxNXhxSDBhMmdCMzU3IiwidWlkIjoiMDB1Mm0xY3dlYVVWb1BJaDUzNTciLCJzY3AiOlsiZW1haWwiLCJhZGRyZXNzIiwib3BlbmlkIiwicHJvZmlsZSIsInBob25lIl0sInN1YiI6Im15b3JnQG1lLmNvbSJ9.2HPNmIMKKwUfkr8NCChlaPOL7mngmPirSQKxbx5J2YUwqoEX4I2T0XW3x2E3PuPISki3rKKpOZEISOFkNLd15rQ-THuNTPshkvqbkZXK21PQ5BEWmKBi38afWiuOMAn01KPnhTOpWCWr3F5Dw3BxQiNA4r6riMUicO1gfb1MkgUOmqFul7A0CZXcy28oiW8kSn55V3fgnSvJvN8vtqr5Ek3x4SMF2VGy1F-Q0nmJvyavW8WlMED8ngZXPOT002L7uqNcK5-cxpPDFAyZMalsJD5sv4dtLjhfsv8pfwU4D-uMxPhtlqP43wpAKZsL_vgfH4aP3h0O7kmcQBgR9gBB0Q";
+                // on token found return it after setting session
                 if ($sToken) {
-                    
-                    $_SESSION['eid'] = $oToken->entity_id;
+                    $iEid = $oToken->entity_id;
+                    $sAccountType = unserialize($oToken->meta)['accountType'];
+                    $this->setSession($iEid,$sAccountType);
                     return $sToken;
                 }
 
@@ -53,7 +61,13 @@ class Auth
                                 $this->deletePreviousToken($response->sub);
                                 $this->addToken($response->sub, $response->email , $token);
 
-                                $_SESSION['eid'] = $CI->input->get('eid');
+                                $iEid = $CI->input->get('eid');
+                                $sAccountType = "";
+                                // on token not found set session
+                                if($CI->input->get("account")=='tester') $sAccountType = 'tester';
+                                $this->setSession($iEid,$sAccountType);
+
+                                // to make role assignment if user has parent attribute, okta organization_type
                                 if($CI->input->get("bit")==1)
                                 {
                                     $CI->load->model("Permissions_model");
@@ -120,7 +134,7 @@ class Auth
             //$CI->load->model("Entity_model");
             //$aEntityData = $CI->Entity_model->getEmailId($email);
             $eid = $CI->input->get('eid');
-
+            $sAccountType = $CI->input->get("account");
 //            if($aEntityData['type']=='ok')
 //                $eid = $aEntityData['results']->id;
 
@@ -138,6 +152,7 @@ class Auth
                 'sub' => $sub,
                 'email' => $email,
                 'token' => $token,
+                'meta'=> serialize(['accountType'=>$sAccountType]),
                 'expired_on' => date('Y-m-d H:i:s',$expired_on),
                 "entity_id" =>  $eid
             );
@@ -178,6 +193,12 @@ class Auth
             $eid = $aEntityData['results']->id;
 
         return $eid;
+    }
+
+    private function setSession($iEid,$sAccountType="")
+    {
+        $_SESSION['eid'] = $iEid;
+        $_SESSION['accountType'] = $sAccountType;
     }
 
 }

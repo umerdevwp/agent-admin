@@ -3,7 +3,7 @@ header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
 class AuthVendor
 {
-    private $auth = ['user_api','entity','tasks'];
+    private $auth = ['user_api','entity','tasks','documents'];
 
     public function basicAuth()
     {
@@ -56,8 +56,8 @@ class AuthVendor
 
                     $responseJson_UserInfo = json_decode(curl_exec($curl2));
                     $host_list = explode(";",$responseJson_UserInfo->profile->organization_apihost);
-                    error_log("vendor ip login: " . $CI->input->ip_address());
-                    if (in_array(strtolower($CI->input->ip_address()), $host_list)) {
+                    //error_log("vendor ip login: " . $CI->input->ip_address());
+                    if (in_array(strtolower($CI->input->ip_address()), $host_list) || isDev()) {
                         $_SESSION['eid'] = $responseJson_UserInfo->profile->organization;
                     } else {
                         $returnResponse = ['status' => 401, 'message' => "Host not is unauthorized"];
@@ -70,7 +70,7 @@ class AuthVendor
                     die();
                 }
             } else {
-                $returnResponse = ['status' => 401, 'message' => "Unauthorized request"];
+                $returnResponse = ['status' => 401, 'message' => "Invalid request"];
                 echo json_encode($returnResponse);
                 die();
             }

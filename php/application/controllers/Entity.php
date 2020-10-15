@@ -34,6 +34,14 @@ class Entity extends RestController
 
     }
 
+    public function index_get()
+    {
+        $this->response([
+            'errors' => ['status' => false, 'message'=>'Request not found']
+        ], 404);
+    }
+
+
     public function entityview_get()
     {
         $this->checkPermission("VIEW", $this->sModule);
@@ -54,7 +62,7 @@ class Entity extends RestController
         $this->load->model("RegisterAgents_model");
 
         // use login entity id
-        $iParentId = ($this->input->get("eid") ? $sid : null);
+        $iParentId = $sid;
 
         // entity id is session id, when requesting as parent
         $id = $this->input->get("eid") ?: $sid;
@@ -74,7 +82,7 @@ class Entity extends RestController
         }
 
         // if session is parent then get entity ID from url
-        if ($bIsParentValid || $iParentId == null) {
+        if ($bIsParentValid) {
             // fetch data from DB
             $aDataEntity = $this->entity_model->getOne($id, $aColumns);
 
@@ -104,15 +112,21 @@ class Entity extends RestController
                 } else {
                     $data['registerAgent'] = [];
                 }
-
-                $data['tasks'] = $this->Tasks_model->getAll($id);
+                $aDataTasks = $this->Tasks_model->getAll($id);
+                if($aDataTasks['type']=='ok') $data['tasks'] = $aDataTasks['results'];
 
                 $aTasksCompleted = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugTasksComplete);
+                if($aTasksCompleted['type']=='ok' && $aDataTasks['type']=='ok')
+                {
+                    $aTasksCompleted = json_decode($aTasksCompleted['results']->json_data);
 
-                if (is_object($aTasksCompleted['results']))
-                    $data['tasks_completed'] = json_decode($aTasksCompleted['results']->json_data);
-                else
-                    $data['tasks_completed'] = [];
+                    foreach($data['tasks'] as $k=>$v)
+                    {
+                        $iUpdateKey = array_search($v->id,$aTasksCompleted);
+                        if($iUpdateKey!==false)
+                            $v->status = "Completed";
+                    }
+                }
 
                 $contact_data = $this->Contacts_model->getAllFromEntityId($id);
                 $aContactMeta = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugNewContact);
@@ -185,7 +199,6 @@ class Entity extends RestController
 
     public function create_post()
     {
-
         $this->checkPermission("ADD", $this->sModule);
 
         $bTagSmartyValidated = true;
@@ -217,44 +230,80 @@ HC;
             $_POST['inputFormationDate'] = date("Y-m-d", strtotime($this->input->post("inputFormationDate")));
             $_POST['inputFiscalDate'] = date("Y-m-d", strtotime($this->input->post("inputFiscalDate")));
 
-            $aResponseZoho = $this->zohoCreateEntity($_SESSION['eid'], $bTagSmartyValidated);
+//            $bEntityExist = $this->checkEntityExist($this->input->post("inputName"),$this->input->post("inputFillingState"));
+            
+            // entity not found
+            //if(!$bEntityExist)
+            //{
+                $aResponseZoho = $this->zohoCreateEntity($_SESSION['eid'], $bTagSmartyValidated);
 
-            // succcess redirect to dashboard
-            if ($aResponseZoho["type"] == 'ok') {
-                // allow without file, else check type and size
-                $iZohoId = $aResponseZoho['id'];
-                //$this->zohoAddAttachment($iZohoId);
+                // succcess redirect to dashboard
+                if ($aResponseZoho["type"] == 'ok') {
+                    // allow without file, else check type and size
+                    $iZohoId = $aResponseZoho['id'];
+                    //$this->zohoAddAttachment($iZohoId);
 
-                // check address is valid from smarty is not needed, validation is at interface
-                $sSmartyAddress = '';//$this->validateSmartyStreet();
-                
-                // add a note if smarty validated address successfuly
-                if ($sSmartyAddress != '') {
-                    $aResponseNote = $this->ZoHo_Account->newZohoNote("Accounts", $iZohoId, "Smartystreet has replaced following", $sSmartyAddress);
-                    if($aResponseNote['type']=='error')
-                    {
-                        $aResponseZoho['type'] = 'error';
-                        if(!empty($aResponseZoho['message']))
-                        $aResponseZoho['message'] .= "," . $aResponseNote['message'];
-                        else
-                        $aResponseZoho['message'] = $aResponseNote['message'];
-                        
+                    // check address is valid from smarty is not needed, validation is at interface
+                    $sSmartyAddress = $this->input->post("inputSmartyResult");
+                    
+                    // add a note if smarty validated address successfuly
+                    if ($sSmartyAddress != '') {
+                        $aResponseNote = $this->ZoHo_Account->newZohoNote("Accounts", $iZohoId, "Smartystreet suggested following", $sSmartyAddress);
+                        if($aResponseNote['type']=='error')
+                        {
+                            $aResponseZoho['type'] = 'error';
+                            if(!empty($aResponseZoho['message']))
+                            $aResponseZoho['message'] .= "," . $aResponseNote['message'];
+                            else
+                            $aResponseZoho['message'] = $aResponseNote['message'];
+                            
+                        }
                     }
+
+                    $this->addPermission($iZohoId);
+
+                    $this->redirectAfterAdd($aResponseZoho);
+
+                    // redirect to form, show error
+                } else {
+                    $this->response([
+                        'status' => false,
+                        'error' => $aResponseZoho['message']
+                    ], 400);
                 }
-
-                $this->addPermission($iZohoId);
-
-                $this->redirectAfterAdd($aResponseZoho);
-
-                // redirect to form, show error
-            } else {
+            /*} else {            // entity already exist
                 $this->response([
                     'status' => false,
-                    'error' => $aResponseZoho['message']
+                    'error' => "Entity with the name: " . $this->input->post("inputName").", state: ".$this->input->post("inputFillingState")." already exist"
                 ], 400);
-            }
-
+            }*/
         }
+    }
+
+    public function checkEntityExist($sInput)
+    {
+        $this->load->model("Entity_model");
+        $this->load->model("Tempmeta_model");
+
+        $sEntityName = $this->input->post("inputName");
+        $sFilingState = $this->input->post("inputFillingState");
+
+        $aDataWhereTemp = ['json_name'=>$sEntityName,'json_filingState'=>$sFilingState];
+
+        $bRowExist = $this->Tempmeta_model->checkRowExistInJson($aDataWhereTemp);
+        
+        if(!$bRowExist)
+        {
+            $aDataWhere = ['name'=>$sEntityName,'filingState'=>$sFilingState];
+        
+            $aRow = $this->Entity_model->getWhere($aDataWhere);    
+            if($aRow["type"]=="ok")
+            {
+                $bRowExist = true;
+            }
+        }
+        // if record found return false for form_vaidator
+        return ($bRowExist?false:true);
     }
 
     private function validateForm()
@@ -294,7 +343,7 @@ HC;
         $this->form_validation->set_rules('inputName', 'Account Name', 'required|regex_match[/[a-zA-Z\s]+/]', ["regex_match" => "Only alphabets and spaces allowed."]);
 
         $this->form_validation->set_rules('inputEIN', 'EIN', 'numeric|exact_length[9]',["numeric" => "Only numbers are allowed.","exact_length"=>"Must contain 9 digits"]);
-        $this->form_validation->set_rules('inputFillingState', 'Filing State', 'required|alpha|exact_length[2]');
+        $this->form_validation->set_rules('inputFillingState', 'Filing State', 'required|alpha|exact_length[2]|callback_checkEntityExist',["checkEntityExist"=>"Entity: ".$this->input->post('inputName').", ".$this->input->post("inputFillingState")." already exist"]);
         $this->form_validation->set_rules('inputFillingStructure', 'Entity Type', 'required|regex_match[/[A-Z\-]+/]');
         $this->form_validation->set_rules('inputFormationDate', 'Formation Date', 'required|regex_match[/[0-9]{4,}\-[0-9]{2,}\-[0-9]{2,}/]', ["regex_match" => "Allowed %s format: 2019-01-01"]);
         $this->form_validation->set_rules('inputFiscalDate', 'Fiscal Date', 'required|regex_match[/[0-9]{4,}\-[0-9]{2,}\-[0-9]{2,}/]', ["regex_match" => "Allowed %s format: 2019-01-01"]);
@@ -418,15 +467,16 @@ HC;
         $this->load->model('ZoHo_Account');
         $this->load->model("entity_model");
         $this->load->model("RegisterAgents_model");
-
+        
         $aZohoResponse = $this->zohoAddEntity();
         $iZohoId = $aZohoResponse['entityId'];
         $iAgentId = $aZohoResponse['agentId'];
 
         if ($iZohoId > 0) {
             $aErrorAttachment = ['type'=>'ok'];
-            if (!empty($this->input->post("inputFileId")))
+            if (!empty($this->input->post("inputFileId"))){
                 $aErrorAttachment = $this->zohoAddAttachment($iZohoId);
+            }
             // contact with entity is skipped 24/6/2020
             //$iContactId = $this->zohoAddContact($iZohoId);
 
@@ -458,7 +508,8 @@ HC;
 
         return $aResponse;
     }
-    
+
+
     private function processTags($iZohoId,$bTagSmartyValidated)
     {
         // no error occur, tags success
@@ -470,8 +521,12 @@ HC;
             $sForeign = ($this->input->post("inputForeign") ?? 0);
             $sNewService = ($this->input->post("inputService") ?? 0);
 
+            
+            $aTags = [];
+            // don't store onboard on tester accounts, as they are not real
+            if($_SESSION['accountType']!='tester')
             $aTags = ["name" => "OnBoard"];
-
+            
             if ($sComplianceOnly) {
                 $aTags["ComplianceOnly"] = "Compliance Only";
             }
@@ -972,6 +1027,20 @@ HC;
         return $sSmartyAddress;
     }
 
+    /**
+     * Add attachment notification row for next notifying cron for attachments available
+     * */
+    private function addAttachmentNotification($iEntityId,$iAttachmentId)
+    {
+        $this->load->model("NotificationAttachments_model");
+        $aResponse = $this->NotificationAttachments_model->addAttachmentNotification($iEntityId,$iAttachmentId);
+        if($aResponse['type']=='ok')
+        {
+            return $aResponse['id'];
+        } else {
+            return false;
+        }
+    }
 
     public function attachment_get($sLoraxFileId)
     {
@@ -997,6 +1066,23 @@ HC;
         $this->response([
             'status' => true,
             'data' => $aData
+        ], 200);
+    }
+
+    public function comboList_get()
+    {
+        $aColumns = (
+            explode(",",$this->input->get('fields'))
+            ?:
+            ['id','name']
+        );
+
+        $this->load->model("entity_model");
+        $aResult = $this->entity_model->getAll(['id','name'],$aWhere);
+
+        $this->response([
+            'status' => true,
+            'data' => $aResult['results']
         ], 200);
     }
 }

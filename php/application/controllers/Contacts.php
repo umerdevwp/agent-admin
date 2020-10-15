@@ -48,7 +48,7 @@ class Contacts extends RestController
 
         // create comma seprated ids from result
         $arCommaIds = array();
-        foreach($result as $v)
+        foreach($result['results'] as $v)
         {
             $arCommaIds[] = $v->id;
         }
