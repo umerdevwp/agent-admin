@@ -23,7 +23,7 @@ export const AttachmentsList = async (zoho_id) => {
 export const attachFiles = async (data) => {
     const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
     if(okta) {
-        const response = await fetch(`${ENTITY}/Attachment_api/attachment`, {
+        const response = await fetch(`${ENTITY}/documents/attachment`, {
             method: 'post',
             headers: {
                 'Access-Control-Allow-Origin': '*',

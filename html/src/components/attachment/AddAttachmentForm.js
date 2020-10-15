@@ -219,7 +219,7 @@ MySnackbarContentWrapper.propTypes = {
 
 const AddAttachmentForm = (props) => {
 
-    const {addTitle, addError} = useContext(UserContext);
+    const {addTitle, addError, attributes} = useContext(UserContext);
     addTitle('Add New Attachment');
     const classes = useStyles();
     const history = useHistory();
@@ -271,8 +271,9 @@ const AddAttachmentForm = (props) => {
 // console.log(inputFormationDate.value);
 
 // Display the key/value pairs
-
-        formData.append('entityId', props.match.params.id)
+        if(attributes.organization) {
+            formData.append('entityId', props.match.params.id ? props.match.params.id : attributes.organization);
+        }
         formData.append('inputFileId', inputFiling.value);
         formData.append('inputFileName', inputFileName.value);
         formData.append('inputFileSize', inputFileSize.value);
@@ -316,6 +317,15 @@ const AddAttachmentForm = (props) => {
         }
     }
 
+    const removeSuccess = () => {
+        setSuccessMessage(' ');
+    }
+
+    const removeErrorMessage = () => {
+        setErrorMessage(' ');
+    }
+
+
     return (
 
         <Layout>
@@ -341,6 +351,7 @@ const AddAttachmentForm = (props) => {
             <Paper className={classes.paper} elevation={3}>
                 {successMessage !== ' ' ? (
                     <MySnackbarContentWrapper
+                        onClose={()=>{removeSuccess()}}
                         variant="success"
                         message={successMessage}
                     />
@@ -349,6 +360,7 @@ const AddAttachmentForm = (props) => {
 
                 {errorMessage !== ' ' ? (
                     <MySnackbarContentWrapper
+                        onClose={()=>{removeErrorMessage()}}
                         variant="error"
                         message={errorMessage}
                     />

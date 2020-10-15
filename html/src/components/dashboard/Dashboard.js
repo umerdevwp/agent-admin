@@ -152,6 +152,10 @@ function Dashboard(props) {
                     window.location.reload();
                 }
 
+                if(response.status === 401){
+                    window.location.reload();
+                }
+
 
             });
         } catch (e) {

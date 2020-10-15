@@ -178,7 +178,7 @@ const SelfDetailedPage = (props) => {
 
         if (detailedView.result) {
             new Promise((resolve, reject) => {
-                setTaskList(detailedView.result.tasks.results)
+                setTaskList(detailedView.result.tasks)
                 resolve();
             });
         }
@@ -208,7 +208,7 @@ const SelfDetailedPage = (props) => {
                 setEntitydetail(detailedView.result)
                 setContactList(detailedView.result.contacts);
                 setAttachmentList(detailedView.result.attachments)
-                setTaskList(detailedView.result.tasks.results)
+                setTaskList(detailedView.result.tasks)
                 setComponentLoading(false);
                 resolve();
             });
@@ -251,13 +251,13 @@ const SelfDetailedPage = (props) => {
                 title: 'File Name',
                 editable: 'never',
                 render: rowData => <a target="_blank"
-                                      href={`${process.env.REACT_APP_SERVER_API_URL}/download/${rowData.fid}?token=${rowData.token}&name=${rowData.name}`}>
+                                      href={`${process.env.REACT_APP_SERVER_API_URL}/download/${rowData.file_id}?token=${rowData.token}&name=${rowData.name}`}>
 
-                <PictureAsPdfIcon/> {rowData.name}
+                    <PictureAsPdfIcon/> {rowData.name}
                 </a>
             },
-            {title: 'Date', field: 'created'},
-            {title: 'Size', field: 'fileSize'},
+            {title: 'Date', field: 'added'},
+            {title: 'Size', field: 'file_size'},
         ],
         data: attachmentList,
     };

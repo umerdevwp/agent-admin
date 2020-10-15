@@ -743,20 +743,23 @@ function AddEntity() {
                         </Button>
                     </DialogActions>
                 </Dialog>
-                <Grid container spacing={0}>
-                    {error ? (<MySnackbarContentWrapper
-                         onClose={()=>{removeErrorMessage()}}
-                        variant="error"
-                        message="Something went wrong"
-                    />) : ''}
 
-                    {successMessage ? (
-                        <MySnackbarContentWrapper
-                           onClose={()=>{removeSuccess()}}
-                            variant="success"
-                            message="Entity has been added"
-                        />
-                    ) : ''}
+                {error ? (<MySnackbarContentWrapper
+                    onClose={()=>{removeErrorMessage()}}
+                    variant="error"
+                    message="Something went wrong"
+                />) : ''}
+
+                {successMessage ? (
+                    <MySnackbarContentWrapper
+                        onClose={()=>{removeSuccess()}}
+                        variant="success"
+                        message="Entity has been added"
+                    />
+                ) : ''}
+
+                <Grid container spacing={0}>
+
 
                     <form className={classes.container} onSubmit={handleOnSubmit} noValidate
                           autoComplete="off">

@@ -32,7 +32,7 @@ function ComplianceTaskList(props) {
     const [open, setOpen] = React.useState(false);
     // const [userAgree, setUserAgree] = React.useState(false);
     const [status, setStatus] = React.useState('');
-
+    const [taskID, setTaskID] = React.useState()
     // const [eid, setEid] = React.useState('');
     // const [data, setData] = React.useState(props.data)
     // const history = useHistory();
@@ -58,10 +58,11 @@ function ComplianceTaskList(props) {
             let formData = new FormData();
             formData.append('status', status);
             formData.append('eid', props.eid);
-            taskUpdate(props.eid, formData).then(response => {
-                setLoading(false);
-                if (response === 'success') {
+            taskUpdate(taskID, formData).then(response => {
+                if (response.message) {
+                    localStorage.setItem('task', 'false');
                     props.update();
+                    setLoading(false);
                 }
 
                 if (response.type === 'error') {
@@ -90,7 +91,7 @@ function ComplianceTaskList(props) {
                 <DialogTitle id="alert-dialog-title">{"Compliance Task"}</DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                      Are you sure, you want to mark this task as "Complete"
+                      Are you sure, you want to mark this task as "{localStorage.getItem('userMessage') ? localStorage.getItem('userMessage') : ''}"
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
@@ -115,7 +116,14 @@ function ComplianceTaskList(props) {
                         position: 'row',
                         onClick: (event, rowData) => {
                             setLoading(true);
-                            Promise.resolve(setStatus(1));
+                            if(rowData.status === 'Completed') {
+                                Promise.resolve(setStatus(0));
+                                localStorage.setItem('userMessage', 'Incomplete');
+                            } else {
+                                Promise.resolve(setStatus(1));
+                                localStorage.setItem('userMessage', 'Complete');
+                            }
+                            Promise.resolve(setTaskID(rowData.id));
                             setOpen(true);
 
 

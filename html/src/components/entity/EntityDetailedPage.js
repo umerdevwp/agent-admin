@@ -150,7 +150,6 @@ const EntityDetailedPage = (props) => {
     const [attachmentList, setAttachmentList] = React.useState([])
     const [taskList, setTaskList] = React.useState([])
     const [compliance, setComplainace] = React.useState(0);
-    // const entity_id = attributes.organization;
     const [componentLoading, setComponentLoading] = React.useState(true);
     useEffect(() => {
         if (loading === true) {
@@ -178,7 +177,7 @@ const EntityDetailedPage = (props) => {
             setEntitydetail(detailedView.result)
             setContactList(detailedView.result.contacts);
             setAttachmentList(detailedView.result.attachments)
-            setTaskList(detailedView.result.tasks.results)
+            setTaskList(detailedView.result.tasks)
             setComponentLoading(false);
 
         }
@@ -186,6 +185,12 @@ const EntityDetailedPage = (props) => {
         if (detailedView.errors) {
             addError(detailedView.errors.detail);
         }
+
+        if(detailedView.status === 401){
+            window.location.reload();
+        }
+
+
 
     }
 
@@ -212,7 +217,7 @@ const EntityDetailedPage = (props) => {
 
         if (detailedView.result) {
             new Promise((resolve, reject) => {
-                setTaskList(detailedView.result.tasks.results)
+                setTaskList(detailedView.result.tasks)
                 resolve();
             });
         }
@@ -251,17 +256,7 @@ const EntityDetailedPage = (props) => {
         data: taskList,
     };
 
-    const formatBytes = (bytes, decimals = 2) => {
-        if (bytes === 0) return '0 Bytes';
 
-        const k = 1024;
-        const dm = decimals < 0 ? 0 : decimals;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-    }
 
 
     const attachmentData = {
@@ -270,13 +265,13 @@ const EntityDetailedPage = (props) => {
                 title: 'File Name',
                 editable: 'never',
                 render: rowData => <a target="_blank"
-                                      href={`${process.env.REACT_APP_SERVER_API_URL}/download/${rowData.fid}?token=${rowData.token}&name=${rowData.name}`}>
+                                      href={`${process.env.REACT_APP_SERVER_API_URL}/download/${rowData.file_id}?token=${rowData.token}&name=${rowData.name}`}>
 
                 <PictureAsPdfIcon/> {rowData.name}
                 </a>
             },
-            {title: 'Date', field: 'created'},
-            {title: 'Size', field: 'fileSize'},
+            {title: 'Date', field: 'added'},
+            {title: 'Size', field: 'file_size'},
         ],
         data: attachmentList,
     };

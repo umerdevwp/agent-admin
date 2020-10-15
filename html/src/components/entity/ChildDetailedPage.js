@@ -108,7 +108,7 @@ function MySnackbarContentWrapper(props) {
     return (
         <SnackbarContent
 
-            elevation={6} variant="filled"
+            elevation={6}
             className={clsx(classes[variant], className)}
             aria-describedby="client-snackbar"
             message={
@@ -138,7 +138,7 @@ const ChildDetailedPage = (props) => {
 
 
 
-    const HOST = process.env.REACT_APP_SERVER_API_URL;
+
     const {attributes, loading, addError, errorList, role, addTitle, removeError} = useContext(UserContext);
     const checkRole = role ? role : localStorage.getItem('role');
     const classes = useStyles();
@@ -147,7 +147,7 @@ const ChildDetailedPage = (props) => {
     const [contactList, setContactList] = React.useState([])
     const [attachmentList, setAttachmentList] = React.useState([])
     const [taskList, setTaskList] = React.useState([])
-
+    const [compliance, setComplainace] = React.useState(0);
     // const entity_id = attributes.organization;
     const [componentLoading, setComponentLoading] = React.useState(true);
     useEffect(() => {
@@ -178,6 +178,39 @@ const ChildDetailedPage = (props) => {
         if (detailedView.errors) {
             addError('Status '+ detailedView.errors.status +' '+ detailedView.errors.detail);
         }
+    }
+
+    const updateComplianceTable = async() => {
+        var detailedView = '';
+        if (role === 'Parent Organization' || role === 'Administrator') {
+            try {
+                detailedView = await entityDetail(attributes.organization);
+            } catch (e) {
+                addError('Something went wrong with the API.');
+            }
+        }
+
+        if (detailedView.result) {
+            new Promise((resolve, reject) => {
+                setTaskList(detailedView.result.tasks)
+                resolve();
+            });
+        }
+        if (detailedView.errors) {
+            addError(detailedView.errors.detail);
+        }
+    }
+
+
+    useEffect(() => {
+        if(compliance !== 0) {
+            updateComplianceTable()
+        }
+    },[compliance]);
+
+
+    const UpdateComplainceState = () => {
+        setComplainace(compliance + 1);
     }
 
 
@@ -213,12 +246,13 @@ const ChildDetailedPage = (props) => {
                 title: 'File Name',
                 editable: 'never',
                 render: rowData => <a target="_blank"
-                                      href={`${HOST}/download/file/${rowData.fid}?name=${rowData.name}`}>
+                                      href={`${process.env.REACT_APP_SERVER_API_URL}/download/${rowData.file_id}?token=${rowData.token}&name=${rowData.name}`}>
+
                     <PictureAsPdfIcon/> {rowData.name}
                 </a>
             },
-            {title: 'Date', field: 'created'},
-            {title: 'Size', field: 'fileSize'},
+            {title: 'Date', field: 'added'},
+            {title: 'Size', field: 'file_size'},
         ],
         data: attachmentList,
     };
@@ -228,6 +262,12 @@ const ChildDetailedPage = (props) => {
 
         <>
                 <Grid container spacing={2}>
+
+                    {errorList?.map((value, index) => (
+                        <MySnackbarContentWrapper key={index} className={classes.errorMessage} spacing={1} index={index} variant="error"
+                                                  message={value} onClose={()=> removeError(index)}/>
+                    ))}
+
                     <Grid item xs={12} sm={4}>
                         <Card className={classes.root}>
                             <CardHeader
@@ -373,8 +413,8 @@ const ChildDetailedPage = (props) => {
                 <Grid container spacing={5}>
 
                     <Grid item xs={12}>
-                        <ComplianceTaskList loading={componentLoading} tooltip={'Add New Contact'} data={taskData}
-                                            title={'Compliance Tasks'}/>
+                        <ComplianceTaskList update={UpdateComplainceState} loading={componentLoading} tooltip={'Add New Contact'} data={taskData}
+                                            title={'Compliance Tasks'} eid={attributes ? attributes.organization : ''}/>
                     </Grid>
                 </Grid>
 

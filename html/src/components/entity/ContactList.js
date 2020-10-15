@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from 'react';
+import React from 'react';
 import MaterialTable from 'material-table';
 
 import {makeStyles} from '@material-ui/core/styles';
@@ -6,9 +6,8 @@ import {
     withRouter
 } from 'react-router-dom';
 import {useHistory} from "react-router-dom";
-import VisibilityIcon from '@material-ui/icons/Visibility';
+
 import Grid from "@material-ui/core/Grid";
-import {UserContext} from "../context/UserContext";
 
 
 
@@ -24,7 +23,6 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function ContactList(props) {
-
     const [loading, setLoading] = React.useState(false);
     const history = useHistory();
 

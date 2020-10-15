@@ -14,7 +14,8 @@ export const UserContext = createContext(
         profile: '',
         attributes: [],
         loading: false,
-        errorList:[]
+        errorList:[],
+        currentEntity:[]
     }
 );
 
@@ -29,6 +30,7 @@ function UserContextProvider(props) {
     const [attributes, setAttributes] = useState([]);
     const [appLoader, setAppLoader] = useState({loading: false});
     const [errorList, setErrorList] = useState([]);
+    const [currentEntity, setCurrentEntity] = useState([]);
     const [role, setRole] = useState({});
     React.useEffect(() => {
         const okta = localStorage.getItem('okta-token-storage');
@@ -120,6 +122,14 @@ function UserContextProvider(props) {
                 }
             }
 
+            if(get_role.type === 'error'){
+                window.location.reload();
+            }
+
+            if(get_role.status === 401){
+                window.location.reload();
+            }
+
 
             if (get_role.message) {
                 addError(get_role.message)
@@ -138,6 +148,10 @@ function UserContextProvider(props) {
 
     const addTitle = (data) => {
         setTitle(data);
+    }
+
+    const updateCurrentEntity = (data) => {
+         setCurrentEntity(data)
     }
 
 
@@ -169,7 +183,9 @@ function UserContextProvider(props) {
                 addTitle,
                 drawerState,
                 changeDrawer,
-                removeError
+                removeError,
+                updateCurrentEntity,
+                currentEntity
             }}>
             {props.children}
         </UserContext.Provider>

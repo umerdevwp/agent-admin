@@ -125,7 +125,7 @@ const useStyles = makeStyles(theme => ({
         marginTop: 30
     },
 
-    fileUploading: {
+    fileUpcomponentLoading: {
         zIndex: 0,
         marginTop: 22,
     },
@@ -237,13 +237,13 @@ const AddContactForm = (props) => {
     const classes = useStyles();
 
 
-    const {attributes, addTitle} = useContext(UserContext);
-    addTitle('Add New Contact');
+    const {loading, attributes, addTitle} = useContext(UserContext);
+
 
     const [addressObject, setAddressObject] = React.useState([]);
     const [addressValue, setAddressValue] = React.useState('');
     const [addressReset, setAddressReset] = React.useState('');
-    const [loading, setLoading] = React.useState(false)
+    const [componentLoading, setComponentLoading] = React.useState(false)
     const [contactType, setContactType] = React.useState([]);
     const [successMessage, setSuccessMessage] = React.useState(' ');
     const [StateRegion, setStateRegion] = React.useState([])
@@ -268,7 +268,7 @@ const AddContactForm = (props) => {
     };
 
     const handleClose = () => {
-        setLoading(false);
+        setComponentLoading(false);
         setUserAgree(false);
         setOpen(false);
     };
@@ -321,10 +321,13 @@ const AddContactForm = (props) => {
 
 
     React.useEffect(() => {
-        fetchDataforDropdownsContactTypeList();
-        fetchDataforDropdownsStateRegion();
-        localStorage.setItem('iAgree', false);
-    }, [])
+        if(loading === true) {
+            addTitle('Add New Contact');
+            fetchDataforDropdownsContactTypeList();
+            fetchDataforDropdownsStateRegion();
+            localStorage.setItem('iAgree', false);
+        }
+    }, [loading])
 
 
     const fetchDataforDropdownsContactTypeList = async () => {
@@ -387,7 +390,7 @@ const AddContactForm = (props) => {
     const handleOnSubmit = async (event, userResponse = false) => {
 
         event.preventDefault();
-        setLoading(true);
+        setComponentLoading(true);
         setAddressReset('');
         // if (userResponse === 'false') {
         //     await addressCheck();
@@ -401,12 +404,12 @@ const AddContactForm = (props) => {
                 if (zip.toString().length === 5) {
                     formsubmit = true;
                 } else {
-                    setLoading(false);
+                    setComponentLoading(false);
                     formsubmit = false;
                     setInputNotificationZip({...inputContactZipcode, error: "Please enter 5 digits zip code"})
                 }
             } else {
-                setLoading(false);
+                setComponentLoading(false);
                 formsubmit = false;
                 setInputNotificationZip({...inputContactZipcode, error: "Please enter 5 digits zip code"})
             }
@@ -444,8 +447,9 @@ const AddContactForm = (props) => {
         setInputNotificationState({...inputContactState, error: ' '})
         setInputNotificationZip({...inputContactZipcode, error: ' '})
 
-
-        formData.append('entityId', props.match.params.id ? props.match.params.id : '' );
+        if(attributes.organization) {
+            formData.append('entityId', props.match.params.id ? props.match.params.id : attributes.organization);
+        }
         formData.append('inputContactFirstName', inputContactFirstName.value);
         formData.append('inputContactLastName', inputContactLastName.value);
         formData.append('inputContactEmail', inputContactEmail.value);
@@ -478,7 +482,7 @@ const AddContactForm = (props) => {
         const response = await createContact(formData);
         if (response.field_error) {
 
-            setLoading(false);
+            setComponentLoading(false);
             setIsValidAddress(false);
             setUserAgree(false);
             Object.keys(response.field_error).forEach((key, index) => {
@@ -525,7 +529,7 @@ const AddContactForm = (props) => {
                     setTimeout(() => {
                         resolve();
                         setUserAgree(false);
-                        setLoading(false);
+                        setComponentLoading(false);
                         setSuccessMessage(response.data.results);
                         resetForm();
                         window.scrollTo(0, 0)
@@ -551,10 +555,10 @@ const AddContactForm = (props) => {
 
         //
         // setTimeout(() => {
-        //     setLoading(false);
+        //     setComponentLoading(false);
         //     history.goBack();
         // }, 4000)
-        // setLoading(true);
+        // setComponentLoading(true);
 
 
     }
@@ -565,7 +569,7 @@ const AddContactForm = (props) => {
             setTimeout(() => {
                 resolve();
                 setUserAgree(false);
-                setLoading(false);
+                setComponentLoading(false);
                 setErrorMessage(data);
                 window.scrollTo(0, 0)
             }, 600);
@@ -694,7 +698,7 @@ const AddContactForm = (props) => {
 
                                         <div className={'col-md-6'}>
                                             <TextField
-                                                disabled={loading}
+                                                disabled={componentLoading}
                                                 required
                                                 error={inputContactFirstName.error !== ' '}
                                                 label="First Name"
@@ -714,7 +718,7 @@ const AddContactForm = (props) => {
                                         </div>
                                         <div className={'col-md-6'}>
                                             <TextField
-                                                disabled={loading}
+                                                disabled={componentLoading}
                                                 required
                                                 value={inputContactLastName.value}
                                                 onChange={e => setInputLastName({
@@ -736,7 +740,7 @@ const AddContactForm = (props) => {
 
                                         <div className={'col-md-6'}>
                                             <TextField
-                                                disabled={loading}
+                                                disabled={componentLoading}
                                                 required
 
                                                 type="email"
@@ -759,7 +763,7 @@ const AddContactForm = (props) => {
                                         </div>
                                         <div className={'col-md-6'}>
                                             <TextField
-                                                disabled={loading}
+                                                disabled={componentLoading}
                                                 required
                                                 value={inputContactPhone.value}
                                                 onChange={e => setInputNotificationPhone({
@@ -779,7 +783,7 @@ const AddContactForm = (props) => {
                                         </div>
                                         <div className={'col-md-12'}>
                                             <Autocomplete
-                                                disabled={loading}
+                                                disabled={componentLoading}
                                                 required
                                                 width={''}
                                                 addressObject={addressObjectChangeHandler}
@@ -800,7 +804,7 @@ const AddContactForm = (props) => {
                                                          error={inputContactType.error !== ' '}>
                                                 <InputLabel htmlFor="age-native-simple">Contact Type</InputLabel>
                                                 <Select
-                                                    disabled={loading}
+                                                    disabled={componentLoading}
                                                     native
                                                     value={inputContactType.value}
                                                     onChange={e => setInputNotificationContactType({
@@ -829,7 +833,7 @@ const AddContactForm = (props) => {
 
                                             <TextField
                                                 id="standard-basic"
-                                                disabled={loading}
+                                                disabled={componentLoading}
                                                 required
                                                 error={inputContactCity.error !== ' '}
                                                 helperText={inputContactCity.error}
@@ -861,7 +865,7 @@ const AddContactForm = (props) => {
                                                     State/Region/Province
                                                 </InputLabel>
                                                 <Select
-                                                    disabled={loading}
+                                                    disabled={componentLoading}
                                                     required
                                                     native
                                                     value={inputContactState.value || ''}
@@ -888,7 +892,7 @@ const AddContactForm = (props) => {
 
                                         <div className={'col-md-6'}>
                                             <TextField
-                                                disabled={loading}
+                                                disabled={componentLoading}
                                                 required
                                                 type="text"
                                                 value={inputContactZipcode.value}
@@ -910,7 +914,7 @@ const AddContactForm = (props) => {
 
                                         <div className={'col-md-12'}>
                                             <div className={clsx(classes.submitButton, 'custom-button-wrapper')}>
-                                                {loading ? (
+                                                {componentLoading ? (
                                                         <div className={clsx(classes.loader)}>
                                                             <FacebookProgress/>
                                                         </div>)
@@ -918,7 +922,7 @@ const AddContactForm = (props) => {
                                                 {/*<input className={clsx('btn btn-primary', classes.restButton)}*/}
                                                 {/*       type="reset" onClick={(e) => {resetForm()}} value="Reset"/>*/}
 
-                                                <input disabled={loading}
+                                                <input disabled={componentLoading}
                                                        className={clsx('btn btn-primary', classes.restButton)}
                                                        type="submit" value="Add new Contact"/>
                                             </div>
