@@ -33,15 +33,19 @@ class Admin_model extends CI_Model
     function checkAdminExist($email = NULL)
     {
         if ($this->db->table_exists($this->table)) {
-            $this->db->select('*');
-            $this->db->from($this->table);
-            if (!empty($email)) {
+            if(!empty($email))
+            {
+                $this->db->select('*');
+                $this->db->from($this->table);
                 $this->db->where('email', $email);
+                
+                $query = $this->db->get();
+                return $query->row();
             }
-            $query = $this->db->get();
-            return $query->result();
+
+            return null;
         } else {
-            log_message('error', 'Administrators table does not exit');
+            logToAdmin('Administrators table does not exit',"admin table not found","DB");
             return NULL;
         }
     }

@@ -22,18 +22,19 @@ class Auth
             if (in_array(strtolower($CI->router->class), $this->auth)) {
 
                 $token = $CI->input->get_request_header('Authorization');
+                // debugging
+//                $token = "eyJraWQiOiJ5T21SR3JScHBsZUs1aFA1ajhxbXFzNVlkV3dDWGZfb1Z3dVhWVUVMaGhBIiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULnR0MF9xSTl3bHFlZTI2Unk5ajJJcGd5VWp1UE96Vngtd0NtN0otalhwZVkiLCJpc3MiOiJodHRwczovL2Rldi02MTIwNjkub2t0YS5jb20vb2F1dGgyL2RlZmF1bHQiLCJhdWQiOiJhcGk6Ly9kZWZhdWx0IiwiaWF0IjoxNTk1MjcwNzkwLCJleHAiOjE1OTUyNzQzOTAsImNpZCI6IjBvYTJyeWJoemxtRDJZenJKMzU3IiwidWlkIjoiMDB1MWwzYzR4eXNCMjhvTXozNTciLCJzY3AiOlsib3BlbmlkIiwiZW1haWwiLCJhZGRyZXNzIiwicGhvbmUiLCJwcm9maWxlIl0sInN1YiI6ImNoYm95Y2VAdW5pdGVkYWdlbnRzZXJ2aWNlcy5jb20ifQ.FqW_mYwTcjSnb3LpQ-xUq2eRtKUsLF-PwKvtJI04hdEiCfNv4308t4N4eNs2i_Zwy4YeW0S_NygYZlOLEQ-bpYY5jv5TzXEvG0RqL961X9kByDd58ma-RkZ49gBpxdlD2SIlBtLnuuO-40Pja3ohfi8jnYVRYjzz8La2ilEPHtoZvAzmTyxBSATORXyXnK3Efq8ewO2PXGLi-ur_uA2ZwdjpMIfw0fPBurMkVYx2rb9pg-ZIaLlvuQiW3GUtcMkFntZiv9hsl2kOPRDuX9YrTupHtnwJteffdH3myBgMJc41t7JJyoqus1UzQ8Ddlxd0rI9hMsIn8Smw64PZNm2ZTg";
                 // TODO: check email exist in admin
 
                 // to allow functionality of login as for admin
                 $oToken = $this->hasToken($token);
                 $sToken = $oToken->token;
-//                $_SESSION['eid'] = "4071993000003468001";   
-//                return "eyJraWQiOiJhbHZ5TV9rQ05rOURCZjJ0QS0zaGVZTXY2S25pVDhjdlI2TzcwRENDSVFnIiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULmM1cFNZTEJNV2RyRTd5T0pqSUNyR3czRE5BeHhSaUxiUGVlZFpUUjBudzQiLCJpc3MiOiJodHRwczovL2Rldi02MTIwNjkub2t0YS5jb20vb2F1dGgyL2RlZmF1bHQiLCJhdWQiOiJhcGk6Ly9kZWZhdWx0IiwiaWF0IjoxNTg1NzYzMTY2LCJleHAiOjE1ODU3NjY3NjYsImNpZCI6IjBvYTFsOTcxNXhxSDBhMmdCMzU3IiwidWlkIjoiMDB1Mm0xY3dlYVVWb1BJaDUzNTciLCJzY3AiOlsiZW1haWwiLCJhZGRyZXNzIiwib3BlbmlkIiwicHJvZmlsZSIsInBob25lIl0sInN1YiI6Im15b3JnQG1lLmNvbSJ9.2HPNmIMKKwUfkr8NCChlaPOL7mngmPirSQKxbx5J2YUwqoEX4I2T0XW3x2E3PuPISki3rKKpOZEISOFkNLd15rQ-THuNTPshkvqbkZXK21PQ5BEWmKBi38afWiuOMAn01KPnhTOpWCWr3F5Dw3BxQiNA4r6riMUicO1gfb1MkgUOmqFul7A0CZXcy28oiW8kSn55V3fgnSvJvN8vtqr5Ek3x4SMF2VGy1F-Q0nmJvyavW8WlMED8ngZXPOT002L7uqNcK5-cxpPDFAyZMalsJD5sv4dtLjhfsv8pfwU4D-uMxPhtlqP43wpAKZsL_vgfH4aP3h0O7kmcQBgR9gBB0Q";
+
                 // on token found return it after setting session
                 if ($sToken) {
                     $iEid = $oToken->entity_id;
                     $sAccountType = unserialize($oToken->meta)['accountType'];
-                    $this->setSession($iEid,$sAccountType);
+                    $this->setSession($iEid,$sAccountType,$oToken->email);
                     return $sToken;
                 }
 
@@ -58,14 +59,18 @@ class Auth
                             // zoho_id should be in the request else don't save token
                             if(!empty($CI->input->get('eid')))
                             {
-                                $this->deletePreviousToken($response->sub);
-                                $this->addToken($response->sub, $response->email , $token);
-
                                 $iEid = $CI->input->get('eid');
                                 $sAccountType = "";
                                 // on token not found set session
-                                if($CI->input->get("account")=='tester') $sAccountType = 'tester';
-                                $this->setSession($iEid,$sAccountType);
+                                if($CI->input->get("account")=='tester'){
+                                    $sAccountType = 'tester';
+                                } else if($this->checkForAdmin($iEid)){
+                                    $sAccountType = 'admin';
+                                }
+
+                                $this->setSession($iEid,$sAccountType,$response->email);
+                                $this->deletePreviousToken($response->sub);
+                                $this->addToken($response->sub,$iEid, $response->email , $sAccountType, $token);
 
                                 // to make role assignment if user has parent attribute, okta organization_type
                                 if($CI->input->get("bit")==1)
@@ -95,21 +100,23 @@ class Auth
         }
     }
 
-    public function checkForAdmin($email = NULL)
+    public function checkForAdmin(string $sEmail)
     {
         $CI =& get_instance();
         $CI->load->model('Admin_model');
+
         $checkSuperUser = $CI->Admin_model->checkAdminExist($email);
+
         if (!empty($checkSuperUser)) {
-            $_SESSION["isAdmin"] = TRUE;
-            $CI->Admin_model->updateAdmin($email);
-        } else {
-            $_SESSION["isAdmin"] = FALSE;
+            $CI->Admin_model->updateAdmin($sEmail);
+            return true;
         }
+
+        return false;
     }
 
 
-    public function addToken($sub, $email , $token)
+    public function addToken($sub,$eid, $email, $sAccountType , $token)
     {
 
         $CI =& get_instance();
@@ -133,8 +140,8 @@ class Auth
             //$email = "chboyce@unitedagentservices.com";
             //$CI->load->model("Entity_model");
             //$aEntityData = $CI->Entity_model->getEmailId($email);
-            $eid = $CI->input->get('eid');
-            $sAccountType = $CI->input->get("account");
+            //$eid = $CI->input->get('eid');
+            //$sAccountType = $CI->input->get("account");
 //            if($aEntityData['type']=='ok')
 //                $eid = $aEntityData['results']->id;
 
@@ -195,10 +202,14 @@ class Auth
         return $eid;
     }
 
-    private function setSession($iEid,$sAccountType="")
+    private function setSession($iEid,$sAccountType="",$sEmail="")
     {
+        $CI =& get_instance();
+
         $_SESSION['eid'] = $iEid;
         $_SESSION['accountType'] = $sAccountType;
+        $_SESSION['email'] = $sEmail;
+        $_SESSION['request'] = strtolower($CI->router->class)."/".$CI->router->method;
     }
 
 }

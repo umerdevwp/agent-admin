@@ -52,6 +52,44 @@ class Tempmeta_model extends CI_Model
         return $result;
     }
 
+    public function getAllForAdmin($sSlug="",$bAsArray=true)
+    {
+        if($this->isDbSynched())
+        {
+            $result = $this->deleteAll();
+            if(!$result)
+            {
+                logToAdmin("Failed tempmeta deletes","Unable to delete tempmeta","DB");
+            }
+        } else {
+
+            if(!empty($sSlug))
+                $data["slug"] = $sSlug;
+
+            $query = $this->db->get_where($this->table, $data);
+
+            if($bAsArray)
+                $result = $query->result_array();
+            else
+                $result = $query->result();
+
+            $aEntityData = [];
+            foreach($result as $k=>$v)
+            {
+                    $aEntityData = array_merge($aEntityData, json_decode($v['json_data']));
+            }
+
+            //echo $this->db->last_query();
+            if (! is_array($aEntityData) && count($aEntityData)>0) {
+                return ['message'=>'No records found','type'=>'error'];
+            } else {
+                return ['type'=>'ok','results'=>$aEntityData];
+            }
+        }
+
+        return $result;
+    }
+
     private function resetTempmeta()
     {
         if($this->isDbSynched())

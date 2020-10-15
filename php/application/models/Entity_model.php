@@ -146,11 +146,16 @@ class Entity_model extends CI_Model
             $this->db->where('id', $iEntityId);
             $this->db->where(Self::$parent_entity, $iParentId);
             $query = $this->db->get();
-            $aData = $query->row();
-            
-            if(isset($aData->id)) return true;
-            else return false;
+            if($query)
+            {
+                $aData = $query->row();
+            } else {
+                logToAdmin("Query failed","Error in isParent() query: eid=" . $iEntityId . ", parent=" . $iParentId,"DB");
+            }
         }
+        
+        if(isset($aData->id)) return true;
+        else return false;
     }
 
     public function getOne($id,$aColumns=[])
@@ -239,6 +244,23 @@ class Entity_model extends CI_Model
         return ['type' => 'ok', 'results' => $result];
     }
 
+    /**
+     * Get array of all entities for admin user
+     * @param Array $aColumns (optional) comma seprated columns name
+     */
+    public function getAllForAdmin($aColumns = [])
+    {        
+        $sQ = "CALL getParentSetForAdmin();";
+        $query = $this->db->query($sQ);
+        $result = $query->result();
+        $this->db->close();
+        if (!is_array($result)) {
+            return ['message' => 'Entities not found.', 'type' => 'error'];
+        }
+
+        return ['type' => 'ok', 'results' => $result];
+    }
+
     public function hasEntities($id)
     {
         $data = [
@@ -256,36 +278,16 @@ class Entity_model extends CI_Model
         return false;
     }
 
-    public function getAll($aColumns=null)
+    public function getAll()
     {
-        if(count($aColumns)>0)
-            $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
-        else {
-            $aMyColumns = [
-                "id","name","type","filingState","formationDate","agentId","entityStructure"
-            ];
-            $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
-        }
-
-       foreach($aMyColumns as $k=>$v)
-       {
-            if($v=='id')
-                $this->db->select("$this->table.$v as `$k`");
-            else
-                $this->db->select("$v as `$k`");
-       }
-
-
         // $query = $this->db->get('zoho_accounts');
         // $result = $query->result_object();
         // if (!$result) {
         //     return ['msg' => 'No such account found', 'msg_type' => 'error'];
         // }
         // return $result;
-        if($aMyColumns==null)
-        {
-            $this->db->select('zoho_accounts.*, entitymeta.entity_status');
-        }
+
+        $this->db->select('zoho_accounts.*, entitymeta.entity_status');
         $this->db->from('zoho_accounts');
         $this->db->join('entitymeta','entitymeta.zoho_accounts_id=zoho_accounts.id', 'left');
         // $this->db->where(["entitymeta.zoho_accounts_id", "zoho_accounts.id"]);
@@ -294,9 +296,10 @@ class Entity_model extends CI_Model
         {
             $result = $query->result_object();
         } else {
-            error_log("Entity getAll() failed ". $this->db->error(). " query: ". $this->db->last_query());
+            logToAdmin("Query failed","Entity getAll() failed ". $this->db->error(). " query: ". $this->db->last_query(),"DB");
             //echo print_r($this->db->error());die;
         }
+
 
         if (! is_array($result)) {
             return ['message'=>'No records available','type'=>'error'];
