@@ -168,6 +168,12 @@ const useStyles = makeStyles(theme => ({
 
     baseColor: {
         color: '#48465b'
+    },
+
+    uploadCustom :{
+        marginTop: 10,
+        marginLeft: 5
+
     }
 
 
@@ -220,7 +226,7 @@ MySnackbarContentWrapper.propTypes = {
 const AddAttachmentForm = (props) => {
 
     const {addTitle, addError, attributes} = useContext(UserContext);
-    addTitle('Add New Attachment');
+    addTitle('Add New Document');
     const classes = useStyles();
     const history = useHistory();
 
@@ -287,8 +293,8 @@ const AddAttachmentForm = (props) => {
                 }
             }
         } catch (e) {
-            addError('Something went wrong with Attchemnt API.');
-            setErrorMessage('Something went wrong with Attchemnt API.');
+            addError('Something went wrong with Document API.');
+            setErrorMessage('Something went wrong with Document API.');
         }
 
         // if(response.status == true) {
@@ -306,7 +312,7 @@ const AddAttachmentForm = (props) => {
         const filename = e.target.files[0].name;
         const response = await lorexFileUpload(formData);
         if (response.error === false) {
-            setInputFiling({...inputFiling, value: response.record_id, success: 'uploaded'});
+            setInputFiling({...inputFiling, value: response.record_id, success: 'Ready to add Document.'});
             setInputFileSize({...inputFileSize, value: response.file_size})
             if (filename) {
                 setInputFileName({...inputFileName, value: filename});
@@ -343,7 +349,7 @@ const AddAttachmentForm = (props) => {
                         }}>
                             <Typography color="textPrimary">Entity</Typography>
                         </Link>
-                        <Typography color="textPrimary">Add Attachment</Typography>
+                        <Typography color="textPrimary">Add Document</Typography>
                     </Breadcrumbs>
                 </Paper>
             </div>
@@ -376,13 +382,13 @@ const AddAttachmentForm = (props) => {
                                     id="attachment"
                                     value={inputFiling.value.File}
                                     onChange={e => fileChange(e)}
-                                    label="Attachment"
+                                    label="Document"
                                     className={clsx(classes.fileUploading, classes.dense)}
                                     margin="dense"
                                     invalid={inputFiling.error !== ' '}
                                     valid={inputFiling.success !== ' '}
                                 />
-                                <span>{inputFiling.success !== ' ' ? inputFiling.success : ' '}</span>
+                                <span className={classes.uploadCustom}>{inputFiling.success !== ' ' ? inputFiling.success : ' '}</span>
                             </div>
 
                             <div className={'col-md-12'}>
@@ -395,7 +401,7 @@ const AddAttachmentForm = (props) => {
 
                                     <input disabled={loading}
                                            className={clsx('btn btn-primary', classes.restButton)}
-                                           type="submit" value="Add attachment"/>
+                                           type="submit" value="Add Document"/>
 
                                 </div>
                             </div>

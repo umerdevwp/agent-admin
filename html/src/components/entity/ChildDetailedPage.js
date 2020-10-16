@@ -426,10 +426,10 @@ const ChildDetailedPage = (props) => {
 
                 <Grid container spacing={5}>
                     <Grid item xs={12}>
-                        <ContactList action={true} loading={componentLoading} tooltip={'Add New Attachment'}
+                        <ContactList action={true} loading={componentLoading} tooltip={'Add New Document'}
                                      redirect={true}
                                      url={`/attachment/form/add`} data={attachmentData}
-                                     title={'Attachments'}/>
+                                     title={'Documents'}/>
                     </Grid>
 
                 </Grid>
