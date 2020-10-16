@@ -46,13 +46,13 @@ function ComplianceTaskList(props) {
         return null;
     };
     const taskUpdateController = () => {
-        console.log('task',localStorage.getItem('task'))
-        if(localStorage.getItem('task') === 'false'){
+        console.log('task', localStorage.getItem('task'))
+        if (localStorage.getItem('task') === 'false') {
             setOpen(true);
         }
 
 
-        if(localStorage.getItem('task') === 'true') {
+        if (localStorage.getItem('task') === 'true') {
             setOpen(false);
 
             let formData = new FormData();
@@ -91,7 +91,7 @@ function ComplianceTaskList(props) {
                 <DialogTitle id="alert-dialog-title">{"Compliance Task"}</DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                      Are you sure, you want to mark this task as "{localStorage.getItem('userMessage') ? localStorage.getItem('userMessage') : ''}"
+                        Are you sure, you want to mark this task as {localStorage.getItem('userMessage') ? localStorage.getItem('userMessage') : ''}
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
@@ -105,18 +105,23 @@ function ComplianceTaskList(props) {
             </Dialog>
 
 
-
-
             <MaterialTable
                 isLoading={loading ? loading : props.loading}
                 actions={[
                     {
                         icon: 'check',
-                        tooltip: 'Mark this task as complete',
+                        tooltip: (event, rowData) => {
+                            if (rowData.status === 'Completed') {
+                                return 'Mark this task Incomplete'
+                            } else {
+                                return 'Mark this task Complete'
+                            }
+
+                        },
                         position: 'row',
                         onClick: (event, rowData) => {
                             setLoading(true);
-                            if(rowData.status === 'Completed') {
+                            if (rowData.status === 'Completed') {
                                 Promise.resolve(setStatus(0));
                                 localStorage.setItem('userMessage', 'Incomplete');
                             } else {

@@ -248,7 +248,6 @@ const EntityDetailedPage = (props) => {
 
     const taskData = {
         columns: [
-            {title: 'id', field: 'id'},
             {title: 'Name', field: 'subject'},
             {title: 'Due Date', field: 'dueDate'},
             {title: 'Status', field: 'status'},

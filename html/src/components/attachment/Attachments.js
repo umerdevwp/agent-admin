@@ -148,7 +148,7 @@ const Attachments = () => {
                 title: 'File Name',
                 editable: 'never',
                 render: rowData => <a target="_blank"
-                                      href={`${process.env.REACT_APP_SERVER_API_URL}download/${rowData.file_id}?token=${rowData.token}&name=${rowData.name}`}>
+                                      href={`${process.env.REACT_APP_SERVER_API_URL}/download/${rowData.fileId}?token=${rowData.token}&name=${rowData.name}`}>
                     <PictureAsPdfIcon/> {rowData.name}
                 </a>
             },
