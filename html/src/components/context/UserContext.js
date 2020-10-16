@@ -56,7 +56,6 @@ function UserContextProvider(props) {
     const initialUtliz = async () => {
         localStorage.removeItem('role');
         const tokenOKTA = await getToken();
-        console.log('Auth in Context',authState.isAuthenticated);
         // if(tokenOKTA === null){
         //  authService.logout('/');
         // }

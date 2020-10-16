@@ -91,7 +91,8 @@ function ComplianceTaskList(props) {
                 <DialogTitle id="alert-dialog-title">{"Compliance Task"}</DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        Are you sure, you want to mark this task as {localStorage.getItem('userMessage') ? localStorage.getItem('userMessage') : ''}
+                        Are you sure, you want to mark this task
+                        as {localStorage.getItem('userMessage') ? localStorage.getItem('userMessage') : ''}.
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
@@ -107,18 +108,12 @@ function ComplianceTaskList(props) {
 
             <MaterialTable
                 isLoading={loading ? loading : props.loading}
-                actions={[
-                    {
-                        icon: 'check',
-                        tooltip: (event, rowData) => {
-                            if (rowData.status === 'Completed') {
-                                return 'Mark this task Incomplete'
-                            } else {
-                                return 'Mark this task Complete'
-                            }
 
-                        },
+                actions={[
+                    rowData => ({
+                        icon: 'check',
                         position: 'row',
+                        tooltip: rowData.status === 'Completed' ? 'Mark this task Incomplete' : 'Mark this task Complete',
                         onClick: (event, rowData) => {
                             setLoading(true);
                             if (rowData.status === 'Completed') {
@@ -133,9 +128,9 @@ function ComplianceTaskList(props) {
 
 
                         }
-                    }
-
+                    })
                 ]}
+
                 title={props.title !== '' ? props.title : ''}
                 options={{
                     selection: props.selection ? props.selection : false,

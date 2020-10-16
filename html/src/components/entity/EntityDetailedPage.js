@@ -192,6 +192,9 @@ const EntityDetailedPage = (props) => {
 
 
 
+
+
+
     }
 
     useEffect(() => {
@@ -264,13 +267,13 @@ const EntityDetailedPage = (props) => {
                 title: 'File Name',
                 editable: 'never',
                 render: rowData => <a target="_blank"
-                                      href={`${process.env.REACT_APP_SERVER_API_URL}/download/${rowData.file_id}?token=${rowData.token}&name=${rowData.name}`}>
+                                      href={`${process.env.REACT_APP_SERVER_API_URL}/download/${rowData.fileId}?token=${rowData.token}&name=${rowData.name}`}>
 
                 <PictureAsPdfIcon/> {rowData.name}
                 </a>
             },
-            {title: 'Date', field: 'added'},
-            {title: 'Size', field: 'file_size'},
+            {title: 'Date', field: 'created'},
+            {title: 'Size', field: 'fileSize'},
         ],
         data: attachmentList,
     };
