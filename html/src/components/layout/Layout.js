@@ -157,11 +157,9 @@ export default withOktaAuth(function Layout(props) {
 
 
     React.useEffect(() => {
-        console.log('Auth', authState.isAuthenticated);
-        console.log('isPending', authState.isPending)
-        if (!matches) {
-            changeDrawer(true);
-        }
+        // if (!matches) {
+        //     changeDrawer(true);
+        // }
         if (matches) {
             changeDrawer(false);
         }

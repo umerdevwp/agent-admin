@@ -121,13 +121,13 @@ function UserContextProvider(props) {
                 }
             }
 
-            if(get_role.type === 'error'){
-                window.location.reload();
-            }
-
-            if(get_role.status === 401){
-                window.location.reload();
-            }
+            // if(get_role.type === 'error'){
+            //     window.location.reload();
+            // }
+            //
+            // if(get_role.status === 401){
+            //     window.location.reload();
+            // }
 
 
             if (get_role.message) {

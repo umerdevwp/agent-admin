@@ -43,6 +43,9 @@ function ContactList(props) {
                         }
                     }
                 ] : ''}
+                options={{
+                    sorting: true
+                }}
                 title={props.title !== '' ? props.title : ''}
                 columns={props.data.columns}
                 data={props.data.data}

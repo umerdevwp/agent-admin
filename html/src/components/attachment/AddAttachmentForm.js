@@ -291,6 +291,10 @@ const AddAttachmentForm = (props) => {
                     setSuccessMessage(response.message);
                     setLoading(false);
                 }
+                if(response.status === false){
+                    setInputFiling({...inputFiling,error: response.message});
+                    setLoading(false);
+                }
             }
         } catch (e) {
             addError('Something went wrong with Document API.');
@@ -389,6 +393,7 @@ const AddAttachmentForm = (props) => {
                                     valid={inputFiling.success !== ' '}
                                 />
                                 <span className={classes.uploadCustom}>{inputFiling.success !== ' ' ? inputFiling.success : ' '}</span>
+                                {inputFiling.error !== ' ' ? <span className={'error'}>{inputFiling.error !== ' ' ? inputFiling.error : ' '}</span> : ''}
                             </div>
 
                             <div className={'col-md-12'}>

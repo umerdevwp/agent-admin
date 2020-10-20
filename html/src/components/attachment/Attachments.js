@@ -11,7 +11,7 @@ import {withOktaAuth} from '@okta/okta-react';
 
 import {UserContext} from "../context/UserContext";
 import {AttachmentsList} from "../api/attachment";
-import ContactList from "../entity/ContactList";
+import AttachmentTable from "../attachment/AttachmentTable";
 import Layout from "../layout/Layout";
 import {amber, green} from "@material-ui/core/colors";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
@@ -147,10 +147,8 @@ const Attachments = () => {
             {
                 title: 'File Name',
                 editable: 'never',
-                render: rowData => <a target="_blank"
-                                      href={`${process.env.REACT_APP_SERVER_API_URL}/download/${rowData.fileId}?token=${rowData.token}&name=${rowData.name}`}>
-                    <PictureAsPdfIcon/> {rowData.name}
-                </a>
+                field: 'name',
+
             },
             {title: 'Date', field: 'created'},
             {title: 'Size', field: 'fileSize'},
@@ -168,7 +166,7 @@ const Attachments = () => {
                 ))}
                 <Grid container spacing={1}>
                     <Grid item xs={12}>
-                        <ContactList loading={componentLoading} tooltip={'Add Attachment'} data={dummyData}
+                        <AttachmentTable loading={componentLoading} tooltip={'Add Attachment'} data={dummyData}
                                      title={'Attachments'}/>
                     </Grid>
                 </Grid>
