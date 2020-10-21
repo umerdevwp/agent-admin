@@ -8,6 +8,8 @@ class Tempmeta_model extends CI_Model
 
     public $slugTasksComplete = "tasks_complete";
 
+    public $slugTasksInComplete = "tasks_incomplete";
+
     public $slugNewEntity = "new_entities";
 
     public $slugNewAttachment = "new_attachments";

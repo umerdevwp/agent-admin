@@ -116,15 +116,30 @@ class Entity extends RestController
                 if($aDataTasks['type']=='ok') $data['tasks'] = $aDataTasks['results'];
 
                 $aTasksCompleted = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugTasksComplete);
-                if($aTasksCompleted['type']=='ok' && $aDataTasks['type']=='ok')
+                if(count($data['tasks'])>0)
                 {
-                    $aTasksCompleted = json_decode($aTasksCompleted['results']->json_data);
-
-                    foreach($data['tasks'] as $k=>$v)
+                    if($aTasksCompleted['type']=='ok')
                     {
-                        $iUpdateKey = array_search($v->id,$aTasksCompleted);
-                        if($iUpdateKey!==false)
-                            $v->status = "Completed";
+                        $aTasksCompleted = json_decode($aTasksCompleted['results']->json_data);
+
+                        foreach($data['tasks'] as $k=>$v)
+                        {
+                            $iUpdateKey = array_search($v->id,$aTasksCompleted);
+                            if($iUpdateKey!==false)
+                                $v->status = "Completed";
+                        }
+                    }
+                    $aTasksInCompleted = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugTasksInComplete);
+                    if($aTasksInCompleted['type']=='ok')
+                    {
+                        $aTasksInCompleted = json_decode($aTasksInCompleted['results']->json_data);
+
+                        foreach($data['tasks'] as $k=>$v)
+                        {
+                            $iUpdateKey = array_search($v->id,$aTasksInCompleted);
+                            if($iUpdateKey!==false)
+                                $v->status = "Not Started";
+                        }
                     }
                 }
 
@@ -144,7 +159,7 @@ class Entity extends RestController
 
                 if ($aDataAttachment['type'] == 'ok') {
                     $data['attachments'] = $aDataAttachment['results'];
-                    $aDataAttachment = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugNewAttachment);
+                    //$aDataAttachment = $this->Tempmeta_model->getOne($id, $this->Tempmeta_model->slugNewAttachment);
                 } else {
                     $data['attachments'] = [];
                 }

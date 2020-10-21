@@ -249,24 +249,28 @@ class Notifications extends RestController
         $aDataNotify = $this->NotificationAttachments_model->getAllWhere(['status'=>'pending']);
         $iMailsSent = 0;
         $iToday = strtotime(date("Y-m-d"));
+
         foreach($aDataNotify['results'] as $oRow)
         {
+
             if(strtotime($oRow->duedate)<=$iToday)
             {
                 $aDataEntity = $this->entity_model->getOne($oRow->entity_id,['id','name','email','type','filingState','entityStructure']);
+
                 if($aDataEntity['type']=='ok' && $aDataEntity['results']->id>0)
                 {
                     $oEntity = $aDataEntity['results'];
-                    $sDownloadUrl = getenv("SITE_URL") . "download/" . $oRow->lorax_id . "?code=" . $oRow->token. "&name=doc-" . date("d-m-y") . ".pdf";
 
-                    $oDataContact = $this->contacts_model->getEntityProfileContact($oEntity->id);
-                    //$this->Messenger_model->sendCurlTemplate();
-                    //$this->Messenger_model->testKitchenSinkExampleWithObjectsAndLegacyTemplate();
-                    if(filter_var($oEntity->email,FILTER_VALIDATE_EMAIL))
+                    if($oEntity->email!="")
                     {
+
+                        $sDownloadUrl = getenv("SITE_URL") . "download/" . $oRow->lorax_id . "?code=" . $oRow->token. "&name=doc-" . date("d-m-y") . ".pdf";
+
+                        //$oDataContact = $this->contacts_model->getEntityProfileContact($oEntity->id);
+                    
                         $bSent = $this->Messenger_model->sendTemplateEmail(
                             "d-2a672857adad4bd79e7f421636b77f6b",
-                            ['contact_name'=>($oDataContact->name?:"Customer"),'entity_name'=>$oEntity->name,'download_url'=>$sDownloadUrl],
+                            ['contact_name'=>"Sir",'entity_name'=>$oEntity->name,'download_url'=>$sDownloadUrl],
                             $oEntity->email,
                             $oEntity->name,
                             $oEntity->id,
@@ -278,17 +282,11 @@ class Notifications extends RestController
                             $iMailsSent++;
                         }
                     } else {
-                        $this->NotificationAttachments_model->updateStatus($oRow->id,"no-email");
+
+                        $this->NotificationAttachments_model->updateDataArray($oRow->id,['status'=>"no-email"]);
                         error_log("Email not found for Attacchment notification, eid: " . $oEntity->id);
+
                     }
-                /*
-                    $this->Messenger_model->sendEmail(
-                        $oEntity->id,
-                        $oEntity->email,
-                        $oEntity->name,
-                        "Attachment available",
-                        $this->load->view("email/attachment-available",['name'=>($oDataContact->name?:"Customer"),'entity_name'=>$oEntity->name,'download_url'=>$sDownloadUrl],true)
-                    );*/
                     
                 }
                 
