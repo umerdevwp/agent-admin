@@ -317,7 +317,7 @@ const SelfDetailedPage = (props) => {
                                     {entitydetail ?
                                         <>
                                         <ul className={classes.companyinfo}>
-                                            <li className={classes.listItem}><strong>State ID:</strong> 0</li>
+                                            <li className={classes.listItem}><strong>State ID:</strong> {entitydetail.entity.stateId ? entitydetail.entity.stateId : ''}</li>
                                             <li className={classes.listItem}><strong>Formation
                                                 Date:</strong> {entitydetail.entity.formationDate ? entitydetail.entity.formationDate : ''}
                                             </li>
