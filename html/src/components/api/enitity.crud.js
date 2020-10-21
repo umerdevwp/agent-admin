@@ -42,7 +42,7 @@ export const checkRole = async (eid,bit, tokenOKTA) => {
            response = await fetch(`${ENTITY}/entity/role?eid=${eid}&bit=${bit}`, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
-                    'Authorization': tokenOKTA,
+                    'Authorization': okta.accessToken.accessToken,
 
                 }
             });

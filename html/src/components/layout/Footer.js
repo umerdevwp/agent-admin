@@ -12,7 +12,10 @@ export default function Footer() {
                 AgentAdmin
             </Link>{' '}
             {new Date().getFullYear()}
-            {'.'}
+            {'. '}
+            <Link color="inherit" href="/privacy-policy">
+                Privacy Policy
+            </Link>
         </Typography>
     );
 }

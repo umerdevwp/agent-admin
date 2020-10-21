@@ -56,7 +56,6 @@ function UserContextProvider(props) {
     const initialUtliz = async () => {
         localStorage.removeItem('role');
         const tokenOKTA = await getToken();
-        console.log('Auth in Context',authState.isAuthenticated);
         // if(tokenOKTA === null){
         //  authService.logout('/');
         // }
@@ -122,13 +121,13 @@ function UserContextProvider(props) {
                 }
             }
 
-            if(get_role.type === 'error'){
-                window.location.reload();
-            }
-
-            if(get_role.status === 401){
-                window.location.reload();
-            }
+            // if(get_role.type === 'error'){
+            //     window.location.reload();
+            // }
+            //
+            // if(get_role.status === 401){
+            //     window.location.reload();
+            // }
 
 
             if (get_role.message) {

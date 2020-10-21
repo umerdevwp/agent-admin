@@ -20,7 +20,10 @@ function Copyright() {
                 AgentAdmin
             </Link>{' '}
             {new Date().getFullYear()}
-            {'.'}
+            {'. '}
+            <Link color="inherit" href="/privacy-policy">
+                Privacy Policy
+            </Link>
         </Typography>
     );
 }

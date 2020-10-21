@@ -31,7 +31,7 @@ import RoomIcon from '@material-ui/icons/Room';
 import PersonIcon from '@material-ui/icons/Person';
 import StreetviewIcon from '@material-ui/icons/Streetview';
 import LocationCityIcon from '@material-ui/icons/LocationCity';
-import BusinessIcon from '@material-ui/icons/Business';
+// import BusinessIcon from '@material-ui/icons/Business';
 import MailIcon from '@material-ui/icons/Mail';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
@@ -39,7 +39,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Avatar from '@material-ui/core/Avatar';
 import FastForwardIcon from '@material-ui/icons/FastForward';
 import Skeleton from "@material-ui/lab/Skeleton";
-
+import AttachmentTable from "../attachment/AttachmentTable";
 const useStyles = makeStyles(theme => ({
     root: {
         flexGrow: 1,
@@ -151,6 +151,7 @@ const EntityDetailedPage = (props) => {
     const [taskList, setTaskList] = React.useState([])
     const [compliance, setComplainace] = React.useState(0);
     const [componentLoading, setComponentLoading] = React.useState(true);
+    const [entityName, setEntityName] = React.useState('');
     useEffect(() => {
         if (loading === true) {
             addTitle('Entity - ');
@@ -165,6 +166,7 @@ const EntityDetailedPage = (props) => {
             detailedView = await entityDetail(entity_id);
             if(detailedView.result) {
                 addTitle('Entity - ' + detailedView.result.entity.name);
+               localStorage.setItem('entityName', detailedView.result.entity.name);
             }
         }
 
@@ -189,6 +191,9 @@ const EntityDetailedPage = (props) => {
         if(detailedView.status === 401){
             window.location.reload();
         }
+
+
+
 
 
 
@@ -248,7 +253,6 @@ const EntityDetailedPage = (props) => {
 
     const taskData = {
         columns: [
-            {title: 'id', field: 'id'},
             {title: 'Name', field: 'subject'},
             {title: 'Due Date', field: 'dueDate'},
             {title: 'Status', field: 'status'},
@@ -264,14 +268,11 @@ const EntityDetailedPage = (props) => {
             {
                 title: 'File Name',
                 editable: 'never',
-                render: rowData => <a target="_blank"
-                                      href={`${process.env.REACT_APP_SERVER_API_URL}/download/${rowData.file_id}?token=${rowData.token}&name=${rowData.name}`}>
+                field: 'name',
 
-                <PictureAsPdfIcon/> {rowData.name}
-                </a>
             },
-            {title: 'Date', field: 'added'},
-            {title: 'Size', field: 'file_size'},
+            {title: 'Date', field: 'created'},
+            {title: 'Size', field: 'fileSize'},
         ],
         data: attachmentList,
     };
@@ -324,7 +325,7 @@ const EntityDetailedPage = (props) => {
                                 {entitydetail ?
                                     <>
                                         <ul className={classes.companyinfo}>
-                                            <li className={classes.listItem}><strong>State ID:</strong> 0</li>
+                                            <li className={classes.listItem}><strong>State ID:</strong> {entitydetail.entity.stateId ? entitydetail.entity.stateId : ''}</li>
                                             <li className={classes.listItem}><strong>Formation
                                                 Date:</strong> {entitydetail.entity.formationDate ? entitydetail.entity.formationDate : ''}
                                             </li>
@@ -454,10 +455,10 @@ const EntityDetailedPage = (props) => {
 
                 <Grid container spacing={5}>
                     <Grid item xs={12}>
-                        <ContactList action={true} loading={componentLoading} tooltip={'Add New Attachment'}
+                        <AttachmentTable action={true} loading={componentLoading} tooltip={'Add New Document'}
                                      redirect={true}
                                      url={`/attachment/form/add/${entity_id}`} data={attachmentData}
-                                     title={'Attachments'}/>
+                                     title={'Documents'}/>
                     </Grid>
 
                 </Grid>
