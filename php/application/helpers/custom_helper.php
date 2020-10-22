@@ -371,6 +371,8 @@ function arrayKeysExist($aNeedle,$aHaystack)
         }
     }
 
+    if(count($aNeedle)!=count($aMyColumns)) return false;
+
     return $aMyColumns;
 }
 
@@ -510,8 +512,7 @@ function logToAdmin(string $sTitle,string $sContent,string $sType="CODE")
     mailto("najm.a@allshorestaffing.com",$sTitle,"SESSION: " . $_SESSION['eid'] . "\n\n" . $sContent);
 }
 
-
 function generateToken(int $iLength=32)
 {
     return bin2hex(random_bytes($iLength));
-} 
+}
