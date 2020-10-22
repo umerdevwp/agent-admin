@@ -1,5 +1,5 @@
-import React, {useEffect, useContext} from 'react';
-import MaterialTable from "material-table";
+import React, {useEffect, useContext, forwardRef } from 'react';
+import MaterialTable, {MTableToolbar} from "material-table";
 import Layout from "../layout/Layout";
 import {entityList} from "../api/enitity.crud";
 import {UserContext} from '../context/UserContext';
@@ -19,6 +19,8 @@ import WarningIcon from "@material-ui/icons/Warning";
 import ErrorIcon from "@material-ui/icons/Error";
 import InfoIcon from "@material-ui/icons/Info";
 import ChildDetailedPage from '../entity/ChildDetailedPage';
+import Add from '@material-ui/icons/Add';
+
 
 
 const useStyles = makeStyles(theme => ({
@@ -110,27 +112,31 @@ function Dashboard(props) {
 
     const classes = useStyles();
     const history = useHistory();
+    const tableIcons = {
+       Add: forwardRef((props, ref) => <Add {...props} ref={ref} color='action' />)
 
+};
     const {loading, attributes, addError, errorList, role, addTitle, removeError} = useContext(UserContext);
     const checkRole = role ? role : localStorage.getItem('role');
     const [entitydata, setEntityData] = React.useState([]);
     const [componentLoading, setComponentLoading] = React.useState(true);
     useEffect(() => {
-            if(loading === true) {
-                addTitle('Dashboard');
-                if(role === 'Parent Organization' || role === 'Administrator' ) {
-                    asyncDataFetch();
-                }
+        if (loading === true) {
+            addTitle('Dashboard');
+            if (role === 'Parent Organization' || role === 'Administrator') {
+                asyncDataFetch();
             }
+        }
 
     }, [loading])
 
     const asyncDataFetch = async () => {
-        const tokenResult = await props.authState.accessToken;;
+        const tokenResult = await props.authState.accessToken;
+        ;
 
         try {
             await fetchData(tokenResult);
-        } catch (e){
+        } catch (e) {
             addError('Something when wrong!!');
         }
     }
@@ -148,11 +154,11 @@ function Dashboard(props) {
                     addError(response.error.message);
                 }
 
-                if(response.type === 'error'){
+                if (response.type === 'error') {
                     window.location.reload();
                 }
 
-                if(response.status === 401){
+                if (response.status === 401) {
                     window.location.reload();
                 }
 
@@ -170,20 +176,26 @@ function Dashboard(props) {
             {title: 'Entity Structure', field: 'entityStructure'},
             {title: 'Filing State', field: 'filingState'},
             {title: 'Formation Date', field: 'formationDate'},
-            {
-                render: rowData => <Link
-                    component="button"
-                    variant="body2"
-                    onClick={() => {
-                        if (rowData.id !== attributes.organization) {
-                            history.push(`/entity/${rowData.id}`);
-                        } else {
-                            history.push(`/entity`);
-                        }
-                    }}>
-                    <VisibilityIcon/>
-                </Link>
-            },
+            // {
+            //     title: 'Action',
+            //     sorting: false,
+            //     field: 'url',
+            //
+            //     render: rowData =>  <Link
+            //         component="button"
+            //         variant="body2"
+            //         onClick={() => {
+            //             if (rowData.id !== attributes.organization) {
+            //                 history.push(`/entity/${rowData.id}`);
+            //             } else {
+            //                 history.push(`/entity`);
+            //             }
+            //         }}>
+            //         {/*<VisibilityIcon/>*/}
+            //     </Link>
+            //
+            //     // render: rowData => <a href={`/entity/${rowData.id}`}> <VisibilityIcon/> </a>
+            // },
         ],
         data: entitydata,
     };
@@ -195,11 +207,14 @@ function Dashboard(props) {
 
                 {errorList?.map((value, index) => (
                     <MySnackbarContentWrapper className={classes.errorMessage} spacing={1} index={index} variant="error"
-                                              message={value} onClose={()=>{removeError(index)}}/>
+                                              message={value} onClose={() => {
+                        removeError(index)
+                    }}/>
                 ))}
-                { checkRole === 'Parent Organization' ?
+                {checkRole === 'Parent Organization' ?
                     <div style={{maxWidth: "100%"}}>
                         <MaterialTable
+                            icons={tableIcons}
                             parentChildData={(row, rows) => rows.find(a => a.id === row.parentId)}
                             isLoading={componentLoading}
                             title={'Entities'}
@@ -207,21 +222,36 @@ function Dashboard(props) {
                             data={settingData.data}
                             options={{
                                 defaultExpanded: false,
+                                sorting: true,
+                                actionsColumnIndex: -1
                             }}
+                            actions={[
+                                rowData => ({
+                                    icon: () => <VisibilityIcon />,
+                                    tooltip: 'View',
+                                    onClick: (event, rowData) => {
+                                        if (rowData.id !== attributes.organization) {
+                                            history.push(`/entity/${rowData.id}`);
+                                        } else {
+                                            history.push(`/entity`);
+                                        }
+                                    }
+                                })
+                            ]}
                         />
-                    </div> : '' }
+                    </div> : ''}
 
                 {
                     checkRole === 'Child Entity' ?
-                        <ChildDetailedPage /> : ''
+                        <ChildDetailedPage/> : ''
                 }
-
 
 
                 {
                     checkRole === 'Administrator' ?
                         <div style={{maxWidth: "100%"}}>
                             <MaterialTable
+                                icons={tableIcons}
                                 parentChildData={(row, rows) => rows.find(a => a.id === row.parentId)}
                                 isLoading={componentLoading}
                                 title={'Entities'}
@@ -229,7 +259,22 @@ function Dashboard(props) {
                                 data={settingData.data}
                                 options={{
                                     defaultExpanded: false,
+                                    sorting: true,
+                                    actionsColumnIndex: -1
                                 }}
+                                actions={[
+                                    rowData => ({
+                                        icon: () => <VisibilityIcon />,
+                                        tooltip: 'View',
+                                        onClick: (event, rowData) => {
+                                            if (rowData.id !== attributes.organization) {
+                                                history.push(`/entity/${rowData.id}`);
+                                            } else {
+                                                history.push(`/entity`);
+                                            }
+                                        }
+                                    })
+                                ]}
                             />
                         </div> : ''
 

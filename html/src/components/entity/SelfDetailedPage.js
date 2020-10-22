@@ -36,6 +36,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Avatar from '@material-ui/core/Avatar';
 import FastForwardIcon from '@material-ui/icons/FastForward';
 import Skeleton from '@material-ui/lab/Skeleton';
+import AttachmentTable from "../attachment/AttachmentTable";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -150,7 +151,11 @@ const SelfDetailedPage = (props) => {
     const [componentLoading, setComponentLoading] = React.useState(true);
     useEffect(() => {
         if (loading === true) {
-            addTitle('Entity - ' + profile.name)
+            try{
+                addTitle('Entity - ' + profile.name);
+            } catch (e) {
+                props.authService.logout('/');
+            }
             fetchDetailedProfile();
         }
     }, [loading])
@@ -255,11 +260,8 @@ const SelfDetailedPage = (props) => {
             {
                 title: 'File Name',
                 editable: 'never',
-                render: rowData => <a target="_blank"
-                                      href={`${process.env.REACT_APP_SERVER_API_URL}/download/${rowData.fileId}?token=${rowData.token}&name=${rowData.name}`}>
+                field: 'name',
 
-                    <PictureAsPdfIcon/> {rowData.name}
-                </a>
             },
             {title: 'Date', field: 'created'},
             {title: 'Size', field: 'fileSize'},
@@ -315,7 +317,7 @@ const SelfDetailedPage = (props) => {
                                     {entitydetail ?
                                         <>
                                         <ul className={classes.companyinfo}>
-                                            <li className={classes.listItem}><strong>State ID:</strong> 0</li>
+                                            <li className={classes.listItem}><strong>State ID:</strong> {entitydetail.entity.stateId ? entitydetail.entity.stateId : ''}</li>
                                             <li className={classes.listItem}><strong>Formation
                                                 Date:</strong> {entitydetail.entity.formationDate ? entitydetail.entity.formationDate : ''}
                                             </li>
@@ -446,7 +448,7 @@ const SelfDetailedPage = (props) => {
 
                 <Grid container spacing={5}>
                     <Grid item xs={12}>
-                        <ContactList action={true} loading={componentLoading} tooltip={'Add New Document'}
+                        <AttachmentTable action={true} loading={componentLoading} tooltip={'Add New Document'}
                                      redirect={true}
                                      url={`/attachment/form/add/${attributes ? attributes.organization : ''}`} data={attachmentData}
                                      title={'Documents'}/>
