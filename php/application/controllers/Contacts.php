@@ -36,15 +36,39 @@ class Contacts extends RestController
 
         $this->load->model("contacts_model");
         $this->load->model("entity_model");
+        $this->load->model("Tempmeta_model");
 
-        $id = $_SESSION['eid'];
+        $sid = $_SESSION['eid'];
 
-        if($id == getenv("SUPER_USER")){
-            $result = $this->entity_model->getAll();
+        if(isAdmin()){
+            $result = $this->entity_model->getAllForAdmin();
+            $aDataAdminTempEntity = $this->Tempmeta_model->getAllForAdmin($this->Tempmeta_model->slugNewEntity);
+            $result['results'] = array_merge($result['results'],$aDataAdminTempEntity['results']);
+
         } else {
             // fetch all childrens ids, to later fetch
-            $result = $this->entity_model->getChildAccounts($id,"id");
+            $result = $this->entity_model->getChildAccounts($sid,"id");
+
+            $aDataTempEntity = $this->Tempmeta_model->getAll(
+                $sid,
+                $this->Tempmeta_model->slugNewEntity
+            );
+            
+            if ($aDataTempEntity['type'] == 'ok')
+            if (count($aDataTempEntity['results']) > 0) {
+                $aNewDataChild = [];
+                if (count($result) > 0) {
+                    $aNewDataChild = array_merge($result['results'], json_decode($aDataTempEntity['results'][0]['json_data']));
+                } else {
+                    $aNewDataChild = json_decode($aDataTempEntity['results'][0]['json_data']);
+                }
+                $result['results'] = $aNewDataChild;
+            }
         }
+
+        
+
+
 
         // create comma seprated ids from result
         $arCommaIds = array();
@@ -53,7 +77,7 @@ class Contacts extends RestController
             $arCommaIds[] = $v->id;
         }
         // add parent id as well
-        $arCommaIds[] = $id;
+        $arCommaIds[] = $sid;
 
         $data['contacts'] = $this->contacts_model->getAllFromEntityList($arCommaIds);
         $this->response([
@@ -65,6 +89,20 @@ class Contacts extends RestController
     public function create_post()
     {
         $this->checkPermission("ADD",$this->sModule);
+        $this->load->model("entity_model");
+        
+        $sid = $_SESSION['eid'];
+
+        if(!isAdmin())
+        {
+            if(!$this->entity_model->isParentOf($this->input->post("entityId"),$sid))
+            {
+                $this->response([
+                    'status' => false,
+                    'message' => ['Permissions'=>"Permissions not allowed to add contact to the entity"]
+                ], 403);exit();
+            }
+        }
 
         $aResponse = [];
         $this->load->model("Smartystreets_model");
@@ -83,6 +121,7 @@ class Contacts extends RestController
         $this->form_validation->set_rules('inputContactCity', 'City', 'required');
         $this->form_validation->set_rules('inputContactState', 'State', 'required');
         $this->form_validation->set_rules('inputContactZipcode', 'Zipcode', 'required|numeric|min_length[5]');
+
 
         if($this->form_validation->run() == FALSE)
         {

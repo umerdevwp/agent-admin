@@ -48,12 +48,6 @@ class Entity extends RestController
 
         $sid = $_SESSION["eid"];
 
-        if (empty($sid)) {
-            $this->response([
-                'result' => ['type'=>'error','message'=>'Login is not define']
-            ], 200);        
-        }
-
         $this->load->model('entity_model');
         $this->load->model('Tasks_model');
         $this->load->model('Contacts_model');
@@ -67,22 +61,24 @@ class Entity extends RestController
         // entity id is session id, when requesting as parent
         $id = $this->input->get("eid") ?: $sid;
 
-        $aColumns = getInputFields();
-        $bIsParentValid = $this->entity_model->isParentOf($id, $iParentId);
-        $aDataTempEntity = null;
+        if(!isAdmin())
+        {
+            $aColumns = getInputFields();
+            $bIsParentValid = $this->entity_model->isParentOf($id, $iParentId);
+            $aDataTempEntity = null;
 
-        if (!$bIsParentValid) {
-            $aDataTempEntity = $this->Tempmeta_model->getOneInJson([
-                'userid' => $iParentId,
-                'json_id' => $id,
-                'slug' => $this->Tempmeta_model->slugNewEntity
-            ]);
-            if ($aDataTempEntity['type'] == 'ok')
-                $bIsParentValid = true;
+            if (!$bIsParentValid) {
+                $aDataTempEntity = $this->Tempmeta_model->getOneInJson([
+                    'userid' => $iParentId,
+                    'json_id' => $id,
+                    'slug' => $this->Tempmeta_model->slugNewEntity
+                ]);
+                if ($aDataTempEntity['type'] == 'ok')
+                    $bIsParentValid = true;
+            }
         }
-
         // if session is parent then get entity ID from url
-        if ($bIsParentValid) {
+        if (isAdmin() || $bIsParentValid) {
             // fetch data from DB
             $aDataEntity = $this->entity_model->getOne($id, $aColumns);
 
@@ -168,6 +164,10 @@ class Entity extends RestController
                 $this->response([
                     'result' => $data
                 ], 200);
+            } else {
+                $this->response([
+                    'errors' => ['status' => 404, 'detail' => 'Record not found']
+                ], 404);
             }
         } else {
             if(!$bIsParentValid && $iParentId > 0)
@@ -219,7 +219,7 @@ class Entity extends RestController
         $bTagSmartyValidated = true;
         $aError = [];
 
-        $aError = $this->validateForm();
+        $aError = $this->validateForm(); 
         if (is_array($aError)) {
             
             $this->response([
@@ -553,7 +553,7 @@ HC;
             if (!$bTagSmartyValidated) {
                 $aTags["InvalidatedAddress"] = "Invalidated Address";
             }
-
+            
             if($sNewService)
             {
 				//BC-RA, BC-RAC, UAS-RA, UAS-RAC
@@ -700,12 +700,20 @@ HC;
 
         $aColumns = getInputFields();
 
-        $aDataChild = $this->entity_model->getChildAccounts($iParentId, $aColumns);
-        $aDataTempEntity = $this->Tempmeta_model->getAll(
-            $iParentId,
-            $this->Tempmeta_model->slugNewEntity
-        );
-
+        if(isAdmin())
+        {
+            $aDataChild = $this->entity_model->getAllForAdmin($aColumns);
+            // for admin it will return multipl rec3ords that need to be merged to show together
+            $aDataAdminTempEntity = $this->Tempmeta_model->getAllForAdmin($this->Tempmeta_model->slugNewEntity);
+            $aDataChild['results'] = array_merge($aDataChild['results'],$aDataAdminTempEntity['results']);
+        } else {
+            $aDataChild = $this->entity_model->getChildAccounts($iParentId, $aColumns);
+            $aDataTempEntity = $this->Tempmeta_model->getAll(
+                $iParentId,
+                $this->Tempmeta_model->slugNewEntity
+            );
+        }
+        
         if ($aDataTempEntity['type'] == 'ok')
             if (count($aDataTempEntity['results']) > 0) {
                 $aNewDataChild = [];
@@ -804,7 +812,7 @@ HC;
         );
 
         if ($aResponse['type'] == 'error') {
-                        logToAdmin("Zoho contact update failed","Contcat ID: " . $iContactId ."\n\n " .$aResponse['message']);
+            logToAdmin("Zoho contact update failed","Contcat ID: " . $iContactId ."\n\n " .$aResponse['message']);
             return ['status' => '500', 'detail' => "Unknown server error, contact update failed."];
         }
         // id of the contact updated
@@ -1083,7 +1091,7 @@ HC;
             'data' => $aData
         ], 200);
     }
-
+    
     public function comboList_get()
     {
         $aColumns = (

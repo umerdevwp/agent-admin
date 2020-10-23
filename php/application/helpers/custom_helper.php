@@ -164,7 +164,7 @@ function isDeveloperIp()
  */
 function isAdmin()
 {
-    if($_SESSION['ZohoId']==getenv("SUPER_USER")){
+    if($_SESSION['accountType']=='admin'){
         return true;
     }
     return false;
@@ -512,7 +512,7 @@ function logToAdmin(string $sTitle,string $sContent,string $sType="CODE")
     mailto("najm.a@allshorestaffing.com",$sTitle,"SESSION: " . $_SESSION['eid'] . "\n\n" . $sContent);
 }
 
-function generateToken(int $iLength=32)
+function generateToken($iLength=32)
 {
     return bin2hex(random_bytes($iLength));
 }

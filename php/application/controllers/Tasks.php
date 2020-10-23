@@ -87,17 +87,12 @@ class Tasks extends RestController
                 if($sDataResp=='SUCCESS')
                 {
                     $aData = $id;
-                    
                     if($iStatus)
-                    {
                     $this->Tempmeta_model->appendRow($iEntityId,$this->Tempmeta_model->slugTasksComplete,$aData);
-                    $this->Tempmeta_model->deduceRow($iEntityId,$this->Tempmeta_model->slugTasksInComplete,$aData);
-                    }
-                    else {
+                    else
                     $this->Tempmeta_model->deduceRow($iEntityId,$this->Tempmeta_model->slugTasksComplete,$aData);
-                    $this->Tempmeta_model->appendRow($iEntityId,$this->Tempmeta_model->slugTasksInComplete,$aData);
-                    }
-
+                    
+                    
                     $this->response([
                         'status'=> true,
                         'message' => "Task updated successfully",
