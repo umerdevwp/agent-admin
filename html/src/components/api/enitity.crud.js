@@ -145,6 +145,21 @@ export const ContactTypeList = async (eid, email) => {
     }
 }
 
+
+export const EntityList = async (eid, email) => {
+    const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
+    if(okta) {
+        const response = await fetch(`${ENTITY}/entity/comboList`, {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': okta.accessToken.accessToken,
+
+            }
+        });
+        return Promise.resolve(response.json());
+    }
+}
+
 export const EntitytypesList = async (eid, email) => {
     const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
     if(okta) {

@@ -48,6 +48,16 @@ export default function MainListItems() {
                     <ListItemText primary="Attachments"/>
                 </ListItem>
             </Link>
+
+            <Link className={classes.link} to='/admin/attachments'>
+                <ListItem button>
+                    <ListItemIcon>
+                        <Attachment color="primary"/>
+                    </ListItemIcon>
+                    <ListItemText primary="Add Attachment"/>
+                </ListItem>
+            </Link>
+
             <Link className={classes.link} to='/contacts'>
                 <ListItem button>
                     <ListItemIcon>

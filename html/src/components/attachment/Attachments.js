@@ -166,7 +166,7 @@ const Attachments = () => {
                 ))}
                 <Grid container spacing={1}>
                     <Grid item xs={12}>
-                        <AttachmentTable loading={componentLoading} tooltip={'Add Attachment'} data={dummyData}
+                        <AttachmentTable redirect={true} url={'/admin/attachments'} loading={componentLoading} tooltip={'Add Attachment'} data={dummyData}
                                      title={'Attachments'}/>
                     </Grid>
                 </Grid>
