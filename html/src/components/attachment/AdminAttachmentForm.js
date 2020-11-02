@@ -338,6 +338,21 @@ const AdminAddAttachmentForm = (props) => {
     const handleOnSubmit = async (event) => {
         event.preventDefault();
         setApiLoading(true);
+
+        if(files.length === 0) {
+            setErrorMessage('File is required');
+            setApiLoading(false);
+        } else {
+            setErrorMessage(' ');
+        }
+
+        if(entityId.value === ''){
+            setEntityId({...entityId, error: 'Entity field is required'});
+            setApiLoading(false);
+        } else {
+            setEntityId({...entityId, error: ' '})
+        }
+
         files.map(async (anObjectMapped, index) => {
             let formData = new FormData();
             formData.append('file', anObjectMapped);
@@ -550,6 +565,7 @@ const AdminAddAttachmentForm = (props) => {
 
                                 <div className={clsx(classes.submitButton, 'custom-button-wrapper')}>
                                     {apiLoading ? (
+                                        files.length !== 0 ?
                                     <Box position="relative" display="inline-flex">
                                         <CircularProgress variant="static" value={Math.round(state.counter / files.length * 100)} />
                                         <Box
@@ -564,7 +580,9 @@ const AdminAddAttachmentForm = (props) => {
                                         >
                                             <Typography variant="caption" component="div" color="textSecondary">{Math.round(state.counter / files.length * 100)}%</Typography>
                                         </Box>
-                                    </Box>): null}
+                                    </Box>: ''
+
+                                    ): null}
 
                                     {/*{apiLoading ? (*/}
                                     {/*        <div className={clsx(classes.loader)}>*/}
