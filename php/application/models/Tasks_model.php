@@ -162,4 +162,24 @@ class Tasks_model extends CI_Model
 
         return ['type'=>'ok','results'=>$result];
     }
+
+    public function add(array $aData)
+    {
+        try {
+            $this->db->insert($this->table,$aData);
+            $id = $this->db->insert_id();
+        } catch (Exception $e)
+        {
+            logToAdmin("Task insert failed","query: " . $this->db->last_query() . "\n error: " . $this->db->error());
+        }
+
+        if($id>0)
+        {
+            return $id;
+        } else {
+            logToAdmin("Task insert failed","query: " . $this->db->last_query() . "\n error: " . $this->db->error());
+            return ['type'=>'error','message'=>'Unable to insert task'];
+        }
+    }
+
 }

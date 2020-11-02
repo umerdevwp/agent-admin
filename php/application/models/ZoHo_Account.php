@@ -711,4 +711,38 @@ class ZoHo_Account extends CI_Model
 
         return $oApiTags->getTags();
     }
+
+
+     /**
+     * Add tasks to zoho records entity/account
+     * 
+     * @param Integer $iRelatedTo entity/record id, the task will relate to
+     * @param String $sTaskSubject task subject
+     * @param String $sDueDate is the date it ends
+     */
+    public function newZohoTask($iRelateToId,$sTaskSubject,$sDueDate)
+    {
+            
+            $oTaskRecord = $this->getInstance("Tasks",null); // to get the task instance
+
+            $oTaskRecord->setFieldValue("\$se_module", "Accounts");// tasks can relate to contacts, therefore need this must
+            $oTaskRecord->setFieldValue("Subject", $sTaskSubject); // task subject
+            $oTaskRecord->setFieldValue("Due_Date", $sDueDate);// due date field
+            $oTaskRecord->setFieldValue("What_Id", $iRelateToId);//what id field
+
+            $aResult = [];
+            try {
+                $oResponseIns=$oTaskRecord->create();
+                $oData = $oResponseIns->getData();
+//                $createdrecord = $responseIns->getData();
+
+                $aResult = ['type'=>'ok','id'=>$oData->getEntityId()];
+
+            } catch(Exception $e){
+                logToAdmin("ZOHO API Fail",$e->getMessage(),"zoho");
+                $aResult = ['type'=>'error','message'=>$e->getMessage()]; 
+            }
+           
+           return $aResult;
+    }   
 }
