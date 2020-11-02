@@ -61,10 +61,11 @@ class Auth
                             {
                                 $iEid = $CI->input->get('eid');
                                 $sAccountType = "";
+
                                 // on token not found set session
                                 if($CI->input->get("account")=='tester'){
                                     $sAccountType = 'tester';
-                                } else if($this->checkForAdmin($iEid)){
+                                } else if($this->checkForAdmin($response->email)){
                                     $sAccountType = 'admin';
                                 }
 
@@ -105,7 +106,7 @@ class Auth
         $CI =& get_instance();
         $CI->load->model('Admin_model');
 
-        $checkSuperUser = $CI->Admin_model->checkAdminExist($email);
+        $checkSuperUser = $CI->Admin_model->checkAdminExist($sEmail);
 
         if (!empty($checkSuperUser)) {
             $CI->Admin_model->updateAdmin($sEmail);
