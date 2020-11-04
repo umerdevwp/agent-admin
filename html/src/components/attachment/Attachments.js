@@ -128,6 +128,13 @@ const Attachments = () => {
     const fetchAttachmentData = async () => {
         try {
             const response = await AttachmentsList(attributes.organization);
+            if (response.type === 'error') {
+                window.location.reload();
+            }
+
+            if (response.status === 401) {
+                window.location.reload();
+            }
             await setAttachmentList(response.data.documents);
             setComponentLoading(false);
 

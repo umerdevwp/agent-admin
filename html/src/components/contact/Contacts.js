@@ -126,7 +126,15 @@ const Contacts = () => {
     const fetchAttachmentData = async () => {
         try {
             const response = await contactList(attributes.organization);
+            if (response.type === 'error') {
+                window.location.reload();
+            }
+
+            if (response.status === 401) {
+                window.location.reload();
+            }
             await setListcontacts(response.data.contacts);
+
             setComponentLoading(false);
 
         } catch (e) {

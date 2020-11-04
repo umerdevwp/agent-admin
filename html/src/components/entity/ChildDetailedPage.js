@@ -180,8 +180,11 @@ const ChildDetailedPage = (props) => {
             addError('Status '+ detailedView.errors.status +' '+ detailedView.errors.detail);
         }
 
+        if (detailedView.type === 'error') {
+            window.location.reload();
+        }
 
-        if(detailedView.status === 401){
+        if (detailedView.status === 401) {
             window.location.reload();
         }
 

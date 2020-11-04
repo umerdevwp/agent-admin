@@ -286,6 +286,13 @@ const AddAttachmentForm = (props) => {
 
         try {
             const response = await attachFiles(formData);
+            if (response.type === 'error') {
+                window.location.reload();
+            }
+
+            if (response.status === 401) {
+                window.location.reload();
+            }
             if (response) {
                 if (response.status === true) {
                     setSuccessMessage(response.message);

@@ -168,6 +168,15 @@ const EntityDetailedPage = (props) => {
                 addTitle('Entity - ' + detailedView.result.entity.name);
                localStorage.setItem('entityName', detailedView.result.entity.name);
             }
+
+            if (detailedView.type === 'error') {
+                window.location.reload();
+            }
+
+            if (detailedView.status === 401) {
+                window.location.reload();
+            }
+
         }
 
         if (checkRole === 'Child Entity') {

@@ -267,7 +267,7 @@ const AdminAddAttachmentForm = (props) => {
 
     useEffect(() => {
         if (loading === true) {
-            addTitle('Add New Attachment');
+            addTitle('Bulk Attachments');
             entitylisitingLoader();
         }
     }, [loading]);

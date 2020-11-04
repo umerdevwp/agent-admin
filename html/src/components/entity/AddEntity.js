@@ -625,6 +625,15 @@ function AddEntity() {
 
 
         const response = await createEntity(formData);
+        if (response.type === 'error') {
+            window.location.reload();
+        }
+
+        if (response.status === 401) {
+            window.location.reload();
+        }
+
+
         if (response.field_error) {
             setApiLoading(false);
             Object.keys(response.field_error).forEach((key, index) => {
