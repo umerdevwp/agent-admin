@@ -502,8 +502,7 @@ const AdminAddAttachmentForm = (props) => {
                         <div className={'col-md-6'}>
                             <FormControl className={clsx(classes.selectField)}
                                          error={entityId.error !== ' '}>
-                                <InputLabel className={clsx(classes.label)} htmlFor="age-native-simple">Entity
-                                    State</InputLabel>
+                                <InputLabel className={clsx(classes.label)} htmlFor="age-native-simple">Entity Name</InputLabel>
                                 <Select
                                     disabled={apiLoading}
                                     required
@@ -542,6 +541,7 @@ const AdminAddAttachmentForm = (props) => {
                                               onChange={handleChange}
                                               disableRejectionFeedback={apiLoading}
                                               clearOnUnmount={true}
+                                              getFileAddedMessage={(fileName) => `File ${fileName} ready to add document.`}
 
                                 />
                             </div>

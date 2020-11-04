@@ -54,7 +54,7 @@ export default function MainListItems() {
                     <ListItemIcon>
                         <Attachment color="primary"/>
                     </ListItemIcon>
-                    <ListItemText primary="Add Attachment"/>
+                    <ListItemText primary="Bulk Attachments"/>
                 </ListItem>
             </Link>
 
