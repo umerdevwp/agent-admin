@@ -128,6 +128,43 @@ class Documents extends RestController
 
     function attachment_post()
     {
+        if($this->input->post("inputFileId")=='undefined')
+            $_POST["inputFileId"] = "";
+        if($this->input->post("inputFileName")=='undefined')
+            $_POST["inputFileName"] = "";
+        if($this->input->post("entityId")=='undefined')
+            $_POST["entityId"] = "";
+
+        $this->load->model("entity_model");
+         $eid = $this->input->post("entityId");
+         $iParentId = $_SESSION['eid'];
+        $bIsParentValid = $this->entity_model->isParentOf($eid, $iParentId);
+        if(!$bIsParentValid)
+        {
+            $this->load->model("Tempmeta_model");
+            $aDataWhereTemp = ['json_id'=>$eid,'userid'=>$iParentId];
+
+            $bRowExist = $this->Tempmeta_model->checkRowExistInJson($aDataWhereTemp);
+            
+            if($bRowExist)
+            {
+                $bIsParentValid = true;
+            }
+        }
+
+
+        if(isAdmin()){
+            $bIsParentValid = true;
+        }
+        
+        if(!$bIsParentValid)
+        {
+            $this->response([
+                'status' => false,
+                'message' => 'Not authorize to access entity'
+            ], 403);
+        }
+
         if(!empty($this->input->post("inputFileId")) && !empty($this->input->post("inputFileName")) && !empty($this->input->post("entityId")))
         {
             $data = array(
