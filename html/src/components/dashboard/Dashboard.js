@@ -131,10 +131,8 @@ function Dashboard(props) {
     }, [loading])
 
     const asyncDataFetch = async () => {
-        const tokenResult = await props.authState.accessToken;
-        ;
-
         try {
+        const tokenResult = await props.authState.accessToken;
             await fetchData(tokenResult);
         } catch (e) {
             addError('Something when wrong!!');
@@ -197,7 +195,7 @@ function Dashboard(props) {
             //     // render: rowData => <a href={`/entity/${rowData.id}`}> <VisibilityIcon/> </a>
             // },
         ],
-        data: entitydata,
+        data:  entitydata ? entitydata : '',
     };
 
     return (

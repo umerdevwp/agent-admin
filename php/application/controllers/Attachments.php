@@ -34,7 +34,7 @@ class Attachments extends RestController
                 if (count($aDataTempEntity['results']) > 0) {
 
                     $aNewDataChild = [];
-                    
+
                     if (count($result['results']) > 0) {
                         $aNewDataChild = array_merge($result['results'], json_decode($aDataTempEntity['results'][0]['json_data']));
                     } else {
@@ -80,10 +80,14 @@ class Attachments extends RestController
 
     public function entity_get(int $id=null)
     {
+
+
+
+
         if($id>0)
         {
             $arCommaIds[] = $id;
-            
+
             $data = $this->getIdIn($arCommaIds);
 
             $this->response([
@@ -96,8 +100,8 @@ class Attachments extends RestController
                 'message' => 'Request must contain numeric ID'
             ], 200);
         }
-    } 
-    
+    }
+
     public function download_get(int $iAttachmentId=0)
     {
         $this->checkPermission("VIEW",$this->sModule);
@@ -118,7 +122,7 @@ class Attachments extends RestController
                 'status' => false,
                 'message' => 'File not found'
             ], 200);
-        }        
+        }
     }
 
     function attachment_post()

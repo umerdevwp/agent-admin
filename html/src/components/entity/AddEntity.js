@@ -243,7 +243,7 @@ function AddEntity() {
     const classes = useStyles();
 
 
-    const {attributes,addTitle, loading } = useContext(UserContext);
+    const {attributes,addTitle, loading, role } = useContext(UserContext);
 
 
     const [open, setOpen] = React.useState(false);
@@ -728,6 +728,8 @@ function AddEntity() {
 
     return (
         <Layout>
+
+            { role === 'Parent Organization' || role === 'Administrator' ?
             <Paper className={classes.paper} elevation={3} >
 
                 <Dialog
@@ -1145,6 +1147,10 @@ function AddEntity() {
                     </form>
                 </Grid>
             </Paper>
+                : <MySnackbarContentWrapper
+                    variant="error"
+                    message={'Access Denied.'}
+                /> }
         </Layout>
     )
 }

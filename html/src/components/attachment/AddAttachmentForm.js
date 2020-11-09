@@ -156,8 +156,8 @@ const useStyles = makeStyles(theme => ({
     paper: {
         paddingTop: 30,
         paddingBottom: 30,
-        paddingLeft:10,
-        paddingRight:10
+        paddingLeft: 10,
+        paddingRight: 10
     },
     breadcrumbsDiv: {
         marginBottom: 30
@@ -170,12 +170,11 @@ const useStyles = makeStyles(theme => ({
         color: '#48465b'
     },
 
-    uploadCustom :{
+    uploadCustom: {
         marginTop: 10,
         marginLeft: 5
 
     }
-
 
 
 }));
@@ -203,7 +202,7 @@ function MySnackbarContentWrapper(props) {
             message={
                 <span id="client-snackbar" className={classes.message}>
                     <Icon className={clsx(classes.icon, classes.iconVariant)}/>
-                        {message}
+                    {message}
                 </span>
             }
             action={[
@@ -225,7 +224,7 @@ MySnackbarContentWrapper.propTypes = {
 
 const AddAttachmentForm = (props) => {
 
-    const {addTitle, addError, attributes} = useContext(UserContext);
+    const {addTitle, addError, attributes, role} = useContext(UserContext);
     addTitle('Add New Document');
     const classes = useStyles();
     const history = useHistory();
@@ -277,7 +276,7 @@ const AddAttachmentForm = (props) => {
 // console.log(inputFormationDate.value);
 
 // Display the key/value pairs
-        if(attributes.organization) {
+        if (attributes.organization) {
             formData.append('entityId', props.match.params.id ? props.match.params.id : attributes.organization);
         }
         formData.append('inputFileId', inputFiling.value);
@@ -298,8 +297,8 @@ const AddAttachmentForm = (props) => {
                     setSuccessMessage(response.message);
                     setLoading(false);
                 }
-                if(response.status === false){
-                    setInputFiling({...inputFiling,error: response.message});
+                if (response.status === false) {
+                    setInputFiling({...inputFiling, error: response.message});
                     setLoading(false);
                 }
             }
@@ -346,82 +345,93 @@ const AddAttachmentForm = (props) => {
     return (
 
         <Layout>
-            <div className={classes.breadcrumbsDiv}>
-                <Paper className={classes.breadcrumbsInner} elevation={1}>
-                    <Typography className={classes.baseColor} color="inherit" variant="h4">Navigation</Typography>
-                    <Breadcrumbs aria-label="breadcrumb">
 
-                        <Link color="inherit" href="/">
-                            <Typography color="textPrimary">Dashboard</Typography>
-                        </Link>
+                <>
+                    <div className={classes.breadcrumbsDiv}>
+                        <Paper className={classes.breadcrumbsInner} elevation={1}>
+                            <Typography className={classes.baseColor} color="inherit"
+                                        variant="h4">Navigation</Typography>
+                            <Breadcrumbs aria-label="breadcrumb">
 
-                        <Link color="inherit" onClick={(e) => {
-                            history.goBack()
-                        }}>
-                            <Typography color="textPrimary">Entity</Typography>
-                        </Link>
-                        <Typography color="textPrimary">Add Document</Typography>
-                    </Breadcrumbs>
-                </Paper>
-            </div>
+                                <Link color="inherit" href="/">
+                                    <Typography color="textPrimary">Dashboard</Typography>
+                                </Link>
 
-            <Paper className={classes.paper} elevation={3}>
-                {successMessage !== ' ' ? (
-                    <MySnackbarContentWrapper
-                        onClose={()=>{removeSuccess()}}
-                        variant="success"
-                        message={successMessage}
-                    />
-                ) : ''}
+                                <Link color="inherit" onClick={(e) => {
+                                    history.goBack()
+                                }}>
+                                    <Typography color="textPrimary">Entity</Typography>
+                                </Link>
+                                <Typography color="textPrimary">Add Document</Typography>
+                            </Breadcrumbs>
+                        </Paper>
+                    </div>
+
+                    <Paper className={classes.paper} elevation={3}>
+                        {successMessage !== ' ' ? (
+                            <MySnackbarContentWrapper
+                                onClose={() => {
+                                    removeSuccess()
+                                }}
+                                variant="success"
+                                message={successMessage}
+                            />
+                        ) : ''}
 
 
-                {errorMessage !== ' ' ? (
-                    <MySnackbarContentWrapper
-                        onClose={()=>{removeErrorMessage()}}
-                        variant="error"
-                        message={errorMessage}
-                    />
-                ) : ''}
-                <div className="row">
-                    <form className={classes.formStyle} onSubmit={handleOnSubmit} noValidate
-                          autoComplete="off">
-                        <FormGroup row>
-                            <div className={'col-md-6'}>
-                                <CustomFileInput
-                                    disabled={loading}
-                                    required
-                                    id="attachment"
-                                    value={inputFiling.value.File}
-                                    onChange={e => fileChange(e)}
-                                    label="Document"
-                                    className={clsx(classes.fileUploading, classes.dense)}
-                                    margin="dense"
-                                    invalid={inputFiling.error !== ' '}
-                                    valid={inputFiling.success !== ' '}
-                                />
-                                <span className={classes.uploadCustom}>{inputFiling.success !== ' ' ? inputFiling.success : ' '}</span>
-                                {inputFiling.error !== ' ' ? <span className={'error'}>{inputFiling.error !== ' ' ? inputFiling.error : ' '}</span> : ''}
-                            </div>
+                        {errorMessage !== ' ' ? (
+                            <MySnackbarContentWrapper
+                                onClose={() => {
+                                    removeErrorMessage()
+                                }}
+                                variant="error"
+                                message={errorMessage}
+                            />
+                        ) : ''}
+                        <div className="row">
+                            <form className={classes.formStyle} onSubmit={handleOnSubmit} noValidate
+                                  autoComplete="off">
+                                <FormGroup row>
+                                    <div className={'col-md-6'}>
+                                        <CustomFileInput
+                                            disabled={loading}
+                                            required
+                                            id="attachment"
+                                            value={inputFiling.value.File}
+                                            onChange={e => fileChange(e)}
+                                            label="Document"
+                                            className={clsx(classes.fileUploading, classes.dense)}
+                                            margin="dense"
+                                            invalid={inputFiling.error !== ' '}
+                                            valid={inputFiling.success !== ' '}
+                                        />
+                                        <span
+                                            className={classes.uploadCustom}>{inputFiling.success !== ' ' ? inputFiling.success : ' '}</span>
+                                        {inputFiling.error !== ' ' ? <span
+                                            className={'error'}>{inputFiling.error !== ' ' ? inputFiling.error : ' '}</span> : ''}
+                                    </div>
 
-                            <div className={'col-md-12'}>
-                                <div className={clsx(classes.submitButton, 'custom-button-wrapper')}>
-                                    {loading ? (
-                                            <div className={clsx(classes.loader)}>
-                                                <FacebookProgress/>
-                                            </div>)
-                                        : null}
+                                    <div className={'col-md-12'}>
+                                        <div className={clsx(classes.submitButton, 'custom-button-wrapper')}>
+                                            {loading ? (
+                                                    <div className={clsx(classes.loader)}>
+                                                        <FacebookProgress/>
+                                                    </div>)
+                                                : null}
 
-                                    <input disabled={loading}
-                                           className={clsx('btn btn-primary', classes.restButton)}
-                                           type="submit" value="Add Document"/>
+                                            <input disabled={loading}
+                                                   className={clsx('btn btn-primary', classes.restButton)}
+                                                   type="submit" value="Add Document"/>
 
-                                </div>
-                            </div>
-                        </FormGroup>
-                    </form>
-                </div>
+                                        </div>
+                                    </div>
+                                </FormGroup>
+                            </form>
+                        </div>
 
-            </Paper>
+                    </Paper>
+                </>
+
         </Layout>
     )
 }

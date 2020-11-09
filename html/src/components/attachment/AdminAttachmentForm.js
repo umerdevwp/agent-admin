@@ -32,6 +32,7 @@ import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import Box from '@material-ui/core/Box';
+
 const handlePreviewIcon = (fileObject, classes) => {
     const {type} = fileObject.file
     const iconProps = {
@@ -246,7 +247,7 @@ MySnackbarContentWrapper.propTypes = {
 
 const AdminAddAttachmentForm = (props) => {
 
-    const {loading, addTitle, addError, attributes} = useContext(UserContext);
+    const {loading, addTitle, addError, role} = useContext(UserContext);
     const classes = useStyles();
     const history = useHistory();
 
@@ -264,7 +265,7 @@ const AdminAddAttachmentForm = (props) => {
     const [entityId, setEntityId] = React.useState({value: '', error: ' '});
     const [entityList, setEntityList] = React.useState([]);
     const [key, setKey] = React.useState(0);
-
+    var fileIndex = 0;
     useEffect(() => {
         if (loading === true) {
             addTitle('Bulk Attachments');
@@ -274,8 +275,8 @@ const AdminAddAttachmentForm = (props) => {
 
 
     useEffect(() => {
-        if(state.counter === files.length){
-            if(files.length > 0) {
+        if (state.counter === files.length) {
+            if (files.length > 0) {
                 setSuccessMessage('Uploaded Successfully');
                 setApiLoading(false);
                 setState({counter: 0});
@@ -285,8 +286,9 @@ const AdminAddAttachmentForm = (props) => {
         }
     }, [state]);
 
-    const  reset = () => {
+    const reset = () => {
         setFiles([]);
+        fileIndex = 0;
         setKey(Math.floor((Math.random() * 10) + 1));
     }
     const entitylisitingLoader = async () => {
@@ -339,14 +341,14 @@ const AdminAddAttachmentForm = (props) => {
         event.preventDefault();
         setApiLoading(true);
 
-        if(files.length === 0) {
+        if (files.length === 0) {
             setErrorMessage('File is required');
             setApiLoading(false);
         } else {
             setErrorMessage(' ');
         }
 
-        if(entityId.value === ''){
+        if (entityId.value === '') {
             setEntityId({...entityId, error: 'Entity field is required'});
             setApiLoading(false);
         } else {
@@ -358,11 +360,15 @@ const AdminAddAttachmentForm = (props) => {
             formData.append('file', anObjectMapped);
             const response = await lorexFileUpload(formData);
             if (response.error === false) {
+                fileIndex = fileIndex + 1;
+
 
                 formData.append('entityId', entityId.value);
                 formData.append('inputFileId', response.record_id);
                 formData.append('inputFileName', anObjectMapped.name);
                 formData.append('inputFileSize', response.file_size);
+                formData.append('bulkUpload', fileIndex);
+                formData.append('totalBulkUpload', files.length);
 
                 try {
                     const response = await attachFiles(formData);
@@ -450,157 +456,167 @@ const AdminAddAttachmentForm = (props) => {
     return (
 
         <Layout>
-            {history.length > 0 ?
-                <div className={classes.breadcrumbsDiv}>
-                    <Paper className={classes.breadcrumbsInner} elevation={1}>
-                        <Typography className={classes.baseColor} color="inherit" variant="h4">Navigation</Typography>
-                        <Breadcrumbs aria-label="breadcrumb">
+            {role === 'Administrator' ?
+                <>
+                    {history.length > 0 ?
+                        <div className={classes.breadcrumbsDiv}>
+                            <Paper className={classes.breadcrumbsInner} elevation={1}>
+                                <Typography className={classes.baseColor} color="inherit"
+                                            variant="h4">Navigation</Typography>
+                                <Breadcrumbs aria-label="breadcrumb">
 
-                            {/*<Link color="inherit" href="/">*/}
-                            {/*    <Typography color="textPrimary">Dashboard</Typography>*/}
-                            {/*</Link>*/}
+                                    {/*<Link color="inherit" href="/">*/}
+                                    {/*    <Typography color="textPrimary">Dashboard</Typography>*/}
+                                    {/*</Link>*/}
 
-                            <Link color="inherit" onClick={(e) => {
-                                history.goBack()
-                            }}>
-                                <Typography color="textPrimary">Attachments</Typography>
-                            </Link>
-                            <Typography color="textPrimary">Add Attachment</Typography>
-                        </Breadcrumbs>
-                    </Paper>
-                </div>
-             : '' }
-
-            <Paper className={classes.paper} elevation={3}>
-                {successMessage !== ' ' ? (
-                    <MySnackbarContentWrapper
-                        onClose={() => {
-                            removeSuccess()
-                        }}
-                        variant="success"
-                        message={successMessage}
-                    />
-                ) : ''}
-
-
-                {errorMessage !== ' ' ? (
-                    <MySnackbarContentWrapper
-                        onClose={() => {
-                            removeErrorMessage()
-                        }}
-                        variant="error"
-                        message={errorMessage}
-                    />
-                ) : ''}
-                {/*<Backdrop className={classes.backdrop} open={apiLoading}>*/}
-                {/*    <CircularProgress color="inherit" />*/}
-                {/*</Backdrop>*/}
-                <div className="row" >
-                    <form className={classes.formStyle} onSubmit={handleOnSubmit} noValidate
-                          autoComplete="off">
-
-                        <div className={'col-md-6'}>
-                            <FormControl className={clsx(classes.selectField)}
-                                         error={entityId.error !== ' '}>
-                                <InputLabel className={clsx(classes.label)} htmlFor="age-native-simple">Entity Name</InputLabel>
-                                <Select
-                                    disabled={apiLoading}
-                                    required
-                                    error={entityId.error !== ' '}
-                                    value={entityId.value}
-
-                                    onChange={e => setEntityId({
-                                        ...entityId,
-                                        value: e.target.value
-                                    })}
-                                    inputProps={{
-                                        name: 'entityId',
-                                        id: 'entityId',
+                                    <Link color="inherit" onClick={(e) => {
+                                        history.goBack()
                                     }}>
-                                    <option value=""/>
-                                    {entityList?.map((anObjectMapped, index) => <option key={index}
-                                                                                        value={anObjectMapped.id}>{anObjectMapped.account_name}</option>)
-
-                                    }
-
-                                </Select>
-                                <FormHelperText>{entityId.error}</FormHelperText>
-                            </FormControl>
+                                        <Typography color="textPrimary">Attachments</Typography>
+                                    </Link>
+                                    <Typography color="textPrimary">Add Attachment</Typography>
+                                </Breadcrumbs>
+                            </Paper>
                         </div>
-                        <FormGroup row>
+                        : ''}
 
-                            <div className="col-md-12">
-                                <DropzoneArea key={key} getPreviewIcon={handlePreviewIcon} filesLimit={50}
-                                              showPreviews={true}
-                                              showPreviewsInDropzone={false}
-                                              useChipsForPreview
-                                              previewGridProps={{container: {spacing: 1, direction: 'row'}}}
-                                              previewChipProps={{classes: {root: classes.previewChip}}}
-                                              previewText="Selected files"
-                                              acceptedFiles={['.pdf']}
-                                              onChange={handleChange}
-                                              disableRejectionFeedback={apiLoading}
-                                              clearOnUnmount={true}
-                                              getFileAddedMessage={(fileName) => `File ${fileName} ready to add document.`}
+                    <Paper className={classes.paper} elevation={3}>
+                        {successMessage !== ' ' ? (
+                            <MySnackbarContentWrapper
+                                onClose={() => {
+                                    removeSuccess()
+                                }}
+                                variant="success"
+                                message={successMessage}
+                            />
+                        ) : ''}
 
-                                />
-                            </div>
-                            {/*<div className={'col-md-6'}>*/}
-                            {/*    <CustomFileInput*/}
-                            {/*        disabled={loading}*/}
-                            {/*        required*/}
-                            {/*        id="attachment"*/}
-                            {/*        value={inputFiling.value.File}*/}
-                            {/*        onChange={e => fileChange(e)}*/}
-                            {/*        label="Attachment"*/}
-                            {/*        className={clsx(classes.fileUploading, classes.dense)}*/}
-                            {/*        margin="dense"*/}
-                            {/*        invalid={inputFiling.error !== ' '}*/}
-                            {/*        valid={inputFiling.success !== ' '}*/}
-                            {/*    />*/}
-                            {/*    <span>{inputFiling.success !== ' ' ? inputFiling.success : ' '}</span>*/}
-                            {/*</div>*/}
 
-                            <div className={'col-md-12'}>
+                        {errorMessage !== ' ' ? (
+                            <MySnackbarContentWrapper
+                                onClose={() => {
+                                    removeErrorMessage()
+                                }}
+                                variant="error"
+                                message={errorMessage}
+                            />
+                        ) : ''}
+                        {/*<Backdrop className={classes.backdrop} open={apiLoading}>*/}
+                        {/*    <CircularProgress color="inherit" />*/}
+                        {/*</Backdrop>*/}
+                        <div className="row">
+                            <form className={classes.formStyle} onSubmit={handleOnSubmit} noValidate
+                                  autoComplete="off">
 
-                                <div className={clsx(classes.submitButton, 'custom-button-wrapper')}>
-                                    {apiLoading ? (
-                                        files.length !== 0 ?
-                                    <Box position="relative" display="inline-flex">
-                                        <CircularProgress variant="static" value={Math.round(state.counter / files.length * 100)} />
-                                        <Box
-                                            top={0}
-                                            left={0}
-                                            bottom={0}
-                                            right={0}
-                                            position="absolute"
-                                            display="flex"
-                                            alignItems="center"
-                                            justifyContent="center"
-                                        >
-                                            <Typography variant="caption" component="div" color="textSecondary">{Math.round(state.counter / files.length * 100)}%</Typography>
-                                        </Box>
-                                    </Box>: ''
+                                <div className={'col-md-6'}>
+                                    <FormControl className={clsx(classes.selectField)}
+                                                 error={entityId.error !== ' '}>
+                                        <InputLabel className={clsx(classes.label)} htmlFor="age-native-simple">Entity
+                                            Name</InputLabel>
+                                        <Select
+                                            disabled={apiLoading}
+                                            required
+                                            error={entityId.error !== ' '}
+                                            defaultValue={entityId.value}
 
-                                    ): null}
+                                            onChange={e => setEntityId({
+                                                ...entityId,
+                                                value: e.target.value
+                                            })}
+                                            inputProps={{
+                                                name: 'entityId',
+                                                id: 'entityId',
+                                            }}>
+                                            <option value=""/>
+                                            {entityList?.map((anObjectMapped, index) => <option key={index}
+                                                                                                value={anObjectMapped.id}>{anObjectMapped.account_name}</option>)
 
-                                    {/*{apiLoading ? (*/}
-                                    {/*        <div className={clsx(classes.loader)}>*/}
-                                    {/*            <FacebookProgress/>*/}
-                                    {/*        </div>)*/}
-                                    {/*    : null}*/}
+                                            }
 
-                                    <input disabled={apiLoading}
-                                           className={clsx('btn btn-primary', classes.restButton)}
-                                           type="submit" value="Add attachment"/>
-
+                                        </Select>
+                                        <FormHelperText>{entityId.error}</FormHelperText>
+                                    </FormControl>
                                 </div>
-                            </div>
-                        </FormGroup>
-                    </form>
-                </div>
+                                <FormGroup row>
 
-            </Paper>
+                                    <div className="col-md-12">
+                                        <DropzoneArea key={key} getPreviewIcon={handlePreviewIcon} filesLimit={50}
+                                                      showPreviews={true}
+                                                      showPreviewsInDropzone={false}
+                                                      useChipsForPreview
+                                                      previewGridProps={{container: {spacing: 1, direction: 'row'}}}
+                                                      previewChipProps={{classes: {root: classes.previewChip}}}
+                                                      previewText="Selected files"
+                                                      acceptedFiles={['.pdf']}
+                                                      onChange={handleChange}
+                                                      disableRejectionFeedback={apiLoading}
+                                                      clearOnUnmount={true}
+                                                      getFileAddedMessage={(fileName) => `File ${fileName} ready to add document.`}
+
+                                        />
+                                    </div>
+                                    {/*<div className={'col-md-6'}>*/}
+                                    {/*    <CustomFileInput*/}
+                                    {/*        disabled={loading}*/}
+                                    {/*        required*/}
+                                    {/*        id="attachment"*/}
+                                    {/*        value={inputFiling.value.File}*/}
+                                    {/*        onChange={e => fileChange(e)}*/}
+                                    {/*        label="Attachment"*/}
+                                    {/*        className={clsx(classes.fileUploading, classes.dense)}*/}
+                                    {/*        margin="dense"*/}
+                                    {/*        invalid={inputFiling.error !== ' '}*/}
+                                    {/*        valid={inputFiling.success !== ' '}*/}
+                                    {/*    />*/}
+                                    {/*    <span>{inputFiling.success !== ' ' ? inputFiling.success : ' '}</span>*/}
+                                    {/*</div>*/}
+
+                                    <div className={'col-md-12'}>
+
+                                        <div className={clsx(classes.submitButton, 'custom-button-wrapper')}>
+                                            {apiLoading ? (
+                                                files.length !== 0 ?
+                                                    <Box position="relative" display="inline-flex">
+                                                        <CircularProgress variant="static"
+                                                                          value={Math.round(state.counter / files.length * 100)}/>
+                                                        <Box
+                                                            top={0}
+                                                            left={0}
+                                                            bottom={0}
+                                                            right={0}
+                                                            position="absolute"
+                                                            display="flex"
+                                                            alignItems="center"
+                                                            justifyContent="center"
+                                                        >
+                                                            <Typography variant="caption" component="div"
+                                                                        color="textSecondary">{Math.round(state.counter / files.length * 100)}%</Typography>
+                                                        </Box>
+                                                    </Box> : ''
+
+                                            ) : null}
+
+                                            {/*{apiLoading ? (*/}
+                                            {/*        <div className={clsx(classes.loader)}>*/}
+                                            {/*            <FacebookProgress/>*/}
+                                            {/*        </div>)*/}
+                                            {/*    : null}*/}
+
+                                            <input disabled={apiLoading}
+                                                   className={clsx('btn btn-primary', classes.restButton)}
+                                                   type="submit" value="Add attachment"/>
+
+                                        </div>
+                                    </div>
+                                </FormGroup>
+                            </form>
+                        </div>
+
+                    </Paper>
+                </> : <MySnackbarContentWrapper
+                    variant="error"
+                    message={'Access Denied.'}
+                />}
         </Layout>
     )
 }
