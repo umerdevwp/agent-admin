@@ -84,11 +84,21 @@ class Entity extends RestController
 
             if ($aDataEntity['type'] == 'error' && $iParentId > 0) {
                 if (!is_array($aDataTempEntity)) {
-                    $aDataTempEntity = $this->Tempmeta_model->getOneInJson([
-                        'userid' => $iParentId,
-                        'json_id' => $id,
-                        'slug' => $this->Tempmeta_model->slugNewEntity
-                    ]);
+                    // if admin do not fetch using parent id
+                    if(isAdmin())
+                    {
+                        $aDataTempEntity = $this->Tempmeta_model->getOneInJson([
+                            'json_id' => $id,
+                            'slug' => $this->Tempmeta_model->slugNewEntity
+                        ]);
+                    // use parent id when parent is accessing data
+                    } else {
+                        $aDataTempEntity = $this->Tempmeta_model->getOneInJson([
+                            'userid' => $iParentId,
+                            'json_id' => $id,
+                            'slug' => $this->Tempmeta_model->slugNewEntity
+                        ]); 
+                    }
                 }
                 if ($aDataTempEntity['type'] == 'ok') {
                     $data['entity'] = $aDataTempEntity['results'];
