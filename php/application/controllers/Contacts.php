@@ -95,7 +95,26 @@ class Contacts extends RestController
 
         if(!isAdmin())
         {
-            if(!$this->entity_model->isParentOf($this->input->post("entityId"),$sid))
+            $eid = $this->input->post("entityId");
+            // check zoho entries for parent verification
+            $bIsParentValid = $this->entity_model->isParentOf($eid,$sid);
+
+            // check under temp records if id is created recently and available in temp
+            if(!$bIsParentValid)
+            {
+                $this->load->model("Tempmeta_model");
+                $aDataWhereTemp = ['json_id'=>$eid,'userid'=>$sid];
+
+                $bRowExist = $this->Tempmeta_model->checkRowExistInJson($aDataWhereTemp);
+                
+                if($bRowExist)
+                {
+                    $bIsParentValid = true;
+                }
+            }
+            
+            // if parent id is not the right parent block with permission denied
+            if(!$bIsParentValid)
             {
                 $this->response([
                     'status' => false,

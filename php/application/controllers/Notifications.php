@@ -267,15 +267,32 @@ class Notifications extends RestController
                         $sDownloadUrl = getenv("SITE_URL") . "download/" . $oRow->lorax_id . "?code=" . $oRow->token. "&name=doc-" . date("d-m-y") . ".pdf";
 
                         //$oDataContact = $this->contacts_model->getEntityProfileContact($oEntity->id);
-                    
+                        //$oDataSendgrid = $this->sendgrid_model->getOne($oRow->sendgrid_id);
+                        $aTemplateVariables = ['entity_name'=>$oEntity->name];
+                        switch($oRow->sendgrid_id)
+                        {
+                            case 1:
+                                $aTemplateVariables = array_merge($aTemplateVariables,['download_url'=>$sDownloadUrl]);
+                                $sTemplateId = "d-2a672857adad4bd79e7f421636b77f6b";
+                            break;
+                            case 2:
+                                $sTemplateId = "d-d0fa3c4400ff49e5bf48c31eb85fc5fe";
+                                $aTemplateVariables = array_merge($aTemplateVariables,['login_url'=>getenv("SITE_MAIN_URL")."entity/".$oEntity->id]);
+
+                                if(!empty($oRow->sendgrid_variable))
+                                $aTemplateVariables = array_merge(unserialize($oRow->sendgrid_variable),$aTemplateVariables);
+                            break;
+                        }
+
                         $bSent = $this->Messenger_model->sendTemplateEmail(
-                            "d-2a672857adad4bd79e7f421636b77f6b",
-                            ['contact_name'=>"Sir",'entity_name'=>$oEntity->name,'download_url'=>$sDownloadUrl],
+                            $sTemplateId,
+                            $aTemplateVariables,
                             $oEntity->email,
                             $oEntity->name,
                             $oEntity->id,
                             "Template loc Attachment available"
                         );
+
                         if($bSent)
                         {
                             $this->NotificationAttachments_model->updateDataArray($oRow->id,['status'=>'sent']);
