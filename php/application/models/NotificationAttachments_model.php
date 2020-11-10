@@ -23,7 +23,7 @@ class NotificationAttachments_model extends CI_Model {
     }
 
 
-    public function addAttachmentNotification(int $iEntityId,string $sLoraxFileId)
+    public function addAttachmentNotification(int $iEntityId,string $sLoraxFileId, int $iSendgridId=1, array $aSendgridVariable=['document_count'=>'',])
     {
         if($iEntityId>0 && $_SESSION['eid']!=$iEntityId)
         {
@@ -32,7 +32,9 @@ class NotificationAttachments_model extends CI_Model {
                 "duedate"=>date("Y-m-d"),
                 "created_by"=>$_SESSION['eid'],
                 "lorax_id"=>$sLoraxFileId,
-                "token"=>generateToken()
+                "token"=>generateToken(),
+                "sendgrid_id"=>$iSendgridId,
+                "sendgrid_variable"=>serialize($aSendgridVariable),
             ];
 
             $bResult = $this->db->insert($this->table,$aData);

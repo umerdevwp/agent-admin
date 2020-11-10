@@ -178,7 +178,23 @@ class Documents extends RestController
             $iId = $this->LoraxAttachments_model->insert($data);
             if(!empty($iId)) {
                 $this->load->model("NotificationAttachments_model");
-                $iNotifyId = $this->NotificationAttachments_model->addAttachmentNotification($this->input->post('entityId'),$sLoraxFileId);
+                // test bulk upload by admins
+                if(isAdmin())
+                {
+                    // if bulk upload then check is admin and total count = current queue (so it become notification last upload)
+                    if($this->input->post("bulkUpload")==$this->input->post("totalBulkUpload") && $this->input->post("totalBulkUpload")>0){
+                        $aSendgridVariable = [
+                            'document_count'   =>  $this->input->post("totalBulkUpload")
+                        ];
+                        // sendgrid id = 2, to send bulk attachment template
+                        $iNotifyId = $this->NotificationAttachments_model->addAttachmentNotification($this->input->post('entityId'),$sLoraxFileId, 2, $aSendgridVariable);
+                    }
+                }
+                // only insert single attachment from detail page add attachment, where no bulkUpload variable exist
+                if(empty($this->input->post("bulkUpload"))){
+                    $iNotifyId = $this->NotificationAttachments_model->addAttachmentNotification($this->input->post('entityId'),$sLoraxFileId, 1);
+                }
+
                 $this->response([
                     'status' => true,
                     'message' => 'File is attached'
