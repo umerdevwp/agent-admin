@@ -22,44 +22,63 @@ class Documents extends RestController
         $this->load->model("entity_model");
         $this->load->model("Tempmeta_model");
         $id = $_SESSION['eid'];
+        $aDataTempEntity = [];
 
-        if($id == getenv("SUPER_USER")){
+        if(isAdmin()){
+            // get zoho accounts data
             $result = $this->entity_model->getAll();
+            // get temp entity data
+            $aDataTempEntity = $this->Tempmeta_model->getAllForAdmin($this->Tempmeta_model->slugNewEntity);
         } else {
             // fetch all childrens ids, to later fetch
             $result = $this->entity_model->getChildAccounts($id,"id");
-
+            // get temp entity data for parent login
             $aDataTempEntity = $this->Tempmeta_model->getAll(
                 $id,
                 $this->Tempmeta_model->slugNewEntity
             );
-            if ($aDataTempEntity['type'] == 'ok')
-            {
-                if (count($aDataTempEntity['results']) > 0) {
 
-                    $aNewDataChild = [];
-                    
-                    if (count($result['results']) > 0) {
-                        $aNewDataChild = array_merge($result['results'], json_decode($aDataTempEntity['results'][0]['json_data']));
-                    } else {
-                        $aNewDataChild = json_decode($aDataTempEntity['results'][0]['json_data']);
-                    }
-                    $result['results'] = $aNewDataChild;
-                }
-            }
+            if(count($aDataTempEntity['results'])>0)
+            $aDataTempEntity['results'] = json_decode($aDataTempEntity['results'][0]['json_data']);
         }
-
+//        print_r($aDataTempEntity);die;
+//print_r($result);die;
         // create comma seprated ids from result
         $arCommaIds = array();
         foreach($result['results'] as $v)
         {
             $arCommaIds[] = (int)$v->id;
         }
-
+//print_r($result);
         // add parent id as well
         $arCommaIds[] = (int)$id;
 
-        $data = $this->getIdIn($arCommaIds);
+        $data = $this->getIdIn($arCommaIds,true);
+// print_r($data);
+
+        if(count($aDataTempEntity)>0)
+        {
+            $arCommaIds = array();
+            foreach($aDataTempEntity['results'] as $v)
+            {
+                $arCommaIds[] = (int)$v->id;
+            }        
+            // print_r($aDataTempEntity);die;
+            $aDataTempAttachment = $this->getIdIn($arCommaIds,false);
+
+            foreach($aDataTempAttachment['documents'] as $v)
+            {
+                foreach($aDataTempEntity['results'] as $v2)
+                {
+                    if($v2->id==$v->entityId)
+                    {
+                    $v->entityName = $v2->name;
+                    }
+                }
+            }
+
+            $data['documents'] = array_merge($data['documents'],$aDataTempAttachment['documents']);
+        }
 //        $data['attachments'] = $data['documents'];
         $this->response([
             
@@ -68,11 +87,18 @@ class Documents extends RestController
         ], 200);
     }
 
-    private function getIdIn(array $arCommaIds=[])
+    private function getIdIn(array $arCommaIds=[],$bWithEntity=true)
     {
 
         $this->load->model('LoraxAttachments_model');
+
+        if($bWithEntity)
+        {
+        $aDataAttachment = $this->LoraxAttachments_model->getAllWithEntity($arCommaIds);
+        } else {
         $aDataAttachment = $this->LoraxAttachments_model->getAllFromEntityList($arCommaIds);
+        }
+
         $data['documents'] = [];
 
         if ($aDataAttachment['type'] == 'ok') {
