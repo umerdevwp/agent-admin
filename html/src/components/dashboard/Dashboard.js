@@ -221,7 +221,8 @@ function Dashboard(props) {
                             options={{
                                 defaultExpanded: false,
                                 sorting: true,
-                                actionsColumnIndex: -1
+                                actionsColumnIndex: -1,
+                                search: true
                             }}
                             actions={[
                                 rowData => ({
