@@ -1,7 +1,8 @@
 import React, {useEffect, useContext, forwardRef } from 'react';
-import MaterialTable, {MTableToolbar} from "material-table";
+// import MaterialTable, {MTableToolbar} from "material-table";
+import MaterialTable from "@material-table/core";
 import Layout from "../layout/Layout";
-import {entityList} from "../api/enitity.crud";
+import {entityList, StateRegionList} from "../api/enitity.crud";
 import {UserContext} from '../context/UserContext';
 import {withOktaAuth} from '@okta/okta-react';
 import {useHistory} from "react-router-dom";
@@ -108,7 +109,7 @@ MySnackbarContentWrapper.propTypes = {
 }
 
 
-function Dashboard(props) {
+function Dashboard(props, { onChange, ...rest }) {
 
     const classes = useStyles();
     const history = useHistory();
@@ -137,6 +138,12 @@ function Dashboard(props) {
         } catch (e) {
             addError('Something when wrong!!');
         }
+
+
+
+
+
+
     }
 
 
@@ -173,7 +180,7 @@ function Dashboard(props) {
             {title: 'Name', field: 'name'},
             {title: 'Entity Structure', field: 'entityStructure'},
             {title: 'Filing State', field: 'filingState'},
-            {title: 'Formation Date', field: 'formationDate'},
+            {title: 'Formation Date', field: 'formationDate', type: 'date'},
             // {
             //     title: 'Action',
             //     sorting: false,
@@ -198,6 +205,22 @@ function Dashboard(props) {
         data:  entitydata ? entitydata : '',
     };
 
+    const isLeaf = rowData =>
+        entitydata.find(el => el.parentId === rowData.id) === undefined;
+
+    function onlyUnique(value, index, self) {
+        return self.indexOf(value) === index;
+    }
+
+
+    const constPathColors = {
+        1: '#e8e8e8',
+        2: '#dcdcdc',
+        3: '#cfcfcf',
+        4: '#c2c2c2',
+        5: '#b6b6b6'
+    };
+
     return (
         <>
 
@@ -219,10 +242,17 @@ function Dashboard(props) {
                             columns={settingData.columns}
                             data={settingData.data}
                             options={{
-                                defaultExpanded: false,
                                 sorting: true,
-                                actionsColumnIndex: -1,
-                                search: true
+                                search: true,
+                                rowStyle: rowData => {
+                                    console.log(rowData.tableData);
+                                    if(rowData.tableData.isTreeExpanded === false && rowData.tableData.path.length === 1) {
+                                        return {};
+                                    } else {
+                                        const rowBackgroundColor = constPathColors[rowData.tableData.path.length];
+                                        return {backgroundColor: rowBackgroundColor};
+                                    }
+                                }
                             }}
                             actions={[
                                 rowData => ({
@@ -257,9 +287,19 @@ function Dashboard(props) {
                                 columns={settingData.columns}
                                 data={settingData.data}
                                 options={{
-                                    defaultExpanded: false,
                                     sorting: true,
-                                    actionsColumnIndex: -1
+                                    search: true,
+                                    rowStyle: rowData => {
+                                        console.log(rowData.tableData);
+                                        if(rowData.tableData.isTreeExpanded === false && rowData.tableData.path.length === 1) {
+                                            return {};
+                                        } else {
+                                            const rowBackgroundColor = constPathColors[rowData.tableData.path.length];
+                                            return {backgroundColor: rowBackgroundColor};
+                                        }
+                                    }
+
+
                                 }}
                                 actions={[
                                     rowData => ({
