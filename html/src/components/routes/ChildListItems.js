@@ -40,14 +40,14 @@ export default function ChildListItems() {
             {/*        <ListItemText primary="Add entity"/>*/}
             {/*    </ListItem>*/}
             {/*</Link>*/}
-            <Link className={classes.link} to='/attachments'>
-                <ListItem button>
-                    <ListItemIcon>
-                        <Attachment color="primary"/>
-                    </ListItemIcon>
-                    <ListItemText primary="Attachments"/>
-                </ListItem>
-            </Link>
+            {/*<Link className={classes.link} to='/attachments'>*/}
+            {/*    <ListItem button>*/}
+            {/*        <ListItemIcon>*/}
+            {/*            <Attachment color="primary"/>*/}
+            {/*        </ListItemIcon>*/}
+            {/*        <ListItemText primary="Attachments"/>*/}
+            {/*    </ListItem>*/}
+            {/*</Link>*/}
             {/*<Link className={classes.link} to='/contacts'>*/}
             {/*    <ListItem button>*/}
             {/*        <ListItemIcon>*/}

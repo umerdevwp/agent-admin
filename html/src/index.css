@@ -65,6 +65,30 @@ span.error {
     margin-top: 5px;
     display: block;
 }
+tr[level="0"] {
+    background-color: inherit;
+}
+
+tr[level="1"] {
+    background-color: #e8e8e8;
+}
+
+tr[level="2"] {
+    background-color: #dcdcdc;
+}
+
+tr[level="3"] {
+    background-color: #cfcfcf;
+}
+
+tr[level="4"] {
+    background-color: #b6b6b6;
+}
+
+
+/*tr[index="2"]{*/
+/*    background-color: #e8e8e8;*/
+/*}*/
 
 
 
