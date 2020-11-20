@@ -4,7 +4,7 @@ use zcrmsdk\crm\setup\restclient\ZCRMRestClient;
 use zcrmsdk\crm\crud\ZCRMModule;
 use zcrmsdk\crm\crud\ZCRMRecord;
 
-class LoraxAttachments_model extends CI_Model
+class LoraxAttachments_model extends CI_Model 
 {
 
     private $table = "lorax_attachments";
@@ -139,6 +139,7 @@ class LoraxAttachments_model extends CI_Model
 
         return ['type'=>'ok','results'=>$result];
     }
+
 
     public function checkOwnership($iOwner,$id)
     {
@@ -309,6 +310,51 @@ class LoraxAttachments_model extends CI_Model
                 logToAdmin("Document token refresh fail","File clause: " . print_r($aWhere,true));
             }
         }
+    }
+
+        /** 
+     * Get joined recordset of lorax attachments and zoho_accounts
+     * 
+     * @param Array $aCommaIds list of entity the user is parent of
+     * @param Array $aCommaIds limit columns from lorax attachment table
+     */
+    public function getAllWithEntity($aCommaIds,$aColumns=[])
+    {
+        $this->refreshTokens($aCommaIds);
+
+        if(count($aColumns)>0)
+            $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
+        else {
+            $aMyColumns = [
+                "id","name","fileId","entityId","fileSize","created","token"
+            ];
+            $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
+        }
+        foreach($aMyColumns as $k=>$v)
+            $this->db->select("la.$v as `$k`");
+
+        // select entity name from zoho_accounts
+        $this->db->select("za.account_name as entityName");
+
+        $this->db->from($this->table." la");
+        $this->db->where_in('entity_id',$aCommaIds);
+        $this->db->join("zoho_accounts za","za.id=la.entity_id");
+
+        $query = $this->db->get();
+//echo $this->db->last_query();
+        $result = false;
+        
+        if($query)
+        {
+            $result = $query->result_object();
+        }
+
+        
+        if (! is_array($result)) {
+            return ['msg'=>'No contacts available','msg_type'=>'error'];
+        }
+
+        return ['type'=>'ok','results'=>$result];
     }
 }
 

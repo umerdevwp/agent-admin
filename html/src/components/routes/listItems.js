@@ -32,14 +32,14 @@ export default function MainListItems() {
                     <ListItemText primary="Dashboard"/>
                 </ListItem>
             </Link>
-            <Link className={classes.link} to='/entity/new/add'>
-                <ListItem button>
-                    <ListItemIcon>
-                        <PeopleIcon color="primary"/>
-                    </ListItemIcon>
-                    <ListItemText primary="Add entity"/>
-                </ListItem>
-            </Link>
+            {/*<Link className={classes.link} to='/entity/new/add'>*/}
+            {/*    <ListItem button>*/}
+            {/*        <ListItemIcon>*/}
+            {/*            <PeopleIcon color="primary"/>*/}
+            {/*        </ListItemIcon>*/}
+            {/*        <ListItemText primary="Add entity"/>*/}
+            {/*    </ListItem>*/}
+            {/*</Link>*/}
             <Link className={classes.link} to='/attachments'>
                 <ListItem button>
                     <ListItemIcon>
@@ -48,6 +48,16 @@ export default function MainListItems() {
                     <ListItemText primary="Attachments"/>
                 </ListItem>
             </Link>
+
+            <Link className={classes.link} to='/admin/attachments'>
+                <ListItem button>
+                    <ListItemIcon>
+                        <Attachment color="primary"/>
+                    </ListItemIcon>
+                    <ListItemText primary="Bulk Attachments"/>
+                </ListItem>
+            </Link>
+
             <Link className={classes.link} to='/contacts'>
                 <ListItem button>
                     <ListItemIcon>

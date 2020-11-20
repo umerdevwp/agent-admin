@@ -1,7 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d9398c1c-af28-4f73-920d-6f1f684f34d9" name="Default Changelist" comment="Merge branch 'master-notification-react' of https://github.com/United-Agent-Services/agentadmin into local-omer&#10;&#10;# Conflicts:&#10;#&#9;application/controllers/Contacts.php&#10;#&#9;application/controllers/Entity.php&#10;#&#9;application/controllers/Login.php&#10;#&#9;application/controllers/Portal.php&#10;#&#9;application/hooks/Auth.php&#10;#&#9;application/models/Accounts_model.php&#10;#&#9;application/models/Contacts_model.php&#10;#&#9;application/models/Entity_model.php&#10;#&#9;application/views/entity-add.php&#10;#&#9;application/views/entity.php&#10;#&#9;application/views/header.php&#10;#&#9;application/views/portal.php" />
+    <list default="true" id="d9398c1c-af28-4f73-920d-6f1f684f34d9" name="Default Changelist" comment="Merge branch 'master-notification-react' of https://github.com/United-Agent-Services/agentadmin into local-omer&#10;&#10;# Conflicts:&#10;#&#9;application/controllers/Contacts.php&#10;#&#9;application/controllers/Entity.php&#10;#&#9;application/controllers/Login.php&#10;#&#9;application/controllers/Portal.php&#10;#&#9;application/hooks/Auth.php&#10;#&#9;application/models/Accounts_model.php&#10;#&#9;application/models/Contacts_model.php&#10;#&#9;application/models/Entity_model.php&#10;#&#9;application/views/entity-add.php&#10;#&#9;application/views/entity.php&#10;#&#9;application/views/header.php&#10;#&#9;application/views/portal.php">
+      <change beforePath="$PROJECT_DIR$/../asset-manifest.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../favicon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../logo192.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../logo512.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../manifest.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../media/agentadmin/bg/login.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../media/agentadmin/logo/aa_full.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../media/agentadmin/logo/aa_logo.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../media/agentadmin/logo/logo-mini-md-aa.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../precache-manifest.51fcf7b96e878382b61cfef0ff03b672.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../robots.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../service-worker.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/css/2.83758d64.chunk.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/css/2.83758d64.chunk.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/css/main.e1063e2e.chunk.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/css/main.e1063e2e.chunk.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/2.0b2fd84d.chunk.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/2.0b2fd84d.chunk.js.LICENSE.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/2.0b2fd84d.chunk.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/3.a406f91f.chunk.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/3.a406f91f.chunk.js.LICENSE.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/3.a406f91f.chunk.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/4.91b14280.chunk.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/4.91b14280.chunk.js.LICENSE.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/4.91b14280.chunk.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/5.72bc2cda.chunk.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/5.72bc2cda.chunk.js.LICENSE.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/5.72bc2cda.chunk.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/main.01343894.chunk.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/main.01343894.chunk.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/runtime-main.ffb3d993.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/runtime-main.ffb3d993.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/media/checkbox-01.7e720020.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/media/checkbox-01@2x.d5554fe4.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/media/checkbox-sign-in-widget@2x.c8c02700.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/media/loader@1x.da5afed5.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/media/montserrat-light-webfont.6225f3ca.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/media/montserrat-light-webfont.70df5da6.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/media/montserrat-light-webfont.8cde2a0e.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/media/montserrat-light-webfont.a11330db.eot" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/media/montserrat-regular-webfont.362ffe72.eot" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/media/montserrat-regular-webfont.69eac499.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/media/montserrat-regular-webfont.6fedfc64.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/media/montserrat-regular-webfont.8f2822b7.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/media/okticon.432df6c2.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/media/okticon.5e1f49dd.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/media/okticon.a560e17e.eot" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/media/okticon.db287231.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/media/radiobutton-01.c837a09b.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/media/radiobutton-01@2x.dc47af40.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/media/sign-on-widget-spinner.eea28db2.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/media/u2f_usb.591cc98f.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/media/yubikeyDemo.f10c9db1.png" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

@@ -480,6 +480,15 @@ const AddContactForm = (props) => {
         formData.append('acceptInvalidAddress', userAgree)
 
         const response = await createContact(formData);
+
+        if (response.type === 'error') {
+            window.location.reload();
+        }
+
+        if (response.status === 401) {
+            window.location.reload();
+        }
+
         if (response.field_error) {
 
             setComponentLoading(false);

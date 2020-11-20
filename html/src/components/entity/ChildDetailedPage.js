@@ -180,8 +180,11 @@ const ChildDetailedPage = (props) => {
             addError('Status '+ detailedView.errors.status +' '+ detailedView.errors.detail);
         }
 
+        if (detailedView.type === 'error') {
+            window.location.reload();
+        }
 
-        if(detailedView.status === 401){
+        if (detailedView.status === 401) {
             window.location.reload();
         }
 
@@ -265,7 +268,6 @@ const ChildDetailedPage = (props) => {
     return (
 
         <>
-            <Layout>
                 <Grid container spacing={2}>
 
                     {errorList?.map((value, index) => (
@@ -423,8 +425,7 @@ const ChildDetailedPage = (props) => {
                 <Grid container spacing={5}>
                     <Grid item xs={12}>
                         <AttachmentTable action={true} loading={componentLoading} tooltip={'Add New Document'}
-                                     redirect={true}
-                                     url={`/attachment/form/add`} data={attachmentData}
+                                     redirect={true} url={`/attachment/form/add/${attributes ? attributes.organization : ''}`} data={attachmentData}
                                      title={'Documents'}/>
                     </Grid>
 
@@ -433,11 +434,10 @@ const ChildDetailedPage = (props) => {
                     <Grid item xs={12}>
                         <ContactList action={true} loading={componentLoading} tooltip={'Add New Contact'}
                                      redirect={true}
-                                     url={`/contact/form/add`} data={contactData}
+                                     url={`/contact/form/add/${attributes ? attributes.organization : ''}`} data={contactData}
                                      title={'Contacts'}/>
                     </Grid>
                 </Grid>
-            </Layout>
         </>
 
     )

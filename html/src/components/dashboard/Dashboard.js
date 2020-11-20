@@ -1,7 +1,8 @@
-import React, {useEffect, useContext, forwardRef } from 'react';
-import MaterialTable, {MTableToolbar} from "material-table";
+import React, {useEffect, useContext, forwardRef} from 'react';
+// import MaterialTable, {MTableToolbar} from "material-table";
+import MaterialTable from "@material-table/core";
 import Layout from "../layout/Layout";
-import {entityList} from "../api/enitity.crud";
+import {entityList, StateRegionList} from "../api/enitity.crud";
 import {UserContext} from '../context/UserContext';
 import {withOktaAuth} from '@okta/okta-react';
 import {useHistory} from "react-router-dom";
@@ -21,6 +22,14 @@ import InfoIcon from "@material-ui/icons/Info";
 import ChildDetailedPage from '../entity/ChildDetailedPage';
 import Add from '@material-ui/icons/Add';
 
+
+const columns = [
+
+    {title: 'Name', field: 'name'},
+    {title: 'Entity Structure', field: 'entityStructure'},
+    {title: 'Filing State', field: 'filingState'},
+    {title: 'Formation Date', field: 'formationDate', type: 'date'},
+];
 
 
 const useStyles = makeStyles(theme => ({
@@ -73,6 +82,13 @@ const variantIcon = {
     info: InfoIcon,
 };
 
+const constPathColors = {
+    1: '#e8e8e8',
+    2: '#dcdcdc',
+    3: '#cfcfcf',
+    4: '#c2c2c2',
+    5: '#b6b6b6'
+};
 
 function MySnackbarContentWrapper(props) {
     const classes = useStyles();
@@ -108,19 +124,16 @@ MySnackbarContentWrapper.propTypes = {
 }
 
 
-function Dashboard(props) {
-
+const Dashboard = (props, {onChange, ...rest}) => {
     const classes = useStyles();
     const history = useHistory();
-    const tableIcons = {
-       Add: forwardRef((props, ref) => <Add {...props} ref={ref} color='action' />)
-
-};
     const {loading, attributes, addError, errorList, role, addTitle, removeError} = useContext(UserContext);
     const checkRole = role ? role : localStorage.getItem('role');
     const [entitydata, setEntityData] = React.useState([]);
     const [componentLoading, setComponentLoading] = React.useState(true);
+
     useEffect(() => {
+
         if (loading === true) {
             addTitle('Dashboard');
             if (role === 'Parent Organization' || role === 'Administrator') {
@@ -131,14 +144,15 @@ function Dashboard(props) {
     }, [loading])
 
     const asyncDataFetch = async () => {
-        const tokenResult = await props.authState.accessToken;
-        ;
-
         try {
+
+            const tokenResult = await props.authState.accessToken;
             await fetchData(tokenResult);
         } catch (e) {
             addError('Something when wrong!!');
         }
+
+
     }
 
 
@@ -169,42 +183,10 @@ function Dashboard(props) {
         }
     }
 
-    const settingData = {
-        columns: [
-
-            {title: 'Name', field: 'name'},
-            {title: 'Entity Structure', field: 'entityStructure'},
-            {title: 'Filing State', field: 'filingState'},
-            {title: 'Formation Date', field: 'formationDate'},
-            // {
-            //     title: 'Action',
-            //     sorting: false,
-            //     field: 'url',
-            //
-            //     render: rowData =>  <Link
-            //         component="button"
-            //         variant="body2"
-            //         onClick={() => {
-            //             if (rowData.id !== attributes.organization) {
-            //                 history.push(`/entity/${rowData.id}`);
-            //             } else {
-            //                 history.push(`/entity`);
-            //             }
-            //         }}>
-            //         {/*<VisibilityIcon/>*/}
-            //     </Link>
-            //
-            //     // render: rowData => <a href={`/entity/${rowData.id}`}> <VisibilityIcon/> </a>
-            // },
-        ],
-        data: entitydata,
-    };
 
     return (
         <>
-
             <Layout>
-
                 {errorList?.map((value, index) => (
                     <MySnackbarContentWrapper className={classes.errorMessage} spacing={1} index={index} variant="error"
                                               message={value} onClose={() => {
@@ -212,80 +194,83 @@ function Dashboard(props) {
                     }}/>
                 ))}
                 {checkRole === 'Parent Organization' ?
-                    <div style={{maxWidth: "100%"}}>
-                        <MaterialTable
-                            icons={tableIcons}
-                            parentChildData={(row, rows) => rows.find(a => a.id === row.parentId)}
-                            isLoading={componentLoading}
-                            title={'Entities'}
-                            columns={settingData.columns}
-                            data={settingData.data}
-                            options={{
-                                defaultExpanded: false,
-                                sorting: true,
-                                actionsColumnIndex: -1
-                            }}
-                            actions={[
-                                rowData => ({
-                                    icon: () => <VisibilityIcon />,
-                                    tooltip: 'View',
-                                    onClick: (event, rowData) => {
-                                        if (rowData.id !== attributes.organization) {
-                                            history.push(`/entity/${rowData.id}`);
-                                        } else {
-                                            history.push(`/entity`);
-                                        }
+                    <MaterialTable
+                        isLoading={componentLoading}
+                        title="Entities"
+                        data={entitydata ? entitydata : ''}
+                        columns={columns}
+                        parentChildData={(row, rows) => rows.find(a => a.id === row.parentId)}
+                        options={{
+                            // selection: true,
+                            // paging: false,
+                            sorting: true,
+                            search: true,
+
+
+                        }}
+                        actions={[
+                            rowData => ({
+                                icon: () => <VisibilityIcon />,
+                                tooltip: 'View',
+                                onClick: (event, rowData) => {
+                                    if (rowData.id !== attributes.organization) {
+                                        history.push(`/entity/${rowData.id}`);
+                                    } else {
+                                        history.push(`/entity`);
                                     }
-                                })
-                            ]}
-                        />
-                    </div> : ''}
+                                }
+                            })
+                        ]}
+                        // onSelectionChange={rows =>
+                        //     onChange(
+                        //         rows.filter(onlyUnique).map(({id, value}) => ({id, value}))
+                        //     )
+                        // }
+                    /> : ''}
 
                 {
                     checkRole === 'Child Entity' ?
                         <ChildDetailedPage/> : ''
                 }
 
+                {checkRole === 'Administrator' ?
+                    <MaterialTable
+                        isLoading={componentLoading}
+                        title="Entities"
+                        data={entitydata ? entitydata : ''}
+                        columns={columns}
+                        parentChildData={(row, rows) => rows.find(a => a.id === row.parentId)}
+                        options={{
+                            // selection: true,
+                            // paging: false,
+                            sorting: true,
+                            search: true,
 
-                {
-                    checkRole === 'Administrator' ?
-                        <div style={{maxWidth: "100%"}}>
-                            <MaterialTable
-                                icons={tableIcons}
-                                parentChildData={(row, rows) => rows.find(a => a.id === row.parentId)}
-                                isLoading={componentLoading}
-                                title={'Entities'}
-                                columns={settingData.columns}
-                                data={settingData.data}
-                                options={{
-                                    defaultExpanded: false,
-                                    sorting: true,
-                                    actionsColumnIndex: -1
-                                }}
-                                actions={[
-                                    rowData => ({
-                                        icon: () => <VisibilityIcon />,
-                                        tooltip: 'View',
-                                        onClick: (event, rowData) => {
-                                            if (rowData.id !== attributes.organization) {
-                                                history.push(`/entity/${rowData.id}`);
-                                            } else {
-                                                history.push(`/entity`);
-                                            }
-                                        }
-                                    })
-                                ]}
-                            />
-                        </div> : ''
 
-                }
+                        }}
+                        actions={[
+                            rowData => ({
+                                icon: () => <VisibilityIcon />,
+                                tooltip: 'View',
+                                onClick: (event, rowData) => {
+                                    if (rowData.id !== attributes.organization) {
+                                        history.push(`/entity/${rowData.id}`);
+                                    } else {
+                                        history.push(`/entity`);
+                                    }
+                                }
+                            })
+                        ]}
+                        // onSelectionChange={rows =>
+                        //     onChange(
+                        //         rows.filter(onlyUnique).map(({id, value}) => ({id, value}))
+                        //     )
+                        // }
+                    /> : ''}
 
             </Layout>
-
         </>
-
-    )
+    );
 }
-
 
 export default withOktaAuth(Dashboard);

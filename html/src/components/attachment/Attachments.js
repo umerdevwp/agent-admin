@@ -128,6 +128,13 @@ const Attachments = () => {
     const fetchAttachmentData = async () => {
         try {
             const response = await AttachmentsList(attributes.organization);
+            if (response.type === 'error') {
+                window.location.reload();
+            }
+
+            if (response.status === 401) {
+                window.location.reload();
+            }
             await setAttachmentList(response.data.documents);
             setComponentLoading(false);
 
@@ -152,6 +159,7 @@ const Attachments = () => {
             },
             {title: 'Date', field: 'created'},
             {title: 'Size', field: 'fileSize'},
+            {title: 'Entity', field: 'entityName'},
         ],
         data: attachmentList,
     };
@@ -166,7 +174,7 @@ const Attachments = () => {
                 ))}
                 <Grid container spacing={1}>
                     <Grid item xs={12}>
-                        <AttachmentTable loading={componentLoading} tooltip={'Add Attachment'} data={dummyData}
+                        <AttachmentTable redirect={true} url={'/admin/attachments'} loading={componentLoading} tooltip={'Add Attachment'} data={dummyData}
                                      title={'Attachments'}/>
                     </Grid>
                 </Grid>

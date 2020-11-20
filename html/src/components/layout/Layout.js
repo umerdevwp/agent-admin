@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useRef} from 'react';
 import {useMediaQuery} from 'react-responsive'
 import clsx from 'clsx';
 import {makeStyles} from '@material-ui/core/styles';
@@ -22,7 +22,7 @@ import {UserContext} from "../context/UserContext";
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Fade from '@material-ui/core/Fade';
-
+import {useHistory} from "react-router-dom";
 import {SnackbarProvider} from 'notistack';
 // import {createMuiTheme} from '@material-ui/core/styles';
 import {useOktaAuth, withOktaAuth} from "@okta/okta-react";
@@ -149,12 +149,13 @@ const useStyles = makeStyles((theme) => ({
 export default withOktaAuth(function Layout(props) {
     const {authState} = useOktaAuth();
     const {role, title, drawerState, changeDrawer, profile} = useContext(UserContext);
-
+    let timer;
+    let flag = 1;
     // const theme = useTheme();
     const classes = useStyles();
     const matches = useMediaQuery({maxWidth: 767});
     // const matches = useMediaQuery(theme.breakpoints.up('sm'));
-
+    const history = useHistory();
 
     React.useEffect(() => {
         // if (!matches) {
@@ -163,13 +164,50 @@ export default withOktaAuth(function Layout(props) {
         if (matches) {
             changeDrawer(false);
         }
-    }, [matches])
+    }, [matches]);
+    const timerToClearSomewhere = useRef();
+
+
+    const ClearSession = () => {
+        localStorage.clear();
+        props.authService.logout('/');
+    }
+
+
+    React.useEffect(()=> {
+        if(typeof role === "undefined") {
+            timerToClearSomewhere.current = setTimeout(function(){ClearSession()}, 40000);
+        } else {
+            clearTimeout(timerToClearSomewhere.current);
+        }
+
+    },[role]);
+
+
+
+
     const handleDrawerOpen = () => {
         changeDrawer(true);
     };
     const handleDrawerClose = () => {
         changeDrawer(false);
     };
+
+
+    // const OKTAClearanceFunction = setTimeout(() => {
+    //             if(flag === 1) {
+    //                 localStorage.clear();
+    //                 props.authService.logout('/');
+    //             }
+    //     }, 40000);
+    //
+    //
+    // const myStopFunction = () => {
+    //     flag = 2;
+    //     console.log('timeout');
+    //     console.log(flag)
+    //     clearTimeout(OKTAClearanceFunction);
+    // }
 
     const [mobileOpen, setMobileOpen] = React.useState(false);
 
@@ -191,102 +229,105 @@ export default withOktaAuth(function Layout(props) {
     return (
         <>
             {role ?
-                <SnackbarProvider maxSnack={3}>
-                    <div className={classes.root}>
-                        <CssBaseline/>
-                        <AppBar position="absolute"
-                                className={clsx(classes.appBar, drawerState && classes.appBarShift)}>
+                <>
 
-                            <Toolbar className={classes.toolbar}>
-                                <IconButton
-                                    edge="start"
-                                    aria-label="open drawer"
-                                    onClick={handleDrawerOpen}
-                                    className={clsx(classes.menuButton, drawerState && classes.menuButtonHidden)}
-                                >
+                    <SnackbarProvider maxSnack={3}>
+                        <div className={classes.root}>
+                            <CssBaseline/>
+                            <AppBar position="absolute"
+                                    className={clsx(classes.appBar, drawerState && classes.appBarShift)}>
 
-                                    <MenuIcon/>
-                                </IconButton>
-                                <Typography component="h1" variant="h6" noWrap className={classes.title}>
-                                    {title}
-                                </Typography>
-                                {/*<IconButton color="inherit">*/}
-                                {/*    <Badge badgeContent={4} color="secondary">*/}
-                                {/*        <NotificationsIcon/>*/}
-                                {/*    </Badge>*/}
-                                {/*</IconButton>*/}
+                                <Toolbar className={classes.toolbar}>
+                                    <IconButton
+                                        edge="start"
+                                        aria-label="open drawer"
+                                        onClick={handleDrawerOpen}
+                                        className={clsx(classes.menuButton, drawerState && classes.menuButtonHidden)}
+                                    >
 
-                                <IconButton color="inherit" onClick={handleClick}>
-                                    <Typography variant="h5" className={clsx(classes.title, classes.button)}>
-                                        Hi, {profile.name ? profile.name : ''}
+                                        <MenuIcon/>
+                                    </IconButton>
+                                    <Typography component="h1" variant="h6" noWrap className={classes.title}>
+                                        {title}
                                     </Typography>
-                                </IconButton>
-                                <Menu
-                                    anchorOrigin={{
-                                        vertical: "bottom",
-                                        horizontal: "right"
-                                    }}
-                                    id="menu-list-grow"
-                                    anchorEl={anchorEl}
-                                    keepMounted
-                                    open={openMenu}
-                                    onClose={handleClose}
-                                    TransitionComponent={Fade}
-                                    getContentAnchorEl={null}
-                                >
-                                    <MenuItem onClick={() => {
-                                        props.authService.logout('/');
-                                    }}>Logout</MenuItem>
-                                </Menu>
+                                    {/*<IconButton color="inherit">*/}
+                                    {/*    <Badge badgeContent={4} color="secondary">*/}
+                                    {/*        <NotificationsIcon/>*/}
+                                    {/*    </Badge>*/}
+                                    {/*</IconButton>*/}
+
+                                    <IconButton color="inherit" onClick={handleClick}>
+                                        <Typography variant="h5" className={clsx(classes.title, classes.button)}>
+                                            Hi, {profile.name ? profile.name : ''}
+                                        </Typography>
+                                    </IconButton>
+                                    <Menu
+                                        anchorOrigin={{
+                                            vertical: "bottom",
+                                            horizontal: "right"
+                                        }}
+                                        id="menu-list-grow"
+                                        anchorEl={anchorEl}
+                                        keepMounted
+                                        open={openMenu}
+                                        onClose={handleClose}
+                                        TransitionComponent={Fade}
+                                        getContentAnchorEl={null}
+                                    >
+                                        <MenuItem onClick={() => {
+                                            props.authService.logout('/');
+                                        }}>Logout</MenuItem>
+                                    </Menu>
 
 
-                            </Toolbar>
-                        </AppBar>
-                        <Drawer
-                            variant="permanent"
-                            classes={{
-                                paper: clsx(classes.drawerPaper, !drawerState && classes.drawerPaperClose),
-                            }}
-                            open={drawerState}
-                            onClose={handleDrawerToggle}
-                            ModalProps={{
-                                keepMounted: true, // Better open performance on mobile.
-                            }}
-                        >
-                            <div className={classes.toolbarIcon}>
-                                <Typography component="h3" variant="h6" color="inherit" noWrap
-                                            className={classes.title}>
-                                    AgentAdmin
-                                </Typography>
-                                <IconButton onClick={handleDrawerClose}>
-                                    <ChevronLeftIcon className={classes.chevronLeftIcon}/>
-                                </IconButton>
-                            </div>
-                            <Divider/>
-                            {role === 'Administrator' ?
-                                <List className={classes.listColor}><MainListItems/></List> : ''}
+                                </Toolbar>
+                            </AppBar>
+                            <Drawer
+                                variant="permanent"
+                                classes={{
+                                    paper: clsx(classes.drawerPaper, !drawerState && classes.drawerPaperClose),
+                                }}
+                                open={drawerState}
+                                onClose={handleDrawerToggle}
+                                ModalProps={{
+                                    keepMounted: true, // Better open performance on mobile.
+                                }}
+                            >
+                                <div className={classes.toolbarIcon}>
+                                    <Typography component="h3" variant="h6" color="inherit" noWrap
+                                                className={classes.title}>
+                                        AgentAdmin
+                                    </Typography>
+                                    <IconButton onClick={handleDrawerClose}>
+                                        <ChevronLeftIcon className={classes.chevronLeftIcon}/>
+                                    </IconButton>
+                                </div>
+                                <Divider/>
+                                {role === 'Administrator' ?
+                                    <List className={classes.listColor}><MainListItems/></List> : ''}
 
-                            {role === 'Child Entity' ?
-                                <List className={classes.listColor}><ChildListItems/></List> : ''}
+                                {role === 'Child Entity' ?
+                                    <List className={classes.listColor}><ChildListItems/></List> : ''}
 
-                            {role === 'Parent Organization' ?
-                                <List className={classes.listColor}><ParentListItems/></List> : ''}
+                                {role === 'Parent Organization' ?
+                                    <List className={classes.listColor}><ParentListItems/></List> : ''}
 
-                        </Drawer>
-                        <main className={classes.content}>
-                            <div className={classes.appBarSpacer}/>
-                            <Container maxWidth="lg" className={classes.container}>
+                            </Drawer>
+                            <main className={classes.content}>
+                                <div className={classes.appBarSpacer}/>
+                                <Container maxWidth="lg" className={classes.container}>
 
-                                {props.children}
+                                    {props.children}
 
-                                <Box pt={4}>
-                                    <Footer/>
-                                </Box>
-                            </Container>
-                        </main>
-                    </div>
-                </SnackbarProvider>
-                : <SemipolarLoading className={'Test'} size={'large'} color={'#1e1e2d'}/>}
+                                    <Box pt={4}>
+                                        <Footer/>
+                                    </Box>
+                                </Container>
+                            </main>
+                        </div>
+                    </SnackbarProvider>
+                </>
+                : <><SemipolarLoading className={'Test'} size={'large'} color={'#1e1e2d'}/></>}
 
         </>
 

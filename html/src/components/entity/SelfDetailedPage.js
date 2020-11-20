@@ -203,6 +203,13 @@ const SelfDetailedPage = (props) => {
         if (role === 'Parent Organization' || role === 'Administrator') {
             try {
                 detailedView = await selfEntityDetail();
+                if (detailedView.type === 'error') {
+                    window.location.reload();
+                }
+
+                if (detailedView.status === 401) {
+                    window.location.reload();
+                }
             } catch (e) {
                 addError('Something went wrong with the API.');
                 setComponentLoading(false);

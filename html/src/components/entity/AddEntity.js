@@ -243,7 +243,7 @@ function AddEntity() {
     const classes = useStyles();
 
 
-    const {attributes,addTitle, loading } = useContext(UserContext);
+    const {attributes,addTitle, loading, role } = useContext(UserContext);
 
 
     const [open, setOpen] = React.useState(false);
@@ -625,6 +625,15 @@ function AddEntity() {
 
 
         const response = await createEntity(formData);
+        if (response.type === 'error') {
+            window.location.reload();
+        }
+
+        if (response.status === 401) {
+            window.location.reload();
+        }
+
+
         if (response.field_error) {
             setApiLoading(false);
             Object.keys(response.field_error).forEach((key, index) => {
@@ -719,6 +728,8 @@ function AddEntity() {
 
     return (
         <Layout>
+
+            { role === 'Parent Organization' || role === 'Administrator' ?
             <Paper className={classes.paper} elevation={3} >
 
                 <Dialog
@@ -1136,6 +1147,10 @@ function AddEntity() {
                     </form>
                 </Grid>
             </Paper>
+                : <MySnackbarContentWrapper
+                    variant="error"
+                    message={'Access Denied.'}
+                /> }
         </Layout>
     )
 }

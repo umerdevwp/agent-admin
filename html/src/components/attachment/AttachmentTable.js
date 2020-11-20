@@ -54,7 +54,8 @@ function AttachmentTable(props) {
                 ]}
                 options={{
                     actionsColumnIndex: -1,
-                    sorting: true
+                    sorting: true,
+                    search: true
                 }}
                 title={props.title !== '' ? props.title : ''}
                 columns={props.data.columns}
