@@ -40,6 +40,12 @@ import Avatar from '@material-ui/core/Avatar';
 import FastForwardIcon from '@material-ui/icons/FastForward';
 import Skeleton from "@material-ui/lab/Skeleton";
 import AttachmentTable from "../attachment/AttachmentTable";
+
+
+import Drawer from '@material-ui/core/Drawer';
+import Button from '@material-ui/core/Button';
+import SendMessageForm from '../message/SendMessageForm';
+
 const useStyles = makeStyles(theme => ({
     root: {
         flexGrow: 1,
@@ -89,7 +95,10 @@ const useStyles = makeStyles(theme => ({
 
     baseColor: {
         color: '#48465b'
-    }
+    },
+    list: {
+        width: 700,
+    },
 
 
 }));
@@ -152,6 +161,7 @@ const EntityDetailedPage = (props) => {
     const [compliance, setComplainace] = React.useState(0);
     const [componentLoading, setComponentLoading] = React.useState(true);
     const [entityName, setEntityName] = React.useState('');
+    const [state, setState] = React.useState(false);
     useEffect(() => {
         if (loading === true) {
             addTitle('Entity - ');
@@ -162,11 +172,11 @@ const EntityDetailedPage = (props) => {
 
     const fetchDetailedProfile = async () => {
         var detailedView = '';
-        if (checkRole === 'Parent Organization' || checkRole === 'Administrator' ) {
+        if (checkRole === 'Parent Organization' || checkRole === 'Administrator') {
             detailedView = await entityDetail(entity_id);
-            if(detailedView.result) {
+            if (detailedView.result) {
                 addTitle('Entity - ' + detailedView.result.entity.name);
-               localStorage.setItem('entityName', detailedView.result.entity.name);
+                localStorage.setItem('entityName', detailedView.result.entity.name);
             }
 
             if (detailedView.type === 'error') {
@@ -184,7 +194,7 @@ const EntityDetailedPage = (props) => {
         }
 
         if (detailedView.result) {
-            addTitle('Entity - '+ detailedView.result.entity.name);
+            addTitle('Entity - ' + detailedView.result.entity.name);
             setEntitydetail(detailedView.result)
             setContactList(detailedView.result.contacts);
             setAttachmentList(detailedView.result.attachments)
@@ -197,29 +207,25 @@ const EntityDetailedPage = (props) => {
             addError(detailedView.errors.detail);
         }
 
-        if(detailedView.status === 401){
+        if (detailedView.status === 401) {
             window.location.reload();
         }
-
-
-
-
 
 
     }
 
     useEffect(() => {
-        if(compliance !== 0) {
+        if (compliance !== 0) {
             updateComplianceTable()
         }
-    },[compliance]);
+    }, [compliance]);
 
 
     const UpdateComplainceState = () => {
         setComplainace(compliance + 1);
     }
 
-    const updateComplianceTable = async() => {
+    const updateComplianceTable = async () => {
         var detailedView = '';
         if (role === 'Parent Organization' || role === 'Administrator') {
             try {
@@ -240,10 +246,20 @@ const EntityDetailedPage = (props) => {
         }
 
 
-
     }
 
+    const toggleDrawer = (event, open) => {
+        if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+            return;
+        }
+        if (open) {
+            setState(true);
+        }
 
+        if (!open) {
+            setState(false);
+        }
+    };
     const contactData = {
         columns: [
             {title: 'Name', field: 'name'},
@@ -268,8 +284,6 @@ const EntityDetailedPage = (props) => {
         ],
         data: taskList,
     };
-
-
 
 
     const attachmentData = {
@@ -310,7 +324,12 @@ const EntityDetailedPage = (props) => {
                     <MySnackbarContentWrapper className={classes.errorMessage} spacing={1} index={index} variant="error"
                                               message={value}/>
                 ))}
-
+                <Button onClick={(event) => toggleDrawer(event, true)}>Send Message</Button>
+                <Drawer anchor={'right'} open={state} onClose={(event) => toggleDrawer(event, false)}>
+                    <div className={clsx(classes.list)}>
+                        <SendMessageForm/>
+                    </div>
+                </Drawer>
 
                 <Grid container spacing={2}>
                     <Grid item xs={12} sm={4}>
@@ -334,21 +353,24 @@ const EntityDetailedPage = (props) => {
                                 {entitydetail ?
                                     <>
                                         <ul className={classes.companyinfo}>
-                                            <li className={classes.listItem}><strong>State ID:</strong> {entitydetail.entity.stateId ? entitydetail.entity.stateId : ''}</li>
+                                            <li className={classes.listItem}><strong>State
+                                                ID:</strong> {entitydetail.entity.stateId ? entitydetail.entity.stateId : ''}
+                                            </li>
                                             <li className={classes.listItem}><strong>Formation
                                                 Date:</strong> {entitydetail.entity.formationDate ? entitydetail.entity.formationDate : ''}
                                             </li>
                                             <li className={classes.listItem}><strong>Registered Agent Expiration
                                                 Date: </strong> {entitydetail.entity.expirationDate}</li>
                                             {/*<li className={classes.listItem}><strong>Tax ID:</strong> 09890890</li>*/}
-                                        </ul> </>:
+                                        </ul>
+                                    </> :
 
                                     <>
-                                        <Skeleton />
-                                        <Skeleton />
-                                        <Skeleton />
-                                        <Skeleton />
-                                        <Skeleton />
+                                        <Skeleton/>
+                                        <Skeleton/>
+                                        <Skeleton/>
+                                        <Skeleton/>
+                                        <Skeleton/>
                                     </>
                                 }
 
@@ -394,11 +416,11 @@ const EntityDetailedPage = (props) => {
                                         </ul>
                                     </> :
                                     <>
-                                        <Skeleton />
-                                        <Skeleton />
-                                        <Skeleton />
-                                        <Skeleton />
-                                        <Skeleton />
+                                        <Skeleton/>
+                                        <Skeleton/>
+                                        <Skeleton/>
+                                        <Skeleton/>
+                                        <Skeleton/>
                                     </>
                                 }
 
@@ -439,11 +461,11 @@ const EntityDetailedPage = (props) => {
                                     </>
                                     :
                                     <>
-                                        <Skeleton />
-                                        <Skeleton />
-                                        <Skeleton />
-                                        <Skeleton />
-                                        <Skeleton />
+                                        <Skeleton/>
+                                        <Skeleton/>
+                                        <Skeleton/>
+                                        <Skeleton/>
+                                        <Skeleton/>
                                     </>
 
                                 }
@@ -457,7 +479,8 @@ const EntityDetailedPage = (props) => {
 
                 <Grid container spacing={5}>
                     <Grid item xs={12}>
-                        <ComplianceTaskList update={UpdateComplainceState} loading={componentLoading} tooltip={'Add New Contact'} data={taskData}
+                        <ComplianceTaskList update={UpdateComplainceState} loading={componentLoading}
+                                            tooltip={'Add New Contact'} data={taskData}
                                             title={'Compliance Tasks'} eid={entity_id}/>
                     </Grid>
                 </Grid>
@@ -465,9 +488,9 @@ const EntityDetailedPage = (props) => {
                 <Grid container spacing={5}>
                     <Grid item xs={12}>
                         <AttachmentTable action={true} loading={componentLoading} tooltip={'Add New Document'}
-                                     redirect={true}
-                                     url={`/attachment/form/add/${entity_id}`} data={attachmentData}
-                                     title={'Documents'}/>
+                                         redirect={true}
+                                         url={`/attachment/form/add/${entity_id}`} data={attachmentData}
+                                         title={'Documents'}/>
                     </Grid>
 
                 </Grid>

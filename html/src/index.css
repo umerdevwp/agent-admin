@@ -85,7 +85,10 @@ tr[level="4"] {
     background-color: #b6b6b6;
 }
 
-
+.custom-button-message {
+    margin-top: 20px;
+    float: right;
+}
 /*tr[index="2"]{*/
 /*    background-color: #e8e8e8;*/
 /*}*/
@@ -101,3 +104,7 @@ tr[level="4"] {
 /*    transform: scale(0.8, 0.8);*/
 
 /*}*/
+.send-as-mail{
+    float: right;
+    margin-top: 15px;
+}

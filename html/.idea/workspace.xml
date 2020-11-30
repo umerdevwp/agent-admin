@@ -4,6 +4,20 @@
     <list default="true" id="d9398c1c-af28-4f73-920d-6f1f684f34d9" name="Default Changelist" comment="Merge branch 'master-notification-react' of https://github.com/United-Agent-Services/agentadmin into local-omer&#10;&#10;# Conflicts:&#10;#&#9;application/controllers/Contacts.php&#10;#&#9;application/controllers/Entity.php&#10;#&#9;application/controllers/Login.php&#10;#&#9;application/controllers/Portal.php&#10;#&#9;application/hooks/Auth.php&#10;#&#9;application/models/Accounts_model.php&#10;#&#9;application/models/Contacts_model.php&#10;#&#9;application/models/Entity_model.php&#10;#&#9;application/views/entity-add.php&#10;#&#9;application/views/entity.php&#10;#&#9;application/views/header.php&#10;#&#9;application/views/portal.php">
       <change beforePath="$PROJECT_DIR$/../asset-manifest.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../favicon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.test.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/dashboard/Dashboard.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/dashboard/Dashboard.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/entity/EntityDetailedPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/entity/EntityDetailedPage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/routes/ChildListItems.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/routes/ChildListItems.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/routes/ParentListItems.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/routes/ParentListItems.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/routes/listItems.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/routes/listItems.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/logo.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/logo.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/serviceWorker.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/serviceWorker.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/setupTests.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/setupTests.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../index.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../logo192.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../logo512.png" beforeDir="false" />
@@ -12,29 +26,29 @@
       <change beforePath="$PROJECT_DIR$/../media/agentadmin/logo/aa_full.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../media/agentadmin/logo/aa_logo.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../media/agentadmin/logo/logo-mini-md-aa.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../precache-manifest.51fcf7b96e878382b61cfef0ff03b672.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../precache-manifest.384c625c9a9e30883ac4cdb628e050d4.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../robots.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../service-worker.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../static/css/2.83758d64.chunk.css" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../static/css/2.83758d64.chunk.css.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/css/main.e1063e2e.chunk.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/css/main.e1063e2e.chunk.css.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/2.0b2fd84d.chunk.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/2.0b2fd84d.chunk.js.LICENSE.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/2.0b2fd84d.chunk.js.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/3.a406f91f.chunk.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/3.a406f91f.chunk.js.LICENSE.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/3.a406f91f.chunk.js.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/4.91b14280.chunk.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/4.91b14280.chunk.js.LICENSE.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/4.91b14280.chunk.js.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/5.72bc2cda.chunk.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/5.72bc2cda.chunk.js.LICENSE.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/5.72bc2cda.chunk.js.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/main.01343894.chunk.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/main.01343894.chunk.js.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/runtime-main.ffb3d993.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/runtime-main.ffb3d993.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/css/main.9adce5c8.chunk.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/css/main.9adce5c8.chunk.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/2.eb5d96bf.chunk.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/2.eb5d96bf.chunk.js.LICENSE.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/2.eb5d96bf.chunk.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/3.8a52c846.chunk.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/3.8a52c846.chunk.js.LICENSE.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/3.8a52c846.chunk.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/4.664cce54.chunk.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/4.664cce54.chunk.js.LICENSE.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/4.664cce54.chunk.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/5.a641906f.chunk.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/5.a641906f.chunk.js.LICENSE.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/5.a641906f.chunk.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/main.0d25b5b1.chunk.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/main.0d25b5b1.chunk.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/runtime-main.cdaeac05.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/runtime-main.cdaeac05.js.map" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../static/media/checkbox-01.7e720020.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../static/media/checkbox-01@2x.d5554fe4.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../static/media/checkbox-sign-in-widget@2x.c8c02700.png" beforeDir="false" />
