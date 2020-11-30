@@ -18,6 +18,7 @@ class Entity extends RestController
     use CommonDbTrait;
 
     private $sModule = "ENTITY";
+    private $oRule = null;
 
     public function __construct()
     {
@@ -266,6 +267,8 @@ HC;
                 if ($aResponseZoho["type"] == 'ok') {
                     // allow without file, else check type and size
                     $iZohoId = $aResponseZoho['id'];
+
+                    $this->addInitialRulingTask($iZohoId);
                     //$this->zohoAddAttachment($iZohoId);
 
                     // check address is valid from smarty is not needed, validation is at interface
@@ -591,9 +594,86 @@ HC;
         return $aResponse;
     }
 
+    public function filing_get()
+    {
+        $this->load->model("Notifications_model");
+        $this->load->model("Tasks_model");
+        $this->load->model("ZoHo_Account");        
+
+        $oRule = $this->Notifications_model->getRules(
+            $this->input->get("inputFillingState"),
+            $this->input->get("inputFillingStructure"),
+            $this->input->get("inputFormationDate"),
+            $this->input->get("inputFiscalDate")
+        );
+
+        $this->response([
+            'status' => true,
+            'id' => $oRule
+        ], 200);
+    }
+
+    private function addInitialRulingTask($iEntityId)
+    {
+        $this->load->model("Notifications_model");
+        $this->load->model("Tasks_model");
+        $this->load->model("ZoHo_Account");   
+
+        if($this->oRule==null)
+        {
+            $this->oRule = $this->Notifications_model->getRules(
+                $this->input->get("inputFillingState"),
+                $this->input->get("inputFillingStructure"),
+                $this->input->get("inputFormationDate"),
+                $this->input->get("inputFiscalDate")
+            );
+        }
+        // if rule exist get it
+        $oRule = $this->oRule;        
+
+        //$iWhatId = "3743841000001982003"; // remove after 
+        if(!empty($oRule->duedate))
+        {
+            $aTaskResult = $this->ZoHo_Account->newZohoTask($iEntityId,$oRule->description,$oRule->duedate);
+            if($aTaskResult['type']=='ok')
+            {
+                $aDataTask = [
+                    "id"        =>  $aTaskResult['id'],
+                    "subject"   => $oRule->description,
+                    "due_date"   =>  $oRule->duedate,
+                    "what_id"   =>  $iEntityId,
+                    "status"    => "Not Started",
+                ];
+    
+                // insert id fails as table is not auto_increment
+                $iTaskId = $this->Tasks_model->add($aDataTask);
+                return ["id"=>$iTaskId,"duedate"=>$oRule->duedate,"subject"=>$oRule->description];
+                /*$this->response([
+                    'status' => true,
+                    'id' => $aTaskResult['id']
+                ], 200);*/
+            } else {
+                return ['type'=>'error','message'=>"Unable to create task for entity"];
+                /*$this->response([
+                    'status' => false,
+                    'error' => 'Unable to create task for entity'
+                ], 404);
+                */
+            }
+        } else {
+            /*
+            $this->response([
+                'status' => false,
+                'error' => 'Unable to find filing date for your state'
+            ], 404);*/
+            return ['type'=>'error','message'=>"Unable to find filing date for your state"];
+        }
+    }
+
     private function addSubscription($iEntityId)
     {
         $this->load->model("Notifications_model");
+        $this->load->model("Tasks_model");
 
         $this->load->library('session');
 
@@ -605,6 +685,9 @@ HC;
             $this->input->post("inputFormationDate"),
             $this->input->post("inputFiscalDate")
         );
+        // to reuse the rule in other methond in same flow
+        $this->oRule = $oRule;
+
         if (!empty($oRule->duedate)) {
             $aData = [
                 "created_by" => userLoginId(),
@@ -623,6 +706,8 @@ HC;
             ];
 
             $id = $this->Notifications_model->add($aData);
+
+
         } else {
             logToAdmin("File ruling subscription failed unable to find duedate ",
                 " state: " . $this->input->post("inputFillingState")

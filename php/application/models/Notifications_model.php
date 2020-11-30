@@ -106,8 +106,12 @@ HC;
 
         //$state = $this->input->post("state");
         //$type = $this->input->post("type");
+        if($sEntityState=="" || $sEntityType=="")
+        {
+            return ['type'=>'error','message'=>'Entity state or type is missing'];
+        }
 
-        $result = $this->findRule(($sEntityState?:""),($sEntityType?:""));
+        $result = $this->findRule($sEntityState,$sEntityType);
         //var_dump($result);
         //$result = $this->Notifications_model->findRule();
 

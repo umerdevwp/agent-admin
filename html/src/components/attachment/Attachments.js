@@ -159,6 +159,7 @@ const Attachments = () => {
             },
             {title: 'Date', field: 'created'},
             {title: 'Size', field: 'fileSize'},
+            {title: 'Entity', field: 'entityName'},
         ],
         data: attachmentList,
     };

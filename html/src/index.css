@@ -65,6 +65,33 @@ span.error {
     margin-top: 5px;
     display: block;
 }
+tr[level="0"] {
+    background-color: inherit;
+}
+
+tr[level="1"] {
+    background-color: #e8e8e8;
+}
+
+tr[level="2"] {
+    background-color: #dcdcdc;
+}
+
+tr[level="3"] {
+    background-color: #cfcfcf;
+}
+
+tr[level="4"] {
+    background-color: #b6b6b6;
+}
+
+.custom-button-message {
+    margin-top: 20px;
+    float: right;
+}
+/*tr[index="2"]{*/
+/*    background-color: #e8e8e8;*/
+/*}*/
 
 
 
@@ -77,3 +104,7 @@ span.error {
 /*    transform: scale(0.8, 0.8);*/
 
 /*}*/
+.send-as-mail{
+    float: right;
+    margin-top: 15px;
+}

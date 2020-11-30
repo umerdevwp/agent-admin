@@ -32,6 +32,8 @@ import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import Box from '@material-ui/core/Box';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import TextField from '@material-ui/core/TextField';
 
 const handlePreviewIcon = (fileObject, classes) => {
     const {type} = fileObject.file
@@ -293,12 +295,26 @@ const AdminAddAttachmentForm = (props) => {
     }
     const entitylisitingLoader = async () => {
         setApiLoading(true);
-        var EntityListLocal = await JSON.parse(localStorage.getItem("EntityList"));
-        if (EntityListLocal) {
+        var EntityListLocal = await JSON.parse(localStorage.getItem("EntityList") !== 'undefined' ? localStorage.getItem("EntityList") : '');
+        if (EntityListLocal !== 'undefined' && EntityListLocal) {
             setEntityList(EntityListLocal);
             setApiLoading(false);
         } else {
             const response = await EntityList();
+
+            if (response.error) {
+                addError(response.error.message);
+            }
+
+            if (response.type === 'error') {
+                window.location.reload();
+            }
+
+            if (response.status === 401) {
+                window.location.reload();
+            }
+
+
             localStorage.setItem("EntityList", JSON.stringify(response.data));
             await setEntityList(response.data);
             setApiLoading(false);
@@ -508,35 +524,34 @@ const AdminAddAttachmentForm = (props) => {
                             <form className={classes.formStyle} onSubmit={handleOnSubmit} noValidate
                                   autoComplete="off">
 
+
                                 <div className={'col-md-6'}>
                                     <FormControl className={clsx(classes.selectField)}
                                                  error={entityId.error !== ' '}>
-                                        <InputLabel className={clsx(classes.label)} htmlFor="age-native-simple">Entity
-                                            Name</InputLabel>
-                                        <Select
-                                            disabled={apiLoading}
-                                            required
-                                            error={entityId.error !== ' '}
-                                            defaultValue={entityId.value}
+                                <Autocomplete
+                                    onChange={(event, newValue) => {
+                                       if(newValue) {
+                                           setEntityId({
+                                               ...entityId,
+                                               value: newValue.id
+                                           })
+                                       } else {
+                                           setEntityId({
+                                               ...entityId,
+                                               value: ''
+                                           })
+                                       }
+                                    }}
 
-                                            onChange={e => setEntityId({
-                                                ...entityId,
-                                                value: e.target.value
-                                            })}
-                                            inputProps={{
-                                                name: 'entityId',
-                                                id: 'entityId',
-                                            }}>
-                                            <option value=""/>
-                                            {entityList?.map((anObjectMapped, index) => <option key={index}
-                                                                                                value={anObjectMapped.id}>{anObjectMapped.account_name}</option>)
-
-                                            }
-
-                                        </Select>
+                                    id="combo-box-demo"
+                                    options={entityList ? entityList : ''}
+                                    getOptionLabel={(option) => option.account_name}
+                                    renderInput={(params) => <TextField error={entityId.error !== ' '} {...params} label="Entity Name" variant="outlined" />}
+                                />
                                         <FormHelperText>{entityId.error}</FormHelperText>
                                     </FormControl>
                                 </div>
+
                                 <FormGroup row>
 
                                     <div className="col-md-12">
