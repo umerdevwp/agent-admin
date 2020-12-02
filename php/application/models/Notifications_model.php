@@ -3,7 +3,7 @@ class Notifications_model extends CI_Model
 {
 
     private $table = "notification_subscriptions";
-    private $table_maillog = "email_log";
+    private $table_sendgridMessage = "sendgrid_message";
     private $table_entity = "zoho_accounts";
 
     private $table_rule = "rules";
@@ -345,49 +345,5 @@ HC;
 
         return false;
     }
-
-    public function addMailLog($data)
-    {
-        
-        $this->db->insert($this->table_maillog,$data);
-
-        return $this->db->insert_id();
-        
-    }
-
-    public function updateMailLog($iId, $sStatus, $sJson)
-    {
-        $aData = [
-            "status"    =>  $sStatus,
-            "sg_status" =>  $sJson
-        ];
-        $aWhere = [
-            "id" =>  $iId
-        ];
-        $this->db->update($this->table_maillog,$aData, $aWhere);
-    }
-
-    public function getLogDates($sDate1,$sDate2)
-    {
-        $q = "SELECT * FROM {$this->table_maillog} WHERE send_time BETWEEN '{$sDate1}' AND '{$sDate2} 23:59:59'";
-        $oResult = $this->db->query($q);
-//        echo $this->db->last_query();die;
-        $aData = $oResult->result_object();
-        return $aData;
-    }
-
     
-    public function getLogEntityDates($sDate1,$sDate2)
-    {
-        $q = "SELECT m.id id, m.entity_id eid, m.to email, m.subject, m.sg_message_id msgid, m.send_time `sent`, m.updated, m.status, e.account_name `name` FROM {$this->table_maillog} m, {$this->table_entity} e WHERE e.id=m.entity_id AND send_time BETWEEN '{$sDate1}' AND '{$sDate2}' ORDER BY send_time DESC";
-        $oResult = $this->db->query($q);
-//        echo $this->db->last_query();die;
-        $aData = [];
-        if($oResult)
-        {
-            $aData = $oResult->result_object();
-        }
-
-        return $aData;
-    }
 }
