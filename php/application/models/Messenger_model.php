@@ -22,11 +22,11 @@ class Messenger_model extends CI_Model {
         
     }
 
-    public function sendMailSimple(string $sEmail,string $sName,string $sSubject,string $sContent)
+    public function sendMailSimple(string $sToEmail,string $sName,string $sFromEmail, string $sFromName, string $sSubject,string $sContent)
     {
         $oEmail = new Mail();
-        $oEmail->setFrom(getenv("NOTIFICATION_FROM_EMAIL"), "Your Agent Services Support");
-        $oEmail->addTo($sEmail, $sName);
+        $oEmail->setFrom($sFromEmail, $sFromName);
+        $oEmail->addTo($sToEmail, $sName);
         $oEmail->setSubject($sSubject);
         $oEmail->addContent("text/html", $sContent);
 

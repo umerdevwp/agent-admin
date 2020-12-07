@@ -53,18 +53,20 @@ class SendgridMessage_model extends ModelDefault {
      * Record the message send through sendgrid API
      * @param Integer $iEntityId entity id to send from/to
      */
-    public function logOutboxMail($iEntityId,$sSgMessageId,$sTo,$sSubject="",$sMessage="")
+    public function logOutboxMail($iEntityId,$sSgMessageId,$sTo,$sFrom,$sSubject="",$sMessage="",$sEntityEmailHash="")
     {
         $aData = [
             "entity_id" => $iEntityId,
             "send_time" =>  date("Y-m-d H:i:s"),
             "to"    =>  $sTo,
+            "from"  =>  $sFrom,
             "subject"   =>  $sSubject,
             "message"   =>  $sMessage,
             "sg_message_id" =>  $sSgMessageId,
-            "email_hash"=>md5($sTo),
+            "entity_email_hash"=>$sEntityEmailHash,
+            'type'=>'outbox',
         ];
-
+        
         $iNewId = $this->insert($aData);
 
         return $iNewId;
@@ -75,16 +77,20 @@ class SendgridMessage_model extends ModelDefault {
      * Record the message received through sendgrid parse API
      * @param Array $data array of insertable values
      */
-    public function logInboxMail(string $sRawJson="",string $sFrom="",string $sTo="",string $sSubject="",string $sMessage="",array $aFileName=[])
+    public function logInboxMail($iEntityId=0,string $sRawJson="",string $sFrom="",string $sTo="",string $sSubject="",string $sMessage="",array $aFileName=[],$sEntityEmailHash="")
     {
+
         $aData = [
+          'entity_id'=>$iEntityId,
           'raw_json' => $sRawJson,
           'to'  =>  $sTo,
           'from'=>$sFrom,
           'subject'=>$sSubject,
           'message'=>$sMessage,
-          "email_hash"=>md5($sFrom),
-          'attachments'=>json_encode($aFileName)
+          "entity_email_hash"=>$sEntityEmailHash,
+          'attachments'=>json_encode($aFileName),
+          'type'=>'inbox',
+          "send_time" =>  date("Y-m-d H:i:s"),
         ];
 
         $iNewId = $this->insert($aData);

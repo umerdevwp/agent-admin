@@ -25,9 +25,10 @@ class Message extends RestController
         $iParentId = $_SESSION['eid'];
 
         $this->load->model("entity_model");
+        // check valid parent is shooting mail for entity, if is parent
         $bIsParentValid = $this->entity_model->isParentOf($iEid, $iParentId);
         
-        // if entity not found or eid is blank
+        // if entity is not authorized to send mail for entity block access
         if(!$bIsParentValid)
         {
             $this->response([
@@ -36,8 +37,10 @@ class Message extends RestController
             ], 404);
         }
 
+        // if eid parameter passed in request
         if($iEid>0)
         {
+          // get entity row
             $aEntity = $this->entity_model->getOne($iEid);
             $oEntity = $aEntity['results'];
         }
@@ -51,12 +54,15 @@ class Message extends RestController
             ], 404);
         }
 
-        $sEmail = $oEntity->email;
-        $sName = $oEntity->name;
-        $sFrom = getenv("NOTIFICATION_FROM_EMAIL");
+        // set entity name and email
+        $sEntityEmail = $oEntity->email;
+        $sEntityName = $oEntity->name;
 
+        // set email is from admin
+        $sFrom = getenv("NOTIFICATION_FROM_EMAIL");
         $sSubject = $this->input->post("subject");
         $sMessage = $this->input->post("message");
+
         // check subject empty
         if(empty($sSubject))
         {
@@ -67,7 +73,7 @@ class Message extends RestController
         {
             $aError[] = "Message cannot be blank, please add message";
         }
-        // check error found
+        // check request parameter error found
         if(count($aError))
         {
             $this->response([
@@ -79,76 +85,138 @@ class Message extends RestController
         // if entity send to admin
         if(!isAdmin())
         {
-          $sEmail = getenv("NOTIFICATION_FROM_EMAIL");
-          $sName = "Your Agent Services Support";
+          // set details for entity mailing admin
+          $sFrom = $sEntityEmail;
+          $sFromName = $sEntityName;
+          $sTo = getenv("NOTIFICATION_FROM_EMAIL");//"kamran@mts.youragentservices.com";//getenv("NOTIFICATION_FROM_EMAIL");
+          $sToName = "Agent Admin Support";
+        } else {
+          // set details for admin mailing entity
+          $sFrom = getenv("NOTIFICATION_FROM_EMAIL");
+          $sFromName = "Agent Admin Support";
+          $sTo = $sEntityEmail;
+          $sToName = $sEntityName;
         }
 
+        // generate hash for easy search email
+        $sEntityEmailHash = md5($sEntityEmail);
+
+        // send mail through messenger centralized model
         $this->load->model("Messenger_model");
+        $aSendgridResult = $this->Messenger_model->sendMailSimple($sTo,$sToName,$sFrom,$sFromName,$sSubject,$sMessage);
 
-        $aSendgridResult = $this->Messenger_model->sendMailSimple($sEmail,$sName,$sSubject,$sMessage);
-
+        // sent success
         if($aSendgridResult['type']=='ok')
         {
+          // hold message id of sendgrid
           $iMessageId = $aSendgridResult['id'];
 
-          $this->load->model("SendgridMessage_model");
-          
-          $iInsertId = $this->SendgridMessage_model->logOutboxMail($iEid,$iMessageId,$sEmail,$sSubject,$sMessage);
-             
+          // record the details for log or trackings
+          $this->load->model("SendgridMessage_model");          
+          $iInsertId = $this->SendgridMessage_model->logOutboxMail($iEid,$iMessageId,$sTo,$sFrom,$sSubject,$sMessage,$sEntityEmailHash);
+
+        // report to admin on failure             
         if(!$iInsertId)
         {
-            logToAdmin("Unable to insert mail log",0);
+            logToAdmin("Mail log failed","$iEid,$iMessageId,$sTo,$sFrom,$sSubject,$sMessage,$sEntityEmailHash","DB");
         }
-
+        
         $this->response([
             'status' => true,
             'message' => 'Message sent successfully'
         ], 200);
-      } else {
-
-        $this->response([
-          'status' => false,
-          'message'=> "Server unable to send message, please try again later"
-        ], 302);
-      }
+        } else {
+          logToAdmin("Sendgrid failed to sent mail",print_r($aSendgridResult,true),"SENDGRID");
+          // sendgrid failed to drop mail
+          $this->response([
+            'status' => false,
+            'message'=> "Server unable to send message, please try again later"
+          ], 302);
+        }
     }
 
     /**
      * Receive Sendgrid Parse API post back request/data
      * @param String $sToken to verify that request is made from sendgrid panel
      */
-    public function receive($sToken)
+    public function receive_post($sToken)
     {
-
-      $this->load->model("SgParseLog_model");
-
+      $this->load->model("SendgridMessage_model");
+      // only calls from custom sendgrid server token allowed
       if($sToken==getenv("SENDGRID_POST_TOKEN"))
       {
+        $sToName = $this->input->post("to");
+        $sFromName = $this->input->post("from");
 
-        $sTo = $_POST["to"];
-        $sFrom =  $_POST["from"];
-        $email_hash = md5($from);
-        $sMessage = $_POST["text"];
-        $sSubject = $_POST["subject"];
-        $num_attachments = (int)$_POST["attachments"];
+        $sHeaders = $this->input->post("headers"); // for date received parse
+//        error_log($sHeaders);
+//        error_log(strpos($sHeaders,"Received: from o1.ptr9325.smallbiz.com"));
+//        error_log(substr($sHeaders,strpos($sHeaders,"Received: from o1.ptr9325.smallbiz.com")-50));
+//        preg_match_all("/Date: .*-",$sHeaders,$matches);
+//error_log(print_r($sHeaders,true));
+//error_log("--");
+//error_log(strpos($sHeaders,"o1.ptr9325.smallbiz.com"));
+//error_log("--");
+//die("TESTING HEADERS");
+        // parse email from name <email>
+        preg_match_all("/[\._a-zA-Z0-9-]+@[\._a-zA-Z0-9-]+/i", $sFromName, $matches);
+        $sFrom = $matches[0][0];
+        // parse email from name <email>
+        preg_match_all("/[\._a-zA-Z0-9-]+@[\._a-zA-Z0-9-]+/i", $sToName, $matches);
+        $sTo = $matches[0][0];
 
-        $aFileName = $this->uploadMailFiles($num_attachments);
-        if(filter_var(substr($sFrom,strpos($sFrom,"<")+1,-1), FILTER_VALIDATE_EMAIL))
+        $sEntityEmailHash = "";
+        $sMessage = $this->input->post("html");
+
+        // empty message, then check for plain text type
+        if(empty($sMessage))
         {
+          $sMessage = $this->input->post("text");
+        }
+        $sSubject = $this->input->post("subject");
+        $num_attachments = (int)$this->input->post("attachments");
+        // check for attachments and upload to temp
+        $aFileName = $this->uploadMailFiles($num_attachments);
+        // valid email can be recorded
+        if(filter_var($sFrom, FILTER_VALIDATE_EMAIL))
+        {
+          $this->load->model("entity_model");
+          $aEntity = $this->entity_model->getEmailId($sFrom);
+          // entity found against email from entity
+          if($aEntity['type']=='ok')
+          {
+            $iEntityId = $aEntity['results']->id;
+            $sEntityEmailHash = md5($sFrom);
+            // if email is for admin then avoid loging as it is logged on sent event
+            if(strpos($sHeaders,"o1.ptr9325.smallbiz.com")>0)
+            {
+              error_log("Skip loging, AgentAdmin mail sent to itself by entity: " . $iEntityId . " to admin: " . getenv("NOTIFICATION_FROM_EMAIL"));
+              die;
+            }
+          } else {
+            $iEntityId = 0;
+            $sEntityEmailHash = "";
+          }
+          // hold the json for any descrepency in future
           $sRawJson = json_encode($_POST);
 
-          $iId = $this->SendgridMessage_model->insert(
+//          error_log("$iEntityId,$sFrom,$sTo,$sSubject,$sMessage,$aFileName,$sEntityEmailHash");
+          // log the sendgrid post back parse request
+          $iId = $this->SendgridMessage_model->logInboxMail(
+                                          $iEntityId,
                                           $sRawJson,
                                           $sFrom,
                                           $sTo,
                                           $sSubject,
                                           $sMessage,
-                                          $aFileName
+                                          $aFileName,
+                                          $sEntityEmailHash
                                         );
         }
-        logToAdmin("Sendgrid Parse API","Recorded response id: " . $iId);
+
+        logToAdmin("Sendgrid Parse API wroking","Recorded response id: " . $iId,'SENDGRID');
       } else {
-        logToAdmin("Sendgrid receive failed","SendgridParser: Path accessed without token");
+        logToAdmin("Sendgrid receive failed","SendgridParser: Path accessed without token",'SENDGRID');
         die("Permission denied");
       }
     }
@@ -170,7 +238,7 @@ class Message extends RestController
             );
             $aFileName[] = $sName;
           } else {
-            error_log("File in mail not valid: " . print_r($aFile,true));
+            //error_log("File in mail not valid: " . print_r($aFile,true));
           }
         }
       }
