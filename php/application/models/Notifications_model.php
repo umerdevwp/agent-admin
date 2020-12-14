@@ -3,7 +3,6 @@ class Notifications_model extends CI_Model
 {
 
     private $table = "notification_subscriptions";
-    private $table_sendgridMessage = "sendgrid_message";
     private $table_entity = "zoho_accounts";
 
     private $table_rule = "rules";
@@ -42,7 +41,7 @@ class Notifications_model extends CI_Model
         return ['type'=>'ok','results'=>$result];
     }
 
-    public function findRule($sState="",$sEntityType="",$sOrigin="domestic")
+    public function getStateTypeRule($sState="",$sEntityType="",$sOrigin="domestic")
     {
 
         $this->db->select("rs.id,rs.rule_id,rs.state,rs.entity_type,r.origin_type,r.base_type,r.period_type,r.month_diff,r.day_diff,year_diff,custom_condition,description");
@@ -63,7 +62,11 @@ class Notifications_model extends CI_Model
         //$this->db->where("r.custom_condition!=",'');
 
         $query = $this->db->get();
-        $result = $query->result_object();
+        $result = ['type'=>'error','message'=>'No rule found'];
+        if($query)
+        {
+            $result = ['type'=>'ok','results'=>$query->result_object()];
+        }
         
         //echo $this->db->last_query();
         
@@ -74,9 +77,8 @@ class Notifications_model extends CI_Model
     {
         
         $sQueryEntity =<<<HC
-SELECT za.filing_state,za.entity_type,za.formation_date,ns.* 
+SELECT ns.* 
 FROM {$this->table} ns
-INNER JOIN {$this->table_zoho_accounts} za ON ns.entity_id=za.id
 WHERE ns.status='active'
 AND due_date IS NOT NULL
 HC;
@@ -96,8 +98,7 @@ HC;
     }
 
     /**
-     * Set calendar for upcoming due dates of notification for entity state and type
-     * 
+     *  Find applicable rule on entity based on formation and entity structure and company type
      */
     public function getRules($sEntityState,$sEntityType,$sFormationDate,$sFiscalDate="",$sNow="",$bReturnSingle=true)
     {
@@ -106,20 +107,37 @@ HC;
 
         //$state = $this->input->post("state");
         //$type = $this->input->post("type");
-        if($sEntityState=="" || $sEntityType=="")
+        if($sEntityState=="")
         {
-            return ['type'=>'error','message'=>'Entity state or type is missing'];
+            $aErrorMessage[] = "Entity state";
         }
 
-        $result = $this->findRule($sEntityState,$sEntityType);
-        //var_dump($result);
-        //$result = $this->Notifications_model->findRule();
+        if($sEntityType=="")
+        {
+            $aErrorMessage[] = "Entity Type";
+        }
+
+        if($sFormationDate=="" || $sFormationDate=="0000-00-00")
+        {
+            $aErrorMessage[] = "Formation date";
+        }
+
+        if(count($aErrorMessage))
+        {
+            return ['type'=>'error','message'=>'For rulings: '.implode(",",$aErrorMessage).' must exist'];
+        }
+
+        $aResultStateType = $this->getStateTypeRule($sEntityState,$sEntityType);
+        if($aResultStateType['type']=='error')
+        {
+            return ['type'=>'error','message'=>$aResultStateType['message']];
+        }
 
         $sFiscalDate = convToMySqlDate($sFiscalDate)?:date("2020-12-31");
         // sample dates for testing
         //$sFormationDate = convToMySqlDate($this->input->post("formation"));// ["1/1/2017","1/1/2018","5/7/19","1/7/20","1/26/20"];
 
-            foreach($result as $oRow)
+            foreach($aResultStateType['results'] as $oRow)
             {
                 
                 // reset me with actual entity date
@@ -232,9 +250,7 @@ HC;
                 
             }
 
-        return $data;
-
-
+        return ['type'=>'ok','results'=>$data];
     }
 
     private function resetFiscalDate($oRow,$oDate,$oDateFormation)

@@ -74,6 +74,30 @@ class SendgridMessage_model extends ModelDefault {
     }
 
     /**
+     * Record the message send through sendgrid API
+     * @param Integer $iEntityId entity id to send from/to
+     */
+    public function logTemplateMail($iEntityId,$sSgMessageId,$sTo,$sFrom,$sTemplateId="",$sTemplateVariables="",$sEntityEmailHash="")
+    {
+        $aData = [
+            "entity_id" => $iEntityId,
+            "send_time" =>  date("Y-m-d H:i:s"),
+            "to"    =>  $sTo,
+            "from"  =>  $sFrom,
+            "template_id"   =>  $sTemplateId,
+            "template_variable"   =>  $sTemplateVariables,
+            "sg_message_id" =>  $sSgMessageId,
+            "entity_email_hash"=>$sEntityEmailHash,
+            'type'=>'outbox',
+        ];
+        
+        $iNewId = $this->insert($aData);
+
+        return $iNewId;
+        
+    }
+
+    /**
      * Record the message received through sendgrid parse API
      * @param Array $data array of insertable values
      */
@@ -98,6 +122,35 @@ class SendgridMessage_model extends ModelDefault {
         return $iNewId;
     }
 
+    /**
+     * Record the message received through sendgrid parse API
+     * @param Array $data array of insertable values
+     */
+    public function logAttachmentMail(
+    int $iEntityId=0,
+    int $iCreatedBy=0,
+    string $sLoraxFileId="",
+    string $sDueDate="",
+    string $sToken="",
+    string $sTemplateId="d-2a672857adad4bd79e7f421636b77f6b",
+    string $aTemplateVariables="")
+    {
+        $aData = [
+            'entity_id'=>$iEntityId,
+            "created_by"=>$iCreatedBy,
+            "lorax_id"=>$sLoraxFileId,
+            "duedate"=>$sDueDate,
+            "access_token"=>$sToken,
+            "template_id"=>$sTemplateId,
+            "template_variable"=>serialize($aTemplateVariables),
+            "type"=>"attachment",
+            "status"=>"pending",
+        ];
+
+        $iNewId = $this->insert($aData);
+
+        return $iNewId;
+    }
 
     public function updateMailLog($iId, $sStatus, $sJson)
     {
@@ -108,12 +161,9 @@ class SendgridMessage_model extends ModelDefault {
         $this->update($iId,$aData);
     }
 
-    public function getLogDates($sDate1,$sDate2)
+    public function getBetweenDates($sDate1,$sDate2)
     {
-        $q = "SELECT * FROM {$this->table_sendgridMessage} WHERE send_time BETWEEN '{$sDate1}' AND '{$sDate2} 23:59:59'";
-        $oResult = $this->db->query($q);
-//        echo $this->db->last_query();die;
-        $aData = $oResult->result_object();
+        $aData = $this->get_many_by("send_time BETWEEN '{$sDate1}' AND '{$sDate2} 23:59:59' AND sg_message_id!=''");
         return $aData;
     }
 }

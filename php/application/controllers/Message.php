@@ -99,7 +99,7 @@ class Message extends RestController
         }
 
         // generate hash for easy search email
-        $sEntityEmailHash = md5($sEntityEmail);
+        $sEntityEmailHash = generateHash($sEntityEmail);
 
         // send mail through messenger centralized model
         $this->load->model("Messenger_model");
@@ -186,7 +186,7 @@ class Message extends RestController
           if($aEntity['type']=='ok')
           {
             $iEntityId = $aEntity['results']->id;
-            $sEntityEmailHash = md5($sFrom);
+            $sEntityEmailHash = generateHash($sFrom);
             // if email is for admin then avoid loging as it is logged on sent event
             if(strpos($sHeaders,"o1.ptr9325.smallbiz.com")>0)
             {
@@ -216,7 +216,7 @@ class Message extends RestController
 
         logToAdmin("Sendgrid Parse API wroking","Recorded response id: " . $iId,'SENDGRID');
       } else {
-        logToAdmin("Sendgrid receive failed","SendgridParser: Path accessed without token",'SENDGRID');
+        logToAdmin("Sendgrid receive failed","Sendgrid Parse API : Path accessed without token",'SENDGRID');
         die("Permission denied");
       }
     }

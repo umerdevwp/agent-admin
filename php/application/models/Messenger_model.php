@@ -93,10 +93,10 @@ class Messenger_model extends CI_Model {
             //   print_r($aHeaders);
             //   print $response->body() . "\n";
             
-            $this->logMailResponse($iEntityIdForLog,$iMessageId,$sEmailAddress,$sSubjectForLog,"Template ID: " . $sTemplateId . " Data: " . print_r($aTemplateFields,true));
+            //$this->logMailResponse($iEntityIdForLog,$iMessageId,$sEmailAddress,$sSubjectForLog,"Template ID: " . $sTemplateId . " Data: " . print_r($aTemplateFields,true));
             if($iMessageId)
             {
-                return true;
+                return $iMessageId;
             } else {
                 return false;
             }
@@ -132,6 +132,77 @@ class Messenger_model extends CI_Model {
             //debug($e);
             error_log($sMessage);
         }
+    }
+    /**
+     * Fetch status from sendgrid API, of mails already sent
+     */
+    public function fetchStatusMsgIdCurl($sMsgId,$sToEmail)
+    {
+
+        $oSendgrid = new SendGrid(getenv('SENDGRID_API_KEY'));
+        //$sToEmail = "najm.a@allshorestaffing.com";
+        $header = array();
+        $headr[] = 'Content-length: 0';
+        $headr[] = 'Content-type: application/json';
+        $headr[] = 'Authorization: Bearer '.getenv("SENDGRID_API_KEY");
+
+//echo urldecode("query=last_event_time%20BETWEEN%20TIMESTAMP%20%22{start_date}%22%20AND%20TIMESTAMP%20%22{end_date}%22AND%20to_email%3D%22<<email>>%22");die;
+        //$sQuery = urlencode(implode(" AND ",$aQueryList));
+        $sQuery = 'msg_id LIKE "'.$sMsgId.'%" AND to_email LIKE "'.$sToEmail.'"';
+
+//        $sArguments = urlencode("to_email=\"{$sToEmail}\"");
+//        echo "Authorization: Bearer ".getenv("SENDGRID_API_KEY");die;
+        $sQuery."<br>";
+        $oCh = curl_init("https://api.sendgrid.com/v3/messages?limit=10&query=".$sQuery);
+        curl_setopt($oCh,CURLOPT_HTTPHEADER,$headr);
+
+        curl_setopt($oCh,CURLOPT_RETURNTRANSFER,true);
+        $sResult = curl_exec($oCh);
+
+        return $sResult;
+    }
+
+
+    public function fetchStatusBetweenDate(string $sStartDate,string $sEndDate)
+    {
+        //$sJsonQuery = json_decode('{"aggregated_by": "day", "limit": 1, "start_date": "'.$sStartDate.'", "end_date": "'.$sStartDate.'", "offset": 1}');
+        $sJsonQuery = json_decode('{"limit":300,"start_date": "'.$sStartDate.'", "end_date": "'.$sStartDate.'"}');
+
+        $oSendgrid = new SendGrid(getenv('SENDGRID_API_KEY'));
+
+        //$oResponse = $oSendgrid->client->stats()->get(null, $sJsonQuery);
+        $oResponse = $oSendgrid->client->messages()->get(null, $sJsonQuery);
+
+        if($oResponse->statusCode()=="200")
+        {
+            return json_decode($oResponse->body());
+        }
+
+        return false;
+//        print $response->statusCode() . "\n";
+//        print $response->body() . "\n";
+//        print_r($response->headers());
+//die;
+    }
+
+    public function fetchStatusMsgId(string $sMessageId)
+    {
+        $sJsonQuery = json_decode('{"limit": 1, "start_date": "2020-12-10", "offset": 1}');
+        $sJsonQuery = json_decode('{ "limit": 1, "start_date": "2020-12-10", "end_date": "2020-12-10", "offset": 1}');
+        $sJsonQuery = json_decode('{ "limit": 1, "query":"msg_id LIKE \'vdV867vIR7iCzRRUXZ519Q%\'", "offset": 1}');
+        
+        $oSendgrid = new SendGrid(getenv('SENDGRID_API_KEY'));
+
+        $oResponse = $oSendgrid->client->messages()->get(null, $sJsonQuery);
+
+        if($oResponse->statusCode()=="200")
+        {
+            return json_decode($oResponse->body());
+        }
+
+        logToAdmin("Sendgrid API fetch status","for msgid: " . $sMessageId . $oResponse->body(),"CRON");
+
+        return false;
     }
 }
 

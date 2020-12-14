@@ -516,3 +516,8 @@ function generateToken($iLength=32)
 {
     return bin2hex(random_bytes($iLength));
 }
+
+function generateHash($sValue)
+{
+    return md5($sValue);
+}

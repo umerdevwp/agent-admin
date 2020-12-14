@@ -139,8 +139,16 @@ class Attachments extends RestController
             $this->load->model("LoraxAttachments_model");
             $iId = $this->LoraxAttachments_model->insert($data);
             if(!empty($iId)) {
-                $this->load->model("NotificationAttachments_model");
-                $iNotifyId = $this->NotificationAttachments_model->addAttachmentNotification($this->input->post('entityId'),$sLoraxFileId);
+                $this->load->model("SendgridMessage_model");
+                //$iNotifyId = $this->NotificationAttachments_model->addAttachmentNotification($this->input->post('entityId'),$sLoraxFileId);
+                $iNotifyId = $this->SendgridMessage_model->logAttachmentMail(
+                    $this->input->post('entityId'),
+                    $_SESSION['eid'],
+                    $sLoraxFileId,
+                    date("Y-m-d"),
+                    generateToken(),
+                    "d-2a672857adad4bd79e7f421636b77f6b"
+                );
                 $this->response([
                     'status' => true,
                     'message' => 'File is attached'
