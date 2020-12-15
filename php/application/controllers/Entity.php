@@ -1148,13 +1148,27 @@ HC;
     /**
      * Add attachment notification row for next notifying cron for attachments available
      * */
-    private function addAttachmentNotification($iEntityId,$iAttachmentId)
+    private function addAttachmentNotification($iEntityId,$sLoraxFileId)
     {
-        $this->load->model("NotificationAttachments_model");
-        $aResponse = $this->NotificationAttachments_model->addAttachmentNotification($iEntityId,$iAttachmentId);
-        if($aResponse['type']=='ok')
+        $this->load->model("SendgridMessage_model");
+        $iNotificationId = 0;
+
+        if($iEntityId>0 && $_SESSION['eid']!=$iEntityId)
         {
-            return $aResponse['id'];
+            //$iNotificationId = $this->NotificationAttachments_model->addAttachmentNotification($iEntityId,$iAttachmentId);
+            $iNotificationId = $this->SendgridMessage_model->logAttachmentMail(
+                $iEntityId,
+                $_SESSION['eid'],
+                $sLoraxFileId,
+                date("Y-m-d"),
+                generateToken(),
+                "d-2a672857adad4bd79e7f421636b77f6b"
+            );
+        }
+
+        if($iNotificationId>0)
+        {
+            return $iNotificationId;
         } else {
             return false;
         }

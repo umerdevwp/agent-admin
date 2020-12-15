@@ -19,11 +19,13 @@ class Download extends CI_Controller
         $oNotificationRow = null;
         if(!empty($this->input->get('code')))
         {
-            $this->load->model("NotificationAttachments_model");
-            $oNotificationRow = $this->NotificationAttachments_model->getOne(['token'=>$this->input->get('code'),'status'=>'sent']);
+            $this->load->model("SendgridMessage_model");
+            //$oNotificationRow = $this->NotificationAttachments_model->getOne(['token'=>$this->input->get('code'),'status'=>'sent']);
+            $oNotificationRow = $this->SendgridMessage_model->get_by(['access_token'=>$this->input->get('code'),'status'=>'sent']);
             if($oNotificationRow->id>0)
             {
-                $aDownloadStatus = $this->NotificationAttachments_model->updateDataArray($oNotificationRow->id,['status'=>'downloaded']);
+                //$aDownloadStatus = $this->NotificationAttachments_model->updateDataArray($oNotificationRow->id,['status'=>'downloaded']);
+                $aDownloadStatus = $this->SendgridMessage_model->update($oNotificationRow->id,['status'=>'downloaded']);
             } else {
                 echo "Download expired, please request new download link.";
                 die;
