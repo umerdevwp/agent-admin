@@ -36,7 +36,7 @@ const useStyles = makeStyles(theme => ({
         // display: 'flex',
         // flexWrap: 'wrap',
 
-        transform: 'scale(0.8)'
+        transform: 'scale(0.9)'
     },
     baseColor: {
         marginTop: 20,
@@ -62,21 +62,18 @@ const SendMessageForm = () => {
                 <form className={classes.container} noValidate autoComplete="off">
                     <FormGroup row>
 
-
-
-
-                        <div className={'col-md-12'}>
-                            <TextField className={clsx(classes.textFieldtwofield, classes.dense)} id="standard-basic"
-                                       label="To"/>
-                        </div>
-                        <div className={'col-md-12'}>
-                            <TextField className={clsx(classes.textFieldtwofield, classes.dense)} id="standard-basic"
-                                       label="From"/>
-                        </div>
-                        <div className={'col-md-12'}>
-                            <TextField className={clsx(classes.textFieldtwofield, classes.dense)} id="standard-basic"
-                                       label="Subject"/>
-                        </div>
+                        {/*<div className={'col-md-12'}>*/}
+                        {/*    <TextField className={clsx(classes.textFieldtwofield, classes.dense)} id="standard-basic"*/}
+                        {/*               label="To"/>*/}
+                        {/*</div>*/}
+                        {/*<div className={'col-md-12'}>*/}
+                        {/*    <TextField className={clsx(classes.textFieldtwofield, classes.dense)} id="standard-basic"*/}
+                        {/*               label="From"/>*/}
+                        {/*</div>*/}
+                        {/*<div className={'col-md-12'}>*/}
+                        {/*    <TextField className={clsx(classes.textFieldtwofield, classes.dense)} id="standard-basic"*/}
+                        {/*               label="Subject"/>*/}
+                        {/*</div>*/}
                         <div className={'col-md-12'}>
 
                             <CKEditor
@@ -99,10 +96,10 @@ const SendMessageForm = () => {
                             />
 
                         </div>
-                        <div className={'col-md-12'}>
-                            <TextField className={clsx(classes.textFieldtwofield, classes.dense)} id="standard-basic"
-                                       label="File Title"/>
-                        </div>
+                        {/*<div className={'col-md-12'}>*/}
+                        {/*    <TextField className={clsx(classes.textFieldtwofield, classes.dense)} id="standard-basic"*/}
+                        {/*               label="File Title"/>*/}
+                        {/*</div>*/}
                         <div className={'col-md-12'}>
                             <CustomFileInput
                                 required
@@ -112,14 +109,14 @@ const SendMessageForm = () => {
                                 margin="dense"
                             />
                         </div>
-                        <div className={'col-md-12'}>
-                            <FormControlLabel
-                                control={<Checkbox color="primary"/>}
-                                label="Send as mail"
-                                className={'send-as-mail'}
-                                labelPlacement="start"
-                            />
-                        </div>
+                        {/*<div className={'col-md-12'}>*/}
+                        {/*    <FormControlLabel*/}
+                        {/*        control={<Checkbox color="primary"/>}*/}
+                        {/*        label="Send as mail"*/}
+                        {/*        className={'send-as-mail'}*/}
+                        {/*        labelPlacement="start"*/}
+                        {/*    />*/}
+                        {/*</div>*/}
 
                         <div className={'col-md-12'}>
                             <div className={clsx(classes.submitButton, 'custom-button-message')}>

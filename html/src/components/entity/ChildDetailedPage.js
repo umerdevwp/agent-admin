@@ -37,6 +37,7 @@ import Avatar from '@material-ui/core/Avatar';
 import FastForwardIcon from '@material-ui/icons/FastForward';
 import Skeleton from '@material-ui/lab/Skeleton';
 import AttachmentTable from "../attachment/AttachmentTable";
+
 const useStyles = makeStyles(theme => ({
     root: {
         flexGrow: 1,

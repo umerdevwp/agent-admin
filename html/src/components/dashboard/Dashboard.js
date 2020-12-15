@@ -37,7 +37,7 @@ const columns = [
     {title: 'Name', field: 'name'},
     {title: 'Entity Structure', field: 'entityStructure'},
     {title: 'Filing State', field: 'filingState'},
-    {title: 'Formation Date', field: 'formationDate', type: 'date'},
+    {title: 'Formation Date', field: 'formationDate'},
 ];
 
 

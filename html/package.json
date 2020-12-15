@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^23.1.0",
+    "@ckeditor/ckeditor5-react": "^3.0.0",
     "@material-table/core": "^2.0.12",
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
@@ -26,6 +28,7 @@
     "react-loader": "^2.4.7",
     "react-loader-spinner": "^3.1.14",
     "react-loadingg": "^1.7.2",
+    "react-modal": "^3.12.1",
     "react-particles-js": "^3.4.1",
     "react-responsive": "^8.1.1",
     "react-router-dom": "^5.1.2",

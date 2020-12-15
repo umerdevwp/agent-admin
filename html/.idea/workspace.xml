@@ -2,74 +2,23 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d9398c1c-af28-4f73-920d-6f1f684f34d9" name="Default Changelist" comment="Merge branch 'master-notification-react' of https://github.com/United-Agent-Services/agentadmin into local-omer&#10;&#10;# Conflicts:&#10;#&#9;application/controllers/Contacts.php&#10;#&#9;application/controllers/Entity.php&#10;#&#9;application/controllers/Login.php&#10;#&#9;application/controllers/Portal.php&#10;#&#9;application/hooks/Auth.php&#10;#&#9;application/models/Accounts_model.php&#10;#&#9;application/models/Contacts_model.php&#10;#&#9;application/models/Entity_model.php&#10;#&#9;application/views/entity-add.php&#10;#&#9;application/views/entity.php&#10;#&#9;application/views/header.php&#10;#&#9;application/views/portal.php">
-      <change beforePath="$PROJECT_DIR$/../asset-manifest.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../favicon.ico" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/api/message.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/message/AdminSendMessageForm.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/message/AllMessages.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/message/ChatPanel.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/message/MainChatApp.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/message/NewChatPanel.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/public/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.test.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/dashboard/Dashboard.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/dashboard/Dashboard.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/entity/ChildDetailedPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/entity/ChildDetailedPage.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/entity/EntityDetailedPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/entity/EntityDetailedPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/routes/ChildListItems.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/routes/ChildListItems.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/routes/ParentListItems.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/routes/ParentListItems.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/routes/listItems.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/routes/listItems.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/message/SendMessageForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/message/SendMessageForm.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/logo.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/logo.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/serviceWorker.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/serviceWorker.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/setupTests.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/setupTests.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../logo192.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../logo512.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../manifest.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../media/agentadmin/bg/login.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../media/agentadmin/logo/aa_full.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../media/agentadmin/logo/aa_logo.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../media/agentadmin/logo/logo-mini-md-aa.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../precache-manifest.384c625c9a9e30883ac4cdb628e050d4.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../robots.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../service-worker.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/css/2.83758d64.chunk.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/css/2.83758d64.chunk.css.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/css/main.9adce5c8.chunk.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/css/main.9adce5c8.chunk.css.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/2.eb5d96bf.chunk.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/2.eb5d96bf.chunk.js.LICENSE.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/2.eb5d96bf.chunk.js.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/3.8a52c846.chunk.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/3.8a52c846.chunk.js.LICENSE.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/3.8a52c846.chunk.js.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/4.664cce54.chunk.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/4.664cce54.chunk.js.LICENSE.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/4.664cce54.chunk.js.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/5.a641906f.chunk.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/5.a641906f.chunk.js.LICENSE.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/5.a641906f.chunk.js.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/main.0d25b5b1.chunk.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/main.0d25b5b1.chunk.js.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/runtime-main.cdaeac05.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/runtime-main.cdaeac05.js.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/media/checkbox-01.7e720020.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/media/checkbox-01@2x.d5554fe4.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/media/checkbox-sign-in-widget@2x.c8c02700.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/media/loader@1x.da5afed5.gif" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/media/montserrat-light-webfont.6225f3ca.woff" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/media/montserrat-light-webfont.70df5da6.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/media/montserrat-light-webfont.8cde2a0e.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/media/montserrat-light-webfont.a11330db.eot" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/media/montserrat-regular-webfont.362ffe72.eot" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/media/montserrat-regular-webfont.69eac499.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/media/montserrat-regular-webfont.6fedfc64.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/media/montserrat-regular-webfont.8f2822b7.woff" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/media/okticon.432df6c2.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/media/okticon.5e1f49dd.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/media/okticon.a560e17e.eot" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/media/okticon.db287231.woff" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/media/radiobutton-01.c837a09b.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/media/radiobutton-01@2x.dc47af40.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/media/sign-on-widget-spinner.eea28db2.gif" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/media/u2f_usb.591cc98f.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/media/yubikeyDemo.f10c9db1.png" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -107,22 +56,22 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/components/message" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="web-ide.project.structure" />
     <property name="ts.external.directory.path" value="C:\Program Files\JetBrains\PhpStorm 2019.2.4\plugins\JavaScriptLanguage\jsLanguageServicesImpl\external" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\omer.s\Desktop\update react code\react-ui\src\_metronic\layout" />
-      <recent name="C:\Users\omer.s\Desktop\update react code\react-ui\src\app\pages\entity" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Bitnami\wampstack\apache2\htdocs\html\src\components\message" />
       <recent name="C:\Bitnami\wampstack\apache2\htdocs\html" />
       <recent name="C:\Users\omer.s\Desktop\update react code\react-ui\src\app\pages\entity" />
       <recent name="C:\Users\omer.s\Desktop\update react code\react-ui\src\_metronic\layout" />
       <recent name="C:\Users\omer.s\Desktop\update react code\react-ui\src\app\pages\contacts" />
-      <recent name="C:\Users\omer.s\Desktop\update react code\react-ui" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\omer.s\Desktop\update react code\react-ui\src\_metronic\layout" />
+      <recent name="C:\Users\omer.s\Desktop\update react code\react-ui\src\app\pages\entity" />
     </key>
   </component>
   <component name="SvnConfiguration">
@@ -180,10 +129,22 @@
       <screen x="0" y="0" width="1366" height="738" />
     </state>
     <state x="426" y="171" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1366.738@0.0.1366.738" timestamp="1598544511516" />
-    <state x="154" y="50" width="1182" height="554" key="DiffContextDialog" timestamp="1597677793421">
+    <state width="1323" height="243" key="GridCell.Tab.0.bottom" timestamp="1607012859876">
       <screen x="0" y="0" width="1366" height="738" />
     </state>
-    <state x="154" y="50" width="1182" height="554" key="DiffContextDialog/0.0.1366.738@0.0.1366.738" timestamp="1597677793421" />
+    <state width="1323" height="243" key="GridCell.Tab.0.bottom/0.0.1366.738@0.0.1366.738" timestamp="1607012859876" />
+    <state width="1323" height="243" key="GridCell.Tab.0.center" timestamp="1607012859876">
+      <screen x="0" y="0" width="1366" height="738" />
+    </state>
+    <state width="1323" height="243" key="GridCell.Tab.0.center/0.0.1366.738@0.0.1366.738" timestamp="1607012859876" />
+    <state width="1323" height="243" key="GridCell.Tab.0.left" timestamp="1607012859876">
+      <screen x="0" y="0" width="1366" height="738" />
+    </state>
+    <state width="1323" height="243" key="GridCell.Tab.0.left/0.0.1366.738@0.0.1366.738" timestamp="1607012859876" />
+    <state width="1323" height="243" key="GridCell.Tab.0.right" timestamp="1607012859876">
+      <screen x="0" y="0" width="1366" height="738" />
+    </state>
+    <state width="1323" height="243" key="GridCell.Tab.0.right/0.0.1366.738@0.0.1366.738" timestamp="1607012859876" />
     <state x="129" y="55" key="MergeDialog" timestamp="1598544413085">
       <screen x="0" y="0" width="1366" height="738" />
     </state>
@@ -192,25 +153,5 @@
       <screen x="0" y="0" width="1366" height="738" />
     </state>
     <state x="395" y="84" key="MultipleFileMergeDialog/0.0.1366.738@0.0.1366.738" timestamp="1598544422007" />
-    <state x="184" y="11" key="SettingsEditor" timestamp="1594137703384">
-      <screen x="0" y="0" width="1366" height="738" />
-    </state>
-    <state x="184" y="11" key="SettingsEditor/0.0.1366.738@0.0.1366.738" timestamp="1594137703384" />
-    <state x="379" y="192" key="com.intellij.ide.util.TipDialog" timestamp="1597678164071">
-      <screen x="0" y="0" width="1366" height="738" />
-    </state>
-    <state x="379" y="192" key="com.intellij.ide.util.TipDialog/0.0.1366.738@0.0.1366.738" timestamp="1597678164071" />
-    <state x="379" y="101" width="607" height="536" key="find.popup" timestamp="1597678258267">
-      <screen x="0" y="0" width="1366" height="738" />
-    </state>
-    <state x="379" y="101" width="607" height="536" key="find.popup/0.0.1366.738@0.0.1366.738" timestamp="1597678258267" />
-    <state x="339" y="165" key="run.anything.popup" timestamp="1592333335308">
-      <screen x="0" y="0" width="1366" height="738" />
-    </state>
-    <state x="339" y="165" key="run.anything.popup/0.0.1366.738@0.0.1366.738" timestamp="1592333335308" />
-    <state x="346" y="59" width="672" height="678" key="search.everywhere.popup" timestamp="1592858899678">
-      <screen x="0" y="0" width="1366" height="738" />
-    </state>
-    <state x="346" y="59" width="672" height="678" key="search.everywhere.popup/0.0.1366.738@0.0.1366.738" timestamp="1592858899678" />
   </component>
 </project>
