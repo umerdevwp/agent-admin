@@ -5,7 +5,7 @@ export const sendMessageAPI = async (data) => {
 
     if(okta) {
         const response = await fetch(`${ENTITY}/message/send`, {
-            method: 'put',
+            method: 'post',
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Authorization': okta.accessToken.accessToken,

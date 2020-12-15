@@ -227,21 +227,21 @@ const AdminSendMessageForm = (props) => {
 
                         </div>
 
-                        <div className={'col-md-12'}>
-                            <CustomFileInput
-                                disable={apiLoading}
-                                value={fileLink.value.File}
-                                onChange={e => fileChange(e)}
-                                required
-                                id="attachment"
-                                label="File"
-                                className={clsx(classes.fileUploading, classes.dense)}
-                                margin="dense"
-                            />
-                            {fileLink.success !== ' ' ? (<span>{fileLink.success}</span>) : ' '}
-                            {fileLink.error !== ' ' ? (
-                                <span className={clsx(classes.fileError)}>{fileLink.error}</span>) : ' '}
-                        </div>
+                        {/*<div className={'col-md-12'}>*/}
+                        {/*    <CustomFileInput*/}
+                        {/*        disable={apiLoading}*/}
+                        {/*        value={fileLink.value.File}*/}
+                        {/*        onChange={e => fileChange(e)}*/}
+                        {/*        required*/}
+                        {/*        id="attachment"*/}
+                        {/*        label="File"*/}
+                        {/*        className={clsx(classes.fileUploading, classes.dense)}*/}
+                        {/*        margin="dense"*/}
+                        {/*    />*/}
+                        {/*    {fileLink.success !== ' ' ? (<span>{fileLink.success}</span>) : ' '}*/}
+                        {/*    {fileLink.error !== ' ' ? (*/}
+                        {/*        <span className={clsx(classes.fileError)}>{fileLink.error}</span>) : ' '}*/}
+                        {/*</div>*/}
                         <div className={'col-md-12'}>
                             <div className={clsx(classes.submitButton, 'custom-button-wrapper')}>
                                 {apiLoading ? (
