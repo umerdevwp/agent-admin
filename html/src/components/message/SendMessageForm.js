@@ -117,7 +117,7 @@ function FacebookProgress(props) {
     );
 }
 
-const AdminSendMessageForm = (props) => {
+const SendMessageForm = (props) => {
     const classes = useStyles();
     const entity_id = props.match.params.id;
     const [content, setContent] = useState({value: '', error: ' '});
@@ -178,17 +178,17 @@ const AdminSendMessageForm = (props) => {
                 <form onSubmit={sendMessageSubmission} className={classes.container} noValidate autoComplete="off">
                     <FormGroup row>
 
-                        <div className={'col-md-12'}>
-                            <FormControlLabel
-                                control={<Checkbox color="primary"/>}
-                                label="Send as mail"
-                                className={'send-as-mail'}
-                                labelPlacement="start"
-                                onChange={e => setSendasEmail(
-                                    e.target.checked
-                                )}
-                            />
-                        </div>
+                        {/*<div className={'col-md-12'}>*/}
+                        {/*    <FormControlLabel*/}
+                        {/*        control={<Checkbox color="primary"/>}*/}
+                        {/*        label="Send as mail"*/}
+                        {/*        className={'send-as-mail'}*/}
+                        {/*        labelPlacement="start"*/}
+                        {/*        onChange={e => setSendasEmail(*/}
+                        {/*            e.target.checked*/}
+                        {/*        )}*/}
+                        {/*    />*/}
+                        {/*</div>*/}
 
                         {/*{sendasEmail === true ?*/}
                         {/*<div className={'col-md-12'}>*/}
@@ -262,4 +262,4 @@ const AdminSendMessageForm = (props) => {
     )
 }
 
-export default AdminSendMessageForm;
+export default SendMessageForm;

@@ -409,7 +409,7 @@ const EntityDetailedPage = (props) => {
 
                             {
                                 role === 'Parent Organization' || role === 'Child Entity' ?
-                                    <SendMessageForm/> : ''
+                                    <SendMessageForm {...props} /> : ''
                             }
                         </main>
                     </div>
