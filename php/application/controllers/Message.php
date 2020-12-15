@@ -245,17 +245,25 @@ class Message extends RestController
 
       return $aFileName;
     }
-
-    public function logMailStatus($key="")
+    
+    /**
+     * Used in cron to check statuses in sendgrid of the mails sent
+     * for attachments reminder, ruling subscription, interface messages
+     */
+    public function logMailStatus_get($key="")
     {
         if($key!=getenv("CRON_KEY")) redirectSession();
 
         $this->load->model("SendgridMessage_model");
+        $this->load->model("Messenger_model");
 
-        $sDateTime1 = date("Y-m-d",strtotime("-2 days"));//"2020-03-12T00:00:00Z";
+        $sDateTime1 = date("Y-m-d",strtotime("-7 days"));//"2020-03-12T00:00:00Z";
         $sDateTime2 = date("Y-m-d");//"2020-03-12T23:59:59Z";
         //$sDateTime1 = "2020-03-12";
-        $aData = $this->SendgridMessage_model->getLogDates($sDateTime1,$sDateTime2);
+        $aData = $this->SendgridMessage_model->getBetweenDates($sDateTime1,$sDateTime2);
+        //$sResult = $this->Messenger_model->fetchStatus(['msg_id LIKE "'.$sMsgId.'%"', 'to_email LIKE "'.$sToEmail.'"']);
+        //$sResult = $this->Messenger_model->fetchStatusBetweenDate($sDateTime1,$sDateTime2);
+        //$sResult = $this->Messenger_model->fetchStatusMsgId("YhTbHYXjSU2cwE9UN2j-ng");
         
         $iRecordsUpdated = 0;
         if($aData)
@@ -266,16 +274,201 @@ class Message extends RestController
                 $sToEmail = $v->to;//"najm.a@allshorestaffing.com";
 
         //        $sResult = $this->sgGetStatus(['(CONTAINS(msg_id,"Ople3WYzQNW9FNyoMB_apA"))', 'to_email LIKE "najm.a@allshorestaffing.com"','last_event_time BETWEEN TIMESTAMP "'.$sDateTime1.'" AND TIMESTAMP "'.$sDateTime2.'"']);
-                $sResult = $this->sgGetStatus(['msg_id LIKE "'.$sMsgId.'%"', 'to_email LIKE "'.$sToEmail.'"']);
-                $oJson = json_decode($sResult);
+                //$sResult = $this->Messenger_model->fetchStatus(['msg_id LIKE "'.$sMsgId.'%"', 'to_email LIKE "'.$sToEmail.'"']);
+                //$sResult = $this->Messenger_model->fetchStatusMsgIdCurl($sMsgId,$sToEmail);
+                $oJson = $this->Messenger_model->fetchStatusMsgId($sMsgId);
+        
                 if(count($oJson->messages)>0)
                 {
-                    $this->SendgridMessage_model->updateMailLog($v->id, $oJson->messages[0]->status,$sResult);
+                    $sPrevStatusJson = $v->sg_status;
+                    if(empty($sPrevStatusJson))
+                    {
+                        $this->SendgridMessage_model->updateMailLog($v->id, $oJson->messages[0]->status,json_encode($oJson));
+                    } else {
+                        $oMessage = $oJson->messages[0];
+                        $this->SendgridMessage_model->updateMailLog($v->id, $oJson->messages[0]->status,
+                        $sPrevStatusJson.",".$oMessage->status.",".$oMessage->opens_count.",".$oMessage->clicks_count.",".$oMessage->last_event_time);
+                    }
+
                     $iRecordsUpdated++;
+                } else {
+                    logToAdmin("Sengrid log not found","For msgid: $sMsgId " . json_encode($oJson),"CRON");
                 }
             }
         }
+        echo "Total statuses: {$iRecordsUpdated} Updated";
+        logToAdmin("CRON Mail Statuses succeed","Total statuses: {$iRecordsUpdated} Updated","CRON");
+    }
 
-        logToAdmin("Cron: message statuses","Log Mail status cron succeed: {$iRecordsUpdated} Updated","CRON");
+    // TODO: set cron to update entity_states table for a new zoho_account is synched to zoho_accounts
+    // REPLACE INTO entity_states SELECT za.id,s.id,NOW(),NOW() FROM zoho_accounts za, states s WHERE za.filing_state=s.code;
+    /**
+     * Used in cron, notify about ruling state notification has reached, it runs everyday
+     * and check if the mail send day has arrive based on days_before
+     * and month_before configuration in the table notification_subscription
+     */
+    public function notifyForSubscription_get($key="")
+    {
+        if($key!=getenv("CRON_KEY")) redirectSession();
+
+        $this->load->model("Notifications_model");
+        $this->load->model("entity_model");
+        $this->load->model("tempmeta_model");
+        $this->load->model("Messenger_model");
+        $this->load->model("SendgridMessage_model");
+        // TODO: apply critearea to get subscription, find which subscription are ready
+        // to check for messages, if both intervals are 0 then check before months if it is 0 then check before days
+        $aSubscription = $this->Notifications_model->getSubscriptions();
+
+        $iMailsSent = 0;
+// TODO: subscription notification loop can be simplified by keeping next notification date in subscription table with flag initial done
+        foreach($aSubscription['results'] as $oSubs)
+        {
+            $aDataEntity = $this->entity_model->getOne($oSubs->entity_id,['id','name','email','type','filingState','entityStructure','formationDate']);
+            
+            if($aDataEntity['type']=='error')
+            {
+                $aDataEntity = $this->tempmeta_model->getOneInJson(["json_id"=>$oSubs->entity_id]);
+            }
+
+            if($aDataEntity['type']=='ok' && $aDataEntity['results']->id>0)
+            {
+                $oEntity = $aDataEntity['results'];
+
+                $aRule = $this->Notifications_model->getRules(
+                    $oEntity->filingState,
+                    $oEntity->entityStructure,
+                    $oEntity->formationDate,
+                    $oEntity->fiscalDate
+                );
+
+                if($aRule['type']=='ok')
+                {
+                    $oRule = $aRule['results'];
+                    $aResult = $this->Notifications_model->getNotifyDate($oSubs,$oRule,date("Y-m-d"));
+                    // date reached to send message now/today
+                    if(isset($aResult['date']))
+                    {
+                        //$this->sendMail($oEntity,$oRule);
+                        $sTemplateId = "d-02d5c4c6dddf4f709ec6c636a27a18eb";
+                        $aTemplateVariables = ['name'=>$oEntity->name,'state'=>$oEntity->filingState,'type'=>$oEntity->entityStructure,'date'=>$aResult['date']];
+                        $sMessageId = $this->Messenger_model->sendTemplateEmail(
+                            $sTemplateId,
+                            $aTemplateVariables,
+                            $oEntity->email,
+                            $oEntity->name,
+                            $oEntity->id,
+                            "Template loc Attachment available"
+                        );
+
+                        // log the sent mail for trackings
+                        $iInsertLogId = $this->SendgridMessage_model->logTemplateMail(
+                            $oEntity->id,$sMessageId,$oEntity->email,getenv("NOTIFICATION_FROM_EMAIL"),$sTemplateId,serialize($aTemplateVariables),generateHash($oEntity->email)
+                        );
+                        $iMailsSent++;
+                    }
+                } else {
+                    logToAdmin("Subscription cron failed","Rule find failed, eid: " . $oSubs->entity_id . ",  state: {$oEntity->filingState}, structure: {$oEntity->entityStructure}, formed:{$oEntity->formationDate}. {$aRule['message']}",'CRON');
+                }
+            } else {
+                logToAdmin("Subscription cron failed","No such entity found: " . $oSubs->entity_id,'CRON');
+            }
+        }
+        echo "Notify Mail cron succeed: {$iMailsSent} sent";
+        logToAdmin("Subscription cron working","Notify Mail cron succeed: {$iMailsSent} sent","CRON");
+    }
+
+    /**
+     * Used in cron to shoot mails to entity that have notification pending
+     */
+    public function notifyForAttachments_get($key="")
+    {
+        if($key!=getenv("CRON_KEY")) redirectSession();
+
+        $this->load->model("SendgridMessage_model");
+        $this->load->model("Messenger_model");
+        $this->load->model("entity_model");
+        $this->load->model("tempmeta_model");
+        $this->load->model("contacts_model");
+        //$aDataNotify = $this->NotificationAttachments_model->getAllWhere(['status'=>'pending']);
+        $aDataNotify = $this->SendgridMessage_model->get_many_by(['status'=>'pending','type'=>'attachment']);
+        $iMailsSent = 0;
+        $iToday = strtotime(date("Y-m-d"));
+
+        foreach($aDataNotify as $oRow)
+        {
+
+            if(strtotime($oRow->duedate)<=$iToday)
+            {
+                $aDataEntity = $this->entity_model->getOne($oRow->entity_id,['id','name','email','type','filingState','entityStructure']);
+                // check in tempmeta records
+                if($aDataEntity['type']=='error')
+                {
+                    $aDataEntity = $this->tempmeta_model->getOneInJson(["json_id"=>$oRow->entity_id]);
+                }
+
+                if($aDataEntity['type']=='ok' && $aDataEntity['results']->id>0)
+                {
+                    $oEntity = $aDataEntity['results'];
+
+                    if($oEntity->email!="")
+                    {
+
+                        $sDownloadUrl = getenv("SITE_URL") . "download/" . $oRow->lorax_id . "?code=" . $oRow->access_token. "&name=doc-" . date("d-m-y") . ".pdf";
+
+                        //$oDataContact = $this->contacts_model->getEntityProfileContact($oEntity->id);
+                        //$oDataSendgrid = $this->sendgrid_model->getOne($oRow->sendgrid_id);
+                        $aTemplateVariables = ['entity_name'=>$oEntity->name];
+                        switch($oRow->template_id)
+                        {
+                            case "d-2a672857adad4bd79e7f421636b77f6b":
+                                $aTemplateVariables = array_merge($aTemplateVariables,['download_url'=>$sDownloadUrl]);
+                                $sTemplateId = "d-2a672857adad4bd79e7f421636b77f6b";
+                            break;
+                            case "d-d0fa3c4400ff49e5bf48c31eb85fc5fe":
+                                $sTemplateId = "d-d0fa3c4400ff49e5bf48c31eb85fc5fe";
+                                $aTemplateVariables = array_merge($aTemplateVariables,['login_url'=>getenv("SITE_MAIN_URL")."entity/".$oEntity->id]);
+
+                                if(!empty($oRow->sendgrid_variable))
+                                $aTemplateVariables = array_merge(unserialize($oRow->sendgrid_variable),$aTemplateVariables);
+                            break;
+                        }
+                        $sSubject = "";
+                        $iMessageId = $this->Messenger_model->sendTemplateEmail(
+                            $sTemplateId,
+                            $aTemplateVariables,
+                            $oEntity->email,
+                            $oEntity->name,
+                            $oEntity->id,
+                            "Template loc Attachment available"
+                        );
+
+                        if($iMessageId)
+                        {
+                            //$this->logMailResponse($iEntityIdForLog,$iMessageId,$sEmailAddress,$sSubjectForLog,"Template ID: " . $sTemplateId . " Data: " . print_r($aTemplateFields,true));
+                            //$this->NotificationAttachments_model->updateDataArray($oRow->id,['status'=>'sent']);
+                            $this->SendgridMessage_model->update($oRow->id,[
+                                'status'=>'sent',
+                                "sg_message_id"=>$iMessageId,
+                                'send_time'=>date("Y-m-d H:i:s"),
+                                'to'=>$oEntity->email,
+                                'entity_email_hash'=>generateHash($oEntity->email)
+                            ]);
+                            $iMailsSent++;
+                        }
+                    } else {
+
+                        //$this->NotificationAttachments_model->updateDataArray($oRow->id,['status'=>"no-email"]);
+                        $this->SendgridMessage_model->update($oRow->id,['status'=>"no-email"]);
+                        error_log("Email not found for Attacchment notification, eid: " . $oEntity->id);
+
+                    }
+                    
+                }
+                
+            }
+        }
+        echo "Notify For Attacchment Cron Succeed: {$iMailsSent} sent";
+        logToAdmin("Notify Attachment Cron succeed","Total mails sent: {$iMailsSent}","CRON");
     }
 }

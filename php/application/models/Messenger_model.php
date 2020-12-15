@@ -149,7 +149,10 @@ class Messenger_model extends CI_Model {
 //echo urldecode("query=last_event_time%20BETWEEN%20TIMESTAMP%20%22{start_date}%22%20AND%20TIMESTAMP%20%22{end_date}%22AND%20to_email%3D%22<<email>>%22");die;
         //$sQuery = urlencode(implode(" AND ",$aQueryList));
         $sQuery = 'msg_id LIKE "'.$sMsgId.'%" AND to_email LIKE "'.$sToEmail.'"';
-
+        //$sMsgId = ['msg_id LIKE "%"'];
+        //$sToEmail = ['to_email LIKE "najm.a@allshorestaffing.com"'];
+        //$sFromEmail = ['from_email LIKE "agentadmin@youragentservices.com"'];
+        //$sOpenCount = ['opens_count LIKE "0"'];
 //        $sArguments = urlencode("to_email=\"{$sToEmail}\"");
 //        echo "Authorization: Bearer ".getenv("SENDGRID_API_KEY");die;
         $sQuery."<br>";

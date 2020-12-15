@@ -63,13 +63,20 @@ class Notifications_model extends CI_Model
 
         $query = $this->db->get();
         $result = ['type'=>'error','message'=>'No rule found'];
+        $aData = 0;
+
+        // avoid query error, it shouldn't be a failed object due to mysql error
         if($query)
         {
-            $result = ['type'=>'ok','results'=>$query->result_object()];
+            $aData = $query->result_object();// can return null
         }
-        
-        //echo $this->db->last_query();
-        
+
+        // check data exist, is array or null
+        if(count($aData)>0)
+        {
+            $result = ['type'=>'ok','results'=>$aData];
+        }
+
         return $result;
     }
 
@@ -102,9 +109,6 @@ HC;
      */
     public function getRules($sEntityState,$sEntityType,$sFormationDate,$sFiscalDate="",$sNow="",$bReturnSingle=true)
     {
-        $this->load->model("Notifications_model");
-        
-
         //$state = $this->input->post("state");
         //$type = $this->input->post("type");
         if($sEntityState=="")
@@ -364,6 +368,57 @@ HC;
         }
 
         return false;
+    }
+
+    public function getNotifyDate($oSubscription,$oRule,$sDateNow)
+    {
+        
+        // setup now, due and subscripiton date objects
+        $oDueDate = new DateTime($oRule->duedate);
+        $oDateNow = new DateTime($sDateNow);
+        $oDiffDue = $oDueDate->diff($oDateNow,true);
+        $oDiffSubs = $oDateNow->diff(new DateTime($oSubscription->start_date));
+        $aResult = null;
+
+        if($oSubscription->interval_months>0 && $oDiffSubs->m>0)
+        {
+            // calculate month intervals
+            $iMonthIntervalRemaining = $oDiffSubs->m%$oSubscription->interval_months;
+            $iDayToday = $oDateNow->format("d");
+            // and today is 1st of month then shoot
+            if($iMonthIntervalRemaining==0 && $iDayToday==1)
+            {
+                $aResult = ['type'=>'interval-months','date'=>$oDateNow->format("Y-m-d")];
+                return $aResult;
+            }
+        }
+
+        // calculate month remaining, difference is 0 when day is last of month
+        if($oDiffDue->m==$oSubscription->before_months && $oDiffDue->d==0)
+        {
+            $aResult = ['type'=>'before-months','date'=>$oDateNow->format("Y-m-d")];
+            return $aResult;
+        }
+
+        // calculate days remaining
+        if($oDiffDue->days==$oSubscription->before_days)
+        {
+            $aResult = ['type'=>'before-days','date'=>$oDateNow->format("Y-m-d")];
+            return $aResult;
+        }
+
+        if($oSubscription->interval_days>0 && $oDiffSubs->days>0)
+        {
+            // calculate day intervals 
+            $iDayIntervalRemaining = $oDiffSubs->days%$oSubscription->interval_days;
+            if($iDayIntervalRemaining==0)
+            {
+                $aResult = ['type'=>'interval-days','date'=>$oDateNow->format("Y-m-d")];
+                return $aResult;
+            }
+        }
+
+        return $aResult;
     }
     
 }
