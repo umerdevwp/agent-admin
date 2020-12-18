@@ -1,26 +1,37 @@
 <?php
-
-use PhpParser\Node\Expr\Cast\Object_;
-use SendGrid\Mail\Mail;
-use SendGrid\Mail\Subject;
-use SendGrid\Mail\To;
-use SendGrid\Mail\From;
-
-use SendGrid\Mail\Cc;
-use SendGrid\Mail\Bcc;
-use SendGrid\Mail\Content;
-use SendGrid\Mail\PlainTextContent;
-use SendGrid\Mail\Substitution;
-use SendGrid\Mail\TemplateId;
-use SendGrid\Mail\HtmlContent;
 include APPPATH . '/libraries/ModelDefault.php';
 
 class SendgridMessage_model extends ModelDefault {
+    private $sTable = "sendgrid_messages";
+    private $aColumns = [
+            "id"        => "id",
+            "entityId"  => "entity_id",
+            "sendTime"  => "send_time",
+            "to"        => "to",
+            "subject"   => "subject",
+            "message"   => "message",
+            "sgMessageId"=> "sg_message_id",
+            "added"     => "added",
+            "updated"   => "updated",
+            "sgStatus"  => "sg_status",
+            "status"    => "status",
+            "entityEmailHash"=> "entity_email_hash",
+            "rawJson"   => "raw_json",
+            "from"      => "from",
+            "attachments"=> "attachments",
+            "type"      => "type",
+            "loraxId"   => "lorax_id",
+            "templateVariable"=> "template_variable",
+            "accessToken"=> "access_token",
+            "createdBy" => "created_by",
+            "duedate"   => "duedate",
+            "templateId"=> "template_id"
+    ];
 
     public function __construct()
     {
         parent::__construct();
-        $this->_table = "sendgrid_message";
+        $this->_table = $this->sTable;
     }
 
     /**
@@ -152,12 +163,17 @@ class SendgridMessage_model extends ModelDefault {
         return $iNewId;
     }
 
-    public function updateMailLog($iId, $sStatus, $sJson)
+    public function updateMailLog(int $iId,string $sJson,string $sStatus="",int $iOpenCount=0,int $iClickCount=0,string $sEventDateTime="")
     {
         $aData = [
-            "status"    =>  $sStatus,
             "sg_status" =>  $sJson
         ];
+
+        if($sStatus) $aData['status'] = $sStatus;
+        if($iOpenCount) $aData['open_count'] = $iOpenCount;
+        if($iClickCount) $aData['click_count'] = $iClickCount;
+        if($sEventDateTime) $aData['last_event_datetime'] = date("Y-m-d H:i:s",strtotime($sEventDateTime));
+
         $this->update($iId,$aData);
     }
 
@@ -165,6 +181,48 @@ class SendgridMessage_model extends ModelDefault {
     {
         $aData = $this->get_many_by("send_time BETWEEN '{$sDate1}' AND '{$sDate2} 23:59:59' AND sg_message_id!=''");
         return $aData;
+    }
+
+    public function getListEntity(int $iEntityId,array $aColumns=[])
+    {
+        if(count($aColumns)>0)
+            $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
+        else {
+            $aMyColumns = [
+                "id","to","from","sendTime","subject",
+                "message","status"
+            ];
+            $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
+        }
+
+//        foreach($aMyColumns as $k=>$v)
+//            $this->db->select("$v as `$k`");
+
+//        $this->order_by("send_time");
+//        $aRecords = $this->get_many_by(['entity_id'=>$iEntityId]);
+
+        $sQueryCombineNotes = "
+SELECT id,`to`,`from`,entity_id,send_time AS sendTime,subject,message,status 
+FROM {$this->sTable} WHERE entity_id={$iEntityId}
+UNION
+SELECT id,'','',entity_id,added AS sendTime, subject,message,'' 
+FROM entity_notes WHERE entity_id={$iEntityId}
+ORDER BY sendTime ASC
+";
+        $oQuery = $this->db->query($sQueryCombineNotes);
+
+        $aRecords = null;
+        if($oQuery)
+        {
+            $aRecords = $oQuery->result();
+        }
+
+        if(count($aRecords)==0)
+        {
+            $aRecords = null;
+        }
+
+        return $aRecords;
     }
 }
 
