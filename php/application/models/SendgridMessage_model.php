@@ -25,7 +25,8 @@ class SendgridMessage_model extends ModelDefault {
             "accessToken"=> "access_token",
             "createdBy" => "created_by",
             "duedate"   => "duedate",
-            "templateId"=> "template_id"
+            "templateId"=> "template_id",
+            "gid"       =>  "group_id"
     ];
 
     public function __construct()
@@ -64,7 +65,7 @@ class SendgridMessage_model extends ModelDefault {
      * Record the message send through sendgrid API
      * @param Integer $iEntityId entity id to send from/to
      */
-    public function logOutboxMail($iEntityId,$sSgMessageId,$sTo,$sFrom,$sSubject="",$sMessage="",$sEntityEmailHash="")
+    public function logOutboxMail($iEntityId,$sSgMessageId,$sTo,$sFrom,$sSubject="",$sMessage="",$sEntityEmailHash="",$iGroupId)
     {
         $aData = [
             "entity_id" => $iEntityId,
@@ -76,6 +77,7 @@ class SendgridMessage_model extends ModelDefault {
             "sg_message_id" =>  $sSgMessageId,
             "entity_email_hash"=>$sEntityEmailHash,
             'type'=>'outbox',
+            'group_id'=>$iGroupId
         ];
         
         $iNewId = $this->insert($aData);
@@ -112,7 +114,7 @@ class SendgridMessage_model extends ModelDefault {
      * Record the message received through sendgrid parse API
      * @param Array $data array of insertable values
      */
-    public function logInboxMail($iEntityId=0,string $sRawJson="",string $sFrom="",string $sTo="",string $sSubject="",string $sMessage="",array $aFileName=[],$sEntityEmailHash="")
+    public function logInboxMail($iEntityId=0,string $sRawJson="",string $sFrom="",string $sTo="",string $sSubject="",string $sMessage="",array $aFileName=[],$sEntityEmailHash="",$iGroupId=0)
     {
 
         $aData = [
@@ -126,7 +128,8 @@ class SendgridMessage_model extends ModelDefault {
           'attachments'=>json_encode($aFileName),
           'type'=>'inbox',
           "send_time" =>  date("Y-m-d H:i:s"),
-        ];
+          "group_id"=>$iGroupId,
+        ]; 
 
         $iNewId = $this->insert($aData);
 
@@ -182,8 +185,10 @@ class SendgridMessage_model extends ModelDefault {
         $aData = $this->get_many_by("send_time BETWEEN '{$sDate1}' AND '{$sDate2} 23:59:59' AND sg_message_id!=''");
         return $aData;
     }
-
-    public function getListEntity(int $iEntityId,array $aColumns=[])
+    /**
+     * Get messages from logs plus notes
+     */
+    public function getListEntityAdmin(int $iEntityId,array $aColumns=[])
     {
         if(count($aColumns)>0)
             $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
@@ -202,10 +207,10 @@ class SendgridMessage_model extends ModelDefault {
 //        $aRecords = $this->get_many_by(['entity_id'=>$iEntityId]);
 
         $sQueryCombineNotes = "
-SELECT id,`to`,`from`,entity_id,send_time AS sendTime,subject,message,status 
+SELECT id,`to`,`from`,entity_id,send_time AS sendTime,subject,message,status,group_id AS gid
 FROM {$this->sTable} WHERE entity_id={$iEntityId}
 UNION
-SELECT id,'','',entity_id,added AS sendTime, subject,message,'' 
+SELECT id,'','',entity_id,added AS sendTime, subject,message,'',0
 FROM entity_notes WHERE entity_id={$iEntityId}
 ORDER BY sendTime ASC
 ";
@@ -224,7 +229,40 @@ ORDER BY sendTime ASC
 
         return $aRecords;
     }
+    /**
+     * Get only messages from logs
+     */
+    public function getListEntity(int $iEntityId,array $aColumns=[])
+    {
+        if(count($aColumns)>0)
+            $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
+        else {
+            $aMyColumns = [
+                "id","to","from","sendTime","subject",
+                "message","gid"
+            ];
+            $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
+        }
+
+        foreach($aMyColumns as $k=>$v)
+            $this->db->select("$v as `$k`");
+
+        $this->order_by("send_time");
+        $aRecords = $this->get_many_by(['entity_id'=>$iEntityId]);
+
+        if(count($aRecords)==0)
+        {
+            $aRecords = null;
+        }
+
+        return $aRecords;
+    }
+
+    /**
+     * Get mail where subject matches
+     */
+    public function whereSubject(string $sSubject,string $sFrom)
+    {
+        return $this->get_by(['subject'=>$sSubject,'to'=>$sFrom,'group_id'=>0]);
+    }
 }
-
-
-

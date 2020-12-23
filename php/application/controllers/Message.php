@@ -86,8 +86,11 @@ class Message extends RestController
         if(isAdmin())
         {
             $this->load->model("EntityNotes_model");
+            $sType = $this->input->post("type");
+            if(empty($sType))
+                $sType = "notes";
 
-            $iNewNoteId = $this->EntityNotes_model->add($iEntityId,$sSubject,$sMessage,$_SESSION['eid']);
+            $iNewNoteId = $this->EntityNotes_model->add($iEntityId,$sType,$sSubject,$sMessage,$_SESSION['eid']);
             
             if($iNewNoteId>0)
             {
@@ -104,7 +107,7 @@ class Message extends RestController
         } else {
             $this->response([
                 'status' => false,
-                'message'=> "Not authorized to access entity"
+                'message'=> "No such request found."
             ], 404);
         }
     }
@@ -117,6 +120,8 @@ class Message extends RestController
     public function send_post()//$sEmail,$sName,$sState,$sEntityType,$sDate,$sPurpose="recurring")
     {
         $iEid = $this->input->post("eid");
+        $iGroupId = (int)$this->input->post("gid");
+
         $iParentId = $_SESSION['eid'];
 
         $this->load->model("entity_model");
@@ -185,7 +190,7 @@ class Message extends RestController
         // if message is a note then record and exit;
         if((int)$this->input->post("note")===1)
         {
-            $this->addNote($iEntityId,$sSubject,$sMessage);
+            $this->addNote($iEid,$sSubject,$sMessage);
             exit();
         }
 
@@ -232,7 +237,7 @@ class Message extends RestController
 
           // record the details for log or trackings
           $this->load->model("SendgridMessage_model");          
-          $iInsertId = $this->SendgridMessage_model->logOutboxMail($iEid,$iMessageId,$sTo,$sFrom,$sSubject,$sMessage,$sEntityEmailHash);
+          $iInsertId = $this->SendgridMessage_model->logOutboxMail($iEid,$iMessageId,$sTo,$sFrom,$sSubject,$sMessage,$sEntityEmailHash,$iGroupId);
 
         // report to admin on failure             
         if(!$iInsertId)
@@ -268,6 +273,7 @@ class Message extends RestController
         $sFromName = $this->input->post("from");
 
         $sHeaders = $this->input->post("headers"); // for date received parse
+
 //        error_log($sHeaders);
 //        error_log(strpos($sHeaders,"Received: from o1.ptr9325.smallbiz.com"));
 //        error_log(substr($sHeaders,strpos($sHeaders,"Received: from o1.ptr9325.smallbiz.com")-50));
@@ -292,13 +298,27 @@ class Message extends RestController
         {
           $sMessage = $this->input->post("text");
         }
+        
+        if(empty($sMessage))
+            $sMessage = "";
+
         $sSubject = $this->input->post("subject");
+
+
+        if(empty($sSubject) && empty($sMessage))
+        {
+            logToAdmin("Sendgrid receive subject/message missing","Sendgrid Parse API json: " . json_encode($_POST),'SENDGRID');
+            die("No subject/message");
+        }
+
         $num_attachments = (int)$this->input->post("attachments");
         // check for attachments and upload to temp
         $aFileName = $this->uploadMailFiles($num_attachments);
+
         // valid email can be recorded
         if(filter_var($sFrom, FILTER_VALIDATE_EMAIL))
         {
+
           $this->load->model("entity_model");
           $aEntity = $this->entity_model->getEmailId($sFrom);
           // entity found against email from entity
@@ -306,10 +326,12 @@ class Message extends RestController
           {
             $iEntityId = $aEntity['results']->id;
             $sEntityEmailHash = generateHash($sFrom);
+//            echo strpos($sHeaders,"o1.ptr9325.smallbiz.com");die;
+
             // if email is for admin then avoid loging as it is logged on sent event
             if(strpos($sHeaders,"o1.ptr9325.smallbiz.com")>0)
             {
-              error_log("Skip loging, AgentAdmin mail sent to itself by entity: " . $iEntityId . " to admin: " . getenv("NOTIFICATION_FROM_EMAIL"));
+              logToAdmin("Sendgrid Parse Post","Skip loging, AgentAdmin mail sent to itself by entity: " . $iEntityId . " to admin: " . getenv("NOTIFICATION_FROM_EMAIL"),"SENDGRID");
               die;
             }
           } else {
@@ -318,8 +340,19 @@ class Message extends RestController
           }
           // hold the json for any descrepency in future
           $sRawJson = json_encode($_POST);
+          // if subject is matched with any previous mail and contains RE:
+          // then bind it to its respective group or sendgrid_message_id
 
+          $sReplySubject = trim(preg_replace("/re:/i","",$sSubject));
+          $oRowForGroupId = $this->SendgridMessage_model->whereSubject($sReplySubject,$sFrom);
+          $iGroupId = 0;
+          if($oRowForGroupId->id>0)
+          {
+            $iGroupId = $oRowForGroupId->id;
+          }
+          //error_log("subject: " . $sReplySubject . ", group:" . $iGroupId);
 //          error_log("$iEntityId,$sFrom,$sTo,$sSubject,$sMessage,$aFileName,$sEntityEmailHash");
+
           // log the sendgrid post back parse request
           $iId = $this->SendgridMessage_model->logInboxMail(
                                           $iEntityId,
@@ -329,7 +362,8 @@ class Message extends RestController
                                           $sSubject,
                                           $sMessage,
                                           $aFileName,
-                                          $sEntityEmailHash
+                                          $sEntityEmailHash,
+                                          $iGroupId,
                                         );
         }
 
@@ -597,7 +631,13 @@ class Message extends RestController
         {
             $this->load->model("SendgridMessage_model");
 
-            $aRecords = $this->SendgridMessage_model->getListEntity($id);
+            // for admin bring notes too
+            if(isAdmin())
+            {
+                $aRecords = $this->SendgridMessage_model->getListEntityAdmin($id);
+            } else {
+                $aRecords = $this->SendgridMessage_model->getListEntity($id);
+            }
 
             $this->response([
                 'status'=>true,

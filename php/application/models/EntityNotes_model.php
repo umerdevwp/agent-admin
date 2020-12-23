@@ -22,15 +22,15 @@ class EntityNotes_model extends ModelDefault {
      * Record the message send through sendgrid API
      * @param Integer $iEntityId entity id to send from/to
      */
-    public function add($iEntityId,$sSubject,$sMessage,$sFrom)
+    public function add($iEntityId,$sType,$sSubject,$sMessage,$sFrom)
     {
         $aData = [
             "entity_id" => $iEntityId,
             "from"  =>  $sFrom,
+            "type"=>    $sType,
             "subject"   =>  $sSubject,
             "message"   =>  $sMessage,
         ];
-        
         $iNewId = $this->insert($aData);
 
         return $iNewId;
