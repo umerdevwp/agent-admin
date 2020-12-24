@@ -15,7 +15,7 @@ import AddAttachmentForm from "../attachment/AddAttachmentForm";
 import Privacy from "../privacy/Privacy";
 import ExampleTable from "../entity/ExampleTable";
 import AdminAddAttachmentForm from "../attachment/AdminAttachmentForm";
-
+import MessageLog from '../message/MessageLog';
 export default withRouter(class AppWithRouterAccess extends Component {
     constructor(props) {
         super(props);
@@ -49,6 +49,7 @@ export default withRouter(class AppWithRouterAccess extends Component {
                     <SecureRoute exact={true} path="/attachment/form/add/:id" component={AddAttachmentForm}/>
                     <SecureRoute exact={true} path="/table" component={ExampleTable}/>
                     <SecureRoute exact={true} path="/admin/attachments" component={AdminAddAttachmentForm}/>
+                    <SecureRoute exact={true} path="/message/logs" component={MessageLog}/>
                 </UserContextProvider>
                 <Route exact={true} path='/login'
                        render={() => <Login baseUrl={process.env.REACT_APP_OKTA_BASE_URL}/>}/>

@@ -1,9 +1,10 @@
-import React, {useContext} from 'react';
+import React, {useContext, ReactDOM} from 'react';
 import Avatar from "@material-ui/core/Avatar";
 import {UserContext} from "../context/UserContext";
 import {object} from "prop-types";
 
 const NewChatPanel = () => {
+    const ref = React.createRef();
     const {attributes, loading, role, profile} = useContext(UserContext);
     const [inComingThreadID, setInComingThreadID] = React.useState('1');
     const [activeThread, setActiveThread] = React.useState('1');
@@ -19,6 +20,9 @@ const NewChatPanel = () => {
                     user: 'self',
                     message_type: 'sent',
                     message: 'How the hell am I supposed to get a jury to believe you when I am not even sure that I do?!',
+                    subject:'Lorem ipsum isk ksieks',
+                    sendTime: '2020-12-14 13:37:17',
+                    status: 'delivered',
 
                 },
 
@@ -27,6 +31,9 @@ const NewChatPanel = () => {
                     user: 'Omer Shafqat',
                     message_type: 'replies',
                     message: 'When you\'re backed against the wall, break the god damn thing down.',
+                    subject:'Lorem ipsum isk ksieks',
+                    sendTime: '2020-12-14 13:37:17',
+                    status: 'delivered',
 
                 }
             ]
@@ -43,6 +50,9 @@ const NewChatPanel = () => {
                     user: 'self',
                     message_type: 'sent',
                     message: 'This is the conversation number 2',
+                    subject:'Lorem ipsum isk ksieks',
+                    sendTime: '2020-12-14 13:37:17',
+                    status: 'delivered',
 
                 },
 
@@ -51,6 +61,9 @@ const NewChatPanel = () => {
                     user: 'Omer Shafqat',
                     message_type: 'replies',
                     message: 'When you\'re backed against the wall, break the god damn thing down.',
+                    subject:'Lorem ipsum isk ksieks',
+                    sendTime: '2020-12-14 13:37:17',
+                    status: 'delivered',
 
                 }
             ]
@@ -66,6 +79,9 @@ const NewChatPanel = () => {
                     user: 'self',
                     message_type: 'sent',
                     message: 'This is the conversation number 3',
+                    subject:'Lorem ipsum isk ksieks',
+                    sendTime: '2020-12-14 13:37:17',
+                    status: 'delivered',
 
                 },
 
@@ -74,6 +90,9 @@ const NewChatPanel = () => {
                     user: 'Omer Shafqat',
                     message_type: 'replies',
                     message: 'When you\'re backed against the wall, break the god damn thing down.',
+                    subject:'Lorem ipsum isk ksieks',
+                    sendTime: '2020-12-14 13:37:17',
+                    status: 'delivered',
 
                 }
             ]
@@ -89,6 +108,9 @@ const NewChatPanel = () => {
                     user: 'self',
                     message_type: 'sent',
                     message: 'This is the conversation number 4',
+                    subject:'Lorem ipsum isk ksieks',
+                    sendTime: '2020-12-14 13:37:17',
+                    status: 'delivered',
 
                 },
 
@@ -97,6 +119,9 @@ const NewChatPanel = () => {
                     user: 'Omer Shafqat',
                     message_type: 'replies',
                     message: 'When you\'re backed against the wall, break the god damn thing down.',
+                    subject:'Lorem ipsum isk ksieks',
+                    sendTime: '2020-12-14 13:37:17',
+                    status: 'delivered',
 
                 }
             ]
@@ -113,6 +138,9 @@ const NewChatPanel = () => {
                     user: 'self',
                     message_type: 'sent',
                     message: 'This is the conversation number 5',
+                    subject:'Lorem ipsum isk ksieks',
+                    sendTime: '2020-12-14 13:37:17',
+                    status: 'delivered',
 
                 },
 
@@ -121,6 +149,9 @@ const NewChatPanel = () => {
                     user: 'Omer Shafqat',
                     message_type: 'replies',
                     message: 'When you\'re backed against the wall, break the god damn thing down.',
+                    subject:'Lorem ipsum isk ksieks',
+                    sendTime: '2020-12-14 13:37:17',
+                    status: 'delivered',
 
                 }
             ]
@@ -137,6 +168,9 @@ const NewChatPanel = () => {
                     user: 'self',
                     message_type: 'sent',
                     message: 'This is the conversation number 6',
+                    subject:'Lorem ipsum isk ksieks',
+                    sendTime: '2020-12-14 13:37:17',
+                    status: 'delivered',
 
                 },
 
@@ -145,6 +179,9 @@ const NewChatPanel = () => {
                     user: 'Omer Shafqat',
                     message_type: 'replies',
                     message: 'When you\'re backed against the wall, break the god damn thing down.',
+                    subject:'Lorem ipsum isk ksieks',
+                    sendTime: '2020-12-14 13:37:17',
+                    status: 'delivered',
 
                 }
             ]
@@ -200,22 +237,23 @@ const NewChatPanel = () => {
             return false;
         }
         const id = Math.floor((Math.random() * 10) + 1);
-        const inputMessage = {
-            id: id.toString(),
-            user: 'self',
-            message_type: 'sent',
-            message: message,
 
-        }
+
+
 
         const elementsIndex = threads.findIndex(element => element.id === activeThread)
+        const subjectaa = threads[elementsIndex].messages[0].subject;
+
         let newArray = [...threads];
         newArray[elementsIndex] = {
             ...newArray[elementsIndex], messages: [...newArray[elementsIndex].messages, {
                 id: id.toString(),
                 user: 'self',
                 message_type: 'sent',
+                sendTime: '2020-12-14 13:37:17',
+                subject: subjectaa,
                 message: message,
+                status: 'delivered',
             }]
         }
         setThreads(newArray);
@@ -265,7 +303,22 @@ const NewChatPanel = () => {
                                 <li key={index} className={anObjectMapped.message_type}>
                                     {/*<Avatar alt={anObjectMapped.user} />*/}
                                     <Avatar>{anObjectMapped.user === 'self' ? getInitials(profile.name) : getInitials(anObjectMapped.user)}</Avatar>
-                                    <p>{anObjectMapped.message}</p>
+
+                                    <p>
+                                        <span><strong>    Subject -</strong> {anObjectMapped.subject}</span>
+                                        {anObjectMapped.message}
+
+                                        <div className="message-info" >
+                                            <div className="message-time">
+                                                <span>{anObjectMapped.sendTime}</span>
+                                            </div>
+
+                                            <div className="message-status">
+                                                <span>{anObjectMapped.status}</span>
+                                            </div>
+                                        </div>
+                                    </p>
+
                                 </li>
                             )
 
@@ -280,7 +333,20 @@ const NewChatPanel = () => {
                                 <li key={index} className={anObjectMapped.message_type}>
                                     {/*<Avatar alt={anObjectMapped.user} />*/}
                                     <Avatar>{anObjectMapped.user === 'self' ? getInitials(profile.name) : getInitials(anObjectMapped.user)}</Avatar>
-                                    <p>{anObjectMapped.message}</p>
+                                    <p id={index}  ref={ref} ><span>Subject: {anObjectMapped.subject}</span>{anObjectMapped.message}
+                                        <div className="message-info" >
+                                            <div className="message-time">
+                                                <span>{anObjectMapped.sendTime}</span>
+                                            </div>
+
+                                            <div className="message-status">
+                                                <span>{anObjectMapped.status}</span>
+                                            </div>
+                                        </div>
+                                    </p>
+
+
+
                                 </li>
                             ) : ''
                         }

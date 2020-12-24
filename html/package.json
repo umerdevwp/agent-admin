@@ -33,6 +33,7 @@
     "react-responsive": "^8.1.1",
     "react-router-dom": "^5.1.2",
     "react-scripts": "^3.4.4",
+    "react-toastify": "^6.2.0",
     "reactstrap": "^8.7.1",
     "recharts": "^1.8.5",
     "smartystreets-javascript-sdk": "^1.6.0",
