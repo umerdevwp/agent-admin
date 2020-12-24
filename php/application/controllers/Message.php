@@ -15,19 +15,124 @@ include APPPATH . '/libraries/CommonDbTrait.php';
 
 class Message extends RestController
 {
+    /** codes that are used in templates */
+    private $aShortcode = ['entity'=>
+            [
+                '[Company Name]'=>'name',
+                '[Formation State]'=>'filingState',
+                '[Forwarding Address]'=>'shippingStreet,shippingStreet2',
+                '[Forwarding City]'=>'shippingCity',
+                '[Forwarding State]'=>'shippingState',
+                '[Forwarding Zip]'=>'shippingCode',
+            ],
+        'contact'=>
+            [
+                '[First Name]'=>'firstName',
+                '[Last Name]'=>'lastName',
+            ]
+        ,
+        'agent'=>
+            [
+                '[RA Amount Due]'=>'ra_due_amount',
+                '[RA Date Due]'=>'ra_due_date',
+                '[RA Renewal Amount]'=>'ra_renewal_amount'        
+            ]        
+    ];
     /**
-     * Send mail using sendgrid API
+     * Replace shortcodes with actual entity/contact values
+     * shortcordes from private class variables $aShortcode
+     * values are taken from provided object of respective shortcodes
+     */
+    public function replaceShortcode($sMessageWithShortcodes,$oObjectHavingVariables,$sReplaceType='entity')
+    {
+        $aShortcode = $this->aShortcode[$sReplaceType];
+
+        $sMessage = $sMessageWithShortcodes;
+        $aObjectHavingVariables = json_decode(json_encode($oObjectHavingVariables),true);
+
+        foreach($aShortcode as $k=>$v)
+        {
+            // replace single variable with single value
+            $sValue = $aObjectHavingVariables[$v];
+
+            // check there r more then 2 replaces required
+            if(strpos($v,",")!==false)
+            {
+                $aCsvFields = explode(",",$v);
+                // replace the multiple varialbes
+                foreach($aCsvFields as $v2)
+                {
+                    $sValue .= " ".$aObjectHavingVariables[$v2];
+                }
+                // remove addition spaces
+                $sValue = trim($sValue);
+            }
+            // finally exchange values
+            $sMessage = str_replace($k,$sValue,$sMessage);
+        }
+
+        return $sMessage;
+    }
+
+    /**
+     * Add note to entity profile, similar to message but
+     * stored in note table
+     * @param int $iEntityId entity id
+     * @param string $sSubject title of note
+     * @param string $sMessage written content of the message
+     */
+    public function addNote($iEntityId,$sSubject,$sMessage)
+    {
+        if(isAdmin())
+        {
+            $this->load->model("EntityNotes_model");
+            $sType = $this->input->post("type");
+            if(empty($sType))
+                $sType = "notes";
+
+            $iNewNoteId = $this->EntityNotes_model->add($iEntityId,$sType,$sSubject,$sMessage,$_SESSION['eid']);
+            
+            if($iNewNoteId>0)
+            {
+                $this->response([
+                    'status' => true,
+                    'message' => 'Message sent successfully'
+                ], 200);
+            } else {
+                $this->response([
+                    'status' => false,
+                    'message'=> "Unable to add note to entity"
+                ], 500);
+            }
+        } else {
+            $this->response([
+                'status' => false,
+                'message'=> "No such request found."
+            ], 404);
+        }
+    }
+
+    /**
+     * Send mail using sendgrid API,
+     * note can also submit using this call, note parameter must exist as 1
      * 
      */
     public function send_post()//$sEmail,$sName,$sState,$sEntityType,$sDate,$sPurpose="recurring")
     {
         $iEid = $this->input->post("eid");
+        $iGroupId = (int)$this->input->post("gid");
+
         $iParentId = $_SESSION['eid'];
 
         $this->load->model("entity_model");
-        // check valid parent is shooting mail for entity, if is parent
-        $bIsParentValid = $this->entity_model->isParentOf($iEid, $iParentId);
-        
+        // don't validate when user is admin
+        if(!isAdmin())
+        {
+            // check valid parent is shooting mail for entity, if is parent
+            $bIsParentValid = $this->entity_model->isParentOf($iEid, $iParentId);
+        } else {
+            $bIsParentValid = true;
+        }        
         // if entity is not authorized to send mail for entity block access
         if(!$bIsParentValid)
         {
@@ -82,20 +187,39 @@ class Message extends RestController
             ], 404);
         }
 
+        // if message is a note then record and exit;
+        if((int)$this->input->post("note")===1)
+        {
+            $this->addNote($iEid,$sSubject,$sMessage);
+            exit();
+        }
+
         // if entity send to admin
         if(!isAdmin())
         {
-          // set details for entity mailing admin
-          $sFrom = $sEntityEmail;
-          $sFromName = $sEntityName;
-          $sTo = getenv("NOTIFICATION_FROM_EMAIL");//"kamran@mts.youragentservices.com";//getenv("NOTIFICATION_FROM_EMAIL");
-          $sToName = "Agent Admin Support";
+            // set details for entity mailing admin
+            $sFrom = $sEntityEmail;
+            $sFromName = $sEntityName;
+            $sTo = getenv("NOTIFICATION_FROM_EMAIL");//"kamran@mts.youragentservices.com";//getenv("NOTIFICATION_FROM_EMAIL");
+            $sToName = "Agent Admin Support";
         } else {
-          // set details for admin mailing entity
-          $sFrom = getenv("NOTIFICATION_FROM_EMAIL");
-          $sFromName = "Agent Admin Support";
-          $sTo = $sEntityEmail;
-          $sToName = $sEntityName;
+            // set details for admin mailing entity
+            $sFrom = getenv("NOTIFICATION_FROM_EMAIL");
+            $sFromName = "Agent Admin Support";
+            $sTo = $sEntityEmail;
+            $sToName = $sEntityName;
+            
+
+            // replace entity shortcode
+            $sMessage = $this->replaceShortcode($sMessage,$oEntity,'entity');
+            // replace RA shortcode
+            $this->load->model("Contacts_model");
+            $oContact = $this->Contacts_model->getPrimaryFromEntityId($iEid);
+            // if contact found replace variables
+            if(is_object($oContact))
+            $sMessage = $this->replaceShortcode($sMessage,$oContact,'contact');
+            // replace Contact shortcode
+//            $sMessage = $this->replaceShortcode($sMessage,$oContact,'contact');
         }
 
         // generate hash for easy search email
@@ -113,7 +237,7 @@ class Message extends RestController
 
           // record the details for log or trackings
           $this->load->model("SendgridMessage_model");          
-          $iInsertId = $this->SendgridMessage_model->logOutboxMail($iEid,$iMessageId,$sTo,$sFrom,$sSubject,$sMessage,$sEntityEmailHash);
+          $iInsertId = $this->SendgridMessage_model->logOutboxMail($iEid,$iMessageId,$sTo,$sFrom,$sSubject,$sMessage,$sEntityEmailHash,$iGroupId);
 
         // report to admin on failure             
         if(!$iInsertId)
@@ -149,6 +273,7 @@ class Message extends RestController
         $sFromName = $this->input->post("from");
 
         $sHeaders = $this->input->post("headers"); // for date received parse
+
 //        error_log($sHeaders);
 //        error_log(strpos($sHeaders,"Received: from o1.ptr9325.smallbiz.com"));
 //        error_log(substr($sHeaders,strpos($sHeaders,"Received: from o1.ptr9325.smallbiz.com")-50));
@@ -173,13 +298,27 @@ class Message extends RestController
         {
           $sMessage = $this->input->post("text");
         }
+        
+        if(empty($sMessage))
+            $sMessage = "";
+
         $sSubject = $this->input->post("subject");
+
+
+        if(empty($sSubject) && empty($sMessage))
+        {
+            logToAdmin("Sendgrid receive subject/message missing","Sendgrid Parse API json: " . json_encode($_POST),'SENDGRID');
+            die("No subject/message");
+        }
+
         $num_attachments = (int)$this->input->post("attachments");
         // check for attachments and upload to temp
         $aFileName = $this->uploadMailFiles($num_attachments);
+
         // valid email can be recorded
         if(filter_var($sFrom, FILTER_VALIDATE_EMAIL))
         {
+
           $this->load->model("entity_model");
           $aEntity = $this->entity_model->getEmailId($sFrom);
           // entity found against email from entity
@@ -187,10 +326,12 @@ class Message extends RestController
           {
             $iEntityId = $aEntity['results']->id;
             $sEntityEmailHash = generateHash($sFrom);
+//            echo strpos($sHeaders,"o1.ptr9325.smallbiz.com");die;
+
             // if email is for admin then avoid loging as it is logged on sent event
             if(strpos($sHeaders,"o1.ptr9325.smallbiz.com")>0)
             {
-              error_log("Skip loging, AgentAdmin mail sent to itself by entity: " . $iEntityId . " to admin: " . getenv("NOTIFICATION_FROM_EMAIL"));
+              logToAdmin("Sendgrid Parse Post","Skip loging, AgentAdmin mail sent to itself by entity: " . $iEntityId . " to admin: " . getenv("NOTIFICATION_FROM_EMAIL"),"SENDGRID");
               die;
             }
           } else {
@@ -199,8 +340,19 @@ class Message extends RestController
           }
           // hold the json for any descrepency in future
           $sRawJson = json_encode($_POST);
+          // if subject is matched with any previous mail and contains RE:
+          // then bind it to its respective group or sendgrid_message_id
 
+          $sReplySubject = trim(preg_replace("/re:/i","",$sSubject));
+          $oRowForGroupId = $this->SendgridMessage_model->whereSubject($sReplySubject,$sFrom);
+          $iGroupId = 0;
+          if($oRowForGroupId->id>0)
+          {
+            $iGroupId = $oRowForGroupId->id;
+          }
+          //error_log("subject: " . $sReplySubject . ", group:" . $iGroupId);
 //          error_log("$iEntityId,$sFrom,$sTo,$sSubject,$sMessage,$aFileName,$sEntityEmailHash");
+
           // log the sendgrid post back parse request
           $iId = $this->SendgridMessage_model->logInboxMail(
                                           $iEntityId,
@@ -210,7 +362,8 @@ class Message extends RestController
                                           $sSubject,
                                           $sMessage,
                                           $aFileName,
-                                          $sEntityEmailHash
+                                          $sEntityEmailHash,
+                                          $iGroupId,
                                         );
         }
 
@@ -221,6 +374,11 @@ class Message extends RestController
       }
     }
 
+    /**
+     * Upload attachments of entity/customer mails are stored on temp
+     * to be checked/validated
+     * @param int $iNumAttachments total attachments present in posted file variable
+     */
     private function uploadMailFiles(int $iNumAttachments=0)
     {
       $aFileName = [];
@@ -250,7 +408,7 @@ class Message extends RestController
      * Used in cron to check statuses in sendgrid of the mails sent
      * for attachments reminder, ruling subscription, interface messages
      */
-    public function logMailStatus_get($key="")
+    public function cronLogMailStatus_get($key="")
     {
         if($key!=getenv("CRON_KEY")) redirectSession();
 
@@ -280,16 +438,8 @@ class Message extends RestController
         
                 if(count($oJson->messages)>0)
                 {
-                    $sPrevStatusJson = $v->sg_status;
-                    if(empty($sPrevStatusJson))
-                    {
-                        $this->SendgridMessage_model->updateMailLog($v->id, $oJson->messages[0]->status,json_encode($oJson));
-                    } else {
-                        $oMessage = $oJson->messages[0];
-                        $this->SendgridMessage_model->updateMailLog($v->id, $oJson->messages[0]->status,
-                        $sPrevStatusJson.",".$oMessage->status.",".$oMessage->opens_count.",".$oMessage->clicks_count.",".$oMessage->last_event_time);
-                    }
-
+                    $oMessage = $oJson->messages[0];
+                    $this->SendgridMessage_model->updateMailLog($v->id, json_encode($oJson),$oMessage->status,$oMessage->opens_count,$oMessage->clicks_count,$oMessage->last_event_time);
                     $iRecordsUpdated++;
                 } else {
                     logToAdmin("Sengrid log not found","For msgid: $sMsgId " . json_encode($oJson),"CRON");
@@ -307,7 +457,7 @@ class Message extends RestController
      * and check if the mail send day has arrive based on days_before
      * and month_before configuration in the table notification_subscription
      */
-    public function notifyForSubscription_get($key="")
+    public function cronNotifyForSubscription_get($key="")
     {
         if($key!=getenv("CRON_KEY")) redirectSession();
 
@@ -381,7 +531,7 @@ class Message extends RestController
     /**
      * Used in cron to shoot mails to entity that have notification pending
      */
-    public function notifyForAttachments_get($key="")
+    public function cronNotifyForAttachments_get($key="")
     {
         if($key!=getenv("CRON_KEY")) redirectSession();
 
@@ -471,4 +621,33 @@ class Message extends RestController
         echo "Notify For Attacchment Cron Succeed: {$iMailsSent} sent";
         logToAdmin("Notify Attachment Cron succeed","Total mails sent: {$iMailsSent}","CRON");
     }
+
+    /**
+     * List all the messages of entity and system/admin
+     */
+    public function list_get(int $id=null)
+    {
+        if($id>0)
+        {
+            $this->load->model("SendgridMessage_model");
+
+            // for admin bring notes too
+            if(isAdmin())
+            {
+                $aRecords = $this->SendgridMessage_model->getListEntityAdmin($id);
+            } else {
+                $aRecords = $this->SendgridMessage_model->getListEntity($id);
+            }
+
+            $this->response([
+                'status'=>true,
+                'data' => $aRecords
+            ], 200);
+        } else {
+            $this->response([
+                'status'=>false,
+                'message' => 'Entity must exist in the request'
+            ], 302);
+        }
+    } 
 }
