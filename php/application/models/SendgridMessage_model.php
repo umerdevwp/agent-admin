@@ -15,7 +15,7 @@ class SendgridMessage_model extends ModelDefault {
             "updated"   => "updated",
             "sgStatus"  => "sg_status",
             "status"    => "status",
-            "entityEmailHash"=> "entity_email_hash",
+            "entityEmailHash"=>"entity_email_hash",
             "rawJson"   => "raw_json",
             "from"      => "from",
             "attachments"=> "attachments",
@@ -31,8 +31,8 @@ class SendgridMessage_model extends ModelDefault {
 
     public function __construct()
     {
-        parent::__construct();
         $this->_table = $this->sTable;
+        parent::__construct();
     }
 
     /**
@@ -210,7 +210,7 @@ class SendgridMessage_model extends ModelDefault {
 SELECT id,`to`,`from`,entity_id,send_time AS sendTime,subject,message,status,group_id AS gid
 FROM {$this->sTable} WHERE entity_id={$iEntityId}
 UNION
-SELECT id,'','',entity_id,added AS sendTime, subject,message,'',0
+SELECT id,'','',entity_id,added AS sendTime, subject,message,type AS status,0
 FROM entity_notes WHERE entity_id={$iEntityId}
 ORDER BY sendTime ASC
 ";

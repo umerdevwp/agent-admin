@@ -124,6 +124,14 @@ class Message extends RestController
 
         $iParentId = $_SESSION['eid'];
 
+        if(empty($iParentId))
+        {
+            $this->response([
+                'status' => false,
+                'message'=> "Not authorized to access entity"
+            ], 403);
+        }
+
         $this->load->model("entity_model");
         // don't validate when user is admin
         if(!isAdmin())
@@ -132,7 +140,8 @@ class Message extends RestController
             $bIsParentValid = $this->entity_model->isParentOf($iEid, $iParentId);
         } else {
             $bIsParentValid = true;
-        }        
+        }
+
         // if entity is not authorized to send mail for entity block access
         if(!$bIsParentValid)
         {
@@ -171,12 +180,12 @@ class Message extends RestController
         // check subject empty
         if(empty($sSubject))
         {
-            $aError[] = "Subject cannot be empty, please add subject";
+            $aError['subject'] = "Subject cannot be empty, please add subject";
         }
         // check content empty
         if(empty($sMessage))
         {
-            $aError[] = "Message cannot be blank, please add message";
+            $aError['message'] = "Message cannot be blank, please add message";
         }
         // check request parameter error found
         if(count($aError))
@@ -314,6 +323,11 @@ class Message extends RestController
         $num_attachments = (int)$this->input->post("attachments");
         // check for attachments and upload to temp
         $aFileName = $this->uploadMailFiles($num_attachments);
+        if(count($aFileName)>0)
+        {
+            foreach($aFileName as $sFileName)
+            $sMessage .= "<br/>" . getenv("SITE_MAIN_URL")."temp786/".$sFileName;
+        }
 
         // valid email can be recorded
         if(filter_var($sFrom, FILTER_VALIDATE_EMAIL))
@@ -384,16 +398,20 @@ class Message extends RestController
       $aFileName = [];
 
       if($iNumAttachments){
+
+        $iAllowedSize = 10*1000*1000; // 10 Mb
+        $sUploadDir = getenv("ROOT_PATH") . getenv("UPLOAD_PATH");
         foreach($_FILES as $aFile) {
 
           $sName = uniqid()."-".$aFile['name'];
-          
-          if(!empty($aFile['tmp_name']) && strpos($aFile['type'],"pdf")!==false && $aFile['size']<100000)
+
+          if(!empty($aFile['tmp_name']) && strpos($aFile['type'],"pdf")!==false && $aFile['size']<$iAllowedSize)
           {
             $result = move_uploaded_file(
               $aFile['tmp_name'],
-              $_SERVER['DOCUMENT_ROOT']."/"."temp786/".$sName
+              $sUploadDir . $sName
             );
+            
             $aFileName[] = $sName;
           } else {
             //error_log("File in mail not valid: " . print_r($aFile,true));
@@ -410,6 +428,7 @@ class Message extends RestController
      */
     public function cronLogMailStatus_get($key="")
     {
+
         if($key!=getenv("CRON_KEY")) redirectSession();
 
         $this->load->model("SendgridMessage_model");
@@ -422,8 +441,8 @@ class Message extends RestController
         //$sResult = $this->Messenger_model->fetchStatus(['msg_id LIKE "'.$sMsgId.'%"', 'to_email LIKE "'.$sToEmail.'"']);
         //$sResult = $this->Messenger_model->fetchStatusBetweenDate($sDateTime1,$sDateTime2);
         //$sResult = $this->Messenger_model->fetchStatusMsgId("YhTbHYXjSU2cwE9UN2j-ng");
-        
         $iRecordsUpdated = 0;
+
         if($aData)
         {
             foreach($aData as $v)
@@ -435,7 +454,7 @@ class Message extends RestController
                 //$sResult = $this->Messenger_model->fetchStatus(['msg_id LIKE "'.$sMsgId.'%"', 'to_email LIKE "'.$sToEmail.'"']);
                 //$sResult = $this->Messenger_model->fetchStatusMsgIdCurl($sMsgId,$sToEmail);
                 $oJson = $this->Messenger_model->fetchStatusMsgId($sMsgId);
-        
+
                 if(count($oJson->messages)>0)
                 {
                     $oMessage = $oJson->messages[0];
@@ -635,13 +654,15 @@ class Message extends RestController
             if(isAdmin())
             {
                 $aRecords = $this->SendgridMessage_model->getListEntityAdmin($id);
+                $aNewRecords = $this->setParentHirarchy($aRecords);
             } else {
                 $aRecords = $this->SendgridMessage_model->getListEntity($id);
+                $aNewRecords = $this->setParentHirarchy($aRecords);
             }
 
             $this->response([
                 'status'=>true,
-                'data' => $aRecords
+                'data' => $aNewRecords
             ], 200);
         } else {
             $this->response([
@@ -650,4 +671,41 @@ class Message extends RestController
             ], 302);
         }
     } 
+
+    /**
+     * Convert db records to hirarchy of parent child messages for message interface and groupings
+     */
+    private function setParentHirarchy(array $aDbRecords)
+    {
+        $aChildRecords = [];
+        $aParentRecords = [];
+        $aNewRecords = [];
+
+        // seprate child and parent from records
+        foreach($aDbRecords as $k=>$v)
+        {
+            // there may be no child, so initiate it empty
+            if(!isset($aChildRecords[$v->gid])) $aChildRecords[$v->gid] = [];
+
+            if($v->gid>0)
+            {
+                $aChildRecords[$v->gid][] = $v;
+            } else {
+                $aParentRecords[] = $v;
+            }
+        }
+
+        // assign child to parent array as child attribute, create new records array
+        foreach($aParentRecords as $v2)
+        {
+            $aParent = (array)$v2;
+            
+            $aParent['child'] = $aChildRecords[$v2->id];
+            if($aParent['child']==null) $aParent['child'] = [];
+
+            $aNewRecords[] = (object)$aParent;
+        }
+
+        return $aNewRecords;
+    }
 }
