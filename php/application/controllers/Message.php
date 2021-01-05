@@ -208,12 +208,14 @@ class Message extends RestController
         {
             // set details for entity mailing admin
             $sFrom = $sEntityEmail;
+            $iFromEid = $iEid;
             $sFromName = $sEntityName;
             $sTo = getenv("NOTIFICATION_FROM_EMAIL");//"kamran@mts.youragentservices.com";//getenv("NOTIFICATION_FROM_EMAIL");
             $sToName = "Agent Admin Support";
         } else {
             // set details for admin mailing entity
             $sFrom = getenv("NOTIFICATION_FROM_EMAIL");
+            $iFromEid = 0;
             $sFromName = "Agent Admin Support";
             $sTo = $sEntityEmail;
             $sToName = $sEntityName;
@@ -246,7 +248,7 @@ class Message extends RestController
 
           // record the details for log or trackings
           $this->load->model("SendgridMessage_model");          
-          $iInsertId = $this->SendgridMessage_model->logOutboxMail($iEid,$iMessageId,$sTo,$sFrom,$sSubject,$sMessage,$sEntityEmailHash,$iGroupId);
+          $iInsertId = $this->SendgridMessage_model->logOutboxMail($iEid,$iMessageId,$sTo,$sFrom,$sSubject,$sMessage,$sEntityEmailHash,$iFromEid,$iGroupId);
 
         // report to admin on failure             
         if(!$iInsertId)
@@ -707,5 +709,176 @@ class Message extends RestController
         }
 
         return $aNewRecords;
+    }
+
+    /**
+     * Get messages that are listed as read or unread based on read bit in request 3rd argument
+     * @param number $iEntityId is required otherwise admin is used if admin
+     * @param number $iReadBit can be used to fetch read request too by default unread list
+     */
+    public function read_get(int $iEntityId=0, int $iReadBit=0)
+    {
+        $this->load->model("SendgridMessage_model");
+
+        if($iEntityId==0 && !isAdmin())
+        {
+            $this->response([
+                'status'=>false,
+                'message' => 'Entity id must exist in the request'
+            ], 404);
+        }
+
+        if(isAdmin())
+        {
+            $aRecords = $this->SendgridMessage_model->readCountAdmin($iReadBit);
+        } else {
+            $this->load->model("entity_model");
+            $iParentId = $_SESSION['eid'];
+            // check valid parent is shooting mail for entity, if is parent
+            $bIsParentValid = $this->entity_model->isParentOf($iEntityId, $iParentId);
+            
+            // if entity is not authorized to send mail for entity block access
+            if(!$bIsParentValid)
+            {
+                $this->response([
+                    'status' => false,
+                    'message'=> "Not authorized to access entity"
+                ], 404);
+            } else {
+                $aChildEntity = $this->entity_model->getEntityIdOfParent($iParentId);
+                // add own parent id to the csv list for all records
+                $sCsvEid = $iParentId;
+                foreach($aChildEntity as $v)
+                {
+                    $sCsvEid .= ",".$v->id;
+                }
+            }
+
+            $aRecords = $this->SendgridMessage_model->readCount($sCsvEid,$iReadBit);
+        }
+        $this->response([
+            'status'=>true,
+            'data' => $aRecords
+        ], 200);
+    }
+
+    /**
+     * Mark unread messages as read
+     * 
+     * @param number $iEntityId for specific entity messages commonly logged in
+     */
+    public function checked_get(int $iEntityId=0)
+    {
+        $this->load->model("SendgridMessage_model");
+        if(isAdmin())
+        {
+            $iAdmin = 1;
+        } else {
+            $iAdmin = 0;
+        }
+        
+        $this->load->model("entity_model");
+        $iParentId = $_SESSION['eid'];
+        // check valid parent is shooting mail for entity, if is parent
+        $bIsParentValid = $this->entity_model->isParentOf($iEntityId, $iParentId);
+        if($bIsParentValid || isAdmin())
+        {
+            $aChildEntity = $this->entity_model->getEntityIdOfParent($iParentId);
+            // add own parent id to the csv list for all records
+            $sCsvEid = $iParentId;
+            foreach($aChildEntity as $v)
+            {
+                $sCsvEid .= ",".$v->id;
+            }
+
+            $this->SendgridMessage_model->updateChecked($sCsvEid,$iAdmin);
+        } else {
+            $this->response([
+                'status' => false,
+                'message'=> "Not authorized to access entity"
+            ], 404);
+        }
+        
+        $this->response([
+            'status'=>true,
+            'data' => "Updated successfully",
+        ], 200);
+    }
+
+    /**
+     * Get last recent messages to always show within profile notification box
+     */
+    public function recent_get()
+    {
+        $iParentId = $_SESSION['eid'];
+        $this->load->model("entity_model");
+        $this->load->model("SendgridMessage_model");
+        
+        if($iParentId>0 && !isAdmin())
+        {
+
+
+            $aChildEntity = $this->entity_model->getEntityIdOfParent($iParentId);
+            // add own parent id to the csv list for all records
+            $sCsvEid = $iParentId;
+            foreach($aChildEntity as $v)
+            {
+                $sCsvEid .= ",".$v->id;
+            }
+
+            $aRecords = $this->SendgridMessage_model->getRecent($iParentId);
+            
+            $this->response([
+                'status'=>true,
+                'data' => $aRecords
+            ], 200);
+
+        } else if(isAdmin())
+        {
+            $aRecords = $this->SendgridMessage_model->getRecent($iParentId,isAdmin());
+            
+            $this->response([
+                'status'=>true,
+                'data' => $aRecords
+            ], 200);
+        
+        } else {
+            $this->response([
+                'status' => false,
+                'message'=> "User must be login"
+            ], 404);
+        }
+    }
+
+    /**
+     * Search messages based on optional entity id and optional date input
+     * by default search last week onwards records
+     * 
+     */
+    public function search_post()
+    {
+
+        if(!isAdmin())
+        {
+            $this->response([
+                'status' => false,
+                'message'=> "Not authorized to access request"
+            ], 403);
+        }
+        
+        $iEntityId = $this->input->post("eid")?:0;
+        $sDate = $this->input->post("date")?:"last week";
+
+        $sDate = date("Y-m-d",strtotime($sDate));
+
+        $this->load->model("SendgridMessage_model");
+
+        $aRecords = $this->SendgridMessage_model->search($iEntityId,$sDate);
+
+        $this->response([
+            'status'=>true,
+            'data' => $aRecords
+        ], 200);
+
     }
 }
