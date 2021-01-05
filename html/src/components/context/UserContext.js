@@ -3,6 +3,7 @@ import {withOktaAuth} from '@okta/okta-react';
 import {useOktaAuth} from "@okta/okta-react";
 import {fetchUserProfile} from "../api/OKTA";
 import {checkRole} from '../api/enitity.crud';
+import moment from "moment";
 
 
 export const UserContext = createContext(
@@ -14,8 +15,9 @@ export const UserContext = createContext(
         profile: '',
         attributes: [],
         loading: false,
-        errorList:[],
-        currentEntity:[]
+        errorList: [],
+        currentEntity: [],
+        userMessages: []
     }
 );
 
@@ -31,26 +33,27 @@ function UserContextProvider(props) {
     const [appLoader, setAppLoader] = useState({loading: false});
     const [errorList, setErrorList] = useState([]);
     const [currentEntity, setCurrentEntity] = useState([]);
+    const [userMessages, setUserMessages] = useState([]);
     const [role, setRole] = useState({});
+    const [outerThreads, setOuterThreads] = useState(false);
     React.useEffect(() => {
         const okta = localStorage.getItem('okta-token-storage');
         if (okta !== '{}' && okta !== null && okta !== undefined) {
-
             initialUtliz();
         }
     }, []);
 
 
-    React.useEffect(()=>{
+    React.useEffect(() => {
         if (errorList !== undefined || errorList.length !== 0) {
             errorList.map((value, index) => {
-               setTimeout(()=>{
-                   removeError(index);
-               }, 6000)
+                setTimeout(() => {
+                    removeError(index);
+                }, 6000)
             })
         }
 
-    },[errorList])
+    }, [errorList])
 
 
     const initialUtliz = async () => {
@@ -65,9 +68,9 @@ function UserContextProvider(props) {
             await getUserRole(result_attributes.profile, tokenOKTA);
         }
 
-        setInterval(()=>{
+        setInterval(() => {
             setAppLoader({...appLoader, loading: true});
-        },4000)
+        }, 4000)
 
 
     }
@@ -150,7 +153,7 @@ function UserContextProvider(props) {
     }
 
     const updateCurrentEntity = (data) => {
-         setCurrentEntity(data)
+        setCurrentEntity(data)
     }
 
 
@@ -165,6 +168,41 @@ function UserContextProvider(props) {
 
     const changeDrawer = (data) => {
         setDrawerState(data);
+    }
+
+
+    const setUserMessagesForInbox = (data) => {
+        setUserMessages(data);
+    }
+    const manageOuterThreads = (data) => {
+        setOuterThreads(data);
+    }
+
+    const addMessage = (data, message, UserRole, currentUser) => {
+        const id = Math.floor((Math.random() * 10) + 1);
+        let newDate = moment().format("YYYY-MM-DD hh:mm:ss");
+        const from_eid = UserRole === 'Administrator' ? '0' : currentUser;
+
+        const elementsIndex = userMessages.findIndex(element => element.id === data.id)
+        const Subject = 'RE: '+userMessages[elementsIndex].subject;
+
+        let newArray = [...userMessages];
+        newArray[elementsIndex] = {
+            ...newArray[elementsIndex], child: [...newArray[elementsIndex].child, {
+                id: id.toString(),
+                entity_id: data.entity_id,
+                fromEid: from_eid,
+                from: "najm@mts.youragentservices.com",
+                gid: data.id,
+                message: message,
+                sendTime: newDate,
+                status: "delivered",
+                subject: Subject,
+                to: "najm.a@allshorestaffing.com",
+
+            }]
+        }
+        setUserMessages(newArray);
     }
 
 
@@ -184,7 +222,12 @@ function UserContextProvider(props) {
                 changeDrawer,
                 removeError,
                 updateCurrentEntity,
-                currentEntity
+                currentEntity,
+                setUserMessagesForInbox,
+                userMessages,
+                addMessage,
+                outerThreads,
+                manageOuterThreads
             }}>
             {props.children}
         </UserContext.Provider>

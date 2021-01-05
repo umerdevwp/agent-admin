@@ -156,9 +156,13 @@ const AdminSendMessageForm = (props) => {
     }, [loading]);
 
     const getTemplateList = async () => {
-        await TemplateList().then(response => {
-            setTemplates(response.data.results);
-        })
+        try {
+            await TemplateList().then(response => {
+                setTemplates(response.data.results);
+            })
+        } catch (e) {
+            addError(e)
+        }
     }
 
     const sendMessageSubmission = async (event) => {
@@ -272,10 +276,13 @@ const AdminSendMessageForm = (props) => {
         if (newValue.id) {
             await getTemplate(newValue.id).then(response => {
                 if (response.status === true) {
-                    setContent({...content, value: response.data.message})
+                    setContent({...content, value: response.data.message});
+                    setSubject({...subject, value:newValue.subject});
                     setApiLoading(false);
                 }
             })
+        } else {
+            setApiLoading(false);
         }
     }
 

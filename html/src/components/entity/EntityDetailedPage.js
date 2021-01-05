@@ -200,7 +200,7 @@ MySnackbarContentWrapper.propTypes = {
 const EntityDetailedPage = (props) => {
 
     const entity_id = props.match.params.id;
-
+    localStorage.setItem('activeEntityID', props.match.params.id);
 
     const {loading, attributes, addError, errorList, role, addTitle, profile} = useContext(UserContext);
     const checkRole = role ? role : localStorage.getItem('role');
@@ -569,8 +569,9 @@ const EntityDetailedPage = (props) => {
                                 <Button variant="outlined" color="primary" className={'sendMessageButton'}
                                         onClick={(event) => toggleDrawer(event, true)}>Send Message</Button>
                             </div>
-                            <AllMessages  openmodal={openModal}/>
-
+                            { entitydetail ?
+                                <AllMessages entityName={entitydetail.entity.name} openmodal={openModal}/> : ''
+                            }
                         </Grid>
 
                     </Grid>

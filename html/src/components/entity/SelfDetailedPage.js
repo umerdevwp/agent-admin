@@ -37,6 +37,17 @@ import Avatar from '@material-ui/core/Avatar';
 import FastForwardIcon from '@material-ui/icons/FastForward';
 import Skeleton from '@material-ui/lab/Skeleton';
 import AttachmentTable from "../attachment/AttachmentTable";
+import Button from "@material-ui/core/Button";
+import AllMessages from "../message/AllMessages";
+import Modal from "react-modal";
+import NewChatPanel from "../message/NewChatPanel";
+import Drawer from "@material-ui/core/Drawer";
+import AdminSendMessageForm from "../message/AdminSendMessageForm";
+import SendMessageForm from "../message/SendMessageForm";
+
+
+
+const drawerWidth = 700;
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -87,7 +98,41 @@ const useStyles = makeStyles(theme => ({
 
     baseColor: {
         color: '#48465b'
-    }
+    },
+
+    listInner:{
+        // width: '100%'
+    },
+
+    messageSection: {
+        marginBottom: 20,
+        marginTop: 30
+    },
+    messageTitle: {
+        marginLeft: 20,
+        float: 'left'
+    },
+
+    rootDrawer: {
+        display: 'flex',
+    },
+    drawer: {
+        [theme.breakpoints.up('sm')]: {
+            width: drawerWidth,
+            flexShrink: 0,
+        },
+    },
+
+    drawerPaper: {
+        width: drawerWidth,
+    },
+
+    content: {
+        flexGrow: 1,
+        paddingLeft: theme.spacing(7),
+        paddingRight: theme.spacing(7),
+    },
+
 
 
 }));
@@ -147,6 +192,9 @@ const SelfDetailedPage = (props) => {
     const [attachmentList, setAttachmentList] = React.useState([])
     const [taskList, setTaskList] = React.useState([])
     const [compliance, setComplainace] = React.useState(0);
+    const [modalIsOpen,setIsOpen] = React.useState(false);
+    const [state, setState] = React.useState(false);
+
     // const entity_id = attributes.organization;
     const [componentLoading, setComponentLoading] = React.useState(true);
     useEffect(() => {
@@ -276,7 +324,30 @@ const SelfDetailedPage = (props) => {
         data: attachmentList,
     };
 
+    function openModal() {
+        setIsOpen(true);
+    }
 
+    function afterOpenModal() {
+        // references are now sync'd and can be accessed.
+        // subtitle.style.color = '#f00';
+    }
+
+    function closeModal(){
+        setIsOpen(false);
+    }
+    const toggleDrawer = (event, open) => {
+        if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+            return;
+        }
+        if (open) {
+            setState(true);
+        }
+
+        if (!open) {
+            setState(false);
+        }
+    };
     return (
 
         <>
@@ -301,7 +372,28 @@ const SelfDetailedPage = (props) => {
                                               message={value} onClose={()=> removeError(index)}/>
                 ))}
 
+                <Drawer
+                    ModalProps={{
+                        keepMounted: true, // Better open performance on mobile.
+                    }}
+                    classes={{
+                        paper: classes.drawerPaper,
+                    }} anchor={'right'} open={state} onClose={(event) => toggleDrawer(event, false)}>
+                    <div>
+                        <main className={classes.content}>
+                            {
+                                role === 'Administrator' ?
+                                    <AdminSendMessageForm {...props} /> : ''
+                                // <SendMessageForm/> : ''
+                            }
 
+                            {
+                                role === 'Parent Organization' || role === 'Child Entity' ?
+                                    <SendMessageForm {...props} /> : ''
+                            }
+                        </main>
+                    </div>
+                </Drawer>
                 <Grid container spacing={2}>
                     <Grid item xs={12} sm={4}>
                         <Card className={classes.root}>
@@ -445,6 +537,25 @@ const SelfDetailedPage = (props) => {
                 </Grid>
 
 
+                <Paper className={classes.messageSection} elevation={2}>
+                    <Grid container spacing={5}>
+
+                        <Grid item xs={12}>
+                            <div className="messageSection">
+                                <Typography className={classes.messageTitle} variant="h5" component="h2"
+                                            color="textPrimary">Messages</Typography>
+                                <Button variant="outlined" color="primary" className={'sendMessageButton'}
+                                        onClick={(event) => toggleDrawer(event, true)}>Send Message</Button>
+                            </div>
+                            { entitydetail ?
+                                <AllMessages entityName={entitydetail.entity.name} openmodal={openModal}/> : ''
+                            }
+                        </Grid>
+
+                    </Grid>
+                </Paper>
+
+
                 <Grid container spacing={5}>
 
                     <Grid item xs={12}>
@@ -470,6 +581,30 @@ const SelfDetailedPage = (props) => {
                                      title={'Contacts'}/>
                     </Grid>
                 </Grid>
+
+
+
+                <div>
+                    <Modal
+                        parentSelector={() => document.querySelector('#messageModal')}
+                        isOpen={modalIsOpen}
+                        onAfterOpen={afterOpenModal}
+                        onRequestClose={closeModal}
+                        contentLabel="Chat Application"
+                        style={{
+                            overlay: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)'
+                            },
+
+                        }}
+                    >
+                        <div className="chat-wrapper">
+                            <NewChatPanel/>
+                        </div>
+                    </Modal>
+                </div>
+
+
             </Layout>
         </>
 
