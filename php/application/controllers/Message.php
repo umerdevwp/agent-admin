@@ -124,6 +124,14 @@ class Message extends RestController
 
         $iParentId = $_SESSION['eid'];
 
+        if(empty($iParentId))
+        {
+            $this->response([
+                'status' => false,
+                'message'=> "Not authorized to access entity"
+            ], 403);
+        }
+
         $this->load->model("entity_model");
         // don't validate when user is admin
         if(!isAdmin())
@@ -132,7 +140,8 @@ class Message extends RestController
             $bIsParentValid = $this->entity_model->isParentOf($iEid, $iParentId);
         } else {
             $bIsParentValid = true;
-        }        
+        }
+
         // if entity is not authorized to send mail for entity block access
         if(!$bIsParentValid)
         {
@@ -171,12 +180,12 @@ class Message extends RestController
         // check subject empty
         if(empty($sSubject))
         {
-            $aError[] = "Subject cannot be empty, please add subject";
+            $aError['subject'] = "Subject cannot be empty, please add subject";
         }
         // check content empty
         if(empty($sMessage))
         {
-            $aError[] = "Message cannot be blank, please add message";
+            $aError['message'] = "Message cannot be blank, please add message";
         }
         // check request parameter error found
         if(count($aError))
@@ -199,12 +208,14 @@ class Message extends RestController
         {
             // set details for entity mailing admin
             $sFrom = $sEntityEmail;
+            $iFromEid = $iEid;
             $sFromName = $sEntityName;
             $sTo = getenv("NOTIFICATION_FROM_EMAIL");//"kamran@mts.youragentservices.com";//getenv("NOTIFICATION_FROM_EMAIL");
             $sToName = "Agent Admin Support";
         } else {
             // set details for admin mailing entity
             $sFrom = getenv("NOTIFICATION_FROM_EMAIL");
+            $iFromEid = 0;
             $sFromName = "Agent Admin Support";
             $sTo = $sEntityEmail;
             $sToName = $sEntityName;
@@ -237,7 +248,7 @@ class Message extends RestController
 
           // record the details for log or trackings
           $this->load->model("SendgridMessage_model");          
-          $iInsertId = $this->SendgridMessage_model->logOutboxMail($iEid,$iMessageId,$sTo,$sFrom,$sSubject,$sMessage,$sEntityEmailHash,$iGroupId);
+          $iInsertId = $this->SendgridMessage_model->logOutboxMail($iEid,$iMessageId,$sTo,$sFrom,$sSubject,$sMessage,$sEntityEmailHash,$iFromEid,$iGroupId);
 
         // report to admin on failure             
         if(!$iInsertId)
@@ -314,6 +325,11 @@ class Message extends RestController
         $num_attachments = (int)$this->input->post("attachments");
         // check for attachments and upload to temp
         $aFileName = $this->uploadMailFiles($num_attachments);
+        if(count($aFileName)>0)
+        {
+            foreach($aFileName as $sFileName)
+            $sMessage .= "<br/>" . getenv("SITE_MAIN_URL")."temp786/".$sFileName;
+        }
 
         // valid email can be recorded
         if(filter_var($sFrom, FILTER_VALIDATE_EMAIL))
@@ -384,16 +400,20 @@ class Message extends RestController
       $aFileName = [];
 
       if($iNumAttachments){
+
+        $iAllowedSize = 10*1000*1000; // 10 Mb
+        $sUploadDir = getenv("ROOT_PATH") . getenv("UPLOAD_PATH");
         foreach($_FILES as $aFile) {
 
           $sName = uniqid()."-".$aFile['name'];
-          
-          if(!empty($aFile['tmp_name']) && strpos($aFile['type'],"pdf")!==false && $aFile['size']<100000)
+
+          if(!empty($aFile['tmp_name']) && strpos($aFile['type'],"pdf")!==false && $aFile['size']<$iAllowedSize)
           {
             $result = move_uploaded_file(
               $aFile['tmp_name'],
-              $_SERVER['DOCUMENT_ROOT']."/"."temp786/".$sName
+              $sUploadDir . $sName
             );
+            
             $aFileName[] = $sName;
           } else {
             //error_log("File in mail not valid: " . print_r($aFile,true));
@@ -410,6 +430,7 @@ class Message extends RestController
      */
     public function cronLogMailStatus_get($key="")
     {
+
         if($key!=getenv("CRON_KEY")) redirectSession();
 
         $this->load->model("SendgridMessage_model");
@@ -422,8 +443,8 @@ class Message extends RestController
         //$sResult = $this->Messenger_model->fetchStatus(['msg_id LIKE "'.$sMsgId.'%"', 'to_email LIKE "'.$sToEmail.'"']);
         //$sResult = $this->Messenger_model->fetchStatusBetweenDate($sDateTime1,$sDateTime2);
         //$sResult = $this->Messenger_model->fetchStatusMsgId("YhTbHYXjSU2cwE9UN2j-ng");
-        
         $iRecordsUpdated = 0;
+
         if($aData)
         {
             foreach($aData as $v)
@@ -435,7 +456,7 @@ class Message extends RestController
                 //$sResult = $this->Messenger_model->fetchStatus(['msg_id LIKE "'.$sMsgId.'%"', 'to_email LIKE "'.$sToEmail.'"']);
                 //$sResult = $this->Messenger_model->fetchStatusMsgIdCurl($sMsgId,$sToEmail);
                 $oJson = $this->Messenger_model->fetchStatusMsgId($sMsgId);
-        
+
                 if(count($oJson->messages)>0)
                 {
                     $oMessage = $oJson->messages[0];
@@ -635,13 +656,15 @@ class Message extends RestController
             if(isAdmin())
             {
                 $aRecords = $this->SendgridMessage_model->getListEntityAdmin($id);
+                $aNewRecords = $this->setParentHirarchy($aRecords);
             } else {
                 $aRecords = $this->SendgridMessage_model->getListEntity($id);
+                $aNewRecords = $this->setParentHirarchy($aRecords);
             }
 
             $this->response([
                 'status'=>true,
-                'data' => $aRecords
+                'data' => $aNewRecords
             ], 200);
         } else {
             $this->response([
@@ -650,4 +673,212 @@ class Message extends RestController
             ], 302);
         }
     } 
+
+    /**
+     * Convert db records to hirarchy of parent child messages for message interface and groupings
+     */
+    private function setParentHirarchy(array $aDbRecords)
+    {
+        $aChildRecords = [];
+        $aParentRecords = [];
+        $aNewRecords = [];
+
+        // seprate child and parent from records
+        foreach($aDbRecords as $k=>$v)
+        {
+            // there may be no child, so initiate it empty
+            if(!isset($aChildRecords[$v->gid])) $aChildRecords[$v->gid] = [];
+
+            if($v->gid>0)
+            {
+                $aChildRecords[$v->gid][] = $v;
+            } else {
+                $aParentRecords[] = $v;
+            }
+        }
+
+        // assign child to parent array as child attribute, create new records array
+        foreach($aParentRecords as $v2)
+        {
+            $aParent = (array)$v2;
+            
+            $aParent['child'] = $aChildRecords[$v2->id];
+            if($aParent['child']==null) $aParent['child'] = [];
+
+            $aNewRecords[] = (object)$aParent;
+        }
+
+        return $aNewRecords;
+    }
+
+    /**
+     * Get messages that are listed as read or unread based on read bit in request 3rd argument
+     * @param number $iEntityId is required otherwise admin is used if admin
+     * @param number $iReadBit can be used to fetch read request too by default unread list
+     */
+    public function read_get(int $iEntityId=0, int $iReadBit=0)
+    {
+        $this->load->model("SendgridMessage_model");
+
+        if($iEntityId==0 && !isAdmin())
+        {
+            $this->response([
+                'status'=>false,
+                'message' => 'Entity id must exist in the request'
+            ], 404);
+        }
+
+        if(isAdmin())
+        {
+            $aRecords = $this->SendgridMessage_model->readCountAdmin($iReadBit);
+        } else {
+            $this->load->model("entity_model");
+            $iParentId = $_SESSION['eid'];
+            // check valid parent is shooting mail for entity, if is parent
+            $bIsParentValid = $this->entity_model->isParentOf($iEntityId, $iParentId);
+            
+            // if entity is not authorized to send mail for entity block access
+            if(!$bIsParentValid)
+            {
+                $this->response([
+                    'status' => false,
+                    'message'=> "Not authorized to access entity"
+                ], 404);
+            } else {
+                $aChildEntity = $this->entity_model->getEntityIdOfParent($iParentId);
+                // add own parent id to the csv list for all records
+                $sCsvEid = $iParentId;
+                foreach($aChildEntity as $v)
+                {
+                    $sCsvEid .= ",".$v->id;
+                }
+            }
+
+            $aRecords = $this->SendgridMessage_model->readCount($sCsvEid,$iReadBit);
+        }
+        $this->response([
+            'status'=>true,
+            'data' => $aRecords
+        ], 200);
+    }
+
+    /**
+     * Mark unread messages as read
+     * 
+     * @param number $iEntityId for specific entity messages commonly logged in
+     */
+    public function checked_get(int $iEntityId=0)
+    {
+        $this->load->model("SendgridMessage_model");
+        if(isAdmin())
+        {
+            $iAdmin = 1;
+        } else {
+            $iAdmin = 0;
+        }
+        
+        $this->load->model("entity_model");
+        $iParentId = $_SESSION['eid'];
+        // check valid parent is shooting mail for entity, if is parent
+        $bIsParentValid = $this->entity_model->isParentOf($iEntityId, $iParentId);
+        if($bIsParentValid || isAdmin())
+        {
+            $aChildEntity = $this->entity_model->getEntityIdOfParent($iParentId);
+            // add own parent id to the csv list for all records
+            $sCsvEid = $iParentId;
+            foreach($aChildEntity as $v)
+            {
+                $sCsvEid .= ",".$v->id;
+            }
+
+            $this->SendgridMessage_model->updateChecked($sCsvEid,$iAdmin);
+        } else {
+            $this->response([
+                'status' => false,
+                'message'=> "Not authorized to access entity"
+            ], 404);
+        }
+        
+        $this->response([
+            'status'=>true,
+            'data' => "Updated successfully",
+        ], 200);
+    }
+
+    /**
+     * Get last recent messages to always show within profile notification box
+     */
+    public function recent_get()
+    {
+        $iParentId = $_SESSION['eid'];
+        $this->load->model("entity_model");
+        $this->load->model("SendgridMessage_model");
+        
+        if($iParentId>0 && !isAdmin())
+        {
+
+
+            $aChildEntity = $this->entity_model->getEntityIdOfParent($iParentId);
+            // add own parent id to the csv list for all records
+            $sCsvEid = $iParentId;
+            foreach($aChildEntity as $v)
+            {
+                $sCsvEid .= ",".$v->id;
+            }
+
+            $aRecords = $this->SendgridMessage_model->getRecent($iParentId);
+            
+            $this->response([
+                'status'=>true,
+                'data' => $aRecords
+            ], 200);
+
+        } else if(isAdmin())
+        {
+            $aRecords = $this->SendgridMessage_model->getRecent($iParentId,isAdmin());
+            
+            $this->response([
+                'status'=>true,
+                'data' => $aRecords
+            ], 200);
+        
+        } else {
+            $this->response([
+                'status' => false,
+                'message'=> "User must be login"
+            ], 404);
+        }
+    }
+
+    /**
+     * Search messages based on optional entity id and optional date input
+     * by default search last week onwards records
+     * 
+     */
+    public function search_post()
+    {
+
+        if(!isAdmin())
+        {
+            $this->response([
+                'status' => false,
+                'message'=> "Not authorized to access request"
+            ], 403);
+        }
+        
+        $iEntityId = $this->input->post("eid")?:0;
+        $sDate = $this->input->post("date")?:"last week";
+
+        $sDate = date("Y-m-d",strtotime($sDate));
+
+        $this->load->model("SendgridMessage_model");
+
+        $aRecords = $this->SendgridMessage_model->search($iEntityId,$sDate);
+
+        $this->response([
+            'status'=>true,
+            'data' => $aRecords
+        ], 200);
+
+    }
 }

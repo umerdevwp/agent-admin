@@ -394,5 +394,24 @@ class Entity_model extends CI_Model
         }
     }
 
+    /**
+     * Fetch all the entities that lies under parent entity
+     * @param number $iParentEntityId entity id
+     * @return array empty or objects array with specififed columns
+     */
+    public function getEntityIdOfParent(int $iParentEntityId)
+    {
+        $this->db->select("id");
+        $this->db->from($this->table);
+        $this->db->where(['parent_account'=>$iParentEntityId]);
 
+        $oResult = $this->db->get();
+        $aRecords = $oResult->result();
+
+        if (! is_array($aRecords)) {
+            return [];
+        }
+
+        return $aRecords;
+    }
 }

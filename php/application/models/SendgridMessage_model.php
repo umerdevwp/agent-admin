@@ -15,7 +15,7 @@ class SendgridMessage_model extends ModelDefault {
             "updated"   => "updated",
             "sgStatus"  => "sg_status",
             "status"    => "status",
-            "entityEmailHash"=> "entity_email_hash",
+            "entityEmailHash"=>"entity_email_hash",
             "rawJson"   => "raw_json",
             "from"      => "from",
             "attachments"=> "attachments",
@@ -26,13 +26,15 @@ class SendgridMessage_model extends ModelDefault {
             "createdBy" => "created_by",
             "duedate"   => "duedate",
             "templateId"=> "template_id",
-            "gid"       =>  "group_id"
+            "gid"       =>  "group_id",
+            "read"      =>  "read",
+            "fromEid"  =>  "from_eid",
     ];
 
     public function __construct()
     {
-        parent::__construct();
         $this->_table = $this->sTable;
+        parent::__construct();
     }
 
     /**
@@ -65,7 +67,7 @@ class SendgridMessage_model extends ModelDefault {
      * Record the message send through sendgrid API
      * @param Integer $iEntityId entity id to send from/to
      */
-    public function logOutboxMail($iEntityId,$sSgMessageId,$sTo,$sFrom,$sSubject="",$sMessage="",$sEntityEmailHash="",$iGroupId)
+    public function logOutboxMail($iEntityId,$sSgMessageId,$sTo,$sFrom,$sSubject="",$sMessage="",$sEntityEmailHash="",$iFromEid=0,$iGroupId=0)
     {
         $aData = [
             "entity_id" => $iEntityId,
@@ -77,7 +79,8 @@ class SendgridMessage_model extends ModelDefault {
             "sg_message_id" =>  $sSgMessageId,
             "entity_email_hash"=>$sEntityEmailHash,
             'type'=>'outbox',
-            'group_id'=>$iGroupId
+            'group_id'=>$iGroupId,
+            "from_eid"=>$iFromEid,
         ];
         
         $iNewId = $this->insert($aData);
@@ -195,7 +198,7 @@ class SendgridMessage_model extends ModelDefault {
         else {
             $aMyColumns = [
                 "id","to","from","sendTime","subject",
-                "message","status"
+                "message","status","fromEid","read"
             ];
             $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
         }
@@ -207,10 +210,10 @@ class SendgridMessage_model extends ModelDefault {
 //        $aRecords = $this->get_many_by(['entity_id'=>$iEntityId]);
 
         $sQueryCombineNotes = "
-SELECT id,`to`,`from`,entity_id,send_time AS sendTime,subject,message,status,group_id AS gid
+SELECT id,`to`,`from`,entity_id,send_time AS sendTime,subject,message,status,group_id AS gid,from_eid AS fromEid,`read`
 FROM {$this->sTable} WHERE entity_id={$iEntityId}
 UNION
-SELECT id,'','',entity_id,added AS sendTime, subject,message,'',0
+SELECT id,'','',entity_id,added AS sendTime, subject,message,type AS status,0,0,1
 FROM entity_notes WHERE entity_id={$iEntityId}
 ORDER BY sendTime ASC
 ";
@@ -239,7 +242,7 @@ ORDER BY sendTime ASC
         else {
             $aMyColumns = [
                 "id","to","from","sendTime","subject",
-                "message","gid"
+                "message","gid","fromEid","read"
             ];
             $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
         }
@@ -264,5 +267,128 @@ ORDER BY sendTime ASC
     public function whereSubject(string $sSubject,string $sFrom)
     {
         return $this->get_by(['subject'=>$sSubject,'to'=>$sFrom,'group_id'=>0]);
+    }
+
+    /**
+     * Get messages read count
+     */
+    public function readCount(string $sCsvEntityId,int $iRead=0,array $aColumns=[])
+    {
+        if(count($aColumns)>0)
+            $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
+        else {
+            $aMyColumns = [
+                "id","to","from","sendTime","subject",
+                "message","gid","fromEid","read"
+            ];
+            $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
+        }
+
+        foreach($aMyColumns as $k=>$v)
+            $this->db->select("$v as `$k`");
+
+        return $this->get_many_by(["`read`=$iRead","entity_id IN($sCsvEntityId)","from_eid"=>0]);
+    }
+
+    /**
+     * Get messages read count
+     */
+    public function readCountAdmin(int $iRead=0,array $aColumns = [])
+    {
+        if(count($aColumns)>0)
+            $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
+        else {
+            $aMyColumns = [
+                "id","to","from","sendTime","subject",
+                "message","gid","fromEid","read"
+            ];
+            $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
+        }
+
+        foreach($aMyColumns as $k=>$v)
+            $this->db->select("$v as `$k`");
+        
+        $aRecords = $this->get_many_by(["`read`=$iRead","from_eid>0"]);
+//        echo $this->db->last_query();
+        return $aRecords;
+    }
+
+    public function updateChecked(string $sCsvEid, int $isAdmin=0)
+    {
+        if($isAdmin)
+        {
+            $this->update_by(["from_eid>0"],['read'=>1]);
+        } else {
+            $this->update_by(["from_eid"=>"0","entity_id IN($sCsvEid)"],['read'=>1]);
+        }
+    }
+
+    /**
+     * Get recent messages
+     */
+    public function getRecent(string $sCsvEntityId,bool $bIsAdmin=false,array $aColumns = [])
+    {
+        if(count($aColumns)>0)
+            $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
+        else {
+            $aMyColumns = [
+                "id","to","from","sendTime","subject",
+                "message","gid","fromEid","read"
+            ];
+            $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
+        }
+
+        foreach($aMyColumns as $k=>$v)
+            $this->db->select("$v as `$k`");
+        
+        $this->db->order_by("id","DESC");
+        $this->db->limit(5);
+
+        $aWhere = ["entity_id IN($sCsvEntityId)"];
+        if($bIsAdmin)
+        {
+            $aWhere[] = 'from_eid>0';
+        } else {
+            $aWhere[] = 'from_eid=0';
+        }
+
+        return $this->get_many_by($aWhere);
+    }
+
+    /**
+     * Search the records based on entity id OR date parameters, received after date
+     */
+    public function search(int $iEntityId=0,string $sDate)
+    {
+
+        if(count($aColumns)>0)
+            $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
+        else {
+            $aMyColumns = [
+                "id","to","from","sendTime","subject",
+                "message","gid","fromEid","read"
+            ];
+            $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
+        }
+
+        foreach($aMyColumns as $k=>$v)
+            $this->db->select("sg.$v as `$k`");
+
+        $this->db->select("account_name as name");
+        $this->db->from($this->sTable." AS sg");
+        $sStartDate = $sDate;
+        $sEndDate = date("Y-m-d");
+
+        $aWhere = ["sg.send_time BETWEEN '$sStartDate' AND '$sEndDate'"];
+
+        if($iEntityId>0)
+        {
+            $aWhere[] = "sg.entity_id='$iEntityId'";
+        }
+        $this->db->join("zoho_accounts za","za.id=sg.entity_id");
+
+        $aRecords = $this->get_many_by($aWhere);
+//echo $this->db->last_query();
+        return $aRecords;
     }
 }
