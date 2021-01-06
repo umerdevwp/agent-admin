@@ -130,9 +130,10 @@ function FacebookProgress(props) {
 
 const SendMessageForm = (props) => {
     const classes = useStyles();
-    const {loading, addError, errorList, role} = useContext(UserContext);
+    const {loading, addError, errorList, role, attributes} = useContext(UserContext);
 
-    const entity_id = props.match.params.id;
+    const entity_id = props.match.params.id ? props.match.params.id : attributes.organization;
+
     const [content, setContent] = useState({value: '', error: ' '});
     const [subject, setSubject] = useState({value: '', error: ' '});
     const [sendasEmail, setSendasEmail] = useState(false);
@@ -246,6 +247,7 @@ const SendMessageForm = (props) => {
             await getTemplate(newValue.id).then(response => {
                 if (response.status === true) {
                     setContent({...content, value: response.data.message})
+                    setSubject({...subject, value:newValue.subject});
                     setApiLoading(false);
                 }
             })
