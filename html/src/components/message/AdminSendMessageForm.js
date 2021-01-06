@@ -135,7 +135,7 @@ function FacebookProgress(props) {
 
 const AdminSendMessageForm = (props) => {
     const classes = useStyles();
-    const {loading, addError, errorList, role, attributes} = useContext(UserContext);
+    const {loading, addError, errorList, role, attributes,manageOuterThreads} = useContext(UserContext);
 
     const entity_id = props.match.params.id ? props.match.params.id : attributes.organization;
     const [content, setContent] = useState({value: '', error: ' '});
@@ -196,6 +196,7 @@ const AdminSendMessageForm = (props) => {
         await sendMessageAPI(formData).then(response => {
             if (response.status === true) {
                 setApiLoading(false);
+                manageOuterThreads(true);
                 toast.success(response.message, {
                     position: toast.POSITION.BOTTOM_LEFT
                 });

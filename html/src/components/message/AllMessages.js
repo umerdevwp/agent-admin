@@ -9,9 +9,8 @@ import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
 import {FetchThreads} from '../api/message';
 import {UserContext} from "../context/UserContext";
-import Select from "@material-ui/core/Select";
 import Button from "@material-ui/core/Button";
-import moment from "moment";
+import Skeleton from '@material-ui/lab/Skeleton';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -26,7 +25,21 @@ const useStyles = makeStyles((theme) => ({
     viewButton: {
         width: '100%',
         textAlign: 'center'
-    }
+    },
+
+    SkeletonLoading: {
+        width: '100%'
+    },
+
+    skeletonWidth: {
+        width: '100%'
+    },
+
+    skeletonStyle: {
+        paddingLeft: theme.spacing(3),
+        paddingRight: theme.spacing(3),
+    },
+
 
 }));
 
@@ -34,6 +47,8 @@ export default function AllMessages(props) {
     const classes = useStyles();
     const {loading, addError, errorList, role, setUserMessagesForInbox, outerThreads, manageOuterThreads} = useContext(UserContext);
     const [threads, setThreads] = useState([]);
+    const [apiLoading, setApiLoading] = useState(false);
+
     useEffect(() => {
         if (loading === true) {
             getAllMessageThreads()
@@ -49,17 +64,19 @@ export default function AllMessages(props) {
     }, [outerThreads]);
 
     const getAllMessageThreads = async () => {
+        setApiLoading(true);
         FetchThreads().then(response => {
             if (response.status === true) {
                 setUserMessagesForInbox(response.data);
                 setThreads(response.data);
+                setApiLoading(false);
             }
         });
     }
 
 
     const stripHTML = (myString) => {
-        return myString.replace(/<[^>]*>?/gm, '');
+        return myString.replace(/<[^>]*>?/gm, '').replace(/\&nbsp;/g, '');
     }
 
     const truncate = (str, no_words) => {
@@ -74,7 +91,7 @@ export default function AllMessages(props) {
 
 
     const ViewAllHandleClickChange = () => {
-        if(threads[0].id) {
+        if (threads[0].id) {
             localStorage.setItem('allMessagesThread', threads[0].id);
         }
         props.openmodal();
@@ -102,38 +119,120 @@ export default function AllMessages(props) {
 
     return (
         <>
-            <List className={classes.root}>
-                {threads?.slice(0, 5).map((anObjectMapped, index) =>
-                    <div key={index}>
-                        <ListItem onClick={(e) => handleClickChange(anObjectMapped.id)} alignItems="flex-start">
+            {!apiLoading ?
+                <>
+                    <List className={classes.root}>
+                        {threads?.slice(0, 5).map((anObjectMapped, index) =>
+                            <div key={index}>
+                                <ListItem onClick={(e) => handleClickChange(anObjectMapped.id)} alignItems="flex-start">
+                                    <ListItemAvatar>
+                                        <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg"/>
+                                    </ListItemAvatar>
+                                    <ListItemText
+                                        primary={anObjectMapped.subject}
+                                        secondary={
+                                            <React.Fragment>
+                                                <Typography
+                                                    component="span"
+                                                    variant="body2"
+                                                    className={classes.inline}
+                                                    color="textPrimary"
+                                                >
+                                                    {props.entityName}
+                                                </Typography>
+                                                {` — ${lastMessage(anObjectMapped)}`}
+                                            </React.Fragment>
+                                        }
+                                    />
+                                </ListItem>
+                                <Divider variant="inset" component="li"/>
+                            </div>
+                        )
+                        }
+                    </List>
+                    <div className={classes.viewButton}>
+                        <Button onClick={ViewAllHandleClickChange} variant="outlined" color="primary">View All</Button>
+                    </div>
+                </>
+                :
+                <>
+                    <List>
+                        <ListItem alignItems="flex-start">
                             <ListItemAvatar>
-                                <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg"/>
+                                <Skeleton variant="circle" height={50} width={50} animation="wave"/>
                             </ListItemAvatar>
                             <ListItemText
-                                primary={anObjectMapped.subject}
+                                primary={
+                                    <React.Fragment>
+                                        <Skeleton height={30} width={'100%'} animation="wave"/>
+                                    </React.Fragment>
+                                }
                                 secondary={
                                     <React.Fragment>
-                                        <Typography
-                                            component="span"
-                                            variant="body2"
-                                            className={classes.inline}
-                                            color="textPrimary"
-                                        >
-                                            {props.entityName}
-                                        </Typography>
-                                        {` — ${lastMessage(anObjectMapped)}`}
+                                        <Skeleton height={50} width={'100%'} animation="wave"/>
                                     </React.Fragment>
                                 }
                             />
                         </ListItem>
                         <Divider variant="inset" component="li"/>
-                    </div>
-                )
-                }
-            </List>
-            <div className={classes.viewButton}>
-                <Button onClick={ViewAllHandleClickChange} variant="outlined" color="primary">View All</Button>
-            </div>
-        </>
-    )
+                        <ListItem alignItems="flex-start">
+                            <ListItemAvatar>
+                                <Skeleton variant="circle" height={50} width={50} animation="wave"/>
+                            </ListItemAvatar>
+                            <ListItemText
+                                primary={
+                                    <React.Fragment>
+                                        <Skeleton height={30} width={'100%'} animation="wave"/>
+                                    </React.Fragment>
+                                }
+                                secondary={
+                                    <React.Fragment>
+                                        <Skeleton height={50} width={'100%'} animation="wave"/>
+                                    </React.Fragment>
+                                }
+                            />
+                        </ListItem>
+                        <Divider variant="inset" component="li"/>
+                        <ListItem alignItems="flex-start">
+                            <ListItemAvatar>
+                                <Skeleton variant="circle" height={50} width={50} animation="wave"/>
+                            </ListItemAvatar>
+                            <ListItemText
+                                primary={
+                                    <React.Fragment>
+                                        <Skeleton height={30} width={'100%'} animation="wave"/>
+                                    </React.Fragment>
+                                }
+                                secondary={
+                                    <React.Fragment>
+                                        <Skeleton height={50} width={'100%'} animation="wave"/>
+                                    </React.Fragment>
+                                }
+                            />
+                        </ListItem>
+                        <Divider variant="inset" component="li"/>
+                        <ListItem alignItems="flex-start">
+                            <ListItemAvatar>
+                                <Skeleton variant="circle" height={50} width={50} animation="wave"/>
+                            </ListItemAvatar>
+                            <ListItemText
+                                primary={
+                                    <React.Fragment>
+                                        <Skeleton height={30} width={'100%'} animation="wave"/>
+                                    </React.Fragment>
+                                }
+                                secondary={
+                                    <React.Fragment>
+                                        <Skeleton height={50} width={'100%'} animation="wave"/>
+                                    </React.Fragment>
+                                }
+                            />
+                        </ListItem>
+                        <Divider variant="inset" component="li"/>
+                    </List>
+
+                </>
+
+            }
+        </>)
 }

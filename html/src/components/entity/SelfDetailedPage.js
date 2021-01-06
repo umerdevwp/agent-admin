@@ -44,6 +44,11 @@ import NewChatPanel from "../message/NewChatPanel";
 import Drawer from "@material-ui/core/Drawer";
 import AdminSendMessageForm from "../message/AdminSendMessageForm";
 import SendMessageForm from "../message/SendMessageForm";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemAvatar from "@material-ui/core/ListItemAvatar";
+import ListItemText from "@material-ui/core/ListItemText";
+import Divider from "@material-ui/core/Divider";
 
 
 
@@ -548,7 +553,81 @@ const SelfDetailedPage = (props) => {
                                         onClick={(event) => toggleDrawer(event, true)}>Send Message</Button>
                             </div>
                             { entitydetail ?
-                                <AllMessages entityName={entitydetail.entity.name} openmodal={openModal}/> : ''
+                                <AllMessages entityName={entitydetail.entity.name} openmodal={openModal}/> :
+                                <List>
+                                    <ListItem alignItems="flex-start">
+                                        <ListItemAvatar>
+                                            <Skeleton variant="circle" height={50} width={50} animation="wave"/>
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={
+                                                <React.Fragment>
+                                                    <Skeleton height={30} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                            secondary={
+                                                <React.Fragment>
+                                                    <Skeleton height={50} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                        />
+                                    </ListItem>
+                                    <Divider variant="inset" component="li"/>
+                                    <ListItem alignItems="flex-start">
+                                        <ListItemAvatar>
+                                            <Skeleton variant="circle" height={50} width={50} animation="wave"/>
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={
+                                                <React.Fragment>
+                                                    <Skeleton height={30} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                            secondary={
+                                                <React.Fragment>
+                                                    <Skeleton height={50} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                        />
+                                    </ListItem>
+                                    <Divider variant="inset" component="li"/>
+                                    <ListItem alignItems="flex-start">
+                                        <ListItemAvatar>
+                                            <Skeleton variant="circle" height={50} width={50} animation="wave"/>
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={
+                                                <React.Fragment>
+                                                    <Skeleton height={30} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                            secondary={
+                                                <React.Fragment>
+                                                    <Skeleton height={50} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                        />
+                                    </ListItem>
+                                    <Divider variant="inset" component="li"/>
+                                    <ListItem alignItems="flex-start">
+                                        <ListItemAvatar>
+                                            <Skeleton variant="circle" height={50} width={50} animation="wave"/>
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={
+                                                <React.Fragment>
+                                                    <Skeleton height={30} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                            secondary={
+                                                <React.Fragment>
+                                                    <Skeleton height={50} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                        />
+                                    </ListItem>
+                                    <Divider variant="inset" component="li"/>
+                                </List>
                             }
                         </Grid>
 

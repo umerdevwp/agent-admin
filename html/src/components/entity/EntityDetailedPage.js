@@ -50,17 +50,21 @@ import ReactDOM from 'react-dom';
 import Modal from 'react-modal';
 import MainChatApp from "../message/MainChatApp";
 import NewChatPanel from "../message/NewChatPanel";
-
+import ListItem from "@material-ui/core/ListItem";
+import List from "@material-ui/core/List";
+import ListItemAvatar from "@material-ui/core/ListItemAvatar";
+import ListItemText from "@material-ui/core/ListItemText";
+import Divider from "@material-ui/core/Divider";
 
 
 const customStyles = {
-    content : {
-        top                   : '50%',
-        left                  : '50%',
-        right                 : 'auto',
-        bottom                : 'auto',
-        marginRight           : '-50%',
-        transform             : 'translate(-50%, -50%)'
+    content: {
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        marginRight: '-50%',
+        transform: 'translate(-50%, -50%)'
     }
 };
 const drawerWidth = 700;
@@ -119,8 +123,8 @@ const useStyles = makeStyles(theme => ({
     //     width: 700,
     // },
 
-    listInner:{
-      // width: '100%'
+    listInner: {
+        // width: '100%'
     },
 
     messageSection: {
@@ -151,6 +155,15 @@ const useStyles = makeStyles(theme => ({
         paddingLeft: theme.spacing(7),
         paddingRight: theme.spacing(7),
     },
+
+    skeletonStyle:{
+        paddingLeft: theme.spacing(3),
+        paddingRight: theme.spacing(3),
+    },
+
+    skeletonItem: {
+        // marginBottom: 1,
+    }
 
 
 }));
@@ -207,7 +220,7 @@ const EntityDetailedPage = (props) => {
     const classes = useStyles();
     const history = useHistory();
     var subtitle;
-    const [modalIsOpen,setIsOpen] = React.useState(false);
+    const [modalIsOpen, setIsOpen] = React.useState(false);
 
     const [entitydetail, setEntitydetail] = React.useState()
     const [contactList, setContactList] = React.useState([])
@@ -364,7 +377,7 @@ const EntityDetailedPage = (props) => {
         // subtitle.style.color = '#f00';
     }
 
-    function closeModal(){
+    function closeModal() {
         setIsOpen(false);
     }
 
@@ -397,8 +410,8 @@ const EntityDetailedPage = (props) => {
                         keepMounted: true, // Better open performance on mobile.
                     }}
                     classes={{
-                    paper: classes.drawerPaper,
-                }} anchor={'right'} open={state} onClose={(event) => toggleDrawer(event, false)}>
+                        paper: classes.drawerPaper,
+                    }} anchor={'right'} open={state} onClose={(event) => toggleDrawer(event, false)}>
                     <div>
                         <main className={classes.content}>
                             {
@@ -569,9 +582,87 @@ const EntityDetailedPage = (props) => {
                                 <Button variant="outlined" color="primary" className={'sendMessageButton'}
                                         onClick={(event) => toggleDrawer(event, true)}>Send Message</Button>
                             </div>
-                            { entitydetail ?
-                                <AllMessages entityName={entitydetail.entity.name} openmodal={openModal}/> : ''
+                            {entitydetail ?
+                                <AllMessages entityName={entitydetail.entity.name} openmodal={openModal}/> :
+
+
+                                <List>
+                                    <ListItem alignItems="flex-start">
+                                        <ListItemAvatar>
+                                            <Skeleton variant="circle" height={50} width={50} animation="wave"/>
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={
+                                                <React.Fragment>
+                                                    <Skeleton height={30} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                            secondary={
+                                                <React.Fragment>
+                                                    <Skeleton height={50} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                        />
+                                    </ListItem>
+                                    <Divider variant="inset" component="li"/>
+                                    <ListItem alignItems="flex-start">
+                                        <ListItemAvatar>
+                                            <Skeleton variant="circle" height={50} width={50} animation="wave"/>
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={
+                                                <React.Fragment>
+                                                    <Skeleton height={30} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                            secondary={
+                                                <React.Fragment>
+                                                    <Skeleton height={50} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                        />
+                                    </ListItem>
+                                    <Divider variant="inset" component="li"/>
+                                    <ListItem alignItems="flex-start">
+                                        <ListItemAvatar>
+                                            <Skeleton variant="circle" height={50} width={50} animation="wave"/>
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={
+                                                <React.Fragment>
+                                                    <Skeleton height={30} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                            secondary={
+                                                <React.Fragment>
+                                                    <Skeleton height={50} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                        />
+                                    </ListItem>
+                                    <Divider variant="inset" component="li"/>
+                                    <ListItem alignItems="flex-start">
+                                        <ListItemAvatar>
+                                            <Skeleton variant="circle" height={50} width={50} animation="wave"/>
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={
+                                                <React.Fragment>
+                                                    <Skeleton height={30} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                            secondary={
+                                                <React.Fragment>
+                                                    <Skeleton height={50} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                        />
+                                    </ListItem>
+                                    <Divider variant="inset" component="li"/>
+                                </List>
+
                             }
+
                         </Grid>
 
                     </Grid>
@@ -618,9 +709,9 @@ const EntityDetailedPage = (props) => {
 
                         }}
                     >
-                      <div className="chat-wrapper">
-                        <NewChatPanel/>
-                      </div>
+                        <div className="chat-wrapper">
+                            <NewChatPanel/>
+                        </div>
                     </Modal>
                 </div>
 

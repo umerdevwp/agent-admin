@@ -313,7 +313,7 @@ const NewChatPanel = (props) => {
 
 
     const stripHTML = (myString) => {
-        return myString.replace(/<[^>]*>?/gm, '');
+        return myString.replace(/<[^>]*>?/gm, '').replace(/\&nbsp;/g, '');
     }
 
     const truncate = (str, no_words) => {

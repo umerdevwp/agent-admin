@@ -130,7 +130,7 @@ function FacebookProgress(props) {
 
 const SendMessageForm = (props) => {
     const classes = useStyles();
-    const {loading, addError, errorList, role, attributes} = useContext(UserContext);
+    const {loading, addError, errorList, role, attributes,   manageOuterThreads} = useContext(UserContext);
 
     const entity_id = props.match.params.id ? props.match.params.id : attributes.organization;
 
@@ -157,15 +157,23 @@ const SendMessageForm = (props) => {
         })
     }
 
+    const resetFormError = () => {
+        setContent({...content, error: ' '})
+        setSubject({...subject, error:' '})
+        setNoteChosen({...noteChosen, error:' '})
+
+    }
     const sendMessageSubmission = async (event) => {
         event.preventDefault();
         setApiLoading(true);
+        resetFormError();
         let formData = new FormData();
         formData.append('eid', entity_id);
         formData.append('subject', subject.value);
         formData.append('message', content.value)
         await sendMessageAPI(formData).then(response => {
             if (response.status === true) {
+                manageOuterThreads(true);
                 setApiLoading(false);
                 toast.success(response.message, {
                     position: toast.POSITION.BOTTOM_LEFT
@@ -309,25 +317,25 @@ const SendMessageForm = (props) => {
                         {/*    </FormControl>*/}
                         {/*</div>*/}
 
-                        <div className={'col-md-12'}>
-                            <FormControl className={clsx(classes.selectField)}
-                                         error={messageType.error !== ' '}>
-                                <Autocomplete
-                                    disabled={apiLoading}
-                                    onChange={(event, newValue) => {
+                        {/*<div className={'col-md-12'}>*/}
+                        {/*    <FormControl className={clsx(classes.selectField)}*/}
+                        {/*                 error={messageType.error !== ' '}>*/}
+                        {/*        <Autocomplete*/}
+                        {/*            disabled={apiLoading}*/}
+                        {/*            onChange={(event, newValue) => {*/}
 
-                                        handleTemplateListing(newValue)
-                                    }}
+                        {/*                handleTemplateListing(newValue)*/}
+                        {/*            }}*/}
 
-                                    id="combo-box-demo"
-                                    options={templates ? templates : ''}
-                                    getOptionLabel={(option) => option.subject}
-                                    renderInput={(params) => <TextField error={messageType.error !== ' '} {...params}
-                                                                        label="Message Type" variant="outlined"/>}
-                                />
-                                <FormHelperText>{messageType.error}</FormHelperText>
-                            </FormControl>
-                        </div>
+                        {/*            id="combo-box-demo"*/}
+                        {/*            options={templates ? templates : ''}*/}
+                        {/*            getOptionLabel={(option) => option.subject}*/}
+                        {/*            renderInput={(params) => <TextField error={messageType.error !== ' '} {...params}*/}
+                        {/*                                                label="Message Type" variant="outlined"/>}*/}
+                        {/*        />*/}
+                        {/*        <FormHelperText>{messageType.error}</FormHelperText>*/}
+                        {/*    </FormControl>*/}
+                        {/*</div>*/}
 
                         {/*{sendasEmail ?*/}
                         {/*    <div className={'col-md-12'}>*/}
