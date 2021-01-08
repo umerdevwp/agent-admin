@@ -84,3 +84,19 @@ export const sendMessageFormChat = async (data) => {
         return Promise.resolve(response.json());
     }
 }
+
+
+export const FetchMessageLogs = async (data) => {
+    const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
+
+    if(okta) {
+        const response = await fetch(`${ENTITY}/message/search`, {
+            method: 'get',
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': okta.accessToken.accessToken,
+            },
+        });
+        return Promise.resolve(response.json());
+    }
+}

@@ -15,6 +15,8 @@ import FormHelperText from "@material-ui/core/FormHelperText";
 import Paper from "@material-ui/core/Paper";
 import {makeStyles} from "@material-ui/core/styles";
 import {amber, green} from "@material-ui/core/colors";
+import {EntityList} from "../api/enitity.crud";
+import Autocomplete from "@material-ui/lab/Autocomplete";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -159,69 +161,110 @@ const MessageLog = (props) => {
     const {loading, attributes, addError, errorList, role, addTitle, profile} = useContext(UserContext);
     const classes = useStyles();
 
-    const handleOnSubmit = () => {
-
-    }
+    const [entityId, setEntityId] = React.useState({value: '', error: ' '});
+    const [apiLoading, setApiLoading] = React.useState(false);
+    const [entityList, setEntityList] = React.useState([]);
 
 
     useEffect(() => {
         if (loading === true) {
             addTitle('Message Logs');
+            entitylisitingLoader();
         }
     }, [loading])
+
+    const entitylisitingLoader = async () => {
+        setApiLoading(true);
+        var EntityListLocal = await JSON.parse(localStorage.getItem("EntityList") !== 'undefined' ? localStorage.getItem("EntityList") : '');
+        if (EntityListLocal !== 'undefined' && EntityListLocal) {
+            setEntityList(EntityListLocal);
+            setApiLoading(false);
+        } else {
+            const response = await EntityList();
+
+            if (response.error) {
+                addError(response.error.message);
+            }
+
+            if (response.type === 'error') {
+                window.location.reload();
+            }
+
+            if (response.status === 401) {
+                window.location.reload();
+            }
+
+
+            localStorage.setItem("EntityList", JSON.stringify(response.data));
+            await setEntityList(response.data);
+            setApiLoading(false);
+        }
+    }
+
+    const handleOnSubmit = () => {
+
+    }
+
+
+
     return(
         <Layout>
 
-
-
-
             <Grid container spacing={0}>
-
                 <Paper className={classes.paper} elevation={3} >
                 <form onSubmit={handleOnSubmit} noValidate
                       autoComplete="off">
                     <FormGroup row>
-                        <div className={'col-md-4'}>
-                            <TextField
+                        <div className={'col-md-5'}>
+                            <FormControl className={clsx(classes.selectField)}
+                                         error={entityId.error !== ' '}>
+                                <Autocomplete
+                                    onChange={(event, newValue) => {
+                                        if(newValue) {
+                                            setEntityId({
+                                                ...entityId,
+                                                value: newValue.id
+                                            })
+                                        } else {
+                                            setEntityId({
+                                                ...entityId,
+                                                value: ''
+                                            })
+                                        }
+                                    }}
 
-                                required
-
-                                id="inputName"
-                                label="Entity Name"
-                                className={clsx(classes.textField, classes.dense, classes.label)}
-                                margin="dense"
-
-                            />
+                                    id="combo-box-demo"
+                                    options={entityList ? entityList : ''}
+                                    getOptionLabel={(option) => option.account_name}
+                                    renderInput={(params) => <TextField error={entityId.error !== ' '} {...params} label="Entity Name" variant="outlined" />}
+                                />
+                                <FormHelperText>{entityId.error}</FormHelperText>
+                            </FormControl>
                         </div>
 
-                        <div className={'col-md-4'}>
+
+                        <div className={'col-md-5'}>
                             <TextField
-
                                 required
-                                label="Formation Date"
+                                label="Date"
                                 format={'Y-M-d'}
-
                                 inputProps={{
                                     name: 'inputFormationDate',
                                     id: 'inputFormationDate',
                                 }}
-
                                 InputLabelProps={{
                                     shrink: true,
                                 }}
                                 type="date"
                                 className={clsx(classes.textFieldOther, classes.dense)}
-
                             />
                         </div>
 
-                        <div className={'col-md-4'}>
+                        <div className={'col-md-2'}>
                             <div className={clsx(classes.submitButton, 'custom-button-wrapper', classes.searchButton)}>
-
                                 <input
                                        className={clsx('btn btn-primary', classes.restButton)}
                                        type="submit" value="Search"/>
-
                             </div>
                         </div>
                     </FormGroup>

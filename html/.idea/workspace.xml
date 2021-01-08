@@ -4,13 +4,8 @@
     <list default="true" id="d9398c1c-af28-4f73-920d-6f1f684f34d9" name="Default Changelist" comment="Merge branch 'master-notification-react' of https://github.com/United-Agent-Services/agentadmin into local-omer&#10;&#10;# Conflicts:&#10;#&#9;application/controllers/Contacts.php&#10;#&#9;application/controllers/Entity.php&#10;#&#9;application/controllers/Login.php&#10;#&#9;application/controllers/Portal.php&#10;#&#9;application/hooks/Auth.php&#10;#&#9;application/models/Accounts_model.php&#10;#&#9;application/models/Contacts_model.php&#10;#&#9;application/models/Entity_model.php&#10;#&#9;application/views/entity-add.php&#10;#&#9;application/views/entity.php&#10;#&#9;application/views/header.php&#10;#&#9;application/views/portal.php">
       <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/entity/ChildDetailedPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/entity/ChildDetailedPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/entity/EntityDetailedPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/entity/EntityDetailedPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/entity/SelfDetailedPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/entity/SelfDetailedPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/message/AdminSendMessageForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/message/AdminSendMessageForm.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/message/AllMessages.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/message/AllMessages.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/message/NewChatPanel.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/message/NewChatPanel.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/message/SendMessageForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/message/SendMessageForm.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/api/message.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/api/message.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/message/MessageLog.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/message/MessageLog.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
