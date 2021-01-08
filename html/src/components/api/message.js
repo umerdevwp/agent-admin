@@ -3,7 +3,7 @@ import {ENTITY} from "./enitity.crud";
 export const sendMessageAPI = async (data) => {
     const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
 
-    if(okta) {
+    if (okta) {
         const response = await fetch(`${ENTITY}/message/send`, {
             method: 'post',
             headers: {
@@ -21,7 +21,7 @@ export const sendMessageAPI = async (data) => {
 export const TemplateList = async (data) => {
     const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
 
-    if(okta) {
+    if (okta) {
         const response = await fetch(`${ENTITY}/templates/list`, {
             method: 'get',
             headers: {
@@ -37,7 +37,7 @@ export const TemplateList = async (data) => {
 export const getTemplate = async (data) => {
     const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
 
-    if(okta) {
+    if (okta) {
         const response = await fetch(`${ENTITY}/templates/${data}`, {
             method: 'get',
             headers: {
@@ -54,8 +54,8 @@ export const getTemplate = async (data) => {
 export const FetchThreads = async (data) => {
     const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
 
-    if(okta) {
-        const response = await fetch(`${ENTITY}/message/list/4071993000001842131`, {
+    if (okta) {
+        const response = await fetch(`${ENTITY}/message/list/${data}`, {
             method: 'get',
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -71,7 +71,7 @@ export const FetchThreads = async (data) => {
 export const sendMessageFormChat = async (data) => {
     const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
 
-    if(okta) {
+    if (okta) {
         const response = await fetch(`${ENTITY}/message/send`, {
             method: 'post',
             headers: {
@@ -89,13 +89,15 @@ export const sendMessageFormChat = async (data) => {
 export const FetchMessageLogs = async (data) => {
     const okta = await JSON.parse(localStorage.getItem('okta-token-storage'));
 
-    if(okta) {
+    if (okta) {
         const response = await fetch(`${ENTITY}/message/search`, {
-            method: 'get',
+            method: 'post',
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Authorization': okta.accessToken.accessToken,
+
             },
+            body: data
         });
         return Promise.resolve(response.json());
     }

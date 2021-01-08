@@ -17,6 +17,10 @@ import {makeStyles} from "@material-ui/core/styles";
 import {amber, green} from "@material-ui/core/colors";
 import {EntityList} from "../api/enitity.crud";
 import Autocomplete from "@material-ui/lab/Autocomplete";
+import {FetchMessageLogs} from "../api/message";
+import VisibilityIcon from "@material-ui/icons/Visibility";
+import Modal from "react-modal";
+import NewChatPanel from "./NewChatPanel";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -140,10 +144,10 @@ const useStyles = makeStyles(theme => ({
     paper: {
         paddingTop: 30,
         paddingBottom: 30,
-        paddingLeft:10,
-        paddingRight:10,
-        width:'100%',
-        marginBottom:20
+        paddingLeft: 10,
+        paddingRight: 10,
+        width: '100%',
+        marginBottom: 20
     },
 
     searchButton: {
@@ -154,7 +158,6 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
-
 const MessageLog = (props) => {
 
 
@@ -163,7 +166,13 @@ const MessageLog = (props) => {
 
     const [entityId, setEntityId] = React.useState({value: '', error: ' '});
     const [apiLoading, setApiLoading] = React.useState(false);
+    const [date, setDate] = React.useState({value: '', error: ' '});
+    const [date2, setDate2] = React.useState({value: '', error: ' '});
     const [entityList, setEntityList] = React.useState([]);
+    const [threads, setThreads] = React.useState([]);
+    const [modalIsOpen,setIsOpen] = React.useState(false);
+    const [state, setState] = React.useState(false);
+
 
 
     useEffect(() => {
@@ -172,6 +181,19 @@ const MessageLog = (props) => {
             entitylisitingLoader();
         }
     }, [loading])
+
+    function openModal() {
+        setIsOpen(true);
+    }
+
+    function afterOpenModal() {
+        // references are now sync'd and can be accessed.
+        // subtitle.style.color = '#f00';
+    }
+
+    function closeModal(){
+        setIsOpen(false);
+    }
 
     const entitylisitingLoader = async () => {
         setApiLoading(true);
@@ -201,99 +223,158 @@ const MessageLog = (props) => {
         }
     }
 
-    const handleOnSubmit = () => {
-
+    const handleOnSubmit = (event) => {
+        event.preventDefault();
+        setApiLoading(true);
+        let formData = new FormData();
+        formData.append('eid', entityId.value);
+        formData.append('startDate', date.value);
+        formData.append('endDate', date2.value);
+        FetchMessageLogs(formData).then(response => {
+            console.log(response);
+            setThreads(response.data);
+            setApiLoading(false);
+        })
     }
 
-
-
-    return(
+    return (
         <Layout>
 
             <Grid container spacing={0}>
-                <Paper className={classes.paper} elevation={3} >
-                <form onSubmit={handleOnSubmit} noValidate
-                      autoComplete="off">
-                    <FormGroup row>
-                        <div className={'col-md-5'}>
-                            <FormControl className={clsx(classes.selectField)}
-                                         error={entityId.error !== ' '}>
-                                <Autocomplete
-                                    onChange={(event, newValue) => {
-                                        if(newValue) {
-                                            setEntityId({
-                                                ...entityId,
-                                                value: newValue.id
-                                            })
-                                        } else {
-                                            setEntityId({
-                                                ...entityId,
-                                                value: ''
-                                            })
-                                        }
-                                    }}
-
-                                    id="combo-box-demo"
-                                    options={entityList ? entityList : ''}
-                                    getOptionLabel={(option) => option.account_name}
-                                    renderInput={(params) => <TextField error={entityId.error !== ' '} {...params} label="Entity Name" variant="outlined" />}
-                                />
-                                <FormHelperText>{entityId.error}</FormHelperText>
-                            </FormControl>
-                        </div>
-
-
-                        <div className={'col-md-5'}>
-                            <TextField
-                                required
-                                label="Date"
-                                format={'Y-M-d'}
-                                inputProps={{
-                                    name: 'inputFormationDate',
-                                    id: 'inputFormationDate',
-                                }}
-                                InputLabelProps={{
-                                    shrink: true,
-                                }}
-                                type="date"
-                                className={clsx(classes.textFieldOther, classes.dense)}
-                            />
-                        </div>
-
-                        <div className={'col-md-2'}>
-                            <div className={clsx(classes.submitButton, 'custom-button-wrapper', classes.searchButton)}>
-                                <input
-                                       className={clsx('btn btn-primary', classes.restButton)}
-                                       type="submit" value="Search"/>
+                <Paper className={classes.paper} elevation={3}>
+                    <form onSubmit={handleOnSubmit} noValidate
+                          autoComplete="off">
+                        <FormGroup row>
+                            <div className={'col-md-4'}>
+                                <FormControl className={clsx(classes.selectField)}
+                                             error={entityId.error !== ' '}>
+                                    <Autocomplete
+                                        onChange={(event, newValue) => {
+                                            if (newValue) {
+                                                setEntityId({
+                                                    ...entityId,
+                                                    value: newValue.id
+                                                })
+                                            } else {
+                                                setEntityId({
+                                                    ...entityId,
+                                                    value: ''
+                                                })
+                                            }
+                                        }}
+                                        disabled={apiLoading}
+                                        id="combo-box-demo"
+                                        options={entityList ? entityList : ''}
+                                        getOptionLabel={(option) => option.account_name}
+                                        renderInput={(params) => <TextField error={entityId.error !== ' '} {...params}
+                                                                            label="Entity Name" variant="outlined"/>}
+                                    />
+                                    <FormHelperText>{entityId.error}</FormHelperText>
+                                </FormControl>
                             </div>
-                        </div>
-                    </FormGroup>
-                </form>
+
+
+                            <div className={'col-md-3'}>
+                                <TextField
+                                    required
+                                    label="Start Date"
+                                    format={'Y-M-d'}
+                                    inputProps={{
+                                        name: 'inputFormationDate',
+                                        id: 'inputFormationDate',
+                                    }}
+                                    onChange={e => setDate({
+                                        ...date,
+                                        value: e.target.value
+                                    })}
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                    type="date"
+                                    className={clsx(classes.textFieldOther, classes.dense)}
+                                />
+                            </div>
+
+                            <div className={'col-md-3'}>
+                                <TextField
+                                    required
+                                    label="End Date"
+                                    format={'Y-M-d'}
+                                    inputProps={{
+                                        name: 'inputFormationDate',
+                                        id: 'inputFormationDate',
+                                    }}
+                                    onChange={e => setDate2({
+                                        ...date2,
+                                        value: e.target.value
+                                    })}
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                    type="date"
+                                    className={clsx(classes.textFieldOther, classes.dense)}
+                                />
+                            </div>
+
+                            <div className={'col-md-2'}>
+                                <div
+                                    className={clsx(classes.submitButton, 'custom-button-wrapper', classes.searchButton)}>
+                                    <input
+                                        className={clsx('btn btn-primary', classes.restButton)}
+                                        type="submit" value="Search"/>
+                                </div>
+                            </div>
+                        </FormGroup>
+                    </form>
                 </Paper>
             </Grid>
 
 
-
-
-
-            <div style={{ maxWidth: "100%" }}>
+            <div style={{maxWidth: "100%"}}>
                 <MaterialTable
+                    isLoading={apiLoading}
                     columns={[
-                        { title: "Entity", field: "name" },
-                        { title: "Subject", field: "surname" },
-                        { title: "Date", field: "birthYear", type: "numeric" },
+                        {title: "Entity", field: "name"},
+                        {title: "Subject", field: "subject"},
+                        {title: "Date", field: "sendTime"},
 
                     ]}
-                    data={[
-                        {
-                            name: "Mehmet",
-                            surname: "Baran",
-                            birthYear: '2020-12-14 13:37:17',
-                        },
+                    data={threads}
+                    actions={[
+                        rowData => ({
+                            icon: () => <VisibilityIcon />,
+                            tooltip: 'View',
+                            onClick: (event, rowData) => {
+                                if (rowData.id) {
+                                 console.log(rowData.id);
+                                }
+                            }
+                        })
                     ]}
                     title="Messages"
                 />
             </div>
+
+
+            <div>
+                <Modal
+                    parentSelector={() => document.querySelector('#messageModal')}
+                    isOpen={modalIsOpen}
+                    onAfterOpen={afterOpenModal}
+                    onRequestClose={closeModal}
+                    contentLabel="Chat Application"
+                    style={{
+                        overlay: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)'
+                        },
+                    }}
+                >
+                    <div className="chat-wrapper">
+                        <NewChatPanel/>
+                    </div>
+                </Modal>
+            </div>
+
         </Layout>
     )
 }

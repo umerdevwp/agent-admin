@@ -205,6 +205,7 @@ const ChildDetailedPage = (props) => {
 
     useEffect(() => {
         if (loading === true) {
+            localStorage.setItem('activeEntityID', attributes.organization);
             fetchDetailedProfile();
         }
     }, [loading])

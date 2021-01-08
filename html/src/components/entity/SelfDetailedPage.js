@@ -206,6 +206,7 @@ const SelfDetailedPage = (props) => {
         if (loading === true) {
             try{
                 addTitle('Entity - ' + profile.name);
+                localStorage.setItem('activeEntityID', attributes.organization);
             } catch (e) {
                 props.authService.logout('/');
             }
@@ -229,6 +230,7 @@ const SelfDetailedPage = (props) => {
         if (role === 'Parent Organization' || role === 'Administrator') {
             try {
                 detailedView = await selfEntityDetail();
+                localStorage.setItem('entityName', detailedView.result.entity.name);
             } catch (e) {
                 addError('Something went wrong with the API.');
             }
@@ -269,6 +271,7 @@ const SelfDetailedPage = (props) => {
             }
         }
         if (detailedView.result) {
+            localStorage.setItem('entityName', detailedView.result.entity.name);
             new Promise((resolve, reject) => {
                 setEntitydetail(detailedView.result)
                 setContactList(detailedView.result.contacts);

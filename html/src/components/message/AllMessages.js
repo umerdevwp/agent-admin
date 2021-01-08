@@ -48,7 +48,7 @@ export default function AllMessages(props) {
     const {loading, addError, errorList, role, setUserMessagesForInbox, outerThreads, manageOuterThreads} = useContext(UserContext);
     const [threads, setThreads] = useState([]);
     const [apiLoading, setApiLoading] = useState(false);
-
+    const entity_id = localStorage.getItem('activeEntityID');
     useEffect(() => {
         if (loading === true) {
             getAllMessageThreads()
@@ -65,13 +65,18 @@ export default function AllMessages(props) {
 
     const getAllMessageThreads = async () => {
         setApiLoading(true);
-        FetchThreads().then(response => {
-            if (response.status === true) {
-                setUserMessagesForInbox(response.data);
-                setThreads(response.data);
-                setApiLoading(false);
-            }
-        });
+        try {
+            FetchThreads(entity_id).then(response => {
+                if (response.status === true) {
+                    setUserMessagesForInbox(response.data);
+                    setThreads(response.data);
+                    setApiLoading(false);
+                }
+            });
+        } catch (e) {
+
+            addError('Something went wrong with the message API')
+        }
     }
 
 
@@ -150,9 +155,35 @@ export default function AllMessages(props) {
                         )
                         }
                     </List>
-                    <div className={classes.viewButton}>
-                        <Button onClick={ViewAllHandleClickChange} variant="outlined" color="primary">View All</Button>
-                    </div>
+                    {(threads.length === 0) ?
+                        <>
+                            <ListItem alignItems="flex-start">
+                                <ListItemText
+                                    primary={'No message found'}
+                                    secondary={
+                                        <React.Fragment>
+                                            <Typography
+                                                component="span"
+                                                variant="body2"
+                                                className={classes.inline}
+                                                color="textPrimary"
+                                            >
+                                                Currently there are no active threads
+                                            </Typography>
+                                        </React.Fragment>
+                                    }
+                                />
+                            </ListItem>
+                        </>
+                        : ''}
+
+
+                    {(threads.length !== 0) ?
+                        <div className={classes.viewButton}>
+                            <Button onClick={ViewAllHandleClickChange} variant="outlined" color="primary">View
+                                All</Button>
+                        </div>
+                        : ' '}
                 </>
                 :
                 <>

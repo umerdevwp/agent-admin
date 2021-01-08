@@ -21,7 +21,7 @@ const ReactDOMServer = require('react-dom/server');
 const HtmlToReactParser = require('html-to-react').Parser;
 
 
-const NewChatPanel = (props) => {
+const NewChatPanelForLogs = (props) => {
     const ref = React.createRef();
     const chatContainer = React.createRef();
     const entity_id = localStorage.getItem('activeEntityID');
@@ -322,4 +322,4 @@ const NewChatPanel = (props) => {
     )
 }
 
-export default NewChatPanel;
+export default NewChatPanelForLogs;
