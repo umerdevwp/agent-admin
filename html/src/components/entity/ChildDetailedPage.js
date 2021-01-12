@@ -357,6 +357,7 @@ const ChildDetailedPage = (props) => {
                     <Drawer
                         ModalProps={{
                             keepMounted: true, // Better open performance on mobile.
+                            disableEnforceFocus: true
                         }}
                         classes={{
                             paper: classes.drawerPaper,

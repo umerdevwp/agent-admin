@@ -10,8 +10,8 @@ import Typography from "@material-ui/core/Typography";
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
 import Link from "@material-ui/core/Link";
 import Paper from "@material-ui/core/Paper";
-import {CKEditor} from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+// import {CKEditor} from '@ckeditor/ckeditor5-react';
+// import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import CustomFileInput from "reactstrap/es/CustomFileInput";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
@@ -26,6 +26,7 @@ import FormHelperText from "@material-ui/core/FormHelperText";
 import {TemplateList, getTemplate} from "../api/message";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import {toast} from 'react-toastify';
+import CKEditor from 'ckeditor4-react';
 
 const useStyles = makeStyles(theme => ({
     form: {
@@ -394,26 +395,37 @@ const SendMessageForm = (props) => {
                         <div className={'col-md-12'}>
                             <FormControl className={clsx(classes.selectField)}
                                          error={content.error !== ' '}>
+
                                 <CKEditor
                                     disable={apiLoading}
-                                    editor={ClassicEditor}
                                     data={content.value}
-                                    onReady={editor => {
-                                        // You can store the "editor" and use when it is needed.
-                                        // console.log('Editor is ready to use!', editor);
-                                    }}
-                                    onChange={(event, editor) => {
-                                        const data = editor.getData();
-                                        // console.log({event, editor, data});
+                                    onChange={(event) => {
+                                        const data = event.editor.getData();
                                         setContent({...content, value: data})
                                     }}
-                                    // onBlur={(event, editor) => {
-                                    //     console.log('Blur.', editor);
-                                    // }}
-                                    // onFocus={(event, editor) => {
-                                    //     console.log('Focus.', editor);
-                                    // }}
+
+
                                 />
+                                {/*<CKEditor*/}
+                                {/*    disable={apiLoading}*/}
+                                {/*    editor={ClassicEditor}*/}
+                                {/*    data={content.value}*/}
+                                {/*    onReady={editor => {*/}
+                                {/*        // You can store the "editor" and use when it is needed.*/}
+                                {/*        // console.log('Editor is ready to use!', editor);*/}
+                                {/*    }}*/}
+                                {/*    onChange={(event, editor) => {*/}
+                                {/*        const data = editor.getData();*/}
+                                {/*        // console.log({event, editor, data});*/}
+                                {/*        setContent({...content, value: data})*/}
+                                {/*    }}*/}
+                                {/*    // onBlur={(event, editor) => {*/}
+                                {/*    //     console.log('Blur.', editor);*/}
+                                {/*    // }}*/}
+                                {/*    // onFocus={(event, editor) => {*/}
+                                {/*    //     console.log('Focus.', editor);*/}
+                                {/*    // }}*/}
+                                {/*/>*/}
                                 <FormHelperText>{content.error}</FormHelperText>
                             </FormControl>
 

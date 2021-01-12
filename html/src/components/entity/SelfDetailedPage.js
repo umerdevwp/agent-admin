@@ -383,6 +383,7 @@ const SelfDetailedPage = (props) => {
                 <Drawer
                     ModalProps={{
                         keepMounted: true, // Better open performance on mobile.
+                        disableEnforceFocus: true
                     }}
                     classes={{
                         paper: classes.drawerPaper,

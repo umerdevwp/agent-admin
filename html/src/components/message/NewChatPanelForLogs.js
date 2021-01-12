@@ -7,16 +7,11 @@ import Select from "@material-ui/core/Select";
 import {sendMessageFormChat} from '../api/message';
 import clsx from "clsx";
 // import {animateScroll} from "react-scroll";
-import {
-    Link,
-    DirectLink,
-    Element,
-    Events,
-    animateScroll,
-    scrollSpy,
-    scroller
-} from "react-scroll";
+import { ScrollTo } from "react-scroll-to";
+
 import {toast} from "react-toastify";
+import {animateScroll, Element, scroller} from "react-scroll";
+
 const ReactDOMServer = require('react-dom/server');
 const HtmlToReactParser = require('html-to-react').Parser;
 
@@ -25,8 +20,8 @@ const NewChatPanelForLogs = (props) => {
     const ref = React.createRef();
     const chatContainer = React.createRef();
     const entity_id = localStorage.getItem('activeEntityID');
-    const IncomingIDFromAllMessages = localStorage.getItem('allMessagesThread');
-    const {attributes, loading, role, profile, userMessages, addMessage, manageOuterThreads} = useContext(UserContext);
+    const IncomingIDFromAllMessages = localStorage.getItem('activeLogThread');
+    const {attributes, loading, role, profile, userMessages, addMessage, manageOuterThreads, messageLogThreads} = useContext(UserContext);
     const [inComingThreadID, setInComingThreadID] = React.useState(IncomingIDFromAllMessages);
     const [activeThread, setActiveThread] = React.useState('');
     const [chosenThread, setChosenThread] = React.useState({});
@@ -36,53 +31,48 @@ const NewChatPanelForLogs = (props) => {
     const [message, setMessage] = React.useState('');
 
     React.useEffect(() => {
-        const obj = userMessages.find(o => o.id === inComingThreadID);
+        const obj = messageLogThreads.find(o => o.id === inComingThreadID);
         setActiveThread(obj.id);
         setChosenThread(obj);
 
-        setTimeout(()=> {
-            scrollToBottom();
+        setTimeout(() => {
+            scrollToBottom(obj.id);
         }, 1000);
 
     }, [inComingThreadID]);
 
 
-    React.useEffect(() => {
-        if (updateThread) {
-            manageOuterThreads(true);
-            setUpdateThread(false);
-            const obj = userMessages.find(o => o.id === chosenThread.id);
-            setChosenThread(obj);
-            setTimeout(()=> {
-                scrollToBottom();
-            }, 2000);
-        }
-
-    }, [userMessages]);
-
-
-
-
-    const scrollToBottom = () => {
-        animateScroll.scrollToBottom({
-
-            containerId: "containerElement",
-            duration: 0,
-            delay: 0,
-            smooth: "easeInOutQuart",
+    const scrollToBottom = (id) => {
+        let goToContainer = new Promise((resolve, reject) => {
+            scroller.scrollTo(`containerElementThread${id}`,{
+                containerId: `contacts`,
+                duration: 0,
+                delay: 0,
+                smooth: "easeInOutQuart",
+            });
+            resolve();
         });
+        const getMessageID = localStorage.getItem('activeLogMessage');
+        // console.log('MessageID', getMessageID);
+        let goToMessage = new Promise((resolve, reject) => {
+            scroller.scrollTo(`containerElementMessage${getMessageID}`,{
+                containerId: `containerElement`,
+                duration: 0,
+                delay: 0,
+                smooth: "easeInOutQuart",
+            });
+            resolve();
+        });
+
+
     }
 
-    // React.useEffect(() => {
-    //     const obj = userMessages.find(o => o.id === activeThread);
-    //     setChosenThread(obj);
-    // }, [threads])
+
 
     const onClickThread = async (threadID) => {
-        const obj = userMessages.find(o => o.id === threadID);
+        const obj = messageLogThreads.find(o => o.id === threadID);
         await setChosenThread(obj);
         setMessage('');
-        scrollToBottom();
     }
 
 
@@ -115,14 +105,14 @@ const NewChatPanelForLogs = (props) => {
         form.append('gid', chosenThread.id);
         form.append('message', message);
         const response = sendMessageFormChat(form).then(response => {
-            if(response.status === true) {
+            if (response.status === true) {
                 setMessage('')
                 setUpdateThread(true);
                 addMessage(chosenThread, message, role, attributes.organization)
             }
 
 
-            if(response.status === false){
+            if (response.status === false) {
                 toast.error(response.message, {
                     position: toast.POSITION.BOTTOM_LEFT
                 });
@@ -143,6 +133,7 @@ const NewChatPanelForLogs = (props) => {
 
 
     const convertHTML = (data) => {
+
         const htmlInput = data;
         const htmlToReactParser = new HtmlToReactParser();
         return htmlToReactParser.parse(htmlInput);
@@ -167,7 +158,7 @@ const NewChatPanelForLogs = (props) => {
             // }
 
 
-            if(threadInfo.fromEid === '0'){
+            if (threadInfo.fromEid === '0') {
                 return 'sent'
             }
             if (threadInfo.fromEid === attributes.organization) {
@@ -184,9 +175,9 @@ const NewChatPanelForLogs = (props) => {
         }
 
         if (threadInfo.fromEid === attributes.organization) {
-            return getInitials(localStorage.getItem('entityName'))
+            return getInitials(localStorage.getItem('ThreadBelongsTo'))
         } else {
-            return getInitials(localStorage.getItem('entityName'))
+            return getInitials(localStorage.getItem('ThreadBelongsTo'))
 
         }
     }
@@ -220,6 +211,7 @@ const NewChatPanelForLogs = (props) => {
         .trim();
 
     return (
+
         <div id="frame">
             <div id="sidepanel">
                 <div id="profile">
@@ -235,14 +227,18 @@ const NewChatPanelForLogs = (props) => {
                     <input disabled type="text" placeholder="Search contacts..."/>
                 </div>
                 <div id="contacts">
+
                     <ul>
-                        {userMessages.map((anObjectMapped, index) =>
-                            <li className={clsx('contact', chosenThread ? chosenThread.id === anObjectMapped.id ? 'active-thread' : '' : '')}
+                        {messageLogThreads.map((anObjectMapped, index) =>
+
+                            <li id={`containerElementThread${anObjectMapped.id}`}
+                                className={clsx('contact', chosenThread ? chosenThread.id === anObjectMapped.id ? 'active-thread' : '' : '')}
                                 onClick={() => onClickThread(anObjectMapped.id)} key={anObjectMapped.id}>
                                 <div className="wrap">
                                     {/*<Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />*/}
                                     {/*<img src="http://emilcarlsson.se/assets/louislitt.png" alt=""/>*/}
-                                    <Avatar>{localStorage.getItem('entityName') ? getInitials(localStorage.getItem('entityName')) : ''}</Avatar>
+
+                                    <Avatar>{localStorage.getItem('ThreadBelongsTo') ? getInitials(localStorage.getItem('ThreadBelongsTo')) : ''}</Avatar>
                                     <div className="meta">
                                         <p className="name">{anObjectMapped.subject}</p>
                                         <p className="preview">{lastMessage(anObjectMapped)}</p>
@@ -252,15 +248,15 @@ const NewChatPanelForLogs = (props) => {
                         )}
 
                     </ul>
+
                 </div>
             </div>
             <div className="content">
 
                 <div className="messages" id="containerElement">
                     <ul>
-
                         {chosenThread ?
-                            <li className={messageOrientation(chosenThread)}>
+                            <li id={`containerElementMessage${chosenThread.id}`} className={messageOrientation(chosenThread)}>
                                 {/*<Avatar alt={anObjectMapped.user} />*/}
                                 <Avatar>{namePicker(chosenThread)}</Avatar>
                                 <div className="message-body-chat">
@@ -285,7 +281,7 @@ const NewChatPanelForLogs = (props) => {
 
                         {
                             chosenThread.child?.map((anObjectMapped, index) =>
-                                <li key={index} className={messageOrientation(anObjectMapped)}>
+                                <li id={`containerElementMessage${anObjectMapped.id}`}  key={index} className={messageOrientation(anObjectMapped)}>
                                     <Avatar>{namePicker(anObjectMapped)}</Avatar>
                                     <div className="message-body-chat">
                                         <span><strong>Subject: </strong> {anObjectMapped.subject}</span>
@@ -310,15 +306,17 @@ const NewChatPanelForLogs = (props) => {
                 </div>
                 <div className="message-input">
                     <div className="wrap">
-                        <input onKeyPress={handleKeypress} value={message} onChange={(event) => setMessage(event.target.value)} type="text"
+                        <input disabled={true} onKeyPress={handleKeypress} value={message} type="text"
                                placeholder="Type a message"/>
                         <i className="fa fa-paperclip attachment" aria-hidden="true"></i>
-                        <button  onClick={(e) => sendMessage(e)} className="submit"><i className="fa fa-paper-plane"
-                                                                                    aria-hidden="true"></i></button>
+                        <button disabled={true} className="submit"><i
+                            className="fa fa-paper-plane"
+                            aria-hidden="true"></i></button>
                     </div>
                 </div>
             </div>
         </div>
+
     )
 }
 

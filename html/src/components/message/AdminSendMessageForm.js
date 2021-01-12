@@ -10,8 +10,8 @@ import Typography from "@material-ui/core/Typography";
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
 import Link from "@material-ui/core/Link";
 import Paper from "@material-ui/core/Paper";
-import {CKEditor} from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+// import {CKEditor} from '@ckeditor/ckeditor5-react';
+// import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import CustomFileInput from "reactstrap/es/CustomFileInput";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
@@ -26,6 +26,7 @@ import FormHelperText from "@material-ui/core/FormHelperText";
 import {TemplateList, getTemplate} from "../api/message";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import {toast} from 'react-toastify';
+import CKEditor from 'ckeditor4-react';
 
 const useStyles = makeStyles(theme => ({
     form: {
@@ -135,7 +136,7 @@ function FacebookProgress(props) {
 
 const AdminSendMessageForm = (props) => {
     const classes = useStyles();
-    const {loading, addError, errorList, role, attributes,manageOuterThreads} = useContext(UserContext);
+    const {loading, addError, errorList, role, attributes, manageOuterThreads} = useContext(UserContext);
 
     const entity_id = props.match.params.id ? props.match.params.id : attributes.organization;
     const [content, setContent] = useState({value: '', error: ' '});
@@ -147,10 +148,10 @@ const AdminSendMessageForm = (props) => {
     const [fileName, setFileName] = useState({value: '', error: ' '});
     const [apiLoading, setApiLoading] = useState(false);
     const [templates, setTemplates] = useState([]);
-    const [noteType, setNoteType] = useState({email: 'Email', note: 'Note', phone: 'Phone', mail:'Mail'});
+    const [noteType, setNoteType] = useState({email: 'Email', note: 'Note', phone: 'Phone', mail: 'Mail'});
     const [noteChosen, setNoteChosen] = useState({value: '', error: ' '});
     useEffect(() => {
-        if(loading === true) {
+        if (loading === true) {
             getTemplateList();
         }
     }, [loading]);
@@ -173,18 +174,18 @@ const AdminSendMessageForm = (props) => {
         let formData = new FormData();
         formData.append('eid', entity_id);
         formData.append('subject', subject.value);
-        if(sendasEmail) {
+        if (sendasEmail) {
             formData.append('note', '1');
         } else {
             formData.append('note', '0');
         }
-        if(noteChosen.value) {
+        if (noteChosen.value) {
             formData.append('notetype', noteChosen.value);
         }
         formData.append('message', content.value);
 
-        if(sendasEmail === true){
-            if(noteChosen.value  === ''){
+        if (sendasEmail === true) {
+            if (noteChosen.value === '') {
                 setNoteChosen({...noteChosen, error: 'Choose the note type'});
                 toast.error('Choose the note type', {
                     position: toast.POSITION.BOTTOM_LEFT
@@ -274,11 +275,11 @@ const AdminSendMessageForm = (props) => {
                 value: ''
             })
         }
-        if (newValue.id) {
+        if (newValue) {
             await getTemplate(newValue.id).then(response => {
                 if (response.status === true) {
                     setContent({...content, value: response.data.message});
-                    setSubject({...subject, value:newValue.subject});
+                    setSubject({...subject, value: newValue.subject});
                     setApiLoading(false);
                 }
             })
@@ -290,198 +291,207 @@ const AdminSendMessageForm = (props) => {
 
     const resetForm = () => {
         setContent({...content, value: ''})
-        setSubject({...subject, value:''})
+        setSubject({...subject, value: ''})
 
     }
 
 
-
     const resetFormError = () => {
         setContent({...content, error: ' '})
-        setSubject({...subject, error:' '})
-        setNoteChosen({...noteChosen, error:' '})
+        setSubject({...subject, error: ' '})
+        setNoteChosen({...noteChosen, error: ' '})
 
     }
 
     return (
         <>
-            <div className="container">
-                <div className="message-title">
-                    <Typography className={classes.baseColor} color="inherit" variant="h5">Send Message</Typography>
-                </div>
-                <form onSubmit={sendMessageSubmission} className={classes.container} noValidate autoComplete="off">
-                    <FormGroup row>
 
-                        <div className={'col-md-12'}>
-                            <FormControlLabel
-                                control={<Checkbox color="primary"/>}
-                                label="Send as Note"
-                                className={'send-as-mail'}
-                                labelPlacement="start"
-                                onChange={e => setSendasEmail(
-                                    e.target.checked
-                                )}
+            <div className="message-title">
+                <Typography className={classes.baseColor} color="inherit" variant="h5">Send Message</Typography>
+            </div>
+            <form onSubmit={sendMessageSubmission} className={classes.container} noValidate autoComplete="off">
+                <FormGroup row>
+
+                    <div className={'col-md-12'}>
+                        <FormControlLabel
+                            control={<Checkbox color="primary"/>}
+                            label="Send as Note"
+                            className={'send-as-mail'}
+                            labelPlacement="start"
+                            onChange={e => setSendasEmail(
+                                e.target.checked
+                            )}
+                        />
+                    </div>
+
+                    {/*<div className={'col-md-12'}>*/}
+                    {/*    <FormControl className={clsx(classes.selectField)}*/}
+                    {/*                 error={messageType.error !== ' '}>*/}
+                    {/*        <InputLabel className={clsx(classes.label)} htmlFor="age-native-simple">Message*/}
+                    {/*            Type</InputLabel>*/}
+                    {/*        <Select*/}
+                    {/*            disabled={apiLoading}*/}
+                    {/*            required*/}
+                    {/*            error={messageType.error !== ' '}*/}
+                    {/*            value={messageType.value}*/}
+
+                    {/*            onChange={e => handleTemplateListing(e)}*/}
+                    {/*            inputProps={{*/}
+                    {/*                name: 'messageType',*/}
+                    {/*                id: 'messageType',*/}
+                    {/*            }}>*/}
+                    {/*            <option value=""/>*/}
+                    {/*            {templates?.map((anObjectMapped, index) => <option key={index}*/}
+                    {/*                                                               value={anObjectMapped.id}>{anObjectMapped.subject}</option>)*/}
+
+                    {/*            }*/}
+
+                    {/*        </Select>*/}
+                    {/*        <FormHelperText>{messageType.error}</FormHelperText>*/}
+                    {/*    </FormControl>*/}
+                    {/*</div>*/}
+
+                    <div className={'col-md-12'}>
+                        <FormControl className={clsx(classes.selectField)}
+                                     error={messageType.error !== ' '}>
+                            <Autocomplete
+                                disabled={apiLoading}
+                                onChange={(event, newValue) => {
+
+                                    handleTemplateListing(newValue)
+                                }}
+
+                                id="combo-box-demo"
+                                options={templates ? templates : ''}
+                                getOptionLabel={(option) => option.subject}
+                                renderInput={(params) => <TextField error={messageType.error !== ' '} {...params}
+                                                                    label="Message Type" variant="outlined"/>}
                             />
-                        </div>
-
-                        {/*<div className={'col-md-12'}>*/}
-                        {/*    <FormControl className={clsx(classes.selectField)}*/}
-                        {/*                 error={messageType.error !== ' '}>*/}
-                        {/*        <InputLabel className={clsx(classes.label)} htmlFor="age-native-simple">Message*/}
-                        {/*            Type</InputLabel>*/}
-                        {/*        <Select*/}
-                        {/*            disabled={apiLoading}*/}
-                        {/*            required*/}
-                        {/*            error={messageType.error !== ' '}*/}
-                        {/*            value={messageType.value}*/}
-
-                        {/*            onChange={e => handleTemplateListing(e)}*/}
-                        {/*            inputProps={{*/}
-                        {/*                name: 'messageType',*/}
-                        {/*                id: 'messageType',*/}
-                        {/*            }}>*/}
-                        {/*            <option value=""/>*/}
-                        {/*            {templates?.map((anObjectMapped, index) => <option key={index}*/}
-                        {/*                                                               value={anObjectMapped.id}>{anObjectMapped.subject}</option>)*/}
-
-                        {/*            }*/}
-
-                        {/*        </Select>*/}
-                        {/*        <FormHelperText>{messageType.error}</FormHelperText>*/}
-                        {/*    </FormControl>*/}
-                        {/*</div>*/}
-
+                            <FormHelperText>{messageType.error}</FormHelperText>
+                        </FormControl>
+                    </div>
+                    {sendasEmail ?
                         <div className={'col-md-12'}>
                             <FormControl className={clsx(classes.selectField)}
-                                         error={messageType.error !== ' '}>
-                                <Autocomplete
+                                         error={noteChosen.error !== ' '}>
+                                <InputLabel className={clsx(classes.label)} htmlFor="age-native-simple">Note
+                                    Type</InputLabel>
+                                <Select
                                     disabled={apiLoading}
-                                    onChange={(event, newValue) => {
+                                    required
+                                    error={noteChosen.error !== ' '}
+                                    value={noteChosen.value}
 
-                                        handleTemplateListing(newValue)
-                                    }}
+                                    onChange={e => setNoteChosen({
+                                        ...noteChosen,
+                                        value: e.target.value
+                                    })}
+                                    inputProps={{
+                                        name: 'noteChosen',
+                                        id: 'noteChosen',
+                                    }}>
+                                    <option value=""/>
+                                    {/*{noteType?.map((anObjectMapped, index) => <option key={index} value={anObjectMapped}>{index}</option>)}*/}
 
-                                    id="combo-box-demo"
-                                    options={templates ? templates : ''}
-                                    getOptionLabel={(option) => option.subject}
-                                    renderInput={(params) => <TextField error={messageType.error !== ' '} {...params}
-                                                                        label="Message Type" variant="outlined"/>}
-                                />
-                                <FormHelperText>{messageType.error}</FormHelperText>
+                                    {/*{noteType.map((value, index) => (*/}
+                                    {/*    <option key={index} value={index}>{value}</option>*/}
+                                    {/*))}*/}
+                                    {
+                                        Object.entries(noteType).map(([key, val]) =>
+                                            <option key={key} value={key}>{val}</option>
+                                        )
+                                    }
+
+
+                                </Select>
+                                <FormHelperText>{noteChosen.error}</FormHelperText>
                             </FormControl>
-                        </div>
-                        {sendasEmail ?
-                            <div className={'col-md-12'}>
-                                <FormControl className={clsx(classes.selectField)}
-                                             error={noteChosen.error !== ' '}>
-                                    <InputLabel className={clsx(classes.label)} htmlFor="age-native-simple">Note
-                                        Type</InputLabel>
-                                    <Select
-                                        disabled={apiLoading}
-                                        required
-                                        error={noteChosen.error !== ' '}
-                                        value={noteChosen.value}
+                        </div> : ''}
 
-                                        onChange={e => setNoteChosen({
-                                            ...noteChosen,
-                                            value: e.target.value
-                                        })}
-                                        inputProps={{
-                                            name: 'noteChosen',
-                                            id: 'noteChosen',
-                                        }}>
-                                        <option value=""/>
-                                        {/*{noteType?.map((anObjectMapped, index) => <option key={index} value={anObjectMapped}>{index}</option>)}*/}
+                    {/*{sendasEmail === true ?*/}
+                    {/*<div className={'col-md-12'}>*/}
+                    {/*    <TextField className={clsx(classes.textFieldtwofield, classes.dense)}*/}
+                    {/*               id="standard-basic"*/}
+                    {/*               label="To"/>*/}
+                    {/*</div> : ''*/}
+                    {/*}*/}
 
-                                        {/*{noteType.map((value, index) => (*/}
-                                        {/*    <option key={index} value={index}>{value}</option>*/}
-                                        {/*))}*/}
-                                        {
-                                            Object.entries(noteType).map(([key, val]) =>
-                                                <option key={key} value={key}>{val}</option>
-                                            )
-                                        }
+                    <div className={'col-md-12 custom-subject'}>
+                        <TextField disabled={apiLoading} value={subject.value}
+                                   error={subject.error !== ' '}
+                                   helperText={subject.error}
+                                   onChange={(e) => setSubject({...subject, value: e.target.value})}
+                                   className={clsx(classes.textFieldtwofield, classes.subjectDense)} id="standard-basic"
+                                   label="Subject"/>
+                    </div>
+                    <div className={'col-md-12'}>
+                        <FormControl className={clsx(classes.selectField)}
+                                     error={content.error !== ' '}>
 
-
-                                    </Select>
-                                    <FormHelperText>{noteChosen.error}</FormHelperText>
-                                </FormControl>
-                            </div> : ''}
-
-                        {/*{sendasEmail === true ?*/}
-                        {/*<div className={'col-md-12'}>*/}
-                        {/*    <TextField className={clsx(classes.textFieldtwofield, classes.dense)}*/}
-                        {/*               id="standard-basic"*/}
-                        {/*               label="To"/>*/}
-                        {/*</div> : ''*/}
-                        {/*}*/}
-
-                        <div className={'col-md-12 custom-subject'}>
-                            <TextField disabled={apiLoading} value={subject.value}
-                                       error={subject.error !== ' '}
-                                       helperText={subject.error}
-                                       onChange={(e) => setSubject({...subject, value: e.target.value})}
-                                       className={clsx(classes.textFieldtwofield, classes.subjectDense)} id="standard-basic"
-                                       label="Subject"/>
-                        </div>
-                        <div className={'col-md-12'}>
-                            <FormControl className={clsx(classes.selectField)}
-                                         error={content.error !== ' '}>
                             <CKEditor
                                 disable={apiLoading}
-                                editor={ClassicEditor}
                                 data={content.value}
-                                onReady={editor => {
-                                    // You can store the "editor" and use when it is needed.
-                                    // console.log('Editor is ready to use!', editor);
-                                }}
-                                onChange={(event, editor) => {
-                                    const data = editor.getData();
-                                    // console.log({event, editor, data});
+                                onChange={(event) => {
+                                    const data = event.editor.getData();
                                     setContent({...content, value: data})
                                 }}
-                                // onBlur={(event, editor) => {
-                                //     console.log('Blur.', editor);
-                                // }}
-                                // onFocus={(event, editor) => {
-                                //     console.log('Focus.', editor);
-                                // }}
+
+
                             />
-                                <FormHelperText>{content.error}</FormHelperText>
-                            </FormControl>
+                            {/*<CKEditor*/}
+                            {/*    disable={apiLoading}*/}
+                            {/*    editor={ClassicEditor}*/}
+                            {/*    data={content.value}*/}
+                            {/*    onReady={editor => {*/}
+                            {/*        // You can store the "editor" and use when it is needed.*/}
+                            {/*        // console.log('Editor is ready to use!', editor);*/}
+                            {/*    }}*/}
+                            {/*    onChange={(event, editor) => {*/}
+                            {/*        const data = editor.getData();*/}
+                            {/*        // console.log({event, editor, data});*/}
+                            {/*        setContent({...content, value: data})*/}
+                            {/*    }}*/}
+                            {/*    // onBlur={(event, editor) => {*/}
+                            {/*    //     console.log('Blur.', editor);*/}
+                            {/*    // }}*/}
+                            {/*    // onFocus={(event, editor) => {*/}
+                            {/*    //     console.log('Focus.', editor);*/}
+                            {/*    // }}*/}
+                            {/*/>*/}
+                            <FormHelperText>{content.error}</FormHelperText>
+                        </FormControl>
 
-                        </div>
+                    </div>
 
-                        {/*<div className={'col-md-12'}>*/}
-                        {/*    <CustomFileInput*/}
-                        {/*        disable={apiLoading}*/}
-                        {/*        value={fileLink.value.File}*/}
-                        {/*        onChange={e => fileChange(e)}*/}
-                        {/*        required*/}
-                        {/*        id="attachment"*/}
-                        {/*        label="File"*/}
-                        {/*        className={clsx(classes.fileUploading, classes.dense)}*/}
-                        {/*        margin="dense"*/}
-                        {/*    />*/}
-                        {/*    {fileLink.success !== ' ' ? (<span>{fileLink.success}</span>) : ' '}*/}
-                        {/*    {fileLink.error !== ' ' ? (*/}
-                        {/*        <span className={clsx(classes.fileError)}>{fileLink.error}</span>) : ' '}*/}
-                        {/*</div>*/}
-                        <div className={'col-md-12'}>
-                            <div className={clsx(classes.submitButton, 'custom-button-wrapper')}>
-                                {apiLoading ? (
-                                        <div className={clsx(classes.loader)}>
-                                            <FacebookProgress/>
-                                        </div>)
-                                    : null}
-                                <input disabled={apiLoading}
-                                       className={clsx('btn btn-primary', classes.restButton)}
-                                       type="submit" value="Send Message"/>
-                            </div>
+                    {/*<div className={'col-md-12'}>*/}
+                    {/*    <CustomFileInput*/}
+                    {/*        disable={apiLoading}*/}
+                    {/*        value={fileLink.value.File}*/}
+                    {/*        onChange={e => fileChange(e)}*/}
+                    {/*        required*/}
+                    {/*        id="attachment"*/}
+                    {/*        label="File"*/}
+                    {/*        className={clsx(classes.fileUploading, classes.dense)}*/}
+                    {/*        margin="dense"*/}
+                    {/*    />*/}
+                    {/*    {fileLink.success !== ' ' ? (<span>{fileLink.success}</span>) : ' '}*/}
+                    {/*    {fileLink.error !== ' ' ? (*/}
+                    {/*        <span className={clsx(classes.fileError)}>{fileLink.error}</span>) : ' '}*/}
+                    {/*</div>*/}
+                    <div className={'col-md-12'}>
+                        <div className={clsx(classes.submitButton, 'custom-button-wrapper')}>
+                            {apiLoading ? (
+                                    <div className={clsx(classes.loader)}>
+                                        <FacebookProgress/>
+                                    </div>)
+                                : null}
+                            <input disabled={apiLoading}
+                                   className={clsx('btn btn-primary', classes.restButton)}
+                                   type="submit" value="Send Message"/>
                         </div>
-                    </FormGroup>
-                </form>
-            </div>
+                    </div>
+                </FormGroup>
+            </form>
 
         </>
     )

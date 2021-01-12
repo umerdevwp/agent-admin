@@ -17,10 +17,10 @@ import {makeStyles} from "@material-ui/core/styles";
 import {amber, green} from "@material-ui/core/colors";
 import {EntityList} from "../api/enitity.crud";
 import Autocomplete from "@material-ui/lab/Autocomplete";
-import {FetchMessageLogs} from "../api/message";
+import {FetchMessageLogs, FetchThreads} from "../api/message";
 import VisibilityIcon from "@material-ui/icons/Visibility";
 import Modal from "react-modal";
-import NewChatPanel from "./NewChatPanel";
+import NewChatPanelForLogs from "./NewChatPanelForLogs";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -161,7 +161,7 @@ const useStyles = makeStyles(theme => ({
 const MessageLog = (props) => {
 
 
-    const {loading, attributes, addError, errorList, role, addTitle, profile} = useContext(UserContext);
+    const {loading, attributes, addError, errorList, role, addTitle, profile, setMessageForLogs} = useContext(UserContext);
     const classes = useStyles();
 
     const [entityId, setEntityId] = React.useState({value: '', error: ' '});
@@ -169,10 +169,11 @@ const MessageLog = (props) => {
     const [date, setDate] = React.useState({value: '', error: ' '});
     const [date2, setDate2] = React.useState({value: '', error: ' '});
     const [entityList, setEntityList] = React.useState([]);
+    const [messagesLogs, setMessagesLogs] = React.useState([]);
     const [threads, setThreads] = React.useState([]);
-    const [modalIsOpen,setIsOpen] = React.useState(false);
-    const [state, setState] = React.useState(false);
 
+    const [modalIsOpen, setIsOpen] = React.useState(false);
+    const [state, setState] = React.useState(false);
 
 
     useEffect(() => {
@@ -191,7 +192,7 @@ const MessageLog = (props) => {
         // subtitle.style.color = '#f00';
     }
 
-    function closeModal(){
+    function closeModal() {
         setIsOpen(false);
     }
 
@@ -223,19 +224,29 @@ const MessageLog = (props) => {
         }
     }
 
-    const handleOnSubmit = (event) => {
+    const handleOnSubmit = async (event) => {
         event.preventDefault();
         setApiLoading(true);
         let formData = new FormData();
         formData.append('eid', entityId.value);
         formData.append('startDate', date.value);
         formData.append('endDate', date2.value);
-        FetchMessageLogs(formData).then(response => {
-            console.log(response);
-            setThreads(response.data);
+        const response = await FetchMessageLogs(formData);
+        if (response.status === true) {
+            setMessagesLogs(response.data);
             setApiLoading(false);
-        })
+        }
+
+        if (response.status === true) {
+            if(response.data.length !== 0){
+                FetchThreads(entityId.value).then(response => {
+                    setMessageForLogs(response.data)
+                })
+            }
+        }
+
     }
+
 
     return (
         <Layout>
@@ -339,14 +350,22 @@ const MessageLog = (props) => {
                         {title: "Date", field: "sendTime"},
 
                     ]}
-                    data={threads}
+                    data={messagesLogs}
                     actions={[
                         rowData => ({
-                            icon: () => <VisibilityIcon />,
+                            icon: () => <VisibilityIcon/>,
                             tooltip: 'View',
                             onClick: (event, rowData) => {
                                 if (rowData.id) {
-                                 console.log(rowData.id);
+                                    console.log(rowData);
+                                    if(rowData.gid !== "0") {
+                                        localStorage.setItem('activeLogThread', rowData.gid);
+                                    } else {
+                                        localStorage.setItem('activeLogThread', rowData.id);
+                                    }
+                                    localStorage.setItem('ThreadBelongsTo', rowData.name);
+                                    localStorage.setItem('activeLogMessage', rowData.id);
+                                    openModal();
                                 }
                             }
                         })
@@ -370,7 +389,7 @@ const MessageLog = (props) => {
                     }}
                 >
                     <div className="chat-wrapper">
-                        <NewChatPanel/>
+                        <NewChatPanelForLogs/>
                     </div>
                 </Modal>
             </div>

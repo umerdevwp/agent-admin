@@ -36,6 +36,7 @@ function UserContextProvider(props) {
     const [userMessages, setUserMessages] = useState([]);
     const [role, setRole] = useState({});
     const [outerThreads, setOuterThreads] = useState(false);
+    const [messageLogThreads, setMessageLogThreads] = useState([]);
     React.useEffect(() => {
         const okta = localStorage.getItem('okta-token-storage');
         if (okta !== '{}' && okta !== null && okta !== undefined) {
@@ -178,6 +179,11 @@ function UserContextProvider(props) {
         setOuterThreads(data);
     }
 
+
+    const setMessageForLogs = (data) => {
+        setMessageLogThreads(data)
+    }
+
     const addMessage = (data, message, UserRole, currentUser) => {
         const id = Math.floor((Math.random() * 10) + 1);
         let newDate = moment().format("YYYY-MM-DD hh:mm:ss");
@@ -227,7 +233,9 @@ function UserContextProvider(props) {
                 userMessages,
                 addMessage,
                 outerThreads,
-                manageOuterThreads
+                manageOuterThreads,
+                setMessageForLogs,
+                messageLogThreads
             }}>
             {props.children}
         </UserContext.Provider>

@@ -17,6 +17,7 @@ import {
     scroller
 } from "react-scroll";
 import {toast} from "react-toastify";
+import stripHtml from "string-strip-html";
 const ReactDOMServer = require('react-dom/server');
 const HtmlToReactParser = require('html-to-react').Parser;
 
@@ -79,6 +80,7 @@ const NewChatPanel = (props) => {
     // }, [threads])
 
     const onClickThread = async (threadID) => {
+        console.log(threadID);
         const obj = userMessages.find(o => o.id === threadID);
         await setChosenThread(obj);
         setMessage('');
@@ -134,18 +136,48 @@ const NewChatPanel = (props) => {
 
 
     const stripHTML = (myString) => {
-        return myString.replace(/<[^>]*>?/gm, '').replace(/\&nbsp;/g, '');
+        if(myString) {
+            return myString.replace(/<[^>]*>?/gm, '').replace(/\&nbsp;/g, '');
+        } else {
+            return myString;
+        }
     }
 
     const truncate = (str, no_words) => {
-        return str.split(" ").splice(0, no_words).join(" ") + " ...";
+        if(str) {
+            return str.split(" ").splice(0, no_words).join(" ") + " ...";
+        } else {
+            return str;
+        }
     }
 
 
     const convertHTML = (data) => {
-        const htmlInput = data;
-        const htmlToReactParser = new HtmlToReactParser();
-        return htmlToReactParser.parse(htmlInput);
+
+        // let html = data;
+        // let reg = html.getElementsByTagName('body')[0].innerHTML()
+        // let contentNew = html.match( reg )[1];
+
+
+        if(typeof data !== 'undefined') {
+
+            // var newHTML = stripHtml(data, {
+            //     stripTogetherWithTheirContents: [
+            //         "head", // default
+            //         "style", // default
+            //         "body", // default
+            //         "meta", // <-- custom-added
+            //     ],
+            // }).result;
+
+            const htmlInput = data;
+            const htmlToReactParser = new HtmlToReactParser();
+            return htmlToReactParser.parse(htmlInput);
+        } else {
+
+           return data;
+
+        }
 
     }
 
@@ -267,7 +299,9 @@ const NewChatPanel = (props) => {
                                     <span><strong>    Subject: </strong> {chosenThread.subject}</span>
                                     {isHTML(chosenThread.message) === true ?
                                         convertHTML(chosenThread.message) :
-                                        <p>{chosenThread.message}</p>}
+                                        <p>{chosenThread.message}</p>
+
+                                        }
 
                                     <div className="message-info">
                                         <div className="message-time">
@@ -290,8 +324,10 @@ const NewChatPanel = (props) => {
                                     <div className="message-body-chat">
                                         <span><strong>Subject: </strong> {anObjectMapped.subject}</span>
                                         {isHTML(anObjectMapped.message) === true ?
-                                            convertHTML(anObjectMapped.message) :
-                                            <p>{anObjectMapped.message}</p>}
+                                            convertHTML(anObjectMapped.message) : <p>{convertHTML(anObjectMapped.message)}</p>
+
+                                        }
+
                                         <div className="message-info">
                                             <div className="message-time">
                                                 <span>{anObjectMapped.sendTime}</span>

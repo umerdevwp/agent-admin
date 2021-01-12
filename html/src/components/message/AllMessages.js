@@ -81,11 +81,19 @@ export default function AllMessages(props) {
 
 
     const stripHTML = (myString) => {
-        return myString.replace(/<[^>]*>?/gm, '').replace(/\&nbsp;/g, '');
+        if(myString) {
+            return myString.replace(/<[^>]*>?/gm, '').replace(/\&nbsp;/g, '');
+        } else {
+            return myString;
+        }
     }
 
     const truncate = (str, no_words) => {
-        return str.split(" ").splice(0, no_words).join(" ") + " ...";
+        if(str) {
+            return str.split(" ").splice(0, no_words).join(" ") + " ...";
+        } else {
+            return str;
+        }
     }
 
     const handleClickChange = (id) => {
