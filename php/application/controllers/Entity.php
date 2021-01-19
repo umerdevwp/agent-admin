@@ -268,7 +268,7 @@ HC;
                     // allow without file, else check type and size
                     $iZohoId = $aResponseZoho['id'];
 
-                    $this->addInitialRulingTask($iZohoId);
+                    $aTaskResult = $this->addInitialRulingTask($iZohoId);
                     //$this->zohoAddAttachment($iZohoId);
 
                     // check address is valid from smarty is not needed, validation is at interface

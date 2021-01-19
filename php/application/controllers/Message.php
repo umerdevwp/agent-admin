@@ -1,7 +1,7 @@
 <?php
 
 // use Src\Services\OktaApiService as Okta;
-header('Access-Control-Allow-Origin: *');
+header("Access-Control-Allow-Origin: *");
 
 use zcrmsdk\crm\crud\ZCRMTag;
 
@@ -38,6 +38,11 @@ class Message extends RestController
                 '[RA Renewal Amount]'=>'ra_renewal_amount'        
             ]        
     ];
+
+    private $sSignatureStarter = "Signature::";
+    private $sSignatureEnder = "::";
+    private $sUploadDirectory = "attachments/";
+
     /**
      * Replace shortcodes with actual entity/contact values
      * shortcordes from private class variables $aShortcode
@@ -128,7 +133,7 @@ class Message extends RestController
         {
             $this->response([
                 'status' => false,
-                'message'=> "Not authorized to access entity"
+                'message'=> "Please login to send message"
             ], 403);
         }
 
@@ -233,41 +238,7 @@ class Message extends RestController
 //            $sMessage = $this->replaceShortcode($sMessage,$oContact,'contact');
         }
 
-        // generate hash for easy search email
-        $sEntityEmailHash = generateHash($sEntityEmail);
-
-        // send mail through messenger centralized model
-        $this->load->model("Messenger_model");
-        $aSendgridResult = $this->Messenger_model->sendMailSimple($sTo,$sToName,$sFrom,$sFromName,$sSubject,$sMessage);
-
-        // sent success
-        if($aSendgridResult['type']=='ok')
-        {
-          // hold message id of sendgrid
-          $iMessageId = $aSendgridResult['id'];
-
-          // record the details for log or trackings
-          $this->load->model("SendgridMessage_model");          
-          $iInsertId = $this->SendgridMessage_model->logOutboxMail($iEid,$iMessageId,$sTo,$sFrom,$sSubject,$sMessage,$sEntityEmailHash,$iFromEid,$iGroupId);
-
-        // report to admin on failure             
-        if(!$iInsertId)
-        {
-            logToAdmin("Mail log failed","$iEid,$iMessageId,$sTo,$sFrom,$sSubject,$sMessage,$sEntityEmailHash","DB");
-        }
-        
-        $this->response([
-            'status' => true,
-            'message' => 'Message sent successfully'
-        ], 200);
-        } else {
-          logToAdmin("Sendgrid failed to sent mail",print_r($aSendgridResult,true),"SENDGRID");
-          // sendgrid failed to drop mail
-          $this->response([
-            'status' => false,
-            'message'=> "Server unable to send message, please try again later"
-          ], 302);
-        }
+        $this->callSendMail($iEid, $iFromEid, $sTo, $sToName, $sFrom, $sFromName, $sSubject, $sMessage, $iGroupId);
     }
 
     /**
@@ -309,9 +280,28 @@ class Message extends RestController
         {
           $sMessage = $this->input->post("text");
         }
-        
+
+        // to avoid null or something unknown
         if(empty($sMessage))
+        {
             $sMessage = "";
+        } else {            
+            // go to till <body tag
+            $sNewMessage = substr($sMessage,strpos($sMessage,"<body"));
+            // go till body tag is closing less then sign >
+            $sNewMessage = substr($sNewMessage,strpos($sNewMessage,">")+1);
+            $sNewMessage = substr($sNewMessage,0,strpos($sNewMessage,"</body>"));
+
+            // parse the signature code
+            $sSignature = substr($sMessage,strpos($sMessage,$this->sSignatureStarter)+strlen($this->sSignatureStarter));
+            $sSignature = substr($sSignature,0,strpos($sSignature,$this->sSignatureEnder));
+            // reverse the signature to entity id
+            $iEntityId = $iParsedEntityId = $this->getInboundEntity($sSignature);
+            // remove styles and classes
+            $sNewMessage = preg_replace('/(style=)"[^>]+"([^>]*)/', '', $sNewMessage);
+            $sMessage = preg_replace('/(class=)"[^>]+"([^>]*)/', '', $sNewMessage);
+            //echo preg_replace('/(<[^\\\s]*)\s[^>]+(>)/', '\1\2', $sMessage);
+        }
 
         $sSubject = $this->input->post("subject");
 
@@ -322,25 +312,40 @@ class Message extends RestController
             die("No subject/message");
         }
 
-        $num_attachments = (int)$this->input->post("attachments");
-        // check for attachments and upload to temp
-        $aFileName = $this->uploadMailFiles($num_attachments);
-        if(count($aFileName)>0)
-        {
-            foreach($aFileName as $sFileName)
-            $sMessage .= "<br/>" . getenv("SITE_MAIN_URL")."temp786/".$sFileName;
-        }
+        //if(count($aFileName)>0)
+        //{
+            //foreach($aFileName as $sFileName)
+            //$sMessage .= "<br/>" . getenv("SITE_MAIN_URL")."temp786/".$sFileName;
+        //}
 
         // valid email can be recorded
         if(filter_var($sFrom, FILTER_VALIDATE_EMAIL))
         {
 
-          $this->load->model("entity_model");
-          $aEntity = $this->entity_model->getEmailId($sFrom);
+            
+            if($sTo==getenv("NOTIFICATION_FROM_EMAIL"))
+            {
+                //$this->load->model("entity_model");
+                // get entity based on signature
+                //$aEntity = $this->entity_model->getOne($iParsedEntityId);
+                //$iEntityId = $aEntity['results']->id;
+                // get entity based on email, depricated because of signature
+                //$aEntity = $this->entity_model->getEmailId($sFrom);
+            } else if($sTo==getenv("MTS_EMAIL_SMALLBIZ"))
+            {
+                //$this->load->model("vendor_entities_model");
+                //$aEntity = $this->vendor_entities_model->get_by(['entity_id'=>$iParsedEntityId]);
+                //$iEntityId = $aEntity->entity_id;
+            }
+
           // entity found against email from entity
-          if($aEntity['type']=='ok')
+          if($iEntityId>0)
           {
-            $iEntityId = $aEntity['results']->id;
+            
+            $iNumAttachments = (int)$this->input->post("attachments");
+            // check for attachments and upload to temp
+            $aFiles = $this->uploadMailFiles($iNumAttachments,$iEntityId);
+
             $sEntityEmailHash = generateHash($sFrom);
 //            echo strpos($sHeaders,"o1.ptr9325.smallbiz.com");die;
 
@@ -360,14 +365,14 @@ class Message extends RestController
           // then bind it to its respective group or sendgrid_message_id
 
           $sReplySubject = trim(preg_replace("/re:/i","",$sSubject));
-          $oRowForGroupId = $this->SendgridMessage_model->whereSubject($sReplySubject,$sFrom);
+          $oRowForGroupId = $this->SendgridMessage_model->whereSubject($sReplySubject,$iEntityId);
           $iGroupId = 0;
           if($oRowForGroupId->id>0)
           {
             $iGroupId = $oRowForGroupId->id;
           }
           //error_log("subject: " . $sReplySubject . ", group:" . $iGroupId);
-//          error_log("$iEntityId,$sFrom,$sTo,$sSubject,$sMessage,$aFileName,$sEntityEmailHash");
+//          error_log("$iEntityId,$sFrom,$sTo,$sSubject,$sMessage,$aFiles,$sEntityEmailHash");
 
           // log the sendgrid post back parse request
           $iId = $this->SendgridMessage_model->logInboxMail(
@@ -377,7 +382,7 @@ class Message extends RestController
                                           $sTo,
                                           $sSubject,
                                           $sMessage,
-                                          $aFileName,
+                                          $aFiles,
                                           $sEntityEmailHash,
                                           $iGroupId,
                                         );
@@ -395,33 +400,39 @@ class Message extends RestController
      * to be checked/validated
      * @param int $iNumAttachments total attachments present in posted file variable
      */
-    private function uploadMailFiles(int $iNumAttachments=0)
+    private function uploadMailFiles(int $iNumAttachments=0,int $iEntityId=0)
     {
-      $aFileName = [];
+      $aFiles = [];
 
-      if($iNumAttachments){
+      if($iNumAttachments && $iEntityId>0){
 
         $iAllowedSize = 10*1000*1000; // 10 Mb
-        $sUploadDir = getenv("ROOT_PATH") . getenv("UPLOAD_PATH");
-        foreach($_FILES as $aFile) {
+        //$sUploadDir = getenv("ROOT_PATH") . getenv("UPLOAD_PATH");
+        $sUploadDir = $this->sUploadDirectory . generateHash($iEntityId);
+        foreach($_FILES as $aLoopFile) {
 
-          $sName = uniqid()."-".$aFile['name'];
-
-          if(!empty($aFile['tmp_name']) && strpos($aFile['type'],"pdf")!==false && $aFile['size']<$iAllowedSize)
+          $sName = $aLoopFile['name'];
+            $iSize = $aLoopFile['size'];
+          if(!empty($aLoopFile['tmp_name']) && strpos($aLoopFile['type'],"pdf")!==false && $iSize<$iAllowedSize)
           {
-            $result = move_uploaded_file(
-              $aFile['tmp_name'],
-              $sUploadDir . $sName
-            );
-            
-            $aFileName[] = $sName;
+              $sPath = $sUploadDir . uniqid() . "-" . $sName;
+              $result = move_uploaded_file(
+                $aLoopFile['tmp_name'],
+                getenv("ROOT_PATH") . $sPath
+              );
+            $aFile = [
+                    'name' => $sName,
+                    'path' => $sPath,
+                    'size' => getFileSize($iSize)
+            ];
+            $aFiles[] = $aFile;
           } else {
             //error_log("File in mail not valid: " . print_r($aFile,true));
           }
         }
       }
 
-      return $aFileName;
+      return $aFiles;
     }
     
     /**
@@ -652,13 +663,17 @@ class Message extends RestController
         {
             $this->load->model("SendgridMessage_model");
 
+            $aNewRecords = [];
             // for admin bring notes too
             if(isAdmin())
             {
                 $aRecords = $this->SendgridMessage_model->getListEntityAdmin($id);
+                if(count($aRecords)>0)
                 $aNewRecords = $this->setParentHirarchy($aRecords);
             } else {
                 $aRecords = $this->SendgridMessage_model->getListEntity($id);
+
+                if(count($aRecords)>0)
                 $aNewRecords = $this->setParentHirarchy($aRecords);
             }
 
@@ -687,13 +702,29 @@ class Message extends RestController
         foreach($aDbRecords as $k=>$v)
         {
             // there may be no child, so initiate it empty
-            if(!isset($aChildRecords[$v->gid])) $aChildRecords[$v->gid] = [];
+            if(!isset($aChildRecords[$v->groupId])) $aChildRecords[$v->groupId] = [];
 
-            if($v->gid>0)
+            if($v->groupId>0)
             {
-                $aChildRecords[$v->gid][] = $v;
+                if($v->groupId==303)
+                {
+                    $sMessage = $v->message;
+                
+                    $aTempMessage = (array)$v;
+                    $aTempMessage['attachments'] = json_decode($aTempMessage['attachments']);
+                    if(!$aTempMessage['attachments']) $aTempMessage['attachments'] = [];
+                }
+                $aTempMessage = (array)$v;
+                $aTempMessage['attachments'] = json_decode($aTempMessage['attachments']);
+                if(!$aTempMessage['attachments']) $aTempMessage['attachments'] = [];
+                $v = (object)$aTempMessage;
+                $aChildRecords[$v->groupId][] = $v;// $aObjectArray;
             } else {
-                $aParentRecords[] = $v;
+                $aTempMessage = (array)$v;
+                $aTempMessage['attachments'] = json_decode($aTempMessage['attachments']);
+                if(!$aTempMessage['attachments']) $aTempMessage['attachments'] = [];
+                $v = (object)$aTempMessage;
+                $aParentRecords[] = (object)$v;
             }
         }
 
@@ -706,6 +737,38 @@ class Message extends RestController
             if($aParent['child']==null) $aParent['child'] = [];
 
             $aNewRecords[] = (object)$aParent;
+        }
+
+        // sort parent thread based on last message in the thread
+        for($i=0;$i<count($aNewRecords);$i++)
+        {
+            $aGroup1 = $aNewRecords[$i];
+            //$aNewRecords[$i]->child = [];
+
+            for($j=($i+1);$j<count($aNewRecords);$j++)
+            {
+                $aGroup2 = $aNewRecords[$j];
+                $iTime1 = strtotime($aGroup1->sendTime);
+                if(count($aGroup1->child)>0)
+                {
+                    $iTime1 = strtotime($aGroup1->child[count($aGroup1->child)-1]->sendTime);
+                }
+                
+                $iTime2 = strtotime($aGroup2->sendTime);
+                if(count($aGroup2->child)>0)
+                {
+                    $iTime2 = strtotime($aGroup2->child[count($aGroup2->child)-1]->sendTime);
+                }
+
+                if($iTime2>$iTime1)
+                {
+                    $aTempAr = $aGroup1;
+                    $aNewRecords[$i] = $aGroup2;
+                    $aNewRecords[$j] = $aTempAr;
+                    $aGroup1 = $aGroup2;
+                }
+
+            }
         }
 
         return $aNewRecords;
@@ -867,18 +930,230 @@ class Message extends RestController
         }
         
         $iEntityId = $this->input->post("eid")?:0;
-        $sDate = $this->input->post("date")?:"last week";
+        $sStartDate = $this->input->post("startDate")?:"last week";
+        $sEndDate = $this->input->post("endDate")?:"now";
 
-        $sDate = date("Y-m-d",strtotime($sDate));
+        $sStartDate = date("Y-m-d",strtotime($sStartDate));
+        $sEndDate = date("Y-m-d",strtotime($sEndDate));
 
         $this->load->model("SendgridMessage_model");
 
-        $aRecords = $this->SendgridMessage_model->search($iEntityId,$sDate);
+        $aRecords = $this->SendgridMessage_model->search($iEntityId,$sStartDate,$sEndDate);
+        //if(count($aRecords))
+        {
+            //$aNewRecords = $this->setParentHirarchy($aRecords);
+        }
 
         $this->response([
             'status'=>true,
             'data' => $aRecords
         ], 200);
 
+    }
+
+    public function post_post()
+    {
+        $aError = $this->validateInputs();
+        if(count($aError)>0)
+        {
+            $this->response([
+                'status' => false,
+                'error'=> $aError
+            ], 500);
+        }
+
+        $sToName = $this->input->post("toName");
+        $sTo = $this->input->post("toEmail");
+        $sSubject = $this->input->post("subject");
+        $sMessage = $this->input->post("message");
+        $iGroupId = (int)$this->input->post("groupId");
+        $iEid = $this->input->post("entityId");
+
+        // from eid is zero, as admin is sending message of smallbiz
+        $iFromEid = 0;
+        $sFrom = getenv("MTS_EMAIL_SMALLBIZ");
+        $sFromName = "SmallBiz Support";
+
+        $this->callSendMail($iEid, $iFromEid, $sTo, $sToName, $sFrom, $sFromName, $sSubject, $sMessage, $iGroupId);
+    }   
+    
+    private function validateInputs()
+    {
+        $sToName = $this->input->post("toName");
+        $sTo = $this->input->post("toEmail");
+
+//        $sFromName = $this->input->post("fromName");
+//        $sFrom = $this->input->post("fromEmail");
+
+        $sSubject = $this->input->post("subject");
+        $sMessage = $this->input->post("message");
+
+        $iGroupId = (int)$this->input->post("groupId");
+        $iEntityId = $this->input->post("entityId");
+        
+        if(!filter_var($sTo,FILTER_VALIDATE_EMAIL))
+        {
+            $aError['toEmail'] = "Must be a valid email";
+        }
+        if(empty($sToName))
+        {
+            $aError['toName'] = "To name is a required field";
+        }
+/*        if(filter_var($sFrom,FILTER_VALIDATE_EMAIL))
+        {
+            $aError['fromEmail'] = "Must be a valid email";
+        }
+        if(empty($sFromName))
+        {
+            $aError['fromName'] = "From name is a required field";
+        }*/
+        if(empty($sSubject))
+        {
+            $aError['subject'] = "Subject is a required field";
+        }
+        if(empty($sMessage))
+        {
+            $aError['message'] = "Message is a required field";
+        }
+
+        if(!is_numeric($iGroupId))
+        {
+            $aError['groupId'] = "Group ID is a required field, can be zero or a valid number.";
+        }
+        if(empty($iEntityId))
+        {
+            $aError['entityId'] = "Entity ID is a required field, can be zero or valid number.";
+        }
+
+        return $aError;
+    }
+
+    private function callSendMail(int $iEid,int $iFromEid, string $sTo,string $sToName,string $sFrom, string $sFromName,string $sSubject,string $sMessage, int $iGroupId)
+    {
+        // generate hash for easy search email
+        $sEntityEmailHash = generateHash($sTo);
+
+        // set signature below mail message, to parse when it get returns
+        $sMessage .= "<br /><br />---------<br />" . $this->sSignatureStarter . $this->getInboundEntity($iEid,true) . $this->sSignatureEnder;
+
+        $aAttachments = [];
+        // upload attachments
+        if(count($_FILES['attachment'])>0)
+        {
+            // auto get and set files from attachment[] variable of $_FILES
+            // make directory based on entity id as hashed
+            $aAttachments = $this->uploadMultipleFiles($iEid);
+        }
+
+        // send mail through messenger centralized model
+        $this->load->model("Messenger_model");
+        $aSendgridResult = $this->Messenger_model->sendMailSimple($sTo,$sToName,$sFrom,$sFromName,$sSubject,$sMessage,$aAttachments);
+
+        // sent success
+        if($aSendgridResult['type']=='ok')
+        {
+            // hold message id of sendgrid
+            $iMessageId = $aSendgridResult['id'];
+
+            // record the details for log or trackings
+            $this->load->model("SendgridMessage_model");          
+            $iInsertId = $this->SendgridMessage_model->logOutboxMail($iEid,$iMessageId,$sTo,$sFrom,$sSubject,$sMessage,$sEntityEmailHash,$iFromEid,$iGroupId,$aAttachments);
+
+            // report to admin on failure             
+            if(!$iInsertId)
+            {
+                logToAdmin("Mail log failed","$iEid,$iMessageId,$sTo,$sFrom,$sSubject,$sMessage,$sEntityEmailHash","DB");
+            }
+
+            $this->response([
+                'status' => true,
+                'message' => 'Message sent successfully',
+                'data'=>['id'=>$iInsertId],
+            ], 200);
+        } else {
+            logToAdmin("Sendgrid failed to sent mail",print_r($aSendgridResult,true),"SENDGRID");
+            // sendgrid failed to drop mail
+            $this->response([
+                'status' => false,
+                'message'=> "Server unable to send message, please try again later"
+            ], 302);
+        }
+    }
+
+    /**
+     * Encrypt and decrypt entity id for email signature, can return id or encrypted string based on 2nd parameter
+     * @param String $sSignature of inbound mail received
+     * @param Bool $bReturnKey set true to get key as string/encrypted else key as id/decrypted
+     */
+    private function getInboundEntity(string $sSignature,bool $bReturnKey=false)
+    {
+        $sPassword = "it-is-to-encrypt-the-simple-entity-ids-under-signature";
+        if($bReturnKey)
+        {
+            $sEntityKey = openssl_encrypt($sSignature,"AES-128-ECB",$sPassword);
+            return $sEntityKey;
+        } else {
+            $iEntityId = openssl_decrypt($sSignature,"AES-128-ECB",$sPassword);
+            return $iEntityId;
+        }
+    }
+
+    /**
+     * Upload multiple files, add unique prefix
+     */
+    private function uploadMultipleFiles(int $iEntityId)
+    {
+        $sDirectoryPath = getenv("ROOT_PATH") . $this->sUploadDirectory . generateHash($iEntityId);
+
+        if(!is_dir($sDirectoryPath))
+        {
+            mkdir($sDirectoryPath);
+            file_put_contents($sDirectoryPath."/index.php","<?php header('Location: ../../index.php');");
+        }
+        $sDirectoryPath .= "/";
+
+        $aConfig = array(
+            'upload_path'   => $sDirectoryPath,
+            'allowed_types' => 'pdf|jpg|gif|png',
+            'overwrite'     => 1,
+        );
+
+        $this->load->library('upload', $aConfig);
+
+        $aFiles = array();
+
+        for($key=0;$key<count($_FILES['attachment']['name']);$key++) {
+            $_FILES['singleFile']['name']= $_FILES['attachment']['name'][$key];
+            $_FILES['singleFile']['type']= $_FILES['attachment']['type'][$key];
+            $_FILES['singleFile']['tmp_name']= $_FILES['attachment']['tmp_name'][$key];
+            $_FILES['singleFile']['error']= $_FILES['attachment']['error'][$key];
+            $_FILES['singleFile']['size']= $_FILES['attachment']['size'][$key];
+
+            $sName = $_FILES['attachment']['name'][$key];
+            $iSize = $_FILES['attachment']['size'][$key];
+
+            $sFileName = uniqid() .'-'. $sName;
+            // set single file details
+            $aFile = [
+                'path'=> $this->sUploadDirectory . generateHash($iEntityId) . "/" . $sFileName,
+                'name'=> $sName,
+                'size'=> getFileSize($iSize),
+            ];
+
+            // set all files array
+            $aFiles[] = $aFile;
+
+            $aConfig['file_name'] = $sFileName;
+
+            $this->upload->initialize($aConfig);
+
+            if ($this->upload->do_upload('singleFile')) {
+                $this->upload->data();
+            } else {
+                return false;
+            }
+        }
+
+        return $aFiles;
     }
 }

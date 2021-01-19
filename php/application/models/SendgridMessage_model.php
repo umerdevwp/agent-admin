@@ -7,7 +7,7 @@ class SendgridMessage_model extends ModelDefault {
             "id"        => "id",
             "entityId"  => "entity_id",
             "sendTime"  => "send_time",
-            "to"        => "to",
+            "toEmail"        => "to",
             "subject"   => "subject",
             "message"   => "message",
             "sgMessageId"=> "sg_message_id",
@@ -17,7 +17,7 @@ class SendgridMessage_model extends ModelDefault {
             "status"    => "status",
             "entityEmailHash"=>"entity_email_hash",
             "rawJson"   => "raw_json",
-            "from"      => "from",
+            "fromEmail"      => "from",
             "attachments"=> "attachments",
             "type"      => "type",
             "loraxId"   => "lorax_id",
@@ -26,7 +26,7 @@ class SendgridMessage_model extends ModelDefault {
             "createdBy" => "created_by",
             "duedate"   => "duedate",
             "templateId"=> "template_id",
-            "gid"       =>  "group_id",
+            "groupId"       =>  "group_id",
             "read"      =>  "read",
             "fromEid"  =>  "from_eid",
     ];
@@ -67,7 +67,7 @@ class SendgridMessage_model extends ModelDefault {
      * Record the message send through sendgrid API
      * @param Integer $iEntityId entity id to send from/to
      */
-    public function logOutboxMail($iEntityId,$sSgMessageId,$sTo,$sFrom,$sSubject="",$sMessage="",$sEntityEmailHash="",$iFromEid=0,$iGroupId=0)
+    public function logOutboxMail($iEntityId,$sSgMessageId,$sTo,$sFrom,$sSubject="",$sMessage="",$sEntityEmailHash="",$iFromEid=0,$iGroupId=0,$aAttachments=[])
     {
         $aData = [
             "entity_id" => $iEntityId,
@@ -81,6 +81,7 @@ class SendgridMessage_model extends ModelDefault {
             'type'=>'outbox',
             'group_id'=>$iGroupId,
             "from_eid"=>$iFromEid,
+            'attachments'=>json_encode($aAttachments),
         ];
         
         $iNewId = $this->insert($aData);
@@ -132,6 +133,7 @@ class SendgridMessage_model extends ModelDefault {
           'type'=>'inbox',
           "send_time" =>  date("Y-m-d H:i:s"),
           "group_id"=>$iGroupId,
+          "from_eid"=>$iEntityId,
         ]; 
 
         $iNewId = $this->insert($aData);
@@ -210,10 +212,10 @@ class SendgridMessage_model extends ModelDefault {
 //        $aRecords = $this->get_many_by(['entity_id'=>$iEntityId]);
 
         $sQueryCombineNotes = "
-SELECT id,`to`,`from`,entity_id,send_time AS sendTime,subject,message,status,group_id AS gid,from_eid AS fromEid,`read`
+SELECT id,`to` AS toEmail,`from` AS fromEmail,entity_id AS entityId,send_time AS sendTime,subject,message,status,group_id AS groupId,from_eid AS fromEid,`read`,attachments
 FROM {$this->sTable} WHERE entity_id={$iEntityId}
 UNION
-SELECT id,'','',entity_id,added AS sendTime, subject,message,type AS status,0,0,1
+SELECT id,'','',entity_id AS entityId,added AS sendTime, subject,message,type AS status,0,0,1,'[]'
 FROM entity_notes WHERE entity_id={$iEntityId}
 ORDER BY sendTime ASC
 ";
@@ -241,9 +243,10 @@ ORDER BY sendTime ASC
             $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
         else {
             $aMyColumns = [
-                "id","to","from","sendTime","subject",
-                "message","gid","fromEid","read"
+                "id","toEmail","fromEmail","sendTime","subject",
+                "message","groupId","fromEid","read",'attachments'
             ];
+
             $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
         }
 
@@ -252,7 +255,6 @@ ORDER BY sendTime ASC
 
         $this->order_by("send_time");
         $aRecords = $this->get_many_by(['entity_id'=>$iEntityId]);
-
         if(count($aRecords)==0)
         {
             $aRecords = null;
@@ -264,9 +266,9 @@ ORDER BY sendTime ASC
     /**
      * Get mail where subject matches
      */
-    public function whereSubject(string $sSubject,string $sFrom)
+    public function whereSubject(string $sSubject,int $iEntityId)
     {
-        return $this->get_by(['subject'=>$sSubject,'to'=>$sFrom,'group_id'=>0]);
+        return $this->get_by(['subject'=>$sSubject,'entity_id'=>$iEntityId,'group_id'=>0]);
     }
 
     /**
@@ -358,7 +360,7 @@ ORDER BY sendTime ASC
     /**
      * Search the records based on entity id OR date parameters, received after date
      */
-    public function search(int $iEntityId=0,string $sDate)
+    public function search(int $iEntityId=0,string $sStartDate, string $sEndDate)
     {
 
         if(count($aColumns)>0)
@@ -372,20 +374,19 @@ ORDER BY sendTime ASC
         }
 
         foreach($aMyColumns as $k=>$v)
-            $this->db->select("sg.$v as `$k`");
+            $this->db->select("$this->sTable.$v as `$k`");
 
         $this->db->select("account_name as name");
-        $this->db->from($this->sTable." AS sg");
-        $sStartDate = $sDate;
-        $sEndDate = date("Y-m-d");
-
-        $aWhere = ["sg.send_time BETWEEN '$sStartDate' AND '$sEndDate'"];
+//        $this->db->from($this->sTable." AS sg");
+        $this->order_by("$this->sTable.send_time");
+        
+        $aWhere = ["$this->sTable.send_time BETWEEN '$sStartDate' AND '$sEndDate'"];
 
         if($iEntityId>0)
         {
-            $aWhere[] = "sg.entity_id='$iEntityId'";
+            $aWhere[] = "$this->sTable.entity_id='$iEntityId'";
         }
-        $this->db->join("zoho_accounts za","za.id=sg.entity_id");
+        $this->db->join("zoho_accounts za","za.id=$this->sTable.entity_id","left");
 
         $aRecords = $this->get_many_by($aWhere);
 //echo $this->db->last_query();

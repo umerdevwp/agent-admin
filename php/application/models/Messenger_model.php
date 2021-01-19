@@ -22,13 +22,32 @@ class Messenger_model extends CI_Model {
         
     }
 
-    public function sendMailSimple(string $sToEmail,string $sName,string $sFromEmail, string $sFromName, string $sSubject,string $sContent)
+    public function sendMailSimple(string $sToEmail,string $sName,string $sFromEmail, string $sFromName, string $sSubject,string $sContent, array $aAttachments=[])
     {
         $oEmail = new Mail();
         $oEmail->setFrom($sFromEmail, $sFromName);
         $oEmail->addTo($sToEmail, $sName);
         $oEmail->setSubject($sSubject);
         $oEmail->addContent("text/html", $sContent);
+        // add attachment if exist
+        if(count($aAttachments)>0)
+        {
+            // attachment is array of path + names only
+            foreach($aAttachments as $v)
+            {
+                $sPath = $v['path'];
+                $sFileName = $v['name'];
+                $sFileEncoded = base64_encode(file_get_contents(getenv("ROOT_PATH").$sPath));
+                //$sFileName = substr($sPath,strrpos($sPath,"/"));
+                //$sFileName = substr($sFileName,strpos($sFileName,"-")+1);
+                $oEmail->addAttachment(
+                    $sFileEncoded,
+                    "application/pdf",
+                    $sFileName,
+                    "attachment"
+                );
+            }
+        }
 
         $oSendgrid = new SendGrid(getenv('SENDGRID_API_KEY'));
         try {
