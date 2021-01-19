@@ -865,9 +865,15 @@ tr[level="4"] {
     display: inline-block;
     /*padding: 10px 15px;*/
     border-radius: 20px;
-    max-width: 205px;
+    width: 100%;
     line-height: 130%;
 }
+
+/*@media screen and (max-width: 735px) {*/
+/*    #frame .content .messages ul li .message-body-chat{*/
+/*        max-width: 420px;*/
+/*    }*/
+/*}*/
 
 @media screen and (min-width: 735px) {
     #frame .content .messages ul li p {
@@ -876,8 +882,8 @@ tr[level="4"] {
     }
 
     #frame .content .messages ul li .message-body-chat {
-        min-width: 300px;
-        max-width: 400px;
+        min-width: 675px;
+        max-width: 875px;
     }
 
 
@@ -1004,7 +1010,7 @@ li.contact.active-thread {
     display: inline-block;
     padding: 10px 15px;
     border-radius: 20px;
-    max-width: 205px;
+    max-width: 320px;
     line-height: 130%;
 }
 
@@ -1024,4 +1030,55 @@ li.contact.active-thread {
 .Toastify {
     z-index: 99999;
     position: relative;
+}
+
+.attachmentModal label {
+    display: contents;
+}
+
+.fileAttachmentInput {
+    margin: 15px;
+}
+
+.chipFile:hover, .chipFile:focus {
+    background-color: #2c3e50;
+    color: white;
+}
+
+.chipFile {
+    background-color: #2c3e50;
+    color: white;
+}
+
+#frame .content .messages ul li.replies {
+    /*height: auto;*/
+    /*max-height: 300px;*/
+}
+
+.fileAttachmentInput {
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.7);
+    margin: 15px;
+    padding: 10px;
+}
+
+
+.fileAttachmentInput .MuiChip-outlinedSecondary {
+    margin: 5px;
+    color: white;
+    border: 1px solid white;
+}
+
+li.MuiListItem-container .MuiAvatar-root.MuiAvatar-circle.MuiAvatar-colorDefault {
+    float: unset !important;
+    margin: unset !important;
+}
+
+.wrap .MuiCircularProgress-colorPrimary{
+    color: white;
+}
+
+
+.message-body-chat table img{
+    display: none;
 }

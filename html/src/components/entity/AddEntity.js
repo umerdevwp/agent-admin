@@ -623,6 +623,10 @@ function AddEntity() {
         formData.append('inputBusinessPurpose', inputBusinessPurpose.value)
         formData.append('inputFileSize', inputFileSize.value);
 
+        // console.log(formData);
+        // for (var pair of formData.entries()) {
+        //     console.log(pair[0]+ ', ' + pair[1]);
+        // }
 
         const response = await createEntity(formData);
         if (response.type === 'error') {

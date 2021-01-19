@@ -5,16 +5,11 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/context/UserContext.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/context/UserContext.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/entity/ChildDetailedPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/entity/ChildDetailedPage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/api/message.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/api/message.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/entity/AddEntity.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/entity/AddEntity.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/entity/EntityDetailedPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/entity/EntityDetailedPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/entity/SelfDetailedPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/entity/SelfDetailedPage.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/message/AdminSendMessageForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/message/AdminSendMessageForm.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/message/AllMessages.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/message/AllMessages.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/message/MessageLog.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/message/MessageLog.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/message/NewChatPanel.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/message/NewChatPanel.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/message/NewChatPanelForLogs.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/message/NewChatPanelForLogs.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/message/SendMessageForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/message/SendMessageForm.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

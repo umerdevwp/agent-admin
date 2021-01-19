@@ -1,18 +1,11 @@
 import React, {useContext, useEffect, useState} from 'react';
 import TextField from '@material-ui/core/TextField';
 import {makeStyles} from '@material-ui/core/styles';
-import {amber, green} from "@material-ui/core/colors";
+import {green} from "@material-ui/core/colors";
 import FormGroup from "@material-ui/core/FormGroup";
 import clsx from "clsx";
 import Grid from "@material-ui/core/Grid";
-import Layout from "../layout/Layout";
 import Typography from "@material-ui/core/Typography";
-import Breadcrumbs from "@material-ui/core/Breadcrumbs";
-import Link from "@material-ui/core/Link";
-import Paper from "@material-ui/core/Paper";
-// import {CKEditor} from '@ckeditor/ckeditor5-react';
-// import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import CustomFileInput from "reactstrap/es/CustomFileInput";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
 import {UserContext} from "../context/UserContext";
@@ -27,6 +20,18 @@ import {TemplateList, getTemplate} from "../api/message";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import {toast} from 'react-toastify';
 import CKEditor from 'ckeditor4-react';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
+import {DropzoneArea, DropzoneDialogBase} from "material-ui-dropzone";
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import ListItemText from '@material-ui/core/ListItemText';
+import Avatar from '@material-ui/core/Avatar';
+import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 const useStyles = makeStyles(theme => ({
     form: {
@@ -68,6 +73,7 @@ const useStyles = makeStyles(theme => ({
 
     submitButton: {
         marginTop: 15,
+        marginBottom: 20,
         float: 'right',
         display: 'inline-flex'
     },
@@ -90,6 +96,14 @@ const useStyles = makeStyles(theme => ({
 
     selectField: {
         width: '100%'
+    },
+
+    demo: {
+        backgroundColor: '#F0F0F6',
+    },
+
+    attachmentSection: {
+        marginTop: 10,
     }
 
 }));
@@ -150,6 +164,12 @@ const AdminSendMessageForm = (props) => {
     const [templates, setTemplates] = useState([]);
     const [noteType, setNoteType] = useState({email: 'Email', note: 'Note', phone: 'Phone', mail: 'Mail'});
     const [noteChosen, setNoteChosen] = useState({value: '', error: ' '});
+
+    const [open, setOpen] = React.useState(false);
+    const [fileObjects, setFileObjects] = React.useState([]);
+    const [secondary, setSecondary] = React.useState(false);
+    const [fileTest, setFileTest] = React.useState('');
+
     useEffect(() => {
         if (loading === true) {
             getTemplateList();
@@ -166,8 +186,30 @@ const AdminSendMessageForm = (props) => {
         }
     }
 
+    const dialogTitle = () => (
+        <>
+            <span>Upload file</span>
+            <IconButton
+                style={{right: '12px', top: '8px', position: 'absolute'}}
+                onClick={() => setOpen(false)}>
+                <CloseIcon/>
+            </IconButton>
+        </>
+    );
+
+
+    const removeFileFromArray = (index) => {
+        let array = [...fileObjects];
+        if (index > -1) {
+            array.splice(index, 1);
+        }
+        setFileObjects(array);
+    }
+
     const sendMessageSubmission = async (event) => {
         event.preventDefault();
+
+
         setApiLoading(true);
         resetFormError();
         const noteValue = sendasEmail ? 1 : 0;
@@ -184,6 +226,16 @@ const AdminSendMessageForm = (props) => {
         }
         formData.append('message', content.value);
 
+        // fileObjects?.map((anObjectMapped, index))
+        // {
+        //     formData.append('attachment[]', anObjectMapped)
+        // }
+
+
+        fileObjects.map(function(val, index){
+            formData.append('attachment[]', val.file)
+        });
+
         if (sendasEmail === true) {
             if (noteChosen.value === '') {
                 setNoteChosen({...noteChosen, error: 'Choose the note type'});
@@ -195,6 +247,7 @@ const AdminSendMessageForm = (props) => {
             }
         }
         await sendMessageAPI(formData).then(response => {
+
             if (response.status === true) {
                 setApiLoading(false);
                 manageOuterThreads(true);
@@ -231,6 +284,13 @@ const AdminSendMessageForm = (props) => {
 
     }
 
+    function generate(element) {
+        return [0, 1, 2].map((value) =>
+            React.cloneElement(element, {
+                key: value,
+            }),
+        );
+    }
 
     const fileChange = async (e) => {
         if (e.target.files[0]) {
@@ -292,6 +352,7 @@ const AdminSendMessageForm = (props) => {
     const resetForm = () => {
         setContent({...content, value: ''})
         setSubject({...subject, value: ''})
+        setFileObjects([]);
 
     }
 
@@ -301,6 +362,13 @@ const AdminSendMessageForm = (props) => {
         setSubject({...subject, error: ' '})
         setNoteChosen({...noteChosen, error: ' '})
 
+    }
+
+    const bytesToSize = (bytes) => {
+        let sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        if (bytes == 0) return '0 Byte';
+        let i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+        return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
     }
 
     return (
@@ -391,11 +459,6 @@ const AdminSendMessageForm = (props) => {
                                         id: 'noteChosen',
                                     }}>
                                     <option value=""/>
-                                    {/*{noteType?.map((anObjectMapped, index) => <option key={index} value={anObjectMapped}>{index}</option>)}*/}
-
-                                    {/*{noteType.map((value, index) => (*/}
-                                    {/*    <option key={index} value={index}>{value}</option>*/}
-                                    {/*))}*/}
                                     {
                                         Object.entries(noteType).map(([key, val]) =>
                                             <option key={key} value={key}>{val}</option>
@@ -408,14 +471,6 @@ const AdminSendMessageForm = (props) => {
                             </FormControl>
                         </div> : ''}
 
-                    {/*{sendasEmail === true ?*/}
-                    {/*<div className={'col-md-12'}>*/}
-                    {/*    <TextField className={clsx(classes.textFieldtwofield, classes.dense)}*/}
-                    {/*               id="standard-basic"*/}
-                    {/*               label="To"/>*/}
-                    {/*</div> : ''*/}
-                    {/*}*/}
-
                     <div className={'col-md-12 custom-subject'}>
                         <TextField disabled={apiLoading} value={subject.value}
                                    error={subject.error !== ' '}
@@ -427,7 +482,6 @@ const AdminSendMessageForm = (props) => {
                     <div className={'col-md-12'}>
                         <FormControl className={clsx(classes.selectField)}
                                      error={content.error !== ' '}>
-
                             <CKEditor
                                 disable={apiLoading}
                                 data={content.value}
@@ -438,46 +492,64 @@ const AdminSendMessageForm = (props) => {
 
 
                             />
-                            {/*<CKEditor*/}
-                            {/*    disable={apiLoading}*/}
-                            {/*    editor={ClassicEditor}*/}
-                            {/*    data={content.value}*/}
-                            {/*    onReady={editor => {*/}
-                            {/*        // You can store the "editor" and use when it is needed.*/}
-                            {/*        // console.log('Editor is ready to use!', editor);*/}
-                            {/*    }}*/}
-                            {/*    onChange={(event, editor) => {*/}
-                            {/*        const data = editor.getData();*/}
-                            {/*        // console.log({event, editor, data});*/}
-                            {/*        setContent({...content, value: data})*/}
-                            {/*    }}*/}
-                            {/*    // onBlur={(event, editor) => {*/}
-                            {/*    //     console.log('Blur.', editor);*/}
-                            {/*    // }}*/}
-                            {/*    // onFocus={(event, editor) => {*/}
-                            {/*    //     console.log('Focus.', editor);*/}
-                            {/*    // }}*/}
-                            {/*/>*/}
                             <FormHelperText>{content.error}</FormHelperText>
                         </FormControl>
 
                     </div>
 
-                    {/*<div className={'col-md-12'}>*/}
-                    {/*    <CustomFileInput*/}
-                    {/*        disable={apiLoading}*/}
-                    {/*        value={fileLink.value.File}*/}
-                    {/*        onChange={e => fileChange(e)}*/}
-                    {/*        required*/}
-                    {/*        id="attachment"*/}
-                    {/*        label="File"*/}
-                    {/*        className={clsx(classes.fileUploading, classes.dense)}*/}
-                    {/*        margin="dense"*/}
-                    {/*    />*/}
-                    {/*    {fileLink.success !== ' ' ? (<span>{fileLink.success}</span>) : ' '}*/}
-                    {/*    {fileLink.error !== ' ' ? (*/}
-                    {/*        <span className={clsx(classes.fileError)}>{fileLink.error}</span>) : ' '}*/}
-                    {/*</div>*/}
+                    <div className={'col-md-12'}>
+                        {/*<CustomFileInput*/}
+                        {/*    disable={apiLoading}*/}
+                        {/*    value={fileLink.value.File}*/}
+                        {/*    onChange={e => fileChange(e)}*/}
+                        {/*    required*/}
+                        {/*    id="attachment"*/}
+                        {/*    label="File"*/}
+                        {/*    className={clsx(classes.fileUploading, classes.dense)}*/}
+                        {/*    margin="dense"*/}
+                        {/*/>*/}
+                        <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
+                            Attach Files
+                        </Button>
+
+                        {fileLink.success !== ' ' ? (<span>{fileLink.success}</span>) : ' '}
+                        {fileLink.error !== ' ' ? (
+                            <span className={clsx(classes.fileError)}>{fileLink.error}</span>) : ' '}
+                        {fileObjects.length !== 0 ?
+                            <Grid className={classes.attachmentSection} container spacing={2}>
+                                <Grid item xs={12} md={12}>
+                                    <Typography variant="h6" className={classes.title}>
+                                        Attached Files
+                                    </Typography>
+                                    <div className={classes.demo}>
+                                        <List>
+                                            {fileObjects?.map((anObjectMapped, index) =>
+
+
+                                                <ListItem key={index}>
+                                                    <ListItemAvatar>
+                                                        <Avatar>
+                                                            <PictureAsPdfIcon/>
+                                                        </Avatar>
+                                                    </ListItemAvatar>
+                                                    <ListItemText
+                                                        primary={anObjectMapped.file.name}
+                                                        secondary={bytesToSize(anObjectMapped.file.size)}
+                                                    />
+                                                    <ListItemSecondaryAction>
+                                                        <IconButton edge="end" aria-label="delete">
+                                                            <DeleteIcon onClick={(e) => removeFileFromArray(index)}/>
+                                                        </IconButton>
+                                                    </ListItemSecondaryAction>
+                                                </ListItem>
+                                            )}
+
+
+                                        </List>
+                                    </div>
+                                </Grid>
+                            </Grid> : ''}
+                    </div>
                     <div className={'col-md-12'}>
                         <div className={clsx(classes.submitButton, 'custom-button-wrapper')}>
                             {apiLoading ? (
@@ -492,7 +564,27 @@ const AdminSendMessageForm = (props) => {
                     </div>
                 </FormGroup>
             </form>
+            <DropzoneDialogBase
+                dialogTitle={dialogTitle()}
+                acceptedFiles={['.pdf']}
+                filesLimit={10}
+                fileObjects={fileObjects}
+                cancelButtonText={"cancel"}
+                submitButtonText={"submit"}
+                maxFileSize={5000000}
+                open={open}
+                onAdd={newFileObjs => {
+                    setFileObjects([].concat(fileObjects, newFileObjs));
+                }}
 
+                onClose={() => setOpen(false)}
+                onSave={() => {
+                    setOpen(false);
+                }}
+                useChipsForPreview
+                fullWidth={true}
+                maxWidth={'md'}
+            />
         </>
     )
 }

@@ -156,7 +156,7 @@ const useStyles = makeStyles(theme => ({
         paddingRight: theme.spacing(7),
     },
 
-    skeletonStyle:{
+    skeletonStyle: {
         paddingLeft: theme.spacing(3),
         paddingRight: theme.spacing(3),
     },
@@ -502,12 +502,15 @@ const EntityDetailedPage = (props) => {
                                             <li className={classes.listItem}><PersonIcon
                                                 className={classes.adjustment}/>
                                                 <strong>{entitydetail.registerAgent.fileAs}</strong></li>
-                                            <li className={classes.listItem}><StreetviewIcon
-                                                className={classes.adjustment}/> {entitydetail.registerAgent.address}
-                                            </li>
-                                            <li className={classes.listItem}><RoomIcon
-                                                className={classes.adjustment}/>{entitydetail.registerAgent.address2}
-                                            </li>
+                                            {entitydetail.registerAgent.address ?
+                                                <li className={classes.listItem}><StreetviewIcon
+                                                    className={classes.adjustment}/> {entitydetail.registerAgent.address}
+                                                </li> : ''}
+                                            {entitydetail.registerAgent.address2 ?
+                                                <li className={classes.listItem}><RoomIcon
+                                                    className={classes.adjustment}/>{entitydetail.registerAgent.address2}
+                                                </li> : ''}
+
                                             <li className={classes.listItem}><LocationCityIcon
                                                 className={classes.adjustment}/> {entitydetail.registerAgent.city}, {entitydetail.registerAgent.state} {entitydetail.registerAgent.zipcode}
                                             </li>
@@ -547,11 +550,15 @@ const EntityDetailedPage = (props) => {
                                 {entitydetail ?
                                     <>
                                         <ul className={classes.companyinfo}>
-                                            {entitydetail.entity.shippingStreet ?
-                                                <li className={classes.listItem}><RoomIcon
-                                                    className={classes.adjustment}/>
-                                                    <strong>{entitydetail.entity.shippingStreet}, {entitydetail.entity.shippingCity}, {entitydetail.entity.shippingState} {entitydetail.entity.shippingCode} </strong>
-                                                </li> : ''}
+
+                                                <li className={classes.listItem}>
+                                                    <div className="forwardingAddress">
+                                                        <RoomIcon
+                                                            className={clsx(classes.adjustment, 'forwardingAddress-icon')}/>
+                                                            <strong>2185 E. Bellamy Rd, Palm Springs, CA 92262, Palm Springs, CA 92262</strong>
+                                                        {/*<strong>{entitydetail.entity.shippingStreet}, {entitydetail.entity.shippingCity}, {entitydetail.entity.shippingState} {entitydetail.entity.shippingCode} </strong>*/}
+                                                    </div>
+                                                </li>
                                             <li className={classes.listItem}><MailIcon
                                                 className={classes.adjustment}/> {entitydetail.entity.email}
                                             </li>

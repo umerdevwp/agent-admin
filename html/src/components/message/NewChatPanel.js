@@ -6,7 +6,7 @@ import Typography from "@material-ui/core/Typography";
 import Select from "@material-ui/core/Select";
 import {sendMessageFormChat} from '../api/message';
 import clsx from "clsx";
-// import {animateScroll} from "react-scroll";
+import Button from "@material-ui/core/Button";
 import {
     Link,
     DirectLink,
@@ -18,12 +18,27 @@ import {
 } from "react-scroll";
 import {toast} from "react-toastify";
 import stripHtml from "string-strip-html";
+import Chip from '@material-ui/core/Chip';
+
+import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemAvatar from "@material-ui/core/ListItemAvatar";
+import ListItemText from "@material-ui/core/ListItemText";
+import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
+import IconButton from "@material-ui/core/IconButton";
+import DeleteIcon from "@material-ui/icons/Delete";
+import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
+import SendIcon from '@material-ui/icons/Send';
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 const ReactDOMServer = require('react-dom/server');
 const HtmlToReactParser = require('html-to-react').Parser;
 
 
 const NewChatPanel = (props) => {
     const ref = React.createRef();
+    // const inputRef = React.useRef();
     const chatContainer = React.createRef();
     const entity_id = localStorage.getItem('activeEntityID');
     const IncomingIDFromAllMessages = localStorage.getItem('allMessagesThread');
@@ -31,17 +46,18 @@ const NewChatPanel = (props) => {
     const [inComingThreadID, setInComingThreadID] = React.useState(IncomingIDFromAllMessages);
     const [activeThread, setActiveThread] = React.useState('');
     const [chosenThread, setChosenThread] = React.useState({});
-
     const [updateThread, setUpdateThread] = React.useState(false)
-
     const [message, setMessage] = React.useState('');
+    const [file, setFile] = React.useState([]);
+    const [key, setKey] = React.useState(0);
+    const [componentLoading, setComponentLoading] = React.useState(false)
 
     React.useEffect(() => {
         const obj = userMessages.find(o => o.id === inComingThreadID);
         setActiveThread(obj.id);
         setChosenThread(obj);
 
-        setTimeout(()=> {
+        setTimeout(() => {
             scrollToBottom();
         }, 1000);
 
@@ -54,14 +70,12 @@ const NewChatPanel = (props) => {
             setUpdateThread(false);
             const obj = userMessages.find(o => o.id === chosenThread.id);
             setChosenThread(obj);
-            setTimeout(()=> {
+            setTimeout(() => {
                 scrollToBottom();
             }, 2000);
         }
 
     }, [userMessages]);
-
-
 
 
     const scrollToBottom = () => {
@@ -80,7 +94,6 @@ const NewChatPanel = (props) => {
     // }, [threads])
 
     const onClickThread = async (threadID) => {
-        console.log(threadID);
         const obj = userMessages.find(o => o.id === threadID);
         await setChosenThread(obj);
         setMessage('');
@@ -110,24 +123,40 @@ const NewChatPanel = (props) => {
 
     const sendMessage = (event) => {
         // event.preventDefault();
-
+        setComponentLoading(true);
         let form = new FormData();
-        form.append('eid', '4071993000001842131')
+        const eid = localStorage.getItem('activeEntityID');
+        form.append('eid', eid);
         form.append('subject', 'RE: ' + chosenThread.subject);
         form.append('gid', chosenThread.id);
         form.append('message', message);
+        file.map(function (val, index) {
+            form.append('attachment[]', val)
+        })
+
         const response = sendMessageFormChat(form).then(response => {
-            if(response.status === true) {
+            if (response.status === true) {
+                setComponentLoading(false);
                 setMessage('')
                 setUpdateThread(true);
+                setFile([]);
                 addMessage(chosenThread, message, role, attributes.organization)
             }
 
 
-            if(response.status === false){
-                toast.error(response.message, {
-                    position: toast.POSITION.BOTTOM_LEFT
-                });
+            if (response.status === false) {
+                setComponentLoading(false);
+                if(response.error.message) {
+                    toast.error(response.error.message, {
+                        position: toast.POSITION.BOTTOM_LEFT
+                    });
+                }
+
+                if(response.message) {
+                    toast.error(response.message, {
+                        position: toast.POSITION.BOTTOM_LEFT
+                    });
+                }
             }
 
         });
@@ -136,7 +165,7 @@ const NewChatPanel = (props) => {
 
 
     const stripHTML = (myString) => {
-        if(myString) {
+        if (myString) {
             return myString.replace(/<[^>]*>?/gm, '').replace(/\&nbsp;/g, '');
         } else {
             return myString;
@@ -144,7 +173,7 @@ const NewChatPanel = (props) => {
     }
 
     const truncate = (str, no_words) => {
-        if(str) {
+        if (str) {
             return str.split(" ").splice(0, no_words).join(" ") + " ...";
         } else {
             return str;
@@ -159,23 +188,22 @@ const NewChatPanel = (props) => {
         // let contentNew = html.match( reg )[1];
 
 
-        if(typeof data !== 'undefined') {
-
+        if (typeof data !== 'undefined') {
+            // console.log('Messages', data);
             // var newHTML = stripHtml(data, {
             //     stripTogetherWithTheirContents: [
-            //         "head", // default
-            //         "style", // default
-            //         "body", // default
-            //         "meta", // <-- custom-added
+            //         "table", // default
+            //
             //     ],
             // }).result;
 
             const htmlInput = data;
             const htmlToReactParser = new HtmlToReactParser();
-            return htmlToReactParser.parse(htmlInput);
+            const abc = htmlToReactParser.parse(htmlInput);
+            return abc;
         } else {
-
-           return data;
+            // console.log(typeof data)
+            return data;
 
         }
 
@@ -199,7 +227,7 @@ const NewChatPanel = (props) => {
             // }
 
 
-            if(threadInfo.fromEid === '0'){
+            if (threadInfo.fromEid === '0') {
                 return 'sent'
             }
             if (threadInfo.fromEid === attributes.organization) {
@@ -242,6 +270,31 @@ const NewChatPanel = (props) => {
         }
     }
 
+    const bytesToSize = (bytes) => {
+        let sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        if (bytes == 0) return '0 Byte';
+        let i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+        return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
+    }
+
+
+    const handleDelete = (index) => {
+        let array = [...file];
+        if (index > -1) {
+            array.splice(index, 1);
+        }
+        setFile(array);
+        setKey(Math.floor((Math.random() * 10) + 1));
+    };
+
+    const attachFile = (e) => {
+        const incomingFile = e.target.files;
+        let array = [];
+        for (let i = 0; i < incomingFile.length; i++) {
+            array.push(incomingFile[i]);
+        }
+        setFile(file.concat(array));
+    }
 
     const isHTML = (str) => !(str || '')
         // replace html tag with content
@@ -297,11 +350,39 @@ const NewChatPanel = (props) => {
                                 <Avatar>{namePicker(chosenThread)}</Avatar>
                                 <div className="message-body-chat">
                                     <span><strong>    Subject: </strong> {chosenThread.subject}</span>
-                                    {isHTML(chosenThread.message) === true ?
-                                        convertHTML(chosenThread.message) :
+                                    {isHTML(chosenThread.message) === false ?
+                                        <>
+                                            {convertHTML(chosenThread.message)}
+                                            <List>
+                                                {chosenThread.attachments?.map((anObjectMapped, index) =>
+                                                    <ListItem key={index}>
+                                                        <ListItemAvatar>
+                                                            <Avatar>
+                                                                <PictureAsPdfIcon/>
+                                                            </Avatar>
+                                                        </ListItemAvatar>
+                                                        <ListItemText
+
+                                                            primary={anObjectMapped.name}
+                                                            secondary={anObjectMapped.size}
+                                                        />
+                                                        <ListItemSecondaryAction>
+                                                            <IconButton edge="end" aria-label="delete">
+                                                                <a download
+                                                                   href={`/${anObjectMapped.path}`}><CloudDownloadIcon/></a>
+                                                            </IconButton>
+                                                        </ListItemSecondaryAction>
+                                                    </ListItem>
+                                                )}
+
+
+                                            </List>
+
+                                        </>
+                                        :
                                         <p>{chosenThread.message}</p>
 
-                                        }
+                                    }
 
                                     <div className="message-info">
                                         <div className="message-time">
@@ -323,11 +404,37 @@ const NewChatPanel = (props) => {
                                     <Avatar>{namePicker(anObjectMapped)}</Avatar>
                                     <div className="message-body-chat">
                                         <span><strong>Subject: </strong> {anObjectMapped.subject}</span>
-                                        {isHTML(anObjectMapped.message) === true ?
-                                            convertHTML(anObjectMapped.message) : <p>{convertHTML(anObjectMapped.message)}</p>
+                                        <>
+                                            {isHTML(anObjectMapped.message) === true ?
+                                                convertHTML(anObjectMapped.message) :
+                                                <p>{convertHTML(anObjectMapped.message)}</p>
 
-                                        }
+                                            }
+                                            <List>
+                                                {anObjectMapped.attachments?.map((anObjectMapped, index) =>
+                                                    <ListItem key={index}>
+                                                        <ListItemAvatar>
+                                                            <Avatar>
+                                                                <PictureAsPdfIcon/>
+                                                            </Avatar>
+                                                        </ListItemAvatar>
+                                                        <ListItemText
 
+                                                            primary={anObjectMapped.name}
+                                                            secondary={anObjectMapped.size}
+                                                        />
+                                                        <ListItemSecondaryAction>
+                                                            <IconButton edge="end" aria-label="delete">
+                                                                <a download
+                                                                   href={`${process.env.REACT_APP_SERVER_API_URL}/${anObjectMapped.path}`}><CloudDownloadIcon/></a>
+                                                            </IconButton>
+                                                        </ListItemSecondaryAction>
+                                                    </ListItem>
+                                                )}
+
+
+                                            </List>
+                                        </>
                                         <div className="message-info">
                                             <div className="message-time">
                                                 <span>{anObjectMapped.sendTime}</span>
@@ -346,11 +453,44 @@ const NewChatPanel = (props) => {
                 </div>
                 <div className="message-input">
                     <div className="wrap">
-                        <input onKeyPress={handleKeypress} value={message} onChange={(event) => setMessage(event.target.value)} type="text"
+                        {file.length !== 0 ?
+                            <div className="fileAttachmentInput">
+                                {file?.map((anObjectMapped, index) =>
+                                    <Chip
+                                        key={index}
+                                        icon={<PictureAsPdfIcon/>}
+                                        label={anObjectMapped.name + ' - ' + bytesToSize(anObjectMapped.size)}
+                                        clickable
+                                        variant="outlined"
+                                        color={'secondary'}
+                                        onDelete={(e) => handleDelete(index)}
+                                    />
+                                )}
+                            </div> : ''}
+
+                        <input onKeyPress={handleKeypress} value={message}
+                               onChange={(event) => setMessage(event.target.value)} type="text"
                                placeholder="Type a message"/>
-                        <i className="fa fa-paperclip attachment" aria-hidden="true"></i>
-                        <button  onClick={(e) => sendMessage(e)} className="submit"><i className="fa fa-paper-plane"
-                                                                                    aria-hidden="true"></i></button>
+
+
+                        <div className="attachmentModal">
+                            <Button
+                                variant="contained"
+                                component="label"
+                            >
+                                <i className="fa fa-paperclip attachment" aria-hidden="true"></i>
+                                <input
+                                    multiple="multiple"
+                                    accept="application/pdf"
+                                    // key={key}
+                                    type="file"
+                                    hidden
+                                    onChange={attachFile}
+                                />
+                            </Button>
+                        </div>
+
+                        <button onClick={(e) => sendMessage(e)} className="submit">{componentLoading === false ? <SendIcon/> :    <CircularProgress />}</button>
                     </div>
                 </div>
             </div>
