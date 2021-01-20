@@ -197,12 +197,12 @@ export default function AllMessages(props) {
                                         </React.Fragment>
                                     }
                                 />
-                                <ListItemSecondaryAction>
-                                    <IconButton edge="end" aria-label="delete">
-                                        <a download
-                                           href='#'><CloudDownloadIcon/></a>
-                                    </IconButton>
-                                </ListItemSecondaryAction>
+                                {/*<ListItemSecondaryAction>*/}
+                                {/*    <IconButton edge="end" aria-label="delete">*/}
+                                {/*        <a download*/}
+                                {/*           href='#'><CloudDownloadIcon/></a>*/}
+                                {/*    </IconButton>*/}
+                                {/*</ListItemSecondaryAction>*/}
                             </ListItem>
                         </>
                         : ''}

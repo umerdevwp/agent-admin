@@ -374,8 +374,7 @@ const NewChatPanel = (props) => {
                                                         />
                                                         <ListItemSecondaryAction>
                                                             <IconButton edge="end" aria-label="delete">
-                                                                <a download
-                                                                   href={`/${anObjectMapped.path}`}><CloudDownloadIcon/></a>
+                                                                <a target="_blank" href={`/${anObjectMapped.path}`}><CloudDownloadIcon/></a>
                                                             </IconButton>
                                                         </ListItemSecondaryAction>
                                                     </ListItem>
@@ -431,8 +430,7 @@ const NewChatPanel = (props) => {
                                                         />
                                                         <ListItemSecondaryAction>
                                                             <IconButton edge="end" aria-label="delete">
-                                                                <a download
-                                                                   href={`/${anObjectMapped.path}`}><CloudDownloadIcon/></a>
+                                                                <a target="_blank" href={`/${anObjectMapped.path}`}><CloudDownloadIcon/></a>
                                                             </IconButton>
                                                         </ListItemSecondaryAction>
                                                     </ListItem>
