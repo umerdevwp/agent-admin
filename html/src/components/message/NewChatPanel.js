@@ -157,6 +157,12 @@ const NewChatPanel = (props) => {
                         position: toast.POSITION.BOTTOM_LEFT
                     });
                 }
+
+
+                if (response.status === 401) {
+                    window.location.reload();
+                }
+
             }
 
         });
@@ -426,7 +432,7 @@ const NewChatPanel = (props) => {
                                                         <ListItemSecondaryAction>
                                                             <IconButton edge="end" aria-label="delete">
                                                                 <a download
-                                                                   href={`${process.env.REACT_APP_SERVER_API_URL}/${anObjectMapped.path}`}><CloudDownloadIcon/></a>
+                                                                   href={`/${anObjectMapped.path}`}><CloudDownloadIcon/></a>
                                                             </IconButton>
                                                         </ListItemSecondaryAction>
                                                     </ListItem>

@@ -49,8 +49,10 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import ListItemText from "@material-ui/core/ListItemText";
 import Divider from "@material-ui/core/Divider";
+import CancelIcon from "@material-ui/icons/Cancel";
 
 
+Modal.setAppElement(document.getElementById('messageModal'));
 
 const drawerWidth = 700;
 
@@ -136,6 +138,12 @@ const useStyles = makeStyles(theme => ({
         flexGrow: 1,
         paddingLeft: theme.spacing(7),
         paddingRight: theme.spacing(7),
+    },
+
+    largeIcon: {
+        width: 40,
+        height: 40,
+        color: '#48465b'
     },
 
 
@@ -519,9 +527,13 @@ const SelfDetailedPage = (props) => {
                                         <>
                                         <ul className={classes.companyinfo}>
                                             {entitydetail.entity.shippingStreet ?
-                                                <li className={classes.listItem}><RoomIcon
-                                                    className={classes.adjustment}/>
-                                                    <strong>{entitydetail.entity.shippingStreet}, {entitydetail.entity.shippingCity}, {entitydetail.entity.shippingState} {entitydetail.entity.shippingCode} </strong>
+                                                <li className={classes.listItem}>
+                                                    <div className="forwardingAddress">
+                                                        <RoomIcon
+                                                            className={clsx(classes.adjustment, 'forwardingAddress-icon')}/>
+                                                        <strong>{entitydetail.entity.shippingStreet}, {entitydetail.entity.shippingCity}, {entitydetail.entity.shippingState} {entitydetail.entity.shippingCode} </strong>
+                                                    </div>
+
                                                 </li> : ''}
                                             <li className={classes.listItem}><MailIcon
                                                 className={classes.adjustment}/> {entitydetail.entity.email}
@@ -669,11 +681,12 @@ const SelfDetailedPage = (props) => {
 
                 <div>
                     <Modal
-                        parentSelector={() => document.querySelector('#messageModal')}
+                        // parentSelector={() => document.querySelector('#messageModal')}
                         isOpen={modalIsOpen}
                         onAfterOpen={afterOpenModal}
                         onRequestClose={closeModal}
                         contentLabel="Chat Application"
+                        ariaHideApp={false}
                         style={{
                             overlay: {
                                 backgroundColor: 'rgba(0, 0, 0, 0.8)'
@@ -681,6 +694,9 @@ const SelfDetailedPage = (props) => {
 
                         }}
                     >
+                        <div className="closeButton">
+                            <CancelIcon onClick={closeModal} className={classes.largeIcon}/>
+                        </div>
                         <div className="chat-wrapper">
                             <NewChatPanel/>
                         </div>
