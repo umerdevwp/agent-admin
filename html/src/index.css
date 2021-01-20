@@ -1057,7 +1057,7 @@ li.contact.active-thread {
 
 .fileAttachmentInput {
     border-radius: 5px;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.5);
     margin: 15px;
     padding: 10px;
 }
@@ -1074,11 +1074,62 @@ li.MuiListItem-container .MuiAvatar-root.MuiAvatar-circle.MuiAvatar-colorDefault
     margin: unset !important;
 }
 
-.wrap .MuiCircularProgress-colorPrimary{
+.wrap .MuiCircularProgress-colorPrimary {
     color: white;
 }
 
 
-.message-body-chat table img{
+.message-body-chat table img {
     display: none;
+}
+
+.sent .message-body-chat span.MuiIconButton-root {
+    border-bottom: none !important;
+    margin-bottom: unset !important;
+}
+
+.sent .message-body-chat button.MuiIconButton-root {
+    border: none !important;
+}
+
+.sent .message-body-chat .MuiListItemText-root.MuiListItemText-multiline span{
+    border-bottom: none !important;
+}
+
+.sent .message-body-chat .MuiListItem-container .MuiIconButton-label a {
+    color: white;
+}
+.sent .message-body-chat .MuiListItem-container p.MuiTypography-body2 {
+    color: white;
+}
+
+
+.closeButton {
+    position: absolute;
+    top: 7px;
+    z-index: 999;
+    right: 10px;
+    opacity: 0.2;
+    transition: all ease-in-out 0.3s;
+}
+
+.closeButton:hover{
+    opacity: 1;
+}
+
+.forwardingAddress {
+    clear: both;
+    display: flex;
+}
+
+.forwardingAddress svg {
+    float: left;
+}
+.forwardingAddress strong {
+    float: right;
+}
+
+p.MuiTypography-root.MuiListItemText-secondary.MuiTypography-body2.MuiTypography-colorTextSecondary.MuiTypography-displayBlock {
+    width: 100%;
+    overflow: hidden;
 }

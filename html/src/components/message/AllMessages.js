@@ -11,6 +11,9 @@ import {FetchThreads} from '../api/message';
 import {UserContext} from "../context/UserContext";
 import Button from "@material-ui/core/Button";
 import Skeleton from '@material-ui/lab/Skeleton';
+import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
+import IconButton from "@material-ui/core/IconButton";
+import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -81,7 +84,7 @@ export default function AllMessages(props) {
 
 
     const stripHTML = (myString) => {
-        if(myString) {
+        if (myString) {
             return myString.replace(/<[^>]*>?/gm, '').replace(/\&nbsp;/g, '');
         } else {
             return myString;
@@ -89,7 +92,7 @@ export default function AllMessages(props) {
     }
 
     const truncate = (str, no_words) => {
-        if(str) {
+        if (str) {
             return str.split(" ").splice(0, no_words).join(" ") + " ...";
         } else {
             return str;
@@ -157,7 +160,20 @@ export default function AllMessages(props) {
                                             </React.Fragment>
                                         }
                                     />
+
+                                        {/*{*/}
+                                        {/*    threads.attachments.length !== 0 ?*/}
+                                        {/*        <ListItemSecondaryAction>*/}
+                                        {/*            <IconButton edge="end" aria-label="delete">*/}
+                                        {/*                <a download*/}
+                                        {/*                   href='#'><CloudDownloadIcon/></a>*/}
+                                        {/*            </IconButton>*/}
+                                        {/*        </ListItemSecondaryAction>*/}
+                                        {/*        : ''*/}
+                                        {/*}*/}
+
                                 </ListItem>
+
                                 <Divider variant="inset" component="li"/>
                             </div>
                         )
@@ -181,6 +197,12 @@ export default function AllMessages(props) {
                                         </React.Fragment>
                                     }
                                 />
+                                <ListItemSecondaryAction>
+                                    <IconButton edge="end" aria-label="delete">
+                                        <a download
+                                           href='#'><CloudDownloadIcon/></a>
+                                    </IconButton>
+                                </ListItemSecondaryAction>
                             </ListItem>
                         </>
                         : ''}
