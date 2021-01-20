@@ -285,13 +285,16 @@ class Message extends RestController
         if(empty($sMessage))
         {
             $sMessage = "";
-        } else {            
-            // go to till <body tag
-            $sNewMessage = substr($sMessage,strpos($sMessage,"<body"));
-            // go till body tag is closing less then sign >
-            $sNewMessage = substr($sNewMessage,strpos($sNewMessage,">")+1);
-            $sNewMessage = substr($sNewMessage,0,strpos($sNewMessage,"</body>"));
-
+        } else {
+            $sNewMessage = $sMessage;
+            if(strpos($sMessage,"<body")!==false)
+            {
+                // go to till <body tag
+                $sNewMessage = substr($sMessage,strpos($sMessage,"<body"));
+                // go till body tag is closing less then sign >
+                $sNewMessage = substr($sNewMessage,strpos($sNewMessage,">")+1);
+                $sNewMessage = substr($sNewMessage,0,strpos($sNewMessage,"</body>"));
+            }
             // parse the signature code
             $sSignature = substr($sMessage,strpos($sMessage,$this->sSignatureStarter)+strlen($this->sSignatureStarter));
             $sSignature = substr($sSignature,0,strpos($sSignature,$this->sSignatureEnder));
@@ -299,7 +302,9 @@ class Message extends RestController
             $iEntityId = $iParsedEntityId = $this->getInboundEntity($sSignature);
             // remove styles and classes
             $sNewMessage = preg_replace('/(style=)"[^>]+"([^>]*)/', '', $sNewMessage);
-            $sMessage = preg_replace('/(class=)"[^>]+"([^>]*)/', '', $sNewMessage);
+            $sNewMessage = preg_replace('/(class=)"[^>]+"([^>]*)/', '', $sNewMessage);
+            $sMessage = $sNewMessage;
+
             //echo preg_replace('/(<[^\\\s]*)\s[^>]+(>)/', '\1\2', $sMessage);
         }
 
@@ -408,7 +413,7 @@ class Message extends RestController
 
         $iAllowedSize = 10*1000*1000; // 10 Mb
         //$sUploadDir = getenv("ROOT_PATH") . getenv("UPLOAD_PATH");
-        $sUploadDir = $this->sUploadDirectory . generateHash($iEntityId);
+        $sUploadDir = $this->sUploadDirectory . generateHash($iEntityId) . "/";
         foreach($_FILES as $aLoopFile) {
 
           $sName = $aLoopFile['name'];
@@ -506,8 +511,9 @@ class Message extends RestController
 // TODO: subscription notification loop can be simplified by keeping next notification date in subscription table with flag initial done
         foreach($aSubscription['results'] as $oSubs)
         {
+            if($oSubs->entity_id!=4071993000002895019) continue;
             $aDataEntity = $this->entity_model->getOne($oSubs->entity_id,['id','name','email','type','filingState','entityStructure','formationDate']);
-            
+
             if($aDataEntity['type']=='error')
             {
                 $aDataEntity = $this->tempmeta_model->getOneInJson(["json_id"=>$oSubs->entity_id]);
@@ -516,18 +522,19 @@ class Message extends RestController
             if($aDataEntity['type']=='ok' && $aDataEntity['results']->id>0)
             {
                 $oEntity = $aDataEntity['results'];
-
+                //print_r($oEntity);
                 $aRule = $this->Notifications_model->getRules(
                     $oEntity->filingState,
                     $oEntity->entityStructure,
                     $oEntity->formationDate,
                     $oEntity->fiscalDate
                 );
-
+                //print_r($aRule);
                 if($aRule['type']=='ok')
                 {
                     $oRule = $aRule['results'];
                     $aResult = $this->Notifications_model->getNotifyDate($oSubs,$oRule,date("Y-m-d"));
+                    //print_r($aResult);die;
                     // date reached to send message now/today
                     if(isset($aResult['date']))
                     {
@@ -540,7 +547,7 @@ class Message extends RestController
                             $oEntity->email,
                             $oEntity->name,
                             $oEntity->id,
-                            "Template loc Attachment available"
+                            "Scheduled Subscription Reached"
                         );
 
                         // log the sent mail for trackings
