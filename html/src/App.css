@@ -45,3 +45,53 @@ h3{
 button:focus{
   border: unset !important;
 }
+
+
+
+.sent .message-info{
+  text-transform: capitalize;
+  color: #F5F5F5;
+  font-size: smaller;
+  margin-top: 10px;
+}
+
+.sent .message-info .message-time{
+  float: left;
+}
+
+
+.sent .message-info .message-status{
+  float: right;
+}
+
+
+.replies .message-info {
+  text-transform: capitalize;
+  color: #435F7A;
+  font-size: smaller;
+  margin-top: 10px;
+}
+
+
+.replies .message-info .message-time{
+  float: left;
+}
+
+
+.replies .message-info .message-status{
+  float: right;
+}
+
+.sent p span {
+  border-bottom: 1px solid;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.replies p span {
+  border-bottom: 1px solid;
+  display: block;
+  margin-bottom: 10px;
+}
+
+

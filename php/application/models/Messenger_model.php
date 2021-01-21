@@ -22,6 +22,52 @@ class Messenger_model extends CI_Model {
         
     }
 
+    public function sendMailSimple(string $sToEmail,string $sName,string $sFromEmail, string $sFromName, string $sSubject,string $sContent, array $aAttachments=[])
+    {
+        $oEmail = new Mail();
+        $oEmail->setFrom($sFromEmail, $sFromName);
+        $oEmail->addTo($sToEmail, $sName);
+        $oEmail->setSubject($sSubject);
+        $oEmail->addContent("text/html", $sContent);
+        // add attachment if exist
+        if(count($aAttachments)>0)
+        {
+            // attachment is array of path + names only
+            foreach($aAttachments as $v)
+            {
+                $sPath = $v['path'];
+                $sFileName = $v['name'];
+                $sFileEncoded = base64_encode(file_get_contents(getenv("ROOT_PATH").$sPath));
+                //$sFileName = substr($sPath,strrpos($sPath,"/"));
+                //$sFileName = substr($sFileName,strpos($sFileName,"-")+1);
+                $oEmail->addAttachment(
+                    $sFileEncoded,
+                    "application/pdf",
+                    $sFileName,
+                    "attachment"
+                );
+            }
+        }
+
+        $oSendgrid = new SendGrid(getenv('SENDGRID_API_KEY'));
+        try {
+             $response = $oSendgrid->send($oEmail);
+             $aHeaders = $response->headers();
+             $iMessageId = "";
+             
+             foreach($aHeaders as $v) 
+                if(strpos($v,"X-Message-Id")!==false) 
+                    $iMessageId = explode(": ",$v)[1];
+            
+            return ['type'=>'ok','id'=>$iMessageId];
+        } catch (Exception $e) {
+            $sMessage = 'Caught exception: '. $e->getMessage() ."\n";
+            logToAdmin("Send mail failed",$sMessage);
+
+            return ['type'=>'error','message'=> "Unable to send message, please try again later"];
+        }
+    }
+
     public function sendTemplateEmail(string $sTemplateId="d-2a672857adad4bd79e7f421636b77f6b", array $aTemplateFields=[], string $sEmailAddress, string $sName,int $iEntityIdForLog=0,string $sSubjectForLog="")
     {
         $oEmail = new Mail();
@@ -66,10 +112,10 @@ class Messenger_model extends CI_Model {
             //   print_r($aHeaders);
             //   print $response->body() . "\n";
             
-            $this->logMailResponse($iEntityIdForLog,$iMessageId,$sEmailAddress,$sSubjectForLog,"Template ID: " . $sTemplateId . " Data: " . print_r($aTemplateFields,true));
+            //$this->logMailResponse($iEntityIdForLog,$iMessageId,$sEmailAddress,$sSubjectForLog,"Template ID: " . $sTemplateId . " Data: " . print_r($aTemplateFields,true));
             if($iMessageId)
             {
-                return true;
+                return $iMessageId;
             } else {
                 return false;
             }
@@ -80,29 +126,6 @@ class Messenger_model extends CI_Model {
             return false;
         }
     }
-
-    public function logMailResponse($iEntityId,$sSgMessageId,$sTo,$sSubject="",$sMessage="")
-    {
-        $this->load->model("Notifications_model");
-        $aData = [
-            "entity_id" => $iEntityId,
-            "send_time" =>  date("Y-m-d H:i:s"),
-            "to"    =>  $sTo,
-            "subject"   =>  $sSubject,
-            "message"   =>  $sMessage,
-            "sg_message_id" =>  $sSgMessageId,
-        ];
-
-        $iInsertId = $this->Notifications_model->addMailLog($aData);
-        if($iInsertId)
-        {
-            return $iInsertId;
-        } else {
-            error_log("Unable to insert mail log",0);
-            return false;
-        }
-    }
-
 
     public function sendEmail($iEntityId,$sEmail,$sName,$sSubject,$sContent)
     {
@@ -129,138 +152,79 @@ class Messenger_model extends CI_Model {
             error_log($sMessage);
         }
     }
-
     /**
-     * Test all parameters using objects
+     * Fetch status from sendgrid API, of mails already sent
      */
-    public function testKitchenSinkExampleWithObjectsAndLegacyTemplate()
+    public function fetchStatusMsgIdCurl($sMsgId,$sToEmail)
     {
-        $email = new Mail();
-
-        // For a detailed description of each of these settings,
-        // please see the
-        // [documentation](https://sendgrid.com/docs/API_Reference/api_v3.html).
-        $email->setSubject(
-            new Subject("Sending with Twilio SendGrid is Fun 2")
-        );
-
-        $email->addTo(new To("najm.a@allshorestaffing.com", "Najm User"));
-//        $email->addTo(new To("test+1@example.com", "Example User1"));
-        // $toEmails = [
-        //     new To("test+2@example.com", "Example User2"),
-        //     new To("test+3@example.com", "Example User3")
-        // ];
-        // $email->addTos($toEmails);
-
-        // $email->addCc(new Cc("test+4@example.com", "Example User4"));
-        // $ccEmails = [
-        //     new Cc("test+5@example.com", "Example User5"),
-        //     new Cc("test+6@example.com", "Example User6")
-        // ];
-        // $email->addCcs($ccEmails);
-
-        // $email->addBcc(
-        //     new Bcc("test+7@example.com", "Example User7")
-        // );
-        // $bccEmails = [
-        //     new Bcc("test+8@example.com", "Example User8"),
-        //     new Bcc("test+9@example.com", "Example User9")
-        // ];
-        // $email->addBccs($bccEmails);
-
-        $email->addSubstitution(
-            new Substitution("%name%", "Example Name 1")
-        );
-        // $email->addSubstitution(
-        //     new Substitution("%city1%", "Denver")
-        // );
-        // $substitutions = [
-        //     new Substitution("%name2%", "Example Name 2"),
-        //     new Substitution("%city2%", "Orange")
-        // ];
-        // $email->addSubstitutions($substitutions);
-
-        // The values below this comment are global to entire message
-
-        $email->setFrom(new From("najm@gmail.com", "Najm Twilio SendGrid"));
-
-        $email->setGlobalSubject(
-            new Subject("Sending with Twilio SendGrid is Fun and Global 2")
-        );
-
-        $plainTextContent = new PlainTextContent(
-            "and easy to do anywhere, even with PHP"
-        );
-        $htmlContent = new HtmlContent(
-            "<strong>and easy to do anywhere, even with PHP</strong>"
-        );
-        $email->addContent($plainTextContent);
-        $email->addContent($htmlContent);
-        $contents = [
-            new Content("text/calendar", "Party Time!!"),
-            new Content("text/calendar2", "Party Time 2!!")
-        ];
-        $email->addContents($contents);
-
-        $email->setTemplateId(
-            new TemplateId("d-2a672857adad4bd79e7f421636b77f6b")
-        );
-
-        // $json = json_encode($email->jsonSerialize());
-        // $isEqual = BaseTestClass::compareJSONObjects($json, $this->REQUEST_OBJECT_LEGACY);
-        // $this->assertTrue($isEqual);
 
         $oSendgrid = new SendGrid(getenv('SENDGRID_API_KEY'));
-        try {
-             $response = $oSendgrid->send($email);
-             $aHeaders = $response->headers();
-             $iMessageId = "";
-             
-             foreach($aHeaders as $v) 
-                if(strpos($v,"X-Message-Id")!==false) 
-                    $iMessageId = explode(": ",$v)[1];
-            
-              print $response->statusCode() . "\n";
-              print_r($aHeaders);
-              print $response->body() . "\n";
-            
-            $this->logMailResponse("000",$iMessageId,"testings","sss","sContent");
-        } catch (Exception $e) {
-            $sMessage = 'Caught exception: '. $e->getMessage() ."\n";
-            //debug($e);
-            error_log($sMessage);
-        }
+        //$sToEmail = "najm.a@allshorestaffing.com";
+        $header = array();
+        $headr[] = 'Content-length: 0';
+        $headr[] = 'Content-type: application/json';
+        $headr[] = 'Authorization: Bearer '.getenv("SENDGRID_API_KEY");
+
+//echo urldecode("query=last_event_time%20BETWEEN%20TIMESTAMP%20%22{start_date}%22%20AND%20TIMESTAMP%20%22{end_date}%22AND%20to_email%3D%22<<email>>%22");die;
+        //$sQuery = urlencode(implode(" AND ",$aQueryList));
+        $sQuery = 'msg_id LIKE "'.$sMsgId.'%" AND to_email LIKE "'.$sToEmail.'"';
+        //$sMsgId = ['msg_id LIKE "%"'];
+        //$sToEmail = ['to_email LIKE "najm.a@allshorestaffing.com"'];
+        //$sFromEmail = ['from_email LIKE "agentadmin@youragentservices.com"'];
+        //$sOpenCount = ['opens_count LIKE "0"'];
+//        $sArguments = urlencode("to_email=\"{$sToEmail}\"");
+//        echo "Authorization: Bearer ".getenv("SENDGRID_API_KEY");die;
+        $sQuery."<br>";
+        $oCh = curl_init("https://api.sendgrid.com/v3/messages?limit=10&query=".$sQuery);
+        curl_setopt($oCh,CURLOPT_HTTPHEADER,$headr);
+
+        curl_setopt($oCh,CURLOPT_RETURNTRANSFER,true);
+        $sResult = curl_exec($oCh);
+
+        return $sResult;
     }
 
-    public function sendCurlTemplate()
+
+    public function fetchStatusBetweenDate(string $sStartDate,string $sEndDate)
     {
-        $curl = curl_init();
+        //$sJsonQuery = json_decode('{"aggregated_by": "day", "limit": 1, "start_date": "'.$sStartDate.'", "end_date": "'.$sStartDate.'", "offset": 1}');
+        $sJsonQuery = json_decode('{"limit":300,"start_date": "'.$sStartDate.'", "end_date": "'.$sStartDate.'"}');
 
-        curl_setopt_array($curl, array(
-        CURLOPT_URL => "https://api.sendgrid.com/v3/mail/send",
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => "",
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 30,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => "POST",
-        CURLOPT_POSTFIELDS => "{\"personalizations\":[{\"to\":[{\"email\":\"najm.a@allshorestaffing.com\",\"name\":\"Najm Doe\"}],\"dynamic_template_data\":{\"verb\":\"\",\"adjective\":\"\",\"noun\":\"\",\"currentDayofWeek\":\"\"},\"subject\":\"Hello, World! Try it\"}],\"from\":{\"email\":\"noreplynajm@gmail.com\",\"name\":\"John Doe no reply\"},\"reply_to\":{\"email\":\"noreplynajm@gmail.com\",\"name\":\"John Doe no reply\"},\"template_id\":\"d-546828bba7ce46dfbf131e400b69d7cb\"}",
-        CURLOPT_HTTPHEADER => array(
-            "authorization: Bearer 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",
-            "content-type: application/json"
-        ),
-        ));
+        $oSendgrid = new SendGrid(getenv('SENDGRID_API_KEY'));
 
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
+        //$oResponse = $oSendgrid->client->stats()->get(null, $sJsonQuery);
+        $oResponse = $oSendgrid->client->messages()->get(null, $sJsonQuery);
 
-        curl_close($curl);
-
-        if ($err) {
-        echo "cURL Error #:" . $err;
-        } else {
-        echo $response;
+        if($oResponse->statusCode()=="200")
+        {
+            return json_decode($oResponse->body());
         }
+
+        return false;
+//        print $response->statusCode() . "\n";
+//        print $response->body() . "\n";
+//        print_r($response->headers());
+//die;
+    }
+
+    public function fetchStatusMsgId(string $sMessageId)
+    {
+        $sJsonQuery = json_decode('{"limit": 1, "start_date": "2020-12-10", "offset": 1}');
+        $sJsonQuery = json_decode('{ "limit": 1, "start_date": "2020-12-10", "end_date": "2020-12-10", "offset": 1}');
+        $sJsonQuery = json_decode('{ "limit": 1, "query":"msg_id LIKE \'vdV867vIR7iCzRRUXZ519Q%\'", "offset": 1}');
+        
+        $oSendgrid = new SendGrid(getenv('SENDGRID_API_KEY'));
+
+        $oResponse = $oSendgrid->client->messages()->get(null, $sJsonQuery);
+
+        if($oResponse->statusCode()=="200")
+        {
+            return json_decode($oResponse->body());
+        }
+
+        logToAdmin("Sendgrid API fetch status","for msgid: " . $sMessageId . $oResponse->body(),"CRON");
+
+        return false;
     }
 }
 

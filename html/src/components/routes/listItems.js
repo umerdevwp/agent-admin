@@ -67,5 +67,14 @@ export default function MainListItems() {
                 </ListItem>
             </Link>
 
+            <Link className={classes.link} to='/message/logs'>
+                <ListItem button>
+                    <ListItemIcon>
+                        <ContactPhoneOutlinedIcon color="primary"/>
+                    </ListItemIcon>
+                    <ListItemText primary="Message Log"/>
+                </ListItem>
+            </Link>
+
         </div>)
 };

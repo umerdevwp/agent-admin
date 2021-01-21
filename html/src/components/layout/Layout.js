@@ -28,7 +28,8 @@ import {SnackbarProvider} from 'notistack';
 import {useOktaAuth, withOktaAuth} from "@okta/okta-react";
 
 import {SemipolarLoading} from 'react-loadingg';
-
+import {ToastContainer} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const drawerWidth = 240;
 
@@ -174,16 +175,16 @@ export default withOktaAuth(function Layout(props) {
     }
 
 
-    React.useEffect(()=> {
-        if(typeof role === "undefined") {
-            timerToClearSomewhere.current = setTimeout(function(){ClearSession()}, 40000);
+    React.useEffect(() => {
+        if (typeof role === "undefined") {
+            timerToClearSomewhere.current = setTimeout(function () {
+                ClearSession()
+            }, 40000);
         } else {
             clearTimeout(timerToClearSomewhere.current);
         }
 
-    },[role]);
-
-
+    }, [role]);
 
 
     const handleDrawerOpen = () => {
@@ -326,6 +327,7 @@ export default withOktaAuth(function Layout(props) {
                             </main>
                         </div>
                     </SnackbarProvider>
+                    <ToastContainer/>
                 </>
                 : <><SemipolarLoading className={'Test'} size={'large'} color={'#1e1e2d'}/></>}
 

@@ -40,6 +40,37 @@ import Avatar from '@material-ui/core/Avatar';
 import FastForwardIcon from '@material-ui/icons/FastForward';
 import Skeleton from "@material-ui/lab/Skeleton";
 import AttachmentTable from "../attachment/AttachmentTable";
+import AllMessages from "../message/AllMessages";
+
+import Drawer from '@material-ui/core/Drawer';
+import Button from '@material-ui/core/Button';
+import SendMessageForm from '../message/SendMessageForm';
+import AdminSendMessageForm from "../message/AdminSendMessageForm";
+import ReactDOM from 'react-dom';
+import Modal from 'react-modal';
+import MainChatApp from "../message/MainChatApp";
+import NewChatPanel from "../message/NewChatPanel";
+import ListItem from "@material-ui/core/ListItem";
+import List from "@material-ui/core/List";
+import ListItemAvatar from "@material-ui/core/ListItemAvatar";
+import ListItemText from "@material-ui/core/ListItemText";
+import Divider from "@material-ui/core/Divider";
+import CancelIcon from '@material-ui/icons/Cancel';
+
+Modal.setAppElement(document.getElementById('messageModal'));
+
+const customStyles = {
+    content: {
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        marginRight: '-50%',
+        transform: 'translate(-50%, -50%)'
+    }
+};
+const drawerWidth = 700;
+
 const useStyles = makeStyles(theme => ({
     root: {
         flexGrow: 1,
@@ -89,7 +120,59 @@ const useStyles = makeStyles(theme => ({
 
     baseColor: {
         color: '#48465b'
-    }
+    },
+    // list: {
+    //     width: 700,
+    // },
+
+    listInner: {
+        // width: '100%'
+    },
+
+    messageSection: {
+        marginBottom: 20,
+        marginTop: 30
+    },
+    messageTitle: {
+        marginLeft: 20,
+        float: 'left'
+    },
+
+    rootDrawer: {
+        display: 'flex',
+    },
+    drawer: {
+        [theme.breakpoints.up('sm')]: {
+            width: drawerWidth,
+            flexShrink: 0,
+        },
+    },
+
+    drawerPaper: {
+        width: drawerWidth,
+    },
+
+    content: {
+        flexGrow: 1,
+        paddingLeft: theme.spacing(7),
+        paddingRight: theme.spacing(7),
+    },
+
+    skeletonStyle: {
+        paddingLeft: theme.spacing(3),
+        paddingRight: theme.spacing(3),
+    },
+
+    skeletonItem: {
+        // marginBottom: 1,
+    },
+
+
+    largeIcon: {
+        width: 40,
+        height: 40,
+        color: '#48465b'
+    },
 
 
 }));
@@ -139,12 +222,15 @@ MySnackbarContentWrapper.propTypes = {
 const EntityDetailedPage = (props) => {
 
     const entity_id = props.match.params.id;
-
+    localStorage.setItem('activeEntityID', props.match.params.id);
 
     const {loading, attributes, addError, errorList, role, addTitle, profile} = useContext(UserContext);
     const checkRole = role ? role : localStorage.getItem('role');
     const classes = useStyles();
     const history = useHistory();
+    var subtitle;
+    const [modalIsOpen, setIsOpen] = React.useState(false);
+
     const [entitydetail, setEntitydetail] = React.useState()
     const [contactList, setContactList] = React.useState([])
     const [attachmentList, setAttachmentList] = React.useState([])
@@ -152,6 +238,7 @@ const EntityDetailedPage = (props) => {
     const [compliance, setComplainace] = React.useState(0);
     const [componentLoading, setComponentLoading] = React.useState(true);
     const [entityName, setEntityName] = React.useState('');
+    const [state, setState] = React.useState(false);
     useEffect(() => {
         if (loading === true) {
             addTitle('Entity - ');
@@ -162,11 +249,11 @@ const EntityDetailedPage = (props) => {
 
     const fetchDetailedProfile = async () => {
         var detailedView = '';
-        if (checkRole === 'Parent Organization' || checkRole === 'Administrator' ) {
+        if (checkRole === 'Parent Organization' || checkRole === 'Administrator') {
             detailedView = await entityDetail(entity_id);
-            if(detailedView.result) {
+            if (detailedView.result) {
                 addTitle('Entity - ' + detailedView.result.entity.name);
-               localStorage.setItem('entityName', detailedView.result.entity.name);
+                localStorage.setItem('entityName', detailedView.result.entity.name);
             }
 
             if (detailedView.type === 'error') {
@@ -184,7 +271,7 @@ const EntityDetailedPage = (props) => {
         }
 
         if (detailedView.result) {
-            addTitle('Entity - '+ detailedView.result.entity.name);
+            addTitle('Entity - ' + detailedView.result.entity.name);
             setEntitydetail(detailedView.result)
             setContactList(detailedView.result.contacts);
             setAttachmentList(detailedView.result.attachments)
@@ -197,29 +284,25 @@ const EntityDetailedPage = (props) => {
             addError(detailedView.errors.detail);
         }
 
-        if(detailedView.status === 401){
+        if (detailedView.status === 401) {
             window.location.reload();
         }
-
-
-
-
 
 
     }
 
     useEffect(() => {
-        if(compliance !== 0) {
+        if (compliance !== 0) {
             updateComplianceTable()
         }
-    },[compliance]);
+    }, [compliance]);
 
 
     const UpdateComplainceState = () => {
         setComplainace(compliance + 1);
     }
 
-    const updateComplianceTable = async() => {
+    const updateComplianceTable = async () => {
         var detailedView = '';
         if (role === 'Parent Organization' || role === 'Administrator') {
             try {
@@ -240,10 +323,20 @@ const EntityDetailedPage = (props) => {
         }
 
 
-
     }
 
+    const toggleDrawer = (event, open) => {
+        if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+            return;
+        }
+        if (open) {
+            setState(true);
+        }
 
+        if (!open) {
+            setState(false);
+        }
+    };
     const contactData = {
         columns: [
             {title: 'Name', field: 'name'},
@@ -270,8 +363,6 @@ const EntityDetailedPage = (props) => {
     };
 
 
-
-
     const attachmentData = {
         columns: [
             {
@@ -286,6 +377,18 @@ const EntityDetailedPage = (props) => {
         data: attachmentList,
     };
 
+    function openModal() {
+        setIsOpen(true);
+    }
+
+    function afterOpenModal() {
+        // references are now sync'd and can be accessed.
+        // subtitle.style.color = '#f00';
+    }
+
+    function closeModal() {
+        setIsOpen(false);
+    }
 
     return (
 
@@ -311,6 +414,29 @@ const EntityDetailedPage = (props) => {
                                               message={value}/>
                 ))}
 
+                <Drawer
+                    ModalProps={{
+                        keepMounted: true, // Better open performance on mobile.
+                        disableEnforceFocus: true
+                    }}
+                    classes={{
+                        paper: classes.drawerPaper,
+                    }} anchor={'right'} open={state} onClose={(event) => toggleDrawer(event, false)}>
+                    <div>
+                        <main className={classes.content}>
+                            {
+                                role === 'Administrator' ?
+                                    <AdminSendMessageForm {...props} /> : ''
+                                // <SendMessageForm/> : ''
+                            }
+
+                            {
+                                role === 'Parent Organization' || role === 'Child Entity' ?
+                                    <SendMessageForm {...props} /> : ''
+                            }
+                        </main>
+                    </div>
+                </Drawer>
 
                 <Grid container spacing={2}>
                     <Grid item xs={12} sm={4}>
@@ -334,21 +460,24 @@ const EntityDetailedPage = (props) => {
                                 {entitydetail ?
                                     <>
                                         <ul className={classes.companyinfo}>
-                                            <li className={classes.listItem}><strong>State ID:</strong> {entitydetail.entity.stateId ? entitydetail.entity.stateId : ''}</li>
+                                            <li className={classes.listItem}><strong>State
+                                                ID:</strong> {entitydetail.entity.stateId ? entitydetail.entity.stateId : ''}
+                                            </li>
                                             <li className={classes.listItem}><strong>Formation
                                                 Date:</strong> {entitydetail.entity.formationDate ? entitydetail.entity.formationDate : ''}
                                             </li>
                                             <li className={classes.listItem}><strong>Registered Agent Expiration
                                                 Date: </strong> {entitydetail.entity.expirationDate}</li>
                                             {/*<li className={classes.listItem}><strong>Tax ID:</strong> 09890890</li>*/}
-                                        </ul> </>:
+                                        </ul>
+                                    </> :
 
                                     <>
-                                        <Skeleton />
-                                        <Skeleton />
-                                        <Skeleton />
-                                        <Skeleton />
-                                        <Skeleton />
+                                        <Skeleton/>
+                                        <Skeleton/>
+                                        <Skeleton/>
+                                        <Skeleton/>
+                                        <Skeleton/>
                                     </>
                                 }
 
@@ -382,23 +511,26 @@ const EntityDetailedPage = (props) => {
                                             <li className={classes.listItem}><PersonIcon
                                                 className={classes.adjustment}/>
                                                 <strong>{entitydetail.registerAgent.fileAs}</strong></li>
-                                            <li className={classes.listItem}><StreetviewIcon
-                                                className={classes.adjustment}/> {entitydetail.registerAgent.address}
-                                            </li>
-                                            <li className={classes.listItem}><RoomIcon
-                                                className={classes.adjustment}/>{entitydetail.registerAgent.address2}
-                                            </li>
+                                            {entitydetail.registerAgent.address ?
+                                                <li className={classes.listItem}><StreetviewIcon
+                                                    className={classes.adjustment}/> {entitydetail.registerAgent.address}
+                                                </li> : ''}
+                                            {entitydetail.registerAgent.address2 ?
+                                                <li className={classes.listItem}><RoomIcon
+                                                    className={classes.adjustment}/>{entitydetail.registerAgent.address2}
+                                                </li> : ''}
+
                                             <li className={classes.listItem}><LocationCityIcon
                                                 className={classes.adjustment}/> {entitydetail.registerAgent.city}, {entitydetail.registerAgent.state} {entitydetail.registerAgent.zipcode}
                                             </li>
                                         </ul>
                                     </> :
                                     <>
-                                        <Skeleton />
-                                        <Skeleton />
-                                        <Skeleton />
-                                        <Skeleton />
-                                        <Skeleton />
+                                        <Skeleton/>
+                                        <Skeleton/>
+                                        <Skeleton/>
+                                        <Skeleton/>
+                                        <Skeleton/>
                                     </>
                                 }
 
@@ -427,11 +559,14 @@ const EntityDetailedPage = (props) => {
                                 {entitydetail ?
                                     <>
                                         <ul className={classes.companyinfo}>
-                                            {entitydetail.entity.shippingStreet ?
-                                                <li className={classes.listItem}><RoomIcon
-                                                    className={classes.adjustment}/>
+
+                                            <li className={classes.listItem}>
+                                                <div className="forwardingAddress">
+                                                    <RoomIcon
+                                                        className={clsx(classes.adjustment, 'forwardingAddress-icon')}/>
                                                     <strong>{entitydetail.entity.shippingStreet}, {entitydetail.entity.shippingCity}, {entitydetail.entity.shippingState} {entitydetail.entity.shippingCode} </strong>
-                                                </li> : ''}
+                                                </div>
+                                            </li>
                                             <li className={classes.listItem}><MailIcon
                                                 className={classes.adjustment}/> {entitydetail.entity.email}
                                             </li>
@@ -439,11 +574,11 @@ const EntityDetailedPage = (props) => {
                                     </>
                                     :
                                     <>
-                                        <Skeleton />
-                                        <Skeleton />
-                                        <Skeleton />
-                                        <Skeleton />
-                                        <Skeleton />
+                                        <Skeleton/>
+                                        <Skeleton/>
+                                        <Skeleton/>
+                                        <Skeleton/>
+                                        <Skeleton/>
                                     </>
 
                                 }
@@ -453,11 +588,107 @@ const EntityDetailedPage = (props) => {
                         </Card>
                     </Grid>
                 </Grid>
+                <Paper className={classes.messageSection} elevation={2}>
+                    <Grid container spacing={5}>
+
+                        <Grid item xs={12}>
+                            <div className="messageSection">
+                                <Typography className={classes.messageTitle} variant="h5" component="h2"
+                                            color="textPrimary">Messages</Typography>
+                                <Button variant="outlined" color="primary" className={'sendMessageButton'}
+                                        onClick={(event) => toggleDrawer(event, true)}>Send Message</Button>
+                            </div>
+                            {entitydetail ?
+                                <AllMessages entityName={entitydetail.entity.name} openmodal={openModal}/> :
+
+
+                                <List>
+                                    <ListItem alignItems="flex-start">
+                                        <ListItemAvatar>
+                                            <Skeleton variant="circle" height={50} width={50} animation="wave"/>
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={
+                                                <React.Fragment>
+                                                    <Skeleton height={30} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                            secondary={
+                                                <React.Fragment>
+                                                    <Skeleton height={50} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                        />
+                                    </ListItem>
+                                    <Divider variant="inset" component="li"/>
+                                    <ListItem alignItems="flex-start">
+                                        <ListItemAvatar>
+                                            <Skeleton variant="circle" height={50} width={50} animation="wave"/>
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={
+                                                <React.Fragment>
+                                                    <Skeleton height={30} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                            secondary={
+                                                <React.Fragment>
+                                                    <Skeleton height={50} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                        />
+                                    </ListItem>
+                                    <Divider variant="inset" component="li"/>
+                                    <ListItem alignItems="flex-start">
+                                        <ListItemAvatar>
+                                            <Skeleton variant="circle" height={50} width={50} animation="wave"/>
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={
+                                                <React.Fragment>
+                                                    <Skeleton height={30} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                            secondary={
+                                                <React.Fragment>
+                                                    <Skeleton height={50} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                        />
+                                    </ListItem>
+                                    <Divider variant="inset" component="li"/>
+                                    <ListItem alignItems="flex-start">
+                                        <ListItemAvatar>
+                                            <Skeleton variant="circle" height={50} width={50} animation="wave"/>
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={
+                                                <React.Fragment>
+                                                    <Skeleton height={30} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                            secondary={
+                                                <React.Fragment>
+                                                    <Skeleton height={50} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                        />
+                                    </ListItem>
+                                    <Divider variant="inset" component="li"/>
+                                </List>
+
+                            }
+
+                        </Grid>
+
+                    </Grid>
+                </Paper>
 
 
                 <Grid container spacing={5}>
                     <Grid item xs={12}>
-                        <ComplianceTaskList update={UpdateComplainceState} loading={componentLoading} tooltip={'Add New Contact'} data={taskData}
+                        <ComplianceTaskList update={UpdateComplainceState} loading={componentLoading}
+                                            tooltip={'Add New Contact'} data={taskData}
                                             title={'Compliance Tasks'} eid={entity_id}/>
                     </Grid>
                 </Grid>
@@ -465,9 +696,9 @@ const EntityDetailedPage = (props) => {
                 <Grid container spacing={5}>
                     <Grid item xs={12}>
                         <AttachmentTable action={true} loading={componentLoading} tooltip={'Add New Document'}
-                                     redirect={true}
-                                     url={`/attachment/form/add/${entity_id}`} data={attachmentData}
-                                     title={'Documents'}/>
+                                         redirect={true}
+                                         url={`/attachment/form/add/${entity_id}`} data={attachmentData}
+                                         title={'Documents'}/>
                     </Grid>
 
                 </Grid>
@@ -479,6 +710,32 @@ const EntityDetailedPage = (props) => {
                                      title={'Contacts'}/>
                     </Grid>
                 </Grid>
+                <div>
+                    <Modal
+                        // parentSelector={() => document.querySelector('#messageModal')}
+
+                        isOpen={modalIsOpen}
+                        onAfterOpen={afterOpenModal}
+                        onRequestClose={closeModal}
+                        contentLabel="Chat Application"
+                        ariaHideApp={false}
+                        style={{
+                            overlay: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)'
+                            },
+
+                        }}
+                    >
+                        <div className="closeButton">
+                            <CancelIcon onClick={closeModal} className={classes.largeIcon}/>
+                        </div>
+                        <div className="chat-wrapper">
+                            <NewChatPanel/>
+                        </div>
+                    </Modal>
+                </div>
+
+
             </Layout>
         </>
 

@@ -20,7 +20,16 @@ import WarningIcon from "@material-ui/icons/Warning";
 import ErrorIcon from "@material-ui/icons/Error";
 import InfoIcon from "@material-ui/icons/Info";
 import ChildDetailedPage from '../entity/ChildDetailedPage';
-import Add from '@material-ui/icons/Add';
+
+import Drawer from '@material-ui/core/Drawer';
+import Button from '@material-ui/core/Button';
+import List from '@material-ui/core/List';
+import Divider from '@material-ui/core/Divider';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import InboxIcon from '@material-ui/icons/MoveToInbox';
+import MailIcon from '@material-ui/icons/Mail';
 
 
 const columns = [
@@ -131,7 +140,7 @@ const Dashboard = (props, {onChange, ...rest}) => {
     const checkRole = role ? role : localStorage.getItem('role');
     const [entitydata, setEntityData] = React.useState([]);
     const [componentLoading, setComponentLoading] = React.useState(true);
-
+    const [state, setState] = React.useState(false);
     useEffect(() => {
 
         if (loading === true) {
@@ -184,6 +193,7 @@ const Dashboard = (props, {onChange, ...rest}) => {
     }
 
 
+
     return (
         <>
             <Layout>
@@ -193,6 +203,9 @@ const Dashboard = (props, {onChange, ...rest}) => {
                         removeError(index)
                     }}/>
                 ))}
+
+
+
                 {checkRole === 'Parent Organization' ?
                     <MaterialTable
                         isLoading={componentLoading}

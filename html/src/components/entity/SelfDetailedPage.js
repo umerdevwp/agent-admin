@@ -37,6 +37,24 @@ import Avatar from '@material-ui/core/Avatar';
 import FastForwardIcon from '@material-ui/icons/FastForward';
 import Skeleton from '@material-ui/lab/Skeleton';
 import AttachmentTable from "../attachment/AttachmentTable";
+import Button from "@material-ui/core/Button";
+import AllMessages from "../message/AllMessages";
+import Modal from "react-modal";
+import NewChatPanel from "../message/NewChatPanel";
+import Drawer from "@material-ui/core/Drawer";
+import AdminSendMessageForm from "../message/AdminSendMessageForm";
+import SendMessageForm from "../message/SendMessageForm";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemAvatar from "@material-ui/core/ListItemAvatar";
+import ListItemText from "@material-ui/core/ListItemText";
+import Divider from "@material-ui/core/Divider";
+import CancelIcon from "@material-ui/icons/Cancel";
+
+
+Modal.setAppElement(document.getElementById('messageModal'));
+
+const drawerWidth = 700;
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -87,7 +105,47 @@ const useStyles = makeStyles(theme => ({
 
     baseColor: {
         color: '#48465b'
-    }
+    },
+
+    listInner:{
+        // width: '100%'
+    },
+
+    messageSection: {
+        marginBottom: 20,
+        marginTop: 30
+    },
+    messageTitle: {
+        marginLeft: 20,
+        float: 'left'
+    },
+
+    rootDrawer: {
+        display: 'flex',
+    },
+    drawer: {
+        [theme.breakpoints.up('sm')]: {
+            width: drawerWidth,
+            flexShrink: 0,
+        },
+    },
+
+    drawerPaper: {
+        width: drawerWidth,
+    },
+
+    content: {
+        flexGrow: 1,
+        paddingLeft: theme.spacing(7),
+        paddingRight: theme.spacing(7),
+    },
+
+    largeIcon: {
+        width: 40,
+        height: 40,
+        color: '#48465b'
+    },
+
 
 
 }));
@@ -147,12 +205,16 @@ const SelfDetailedPage = (props) => {
     const [attachmentList, setAttachmentList] = React.useState([])
     const [taskList, setTaskList] = React.useState([])
     const [compliance, setComplainace] = React.useState(0);
+    const [modalIsOpen,setIsOpen] = React.useState(false);
+    const [state, setState] = React.useState(false);
+
     // const entity_id = attributes.organization;
     const [componentLoading, setComponentLoading] = React.useState(true);
     useEffect(() => {
         if (loading === true) {
             try{
                 addTitle('Entity - ' + profile.name);
+                localStorage.setItem('activeEntityID', attributes.organization);
             } catch (e) {
                 props.authService.logout('/');
             }
@@ -176,6 +238,7 @@ const SelfDetailedPage = (props) => {
         if (role === 'Parent Organization' || role === 'Administrator') {
             try {
                 detailedView = await selfEntityDetail();
+                localStorage.setItem('entityName', detailedView.result.entity.name);
             } catch (e) {
                 addError('Something went wrong with the API.');
             }
@@ -216,6 +279,7 @@ const SelfDetailedPage = (props) => {
             }
         }
         if (detailedView.result) {
+            localStorage.setItem('entityName', detailedView.result.entity.name);
             new Promise((resolve, reject) => {
                 setEntitydetail(detailedView.result)
                 setContactList(detailedView.result.contacts);
@@ -276,7 +340,30 @@ const SelfDetailedPage = (props) => {
         data: attachmentList,
     };
 
+    function openModal() {
+        setIsOpen(true);
+    }
 
+    function afterOpenModal() {
+        // references are now sync'd and can be accessed.
+        // subtitle.style.color = '#f00';
+    }
+
+    function closeModal(){
+        setIsOpen(false);
+    }
+    const toggleDrawer = (event, open) => {
+        if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+            return;
+        }
+        if (open) {
+            setState(true);
+        }
+
+        if (!open) {
+            setState(false);
+        }
+    };
     return (
 
         <>
@@ -301,7 +388,29 @@ const SelfDetailedPage = (props) => {
                                               message={value} onClose={()=> removeError(index)}/>
                 ))}
 
+                <Drawer
+                    ModalProps={{
+                        keepMounted: true, // Better open performance on mobile.
+                        disableEnforceFocus: true
+                    }}
+                    classes={{
+                        paper: classes.drawerPaper,
+                    }} anchor={'right'} open={state} onClose={(event) => toggleDrawer(event, false)}>
+                    <div>
+                        <main className={classes.content}>
+                            {
+                                role === 'Administrator' ?
+                                    <AdminSendMessageForm {...props} /> : ''
+                                // <SendMessageForm/> : ''
+                            }
 
+                            {
+                                role === 'Parent Organization' || role === 'Child Entity' ?
+                                    <SendMessageForm {...props} /> : ''
+                            }
+                        </main>
+                    </div>
+                </Drawer>
                 <Grid container spacing={2}>
                     <Grid item xs={12} sm={4}>
                         <Card className={classes.root}>
@@ -418,9 +527,13 @@ const SelfDetailedPage = (props) => {
                                         <>
                                         <ul className={classes.companyinfo}>
                                             {entitydetail.entity.shippingStreet ?
-                                                <li className={classes.listItem}><RoomIcon
-                                                    className={classes.adjustment}/>
-                                                    <strong>{entitydetail.entity.shippingStreet}, {entitydetail.entity.shippingCity}, {entitydetail.entity.shippingState} {entitydetail.entity.shippingCode} </strong>
+                                                <li className={classes.listItem}>
+                                                    <div className="forwardingAddress">
+                                                        <RoomIcon
+                                                            className={clsx(classes.adjustment, 'forwardingAddress-icon')}/>
+                                                        <strong>{entitydetail.entity.shippingStreet}, {entitydetail.entity.shippingCity}, {entitydetail.entity.shippingState} {entitydetail.entity.shippingCode} </strong>
+                                                    </div>
+
                                                 </li> : ''}
                                             <li className={classes.listItem}><MailIcon
                                                 className={classes.adjustment}/> {entitydetail.entity.email}
@@ -443,6 +556,99 @@ const SelfDetailedPage = (props) => {
                         </Card>
                     </Grid>
                 </Grid>
+
+
+                <Paper className={classes.messageSection} elevation={2}>
+                    <Grid container spacing={5}>
+
+                        <Grid item xs={12}>
+                            <div className="messageSection">
+                                <Typography className={classes.messageTitle} variant="h5" component="h2"
+                                            color="textPrimary">Messages</Typography>
+                                <Button variant="outlined" color="primary" className={'sendMessageButton'}
+                                        onClick={(event) => toggleDrawer(event, true)}>Send Message</Button>
+                            </div>
+                            { entitydetail ?
+                                <AllMessages entityName={entitydetail.entity.name} openmodal={openModal}/> :
+                                <List>
+                                    <ListItem alignItems="flex-start">
+                                        <ListItemAvatar>
+                                            <Skeleton variant="circle" height={50} width={50} animation="wave"/>
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={
+                                                <React.Fragment>
+                                                    <Skeleton height={30} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                            secondary={
+                                                <React.Fragment>
+                                                    <Skeleton height={50} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                        />
+                                    </ListItem>
+                                    <Divider variant="inset" component="li"/>
+                                    <ListItem alignItems="flex-start">
+                                        <ListItemAvatar>
+                                            <Skeleton variant="circle" height={50} width={50} animation="wave"/>
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={
+                                                <React.Fragment>
+                                                    <Skeleton height={30} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                            secondary={
+                                                <React.Fragment>
+                                                    <Skeleton height={50} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                        />
+                                    </ListItem>
+                                    <Divider variant="inset" component="li"/>
+                                    <ListItem alignItems="flex-start">
+                                        <ListItemAvatar>
+                                            <Skeleton variant="circle" height={50} width={50} animation="wave"/>
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={
+                                                <React.Fragment>
+                                                    <Skeleton height={30} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                            secondary={
+                                                <React.Fragment>
+                                                    <Skeleton height={50} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                        />
+                                    </ListItem>
+                                    <Divider variant="inset" component="li"/>
+                                    <ListItem alignItems="flex-start">
+                                        <ListItemAvatar>
+                                            <Skeleton variant="circle" height={50} width={50} animation="wave"/>
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={
+                                                <React.Fragment>
+                                                    <Skeleton height={30} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                            secondary={
+                                                <React.Fragment>
+                                                    <Skeleton height={50} width={'100%'} animation="wave"/>
+                                                </React.Fragment>
+                                            }
+                                        />
+                                    </ListItem>
+                                    <Divider variant="inset" component="li"/>
+                                </List>
+                            }
+                        </Grid>
+
+                    </Grid>
+                </Paper>
 
 
                 <Grid container spacing={5}>
@@ -470,6 +676,34 @@ const SelfDetailedPage = (props) => {
                                      title={'Contacts'}/>
                     </Grid>
                 </Grid>
+
+
+
+                <div>
+                    <Modal
+                        // parentSelector={() => document.querySelector('#messageModal')}
+                        isOpen={modalIsOpen}
+                        onAfterOpen={afterOpenModal}
+                        onRequestClose={closeModal}
+                        contentLabel="Chat Application"
+                        ariaHideApp={false}
+                        style={{
+                            overlay: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)'
+                            },
+
+                        }}
+                    >
+                        <div className="closeButton">
+                            <CancelIcon onClick={closeModal} className={classes.largeIcon}/>
+                        </div>
+                        <div className="chat-wrapper">
+                            <NewChatPanel/>
+                        </div>
+                    </Modal>
+                </div>
+
+
             </Layout>
         </>
 

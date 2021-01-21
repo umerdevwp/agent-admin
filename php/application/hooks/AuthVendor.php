@@ -3,7 +3,7 @@ header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
 class AuthVendor
 {
-    private $auth = ['user_api','entity','tasks','documents'];
+    private $auth = ['user_api','entity','tasks','documents','message'];
 
     public function basicAuth()
     {

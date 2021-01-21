@@ -3,7 +3,6 @@ class Notifications_model extends CI_Model
 {
 
     private $table = "notification_subscriptions";
-    private $table_maillog = "email_log";
     private $table_entity = "zoho_accounts";
 
     private $table_rule = "rules";
@@ -42,7 +41,7 @@ class Notifications_model extends CI_Model
         return ['type'=>'ok','results'=>$result];
     }
 
-    public function findRule($sState="",$sEntityType="",$sOrigin="domestic")
+    public function getStateTypeRule($sState="",$sEntityType="",$sOrigin="domestic")
     {
 
         $this->db->select("rs.id,rs.rule_id,rs.state,rs.entity_type,r.origin_type,r.base_type,r.period_type,r.month_diff,r.day_diff,year_diff,custom_condition,description");
@@ -63,10 +62,21 @@ class Notifications_model extends CI_Model
         //$this->db->where("r.custom_condition!=",'');
 
         $query = $this->db->get();
-        $result = $query->result_object();
-        
-        //echo $this->db->last_query();
-        
+        $result = ['type'=>'error','message'=>'No rule found'];
+        $aData = 0;
+
+        // avoid query error, it shouldn't be a failed object due to mysql error
+        if($query)
+        {
+            $aData = $query->result_object();// can return null
+        }
+
+        // check data exist, is array or null
+        if(count($aData)>0)
+        {
+            $result = ['type'=>'ok','results'=>$aData];
+        }
+
         return $result;
     }
 
@@ -74,9 +84,8 @@ class Notifications_model extends CI_Model
     {
         
         $sQueryEntity =<<<HC
-SELECT za.filing_state,za.entity_type,za.formation_date,ns.* 
+SELECT ns.* 
 FROM {$this->table} ns
-INNER JOIN {$this->table_zoho_accounts} za ON ns.entity_id=za.id
 WHERE ns.status='active'
 AND due_date IS NOT NULL
 HC;
@@ -96,30 +105,43 @@ HC;
     }
 
     /**
-     * Set calendar for upcoming due dates of notification for entity state and type
-     * 
+     *  Find applicable rule on entity based on formation and entity structure and company type
      */
     public function getRules($sEntityState,$sEntityType,$sFormationDate,$sFiscalDate="",$sNow="",$bReturnSingle=true)
     {
-        $this->load->model("Notifications_model");
-        
-
         //$state = $this->input->post("state");
         //$type = $this->input->post("type");
-        if($sEntityState=="" || $sEntityType=="")
+        if($sEntityState=="")
         {
-            return ['type'=>'error','message'=>'Entity state or type is missing'];
+            $aErrorMessage[] = "Entity state";
         }
 
-        $result = $this->findRule($sEntityState,$sEntityType);
-        //var_dump($result);
-        //$result = $this->Notifications_model->findRule();
+        if($sEntityType=="")
+        {
+            $aErrorMessage[] = "Entity Type";
+        }
+
+        if($sFormationDate=="" || $sFormationDate=="0000-00-00")
+        {
+            $aErrorMessage[] = "Formation date";
+        }
+
+        if(count($aErrorMessage))
+        {
+            return ['type'=>'error','message'=>'For rulings: '.implode(",",$aErrorMessage).' must exist'];
+        }
+
+        $aResultStateType = $this->getStateTypeRule($sEntityState,$sEntityType);
+        if($aResultStateType['type']=='error')
+        {
+            return ['type'=>'error','message'=>$aResultStateType['message']];
+        }
 
         $sFiscalDate = convToMySqlDate($sFiscalDate)?:date("2020-12-31");
         // sample dates for testing
         //$sFormationDate = convToMySqlDate($this->input->post("formation"));// ["1/1/2017","1/1/2018","5/7/19","1/7/20","1/26/20"];
 
-            foreach($result as $oRow)
+            foreach($aResultStateType['results'] as $oRow)
             {
                 
                 // reset me with actual entity date
@@ -232,9 +254,7 @@ HC;
                 
             }
 
-        return $data;
-
-
+        return ['type'=>'ok','results'=>$data];
     }
 
     private function resetFiscalDate($oRow,$oDate,$oDateFormation)
@@ -350,48 +370,55 @@ HC;
         return false;
     }
 
-    public function addMailLog($data)
+    public function getNotifyDate($oSubscription,$oRule,$sDateNow)
     {
         
-        $this->db->insert($this->table_maillog,$data);
+        // setup now, due and subscripiton date objects
+        $oDueDate = new DateTime($oRule->duedate);
+        $oDateNow = new DateTime($sDateNow);
+        $oDiffDue = $oDueDate->diff($oDateNow,true);
+        $oDiffSubs = $oDateNow->diff(new DateTime($oSubscription->start_date));
+        $aResult = null;
 
-        return $this->db->insert_id();
-        
-    }
-
-    public function updateMailLog($iId, $sStatus, $sJson)
-    {
-        $aData = [
-            "status"    =>  $sStatus,
-            "sg_status" =>  $sJson
-        ];
-        $aWhere = [
-            "id" =>  $iId
-        ];
-        $this->db->update($this->table_maillog,$aData, $aWhere);
-    }
-
-    public function getLogDates($sDate1,$sDate2)
-    {
-        $q = "SELECT * FROM {$this->table_maillog} WHERE send_time BETWEEN '{$sDate1}' AND '{$sDate2} 23:59:59'";
-        $oResult = $this->db->query($q);
-//        echo $this->db->last_query();die;
-        $aData = $oResult->result_object();
-        return $aData;
-    }
-
-    
-    public function getLogEntityDates($sDate1,$sDate2)
-    {
-        $q = "SELECT m.id id, m.entity_id eid, m.to email, m.subject, m.sg_message_id msgid, m.send_time `sent`, m.updated, m.status, e.account_name `name` FROM {$this->table_maillog} m, {$this->table_entity} e WHERE e.id=m.entity_id AND send_time BETWEEN '{$sDate1}' AND '{$sDate2}' ORDER BY send_time DESC";
-        $oResult = $this->db->query($q);
-//        echo $this->db->last_query();die;
-        $aData = [];
-        if($oResult)
+        if($oSubscription->interval_months>0 && $oDiffSubs->m>0)
         {
-            $aData = $oResult->result_object();
+            // calculate month intervals
+            $iMonthIntervalRemaining = $oDiffSubs->m%$oSubscription->interval_months;
+            $iDayToday = $oDateNow->format("d");
+            // and today is 1st of month then shoot
+            if($iMonthIntervalRemaining==0 && $iDayToday==1)
+            {
+                $aResult = ['type'=>'interval-months','date'=>$oDateNow->format("Y-m-d")];
+                return $aResult;
+            }
         }
 
-        return $aData;
+        // calculate month remaining, difference is 0 when day is last of month
+        if($oDiffDue->m==$oSubscription->before_months && $oDiffDue->d==0)
+        {
+            $aResult = ['type'=>'before-months','date'=>$oDateNow->format("Y-m-d")];
+            return $aResult;
+        }
+
+        // calculate days remaining
+        if($oDiffDue->days==$oSubscription->before_days)
+        {
+            $aResult = ['type'=>'before-days','date'=>$oDateNow->format("Y-m-d")];
+            return $aResult;
+        }
+
+        if($oSubscription->interval_days>0 && $oDiffSubs->days>0)
+        {
+            // calculate day intervals 
+            $iDayIntervalRemaining = $oDiffSubs->days%$oSubscription->interval_days;
+            if($iDayIntervalRemaining==0)
+            {
+                $aResult = ['type'=>'interval-days','date'=>$oDateNow->format("Y-m-d")];
+                return $aResult;
+            }
+        }
+
+        return $aResult;
     }
+    
 }

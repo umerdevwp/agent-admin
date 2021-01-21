@@ -55,7 +55,7 @@ date_default_timezone_set("Asia/Kolkata");
  *
  * NOTE: If you change these, also change the error_reporting() code below
  */
-$aServers = ['apidev.youragentservices.com','192.168.0.187','192.168.1.155', '10.10.10.159','api.agentadmin.local'];
+$aServers = ['apidev.youragentservices.com','192.168.0.187','192.168.1.155', '10.10.10.159','api.agentadmin.loc'];
 define('ENVIRONMENT', (in_array($_SERVER['SERVER_NAME'],$aServers)?"development":"production"));//(isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development'));
 // Allow from any origin
 if (isset($_SERVER['HTTP_ORIGIN'])) {

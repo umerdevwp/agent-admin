@@ -96,6 +96,56 @@ class Contacts_model extends CI_Model
         return $result;
     }
 
+    /**
+     * Fetch contact details of entity personal contact
+     * it fetches the 1st record and treat this as primary contact details
+     * 
+     * @param int $id of entity
+     * @param Array $aColumns list of columns required from table
+     */
+    public function getPrimaryFromEntityId($id,$aColumns=[])
+    {
+        // TODO: remove fake id
+
+        $aMyColumns = [];
+        if(count($aColumns)>0)
+            $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
+        else {
+            $aMyColumns = [
+                "id","name","firstName","lastName","email","phone", "contactType",
+                "mailingStreet", "mailingCountry", "mailingCity",
+        "mailingState", "mailingZip"
+            ];
+            $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
+        }
+        foreach($aMyColumns as $k=>$v)
+        $this->db->select("zc.$v as `$k`");
+
+        //$this->db->select('zoho_contacts.*,contactmeta.*');
+        $this->db->from('zoho_contacts zc');
+        $this->db->join('contactmeta','zc.id=contactmeta.contact_id', 'left');
+        $this->db->where(["zc.account_name"=>$id]);
+        $this->db->order_by("id","asc");
+        $this->db->limit(1);
+
+        $query = $this->db->get();
+        if ($query->num_rows() > 0) {
+            $result = $query->row_object();
+        }
+
+        if (!is_object($result)) {
+            return ['message' => 'No contacts available', 'type' => 'error'];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get all the contacts that has entity ids from provided list of entity ids
+     * 
+     * @param Array $arCommaIds ids of entities whoes contacts are required
+     * @param Array $aColumns list of fields/columns require from table
+     */
     public function getAllFromEntityList($arCommaIds,$aColumns=[])
     {
         $aMyColumns = [];
@@ -123,6 +173,11 @@ class Contacts_model extends CI_Model
         return $result;
     }
 
+    /**
+     * Check if row exist with specific criterea provided
+     * 
+     * @param Array $aData associative array of column and value to check
+     */
     public function checkRowExist($aData)
     {
         $query = $this->db->select("id")->get_where($this->table, $aData);

@@ -2,17 +2,80 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d9398c1c-af28-4f73-920d-6f1f684f34d9" name="Default Changelist" comment="Merge branch 'master-notification-react' of https://github.com/United-Agent-Services/agentadmin into local-omer&#10;&#10;# Conflicts:&#10;#&#9;application/controllers/Contacts.php&#10;#&#9;application/controllers/Entity.php&#10;#&#9;application/controllers/Login.php&#10;#&#9;application/controllers/Portal.php&#10;#&#9;application/hooks/Auth.php&#10;#&#9;application/models/Accounts_model.php&#10;#&#9;application/models/Contacts_model.php&#10;#&#9;application/models/Entity_model.php&#10;#&#9;application/views/entity-add.php&#10;#&#9;application/views/entity.php&#10;#&#9;application/views/header.php&#10;#&#9;application/views/portal.php">
-      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/api/message.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/message/AdminSendMessageForm.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/message/AllMessages.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/message/ChatPanel.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/message/MainChatApp.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/message/MessageLog.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/message/NewChatPanel.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/message/NewChatPanelForLogs.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/message/SendMessageForm.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../php/application/controllers/Message.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../php/application/controllers/Templates.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../php/application/libraries/ModelDefault.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../php/application/models/EntityNotes_model.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../php/application/models/MailTemplates_model.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../php/application/models/SendgridMessage_model.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../static/css/2.470db658.chunk.css.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../static/css/main.851a71dc.chunk.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../static/css/main.851a71dc.chunk.css.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../static/js/2.ba8c7a6e.chunk.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../static/js/3.4f0676f7.chunk.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../static/js/3.4f0676f7.chunk.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../static/js/main.f86f66b6.chunk.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../static/js/main.f86f66b6.chunk.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../asset-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/../asset-manifest.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/public/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/manifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/robots.txt" beforeDir="false" afterPath="$PROJECT_DIR$/public/robots.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/context/UserContext.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/context/UserContext.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/dashboard/Dashboard.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/dashboard/Dashboard.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/entity/AddEntity.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/entity/AddEntity.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/entity/ChildDetailedPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/entity/ChildDetailedPage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/entity/EntityDetailedPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/entity/EntityDetailedPage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/entity/SelfDetailedPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/entity/SelfDetailedPage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/layout/Layout.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/layout/Layout.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/routes/AppWithRouterAccess.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/routes/AppWithRouterAccess.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/routes/listItems.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/routes/listItems.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../index.html" beforeDir="false" afterPath="$PROJECT_DIR$/../index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../php/application/config/routes.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/config/routes.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../php/application/controllers/Attachments.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/controllers/Attachments.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../php/application/controllers/Documents.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/controllers/Documents.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../php/application/controllers/Download.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/controllers/Download.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../php/application/controllers/Entity.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/controllers/Entity.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../php/application/controllers/Notifications.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/controllers/Notifications.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../php/application/helpers/custom_helper.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/helpers/custom_helper.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../php/application/hooks/Auth.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/hooks/Auth.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../php/application/hooks/AuthVendor.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/hooks/AuthVendor.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../php/application/models/Contacts_model.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/models/Contacts_model.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../php/application/models/Entity_model.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/models/Entity_model.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../php/application/models/Messenger_model.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/models/Messenger_model.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../php/application/models/Notifications_model.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/models/Notifications_model.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../php/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/index.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../precache-manifest.32bfaf08aa1108e069b0db21db73d967.js" beforeDir="false" afterPath="$PROJECT_DIR$/../precache-manifest.502e57af565dec42a59250a7b83a8a5a.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../service-worker.js" beforeDir="false" afterPath="$PROJECT_DIR$/../service-worker.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/css/2.83758d64.chunk.css" beforeDir="false" afterPath="$PROJECT_DIR$/../static/css/2.470db658.chunk.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/css/2.83758d64.chunk.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/css/main.911cbf93.chunk.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/2.a8ed1fd0.chunk.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/2.a8ed1fd0.chunk.js.LICENSE.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../static/js/2.ba8c7a6e.chunk.js.LICENSE.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/2.a8ed1fd0.chunk.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../static/js/2.ba8c7a6e.chunk.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/3.8a52c846.chunk.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/3.8a52c846.chunk.js.LICENSE.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/3.8a52c846.chunk.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/4.664cce54.chunk.js" beforeDir="false" afterPath="$PROJECT_DIR$/../static/js/4.6d86cf4b.chunk.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/4.664cce54.chunk.js.LICENSE.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../static/js/4.6d86cf4b.chunk.js.LICENSE.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/4.664cce54.chunk.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../static/js/4.6d86cf4b.chunk.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/5.a641906f.chunk.js" beforeDir="false" afterPath="$PROJECT_DIR$/../static/js/5.37af08f0.chunk.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/5.a641906f.chunk.js.LICENSE.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../static/js/5.37af08f0.chunk.js.LICENSE.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/5.a641906f.chunk.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../static/js/5.37af08f0.chunk.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/runtime-main.cdaeac05.js" beforeDir="false" afterPath="$PROJECT_DIR$/../static/js/runtime-main.c7a4c41b.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../static/js/runtime-main.cdaeac05.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../static/js/runtime-main.c7a4c41b.js.map" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,7 +113,7 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/components/message" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="web-ide.project.structure" />
     <property name="ts.external.directory.path" value="C:\Program Files\JetBrains\PhpStorm 2019.2.4\plugins\JavaScriptLanguage\jsLanguageServicesImpl\external" />
@@ -61,11 +124,11 @@
       <recent name="C:\Users\omer.s\Desktop\update react code\react-ui\src\app\pages\entity" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Bitnami\wampstack\apache2\htdocs\html\src\components\message" />
       <recent name="C:\Bitnami\wampstack\apache2\htdocs\html" />
       <recent name="C:\Users\omer.s\Desktop\update react code\react-ui\src\app\pages\entity" />
       <recent name="C:\Users\omer.s\Desktop\update react code\react-ui\src\_metronic\layout" />
       <recent name="C:\Users\omer.s\Desktop\update react code\react-ui\src\app\pages\contacts" />
-      <recent name="C:\Users\omer.s\Desktop\update react code\react-ui" />
     </key>
   </component>
   <component name="SvnConfiguration">
@@ -112,7 +175,6 @@
       <workItem from="1597676131027" duration="1226000" />
       <workItem from="1597678161903" duration="71881000" />
       <workItem from="1602187921745" duration="1231000" />
-      <workItem from="1606842101497" duration="677000" />
     </task>
     <servers />
   </component>
@@ -124,22 +186,22 @@
       <screen x="0" y="0" width="1366" height="738" />
     </state>
     <state x="426" y="171" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1366.738@0.0.1366.738" timestamp="1598544511516" />
-    <state width="1323" height="243" key="GridCell.Tab.0.bottom" timestamp="1606842488116">
+    <state width="1323" height="243" key="GridCell.Tab.0.bottom" timestamp="1607012859876">
       <screen x="0" y="0" width="1366" height="738" />
     </state>
-    <state width="1323" height="243" key="GridCell.Tab.0.bottom/0.0.1366.738@0.0.1366.738" timestamp="1606842488116" />
-    <state width="1323" height="243" key="GridCell.Tab.0.center" timestamp="1606842488116">
+    <state width="1323" height="243" key="GridCell.Tab.0.bottom/0.0.1366.738@0.0.1366.738" timestamp="1607012859876" />
+    <state width="1323" height="243" key="GridCell.Tab.0.center" timestamp="1607012859876">
       <screen x="0" y="0" width="1366" height="738" />
     </state>
-    <state width="1323" height="243" key="GridCell.Tab.0.center/0.0.1366.738@0.0.1366.738" timestamp="1606842488116" />
-    <state width="1323" height="243" key="GridCell.Tab.0.left" timestamp="1606842488115">
+    <state width="1323" height="243" key="GridCell.Tab.0.center/0.0.1366.738@0.0.1366.738" timestamp="1607012859876" />
+    <state width="1323" height="243" key="GridCell.Tab.0.left" timestamp="1607012859876">
       <screen x="0" y="0" width="1366" height="738" />
     </state>
-    <state width="1323" height="243" key="GridCell.Tab.0.left/0.0.1366.738@0.0.1366.738" timestamp="1606842488115" />
-    <state width="1323" height="243" key="GridCell.Tab.0.right" timestamp="1606842488116">
+    <state width="1323" height="243" key="GridCell.Tab.0.left/0.0.1366.738@0.0.1366.738" timestamp="1607012859876" />
+    <state width="1323" height="243" key="GridCell.Tab.0.right" timestamp="1607012859876">
       <screen x="0" y="0" width="1366" height="738" />
     </state>
-    <state width="1323" height="243" key="GridCell.Tab.0.right/0.0.1366.738@0.0.1366.738" timestamp="1606842488116" />
+    <state width="1323" height="243" key="GridCell.Tab.0.right/0.0.1366.738@0.0.1366.738" timestamp="1607012859876" />
     <state x="129" y="55" key="MergeDialog" timestamp="1598544413085">
       <screen x="0" y="0" width="1366" height="738" />
     </state>
@@ -148,9 +210,13 @@
       <screen x="0" y="0" width="1366" height="738" />
     </state>
     <state x="395" y="84" key="MultipleFileMergeDialog/0.0.1366.738@0.0.1366.738" timestamp="1598544422007" />
-    <state x="379" y="192" key="com.intellij.ide.util.TipDialog" timestamp="1606842102135">
+    <state x="379" y="101" width="607" height="536" key="find.popup" timestamp="1608819094824">
       <screen x="0" y="0" width="1366" height="738" />
     </state>
-    <state x="379" y="192" key="com.intellij.ide.util.TipDialog/0.0.1366.738@0.0.1366.738" timestamp="1606842102135" />
+    <state x="379" y="101" width="607" height="536" key="find.popup/0.0.1366.738@0.0.1366.738" timestamp="1608819094824" />
+    <state x="346" y="59" width="672" height="678" key="search.everywhere.popup" timestamp="1610392498340">
+      <screen x="0" y="0" width="1366" height="738" />
+    </state>
+    <state x="346" y="59" width="672" height="678" key="search.everywhere.popup/0.0.1366.738@0.0.1366.738" timestamp="1610392498340" />
   </component>
 </project>
