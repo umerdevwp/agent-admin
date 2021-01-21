@@ -2,80 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d9398c1c-af28-4f73-920d-6f1f684f34d9" name="Default Changelist" comment="Merge branch 'master-notification-react' of https://github.com/United-Agent-Services/agentadmin into local-omer&#10;&#10;# Conflicts:&#10;#&#9;application/controllers/Contacts.php&#10;#&#9;application/controllers/Entity.php&#10;#&#9;application/controllers/Login.php&#10;#&#9;application/controllers/Portal.php&#10;#&#9;application/hooks/Auth.php&#10;#&#9;application/models/Accounts_model.php&#10;#&#9;application/models/Contacts_model.php&#10;#&#9;application/models/Entity_model.php&#10;#&#9;application/views/entity-add.php&#10;#&#9;application/views/entity.php&#10;#&#9;application/views/header.php&#10;#&#9;application/views/portal.php">
-      <change afterPath="$PROJECT_DIR$/src/components/api/message.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/message/AdminSendMessageForm.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/message/AllMessages.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/message/ChatPanel.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/message/MainChatApp.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/message/MessageLog.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/message/NewChatPanel.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/message/NewChatPanelForLogs.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/message/SendMessageForm.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../php/application/controllers/Message.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../php/application/controllers/Templates.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../php/application/libraries/ModelDefault.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../php/application/models/EntityNotes_model.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../php/application/models/MailTemplates_model.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../php/application/models/SendgridMessage_model.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../static/css/2.470db658.chunk.css.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../static/css/main.851a71dc.chunk.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../static/css/main.851a71dc.chunk.css.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../static/js/2.ba8c7a6e.chunk.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../static/js/3.4f0676f7.chunk.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../static/js/3.4f0676f7.chunk.js.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../static/js/main.f86f66b6.chunk.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../static/js/main.f86f66b6.chunk.js.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../asset-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/../asset-manifest.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/public/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/context/UserContext.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/context/UserContext.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/dashboard/Dashboard.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/dashboard/Dashboard.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/entity/AddEntity.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/entity/AddEntity.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/entity/ChildDetailedPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/entity/ChildDetailedPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/entity/EntityDetailedPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/entity/EntityDetailedPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/entity/SelfDetailedPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/entity/SelfDetailedPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/layout/Layout.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/layout/Layout.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/routes/AppWithRouterAccess.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/routes/AppWithRouterAccess.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/routes/listItems.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/routes/listItems.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../index.html" beforeDir="false" afterPath="$PROJECT_DIR$/../index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../php/application/config/routes.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/config/routes.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../php/application/controllers/Attachments.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/controllers/Attachments.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../php/application/controllers/Documents.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/controllers/Documents.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../php/application/controllers/Download.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/controllers/Download.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../php/application/controllers/Entity.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/controllers/Entity.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../php/application/controllers/Notifications.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/controllers/Notifications.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../php/application/helpers/custom_helper.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/helpers/custom_helper.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../php/application/hooks/Auth.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/hooks/Auth.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../php/application/hooks/AuthVendor.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/hooks/AuthVendor.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../php/application/models/Contacts_model.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/models/Contacts_model.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../php/application/models/Entity_model.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/models/Entity_model.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../php/application/models/Messenger_model.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/models/Messenger_model.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../php/application/models/Notifications_model.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/models/Notifications_model.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../php/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/index.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../precache-manifest.32bfaf08aa1108e069b0db21db73d967.js" beforeDir="false" afterPath="$PROJECT_DIR$/../precache-manifest.502e57af565dec42a59250a7b83a8a5a.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../service-worker.js" beforeDir="false" afterPath="$PROJECT_DIR$/../service-worker.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/css/2.83758d64.chunk.css" beforeDir="false" afterPath="$PROJECT_DIR$/../static/css/2.470db658.chunk.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/css/2.83758d64.chunk.css.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/css/main.911cbf93.chunk.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/2.a8ed1fd0.chunk.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/2.a8ed1fd0.chunk.js.LICENSE.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../static/js/2.ba8c7a6e.chunk.js.LICENSE.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/2.a8ed1fd0.chunk.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../static/js/2.ba8c7a6e.chunk.js.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/3.8a52c846.chunk.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/3.8a52c846.chunk.js.LICENSE.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/3.8a52c846.chunk.js.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/4.664cce54.chunk.js" beforeDir="false" afterPath="$PROJECT_DIR$/../static/js/4.6d86cf4b.chunk.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/4.664cce54.chunk.js.LICENSE.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../static/js/4.6d86cf4b.chunk.js.LICENSE.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/4.664cce54.chunk.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../static/js/4.6d86cf4b.chunk.js.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/5.a641906f.chunk.js" beforeDir="false" afterPath="$PROJECT_DIR$/../static/js/5.37af08f0.chunk.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/5.a641906f.chunk.js.LICENSE.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../static/js/5.37af08f0.chunk.js.LICENSE.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/5.a641906f.chunk.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../static/js/5.37af08f0.chunk.js.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/runtime-main.cdaeac05.js" beforeDir="false" afterPath="$PROJECT_DIR$/../static/js/runtime-main.c7a4c41b.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../static/js/runtime-main.cdaeac05.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../static/js/runtime-main.c7a4c41b.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/message/NewChatPanel.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/message/NewChatPanel.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

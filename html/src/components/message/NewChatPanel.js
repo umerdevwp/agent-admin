@@ -236,6 +236,13 @@ const NewChatPanel = (props) => {
             if (threadInfo.fromEid === '0') {
                 return 'sent'
             }
+
+            const currentActiveUser = localStorage.getItem('activeEntityID');
+
+            if (threadInfo.fromEid === currentActiveUser) {
+                return 'replies'
+            }
+
             if (threadInfo.fromEid === attributes.organization) {
                 return 'replies'
             }
