@@ -213,7 +213,7 @@ class SendgridMessage_model extends ModelDefault {
 
         $sQueryCombineNotes = "
 SELECT id,`to` AS toEmail,`from` AS fromEmail,entity_id AS entityId,send_time AS sendTime,subject,message,status,group_id AS groupId,from_eid AS fromEid,`read`,attachments
-FROM {$this->sTable} WHERE entity_id={$iEntityId}
+FROM {$this->sTable} WHERE entity_id={$iEntityId} and status!=pending
 UNION
 SELECT id,'','',entity_id AS entityId,added AS sendTime, subject,message,type AS status,0,0,1,'[]'
 FROM entity_notes WHERE entity_id={$iEntityId}
@@ -254,7 +254,7 @@ ORDER BY sendTime ASC
             $this->db->select("$v as `$k`");
 
         $this->order_by("send_time");
-        $aRecords = $this->get_many_by(['entity_id'=>$iEntityId]);
+        $aRecords = $this->get_many_by(['entity_id'=>$iEntityId,"status!='pending'"]);
         if(count($aRecords)==0)
         {
             $aRecords = null;

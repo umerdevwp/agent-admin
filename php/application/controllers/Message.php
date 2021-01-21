@@ -138,11 +138,22 @@ class Message extends RestController
         }
 
         $this->load->model("entity_model");
+        $this->load->model("Tempmeta_model");
         // don't validate when user is admin
         if(!isAdmin())
         {
             // check valid parent is shooting mail for entity, if is parent
             $bIsParentValid = $this->entity_model->isParentOf($iEid, $iParentId);
+            if (!$bIsParentValid) {
+                
+                $aDataTempEntity = $this->Tempmeta_model->getOneInJson([
+                    'userid' => $iParentId,
+                    'json_id' => $iEid,
+                    'slug' => $this->Tempmeta_model->slugNewEntity
+                ]);
+                if ($aDataTempEntity['type'] == 'ok')
+                    $bIsParentValid = true;
+            }
         } else {
             $bIsParentValid = true;
         }
@@ -161,7 +172,17 @@ class Message extends RestController
         {
           // get entity row
             $aEntity = $this->entity_model->getOne($iEid);
-            $oEntity = $aEntity['results'];
+            if($aEntity['type']=='ok'){
+                $oEntity = $aEntity['results'];
+            } else {
+                $aEntity = $this->Tempmeta_model->getOneInJson([
+                    'userid' => $iParentId,
+                    'json_id' => $iEid,
+                    'slug' => $this->Tempmeta_model->slugNewEntity
+                ]); 
+                if($aEntity['type']=='ok')
+                $oEntity = $aEntity['results'];
+            }
         }
 
         // if entity not found or eid is blank
@@ -641,7 +662,9 @@ class Message extends RestController
                                 "sg_message_id"=>$iMessageId,
                                 'send_time'=>date("Y-m-d H:i:s"),
                                 'to'=>$oEntity->email,
-                                'entity_email_hash'=>generateHash($oEntity->email)
+                                'entity_email_hash'=>generateHash($oEntity->email),
+                                "subject"=>"Attachments",
+                                ""
                             ]);
                             $iMailsSent++;
                         }
@@ -806,7 +829,16 @@ class Message extends RestController
             $iParentId = $_SESSION['eid'];
             // check valid parent is shooting mail for entity, if is parent
             $bIsParentValid = $this->entity_model->isParentOf($iEntityId, $iParentId);
-            
+            if (!$bIsParentValid) {
+                $this->load->model("Tempmeta_model");
+                $aDataTempEntity = $this->Tempmeta_model->getOneInJson([
+                    'userid' => $iParentId,
+                    'json_id' => $iEntityId,
+                    'slug' => $this->Tempmeta_model->slugNewEntity
+                ]);
+                if ($aDataTempEntity['type'] == 'ok')
+                    $bIsParentValid = true;
+            }
             // if entity is not authorized to send mail for entity block access
             if(!$bIsParentValid)
             {
@@ -851,6 +883,16 @@ class Message extends RestController
         $iParentId = $_SESSION['eid'];
         // check valid parent is shooting mail for entity, if is parent
         $bIsParentValid = $this->entity_model->isParentOf($iEntityId, $iParentId);
+        if (!$bIsParentValid) {
+            $this->load->model("Tempmeta_model");
+            $aDataTempEntity = $this->Tempmeta_model->getOneInJson([
+                'userid' => $iParentId,
+                'json_id' => $iEntityId,
+                'slug' => $this->Tempmeta_model->slugNewEntity
+            ]);
+            if ($aDataTempEntity['type'] == 'ok')
+                $bIsParentValid = true;
+        }
         if($bIsParentValid || isAdmin())
         {
             $aChildEntity = $this->entity_model->getEntityIdOfParent($iParentId);
