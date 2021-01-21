@@ -44,7 +44,7 @@ class Tasks_model extends CI_Model
             $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
         else {
             $aMyColumns = [
-                "id","subject","status","dueDate"
+                "id","subject","description","status","dueDate"
             ];
             $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
         }
