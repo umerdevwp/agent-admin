@@ -357,9 +357,8 @@ const MessageLog = (props) => {
                             tooltip: 'View',
                             onClick: (event, rowData) => {
                                 if (rowData.id) {
-                                    console.log(rowData);
-                                    if(rowData.gid !== "0") {
-                                        localStorage.setItem('activeLogThread', rowData.gid);
+                                    if(rowData.groupId !== "0") {
+                                        localStorage.setItem('activeLogThread', rowData.groupId);
                                     } else {
                                         localStorage.setItem('activeLogThread', rowData.id);
                                     }
