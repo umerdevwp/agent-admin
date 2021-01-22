@@ -498,16 +498,7 @@ const AdminSendMessageForm = (props) => {
                     </div>
 
                     <div className={'col-md-12'}>
-                        {/*<CustomFileInput*/}
-                        {/*    disable={apiLoading}*/}
-                        {/*    value={fileLink.value.File}*/}
-                        {/*    onChange={e => fileChange(e)}*/}
-                        {/*    required*/}
-                        {/*    id="attachment"*/}
-                        {/*    label="File"*/}
-                        {/*    className={clsx(classes.fileUploading, classes.dense)}*/}
-                        {/*    margin="dense"*/}
-                        {/*/>*/}
+
                         <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
                             Attach Files
                         </Button>
@@ -570,7 +561,7 @@ const AdminSendMessageForm = (props) => {
                 filesLimit={10}
                 fileObjects={fileObjects}
                 cancelButtonText={"cancel"}
-                submitButtonText={"submit"}
+                submitButtonText={"Attach Files"}
                 maxFileSize={5000000}
                 open={open}
                 onAdd={newFileObjs => {

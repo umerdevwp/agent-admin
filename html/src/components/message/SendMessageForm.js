@@ -27,6 +27,18 @@ import {TemplateList, getTemplate} from "../api/message";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import {toast} from 'react-toastify';
 import CKEditor from 'ckeditor4-react';
+import Button from "@material-ui/core/Button";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemAvatar from "@material-ui/core/ListItemAvatar";
+import Avatar from "@material-ui/core/Avatar";
+import PictureAsPdfIcon from "@material-ui/icons/PictureAsPdf";
+import ListItemText from "@material-ui/core/ListItemText";
+import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
+import IconButton from "@material-ui/core/IconButton";
+import DeleteIcon from "@material-ui/icons/Delete";
+import CloseIcon from "@material-ui/icons/Close";
+import {DropzoneDialogBase} from "material-ui-dropzone";
 
 const useStyles = makeStyles(theme => ({
     form: {
@@ -63,6 +75,7 @@ const useStyles = makeStyles(theme => ({
 
     submitButton: {
         marginTop: 15,
+        marginBottom: 20,
         float: 'right',
         display: 'inline-flex'
     },
@@ -79,12 +92,18 @@ const useStyles = makeStyles(theme => ({
     },
 
     restButton: {
-
         marginLeft: 20,
     },
 
     selectField: {
         width: '100%'
+    },
+    demo: {
+        backgroundColor: '#F0F0F6',
+    },
+
+    attachmentSection: {
+        marginTop: 10,
     }
 
 }));
@@ -146,6 +165,8 @@ const SendMessageForm = (props) => {
     const [templates, setTemplates] = useState([]);
     const [noteType, setNoteType] = useState({mail: 'Email', note: 'Note', phone: 'Phone'});
     const [noteChosen, setNoteChosen] = useState({value: '', error: ' '});
+    const [open, setOpen] = React.useState(false);
+    const [fileObjects, setFileObjects] = React.useState([]);
     useEffect(() => {
         if(loading === true) {
             getTemplateList();
@@ -156,6 +177,25 @@ const SendMessageForm = (props) => {
         await TemplateList().then(response => {
             setTemplates(response.data.results);
         })
+    }
+
+    const dialogTitle = () => (
+        <>
+            <span>Upload file</span>
+            <IconButton
+                style={{right: '12px', top: '8px', position: 'absolute'}}
+                onClick={() => setOpen(false)}>
+                <CloseIcon/>
+            </IconButton>
+        </>
+    );
+
+    const removeFileFromArray = (index) => {
+        let array = [...fileObjects];
+        if (index > -1) {
+            array.splice(index, 1);
+        }
+        setFileObjects(array);
     }
 
     const resetFormError = () => {
@@ -171,7 +211,10 @@ const SendMessageForm = (props) => {
         let formData = new FormData();
         formData.append('eid', entity_id);
         formData.append('subject', subject.value);
-        formData.append('message', content.value)
+        formData.append('message', content.value);
+        fileObjects.map(function(val, index){
+            formData.append('attachment[]', val.file)
+        });
         await sendMessageAPI(formData).then(response => {
             if (response.status === true) {
                 manageOuterThreads(true);
@@ -265,9 +308,17 @@ const SendMessageForm = (props) => {
 
 
     const resetForm = () => {
-        setContent({...content, value: ''})
-        setSubject({...subject, value:''})
+        setContent({...content, value: ''});
+        setSubject({...subject, value:''});
+        setFileObjects([]);
 
+    }
+
+    const bytesToSize = (bytes) => {
+        let sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        if (bytes == 0) return '0 Byte';
+        let i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+        return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
     }
 
     return (
@@ -431,21 +482,59 @@ const SendMessageForm = (props) => {
 
                         </div>
 
-                        {/*<div className={'col-md-12'}>*/}
-                        {/*    <CustomFileInput*/}
-                        {/*        disable={apiLoading}*/}
-                        {/*        value={fileLink.value.File}*/}
-                        {/*        onChange={e => fileChange(e)}*/}
-                        {/*        required*/}
-                        {/*        id="attachment"*/}
-                        {/*        label="File"*/}
-                        {/*        className={clsx(classes.fileUploading, classes.dense)}*/}
-                        {/*        margin="dense"*/}
-                        {/*    />*/}
-                        {/*    {fileLink.success !== ' ' ? (<span>{fileLink.success}</span>) : ' '}*/}
-                        {/*    {fileLink.error !== ' ' ? (*/}
-                        {/*        <span className={clsx(classes.fileError)}>{fileLink.error}</span>) : ' '}*/}
-                        {/*</div>*/}
+                        <div className={'col-md-12'}>
+                            {/*<CustomFileInput*/}
+                            {/*    disable={apiLoading}*/}
+                            {/*    value={fileLink.value.File}*/}
+                            {/*    onChange={e => fileChange(e)}*/}
+                            {/*    required*/}
+                            {/*    id="attachment"*/}
+                            {/*    label="File"*/}
+                            {/*    className={clsx(classes.fileUploading, classes.dense)}*/}
+                            {/*    margin="dense"*/}
+                            {/*/>*/}
+                            <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
+                                Attach Files
+                            </Button>
+
+                            {fileLink.success !== ' ' ? (<span>{fileLink.success}</span>) : ' '}
+                            {fileLink.error !== ' ' ? (
+                                <span className={clsx(classes.fileError)}>{fileLink.error}</span>) : ' '}
+                            {fileObjects.length !== 0 ?
+                                <Grid className={classes.attachmentSection} container spacing={2}>
+                                    <Grid item xs={12} md={12}>
+                                        <Typography variant="h6" className={classes.title}>
+                                            Attached Files
+                                        </Typography>
+                                        <div className={classes.demo}>
+                                            <List>
+                                                {fileObjects?.map((anObjectMapped, index) =>
+
+
+                                                    <ListItem key={index}>
+                                                        <ListItemAvatar>
+                                                            <Avatar>
+                                                                <PictureAsPdfIcon/>
+                                                            </Avatar>
+                                                        </ListItemAvatar>
+                                                        <ListItemText
+                                                            primary={anObjectMapped.file.name}
+                                                            secondary={bytesToSize(anObjectMapped.file.size)}
+                                                        />
+                                                        <ListItemSecondaryAction>
+                                                            <IconButton edge="end" aria-label="delete">
+                                                                <DeleteIcon onClick={(e) => removeFileFromArray(index)}/>
+                                                            </IconButton>
+                                                        </ListItemSecondaryAction>
+                                                    </ListItem>
+                                                )}
+
+
+                                            </List>
+                                        </div>
+                                    </Grid>
+                                </Grid> : ''}
+                        </div>
                         <div className={'col-md-12'}>
                             <div className={clsx(classes.submitButton, 'custom-button-wrapper')}>
                                 {apiLoading ? (
@@ -460,6 +549,28 @@ const SendMessageForm = (props) => {
                         </div>
                     </FormGroup>
                 </form>
+
+                <DropzoneDialogBase
+                    dialogTitle={dialogTitle()}
+                    acceptedFiles={['.pdf']}
+                    filesLimit={10}
+                    fileObjects={fileObjects}
+                    cancelButtonText={"cancel"}
+                    submitButtonText={"Attach Files"}
+                    maxFileSize={5000000}
+                    open={open}
+                    onAdd={newFileObjs => {
+                        setFileObjects([].concat(fileObjects, newFileObjs));
+                    }}
+
+                    onClose={() => setOpen(false)}
+                    onSave={() => {
+                        setOpen(false);
+                    }}
+                    useChipsForPreview
+                    fullWidth={true}
+                    maxWidth={'md'}
+                />
             </div>
 
         </>

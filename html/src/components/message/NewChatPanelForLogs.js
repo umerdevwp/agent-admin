@@ -11,6 +11,14 @@ import { ScrollTo } from "react-scroll-to";
 
 import {toast} from "react-toastify";
 import {animateScroll, Element, scroller} from "react-scroll";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemAvatar from "@material-ui/core/ListItemAvatar";
+import PictureAsPdfIcon from "@material-ui/icons/PictureAsPdf";
+import ListItemText from "@material-ui/core/ListItemText";
+import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
+import IconButton from "@material-ui/core/IconButton";
+import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 
 const ReactDOMServer = require('react-dom/server');
 const HtmlToReactParser = require('html-to-react').Parser;
@@ -134,9 +142,25 @@ const NewChatPanelForLogs = (props) => {
 
     const convertHTML = (data) => {
 
-        const htmlInput = data;
-        const htmlToReactParser = new HtmlToReactParser();
-        return htmlToReactParser.parse(htmlInput);
+
+        if (typeof data !== 'undefined') {
+            // console.log('Messages', data);
+            // var newHTML = stripHtml(data, {
+            //     stripTogetherWithTheirContents: [
+            //         "table", // default
+            //
+            //     ],
+            // }).result;
+
+            const htmlInput = data;
+            const htmlToReactParser = new HtmlToReactParser();
+            const abc = htmlToReactParser.parse(htmlInput);
+            return abc;
+        } else {
+            // console.log(typeof data)
+            return data;
+
+        }
 
     }
 
@@ -261,9 +285,39 @@ const NewChatPanelForLogs = (props) => {
                                 <Avatar>{namePicker(chosenThread)}</Avatar>
                                 <div className="message-body-chat">
                                     <span><strong>    Subject: </strong> {chosenThread.subject}</span>
-                                    {isHTML(chosenThread.message) === true ?
-                                        convertHTML(chosenThread.message) :
-                                        <p>{chosenThread.message}</p>}
+                                    {isHTML(chosenThread.message) === false ?
+                                        <>
+                                            {convertHTML(chosenThread.message)}
+                                            <List>
+                                                {chosenThread.attachments?.map((anObjectMapped, index) =>
+                                                    <ListItem key={index}>
+                                                        <ListItemAvatar>
+                                                            <Avatar>
+                                                                <PictureAsPdfIcon/>
+                                                            </Avatar>
+                                                        </ListItemAvatar>
+                                                        <ListItemText
+
+                                                            primary={anObjectMapped.name}
+                                                            secondary={anObjectMapped.size}
+                                                        />
+                                                        <ListItemSecondaryAction>
+                                                            <IconButton edge="end" aria-label="delete">
+                                                                <a target="_blank" href={`/${anObjectMapped.path}`}><CloudDownloadIcon/></a>
+                                                            </IconButton>
+                                                        </ListItemSecondaryAction>
+                                                    </ListItem>
+                                                )}
+
+
+                                            </List>
+
+                                        </>
+                                        :
+                                        <p>{chosenThread.message}</p>
+
+                                    }
+
 
                                     <div className="message-info">
                                         <div className="message-time">
@@ -285,9 +339,36 @@ const NewChatPanelForLogs = (props) => {
                                     <Avatar>{namePicker(anObjectMapped)}</Avatar>
                                     <div className="message-body-chat">
                                         <span><strong>Subject: </strong> {anObjectMapped.subject}</span>
-                                        {isHTML(anObjectMapped.message) === true ?
-                                            convertHTML(anObjectMapped.message) :
-                                            <p>{anObjectMapped.message}</p>}
+                                        <>
+                                            {isHTML(anObjectMapped.message) === true ?
+                                                convertHTML(anObjectMapped.message) :
+                                                <p>{convertHTML(anObjectMapped.message)}</p>
+
+                                            }
+                                            <List>
+                                                {anObjectMapped.attachments?.map((anObjectMapped, index) =>
+                                                    <ListItem key={index}>
+                                                        <ListItemAvatar>
+                                                            <Avatar>
+                                                                <PictureAsPdfIcon/>
+                                                            </Avatar>
+                                                        </ListItemAvatar>
+                                                        <ListItemText
+
+                                                            primary={anObjectMapped.name}
+                                                            secondary={anObjectMapped.size}
+                                                        />
+                                                        <ListItemSecondaryAction>
+                                                            <IconButton edge="end" aria-label="delete">
+                                                                <a target="_blank" href={`/${anObjectMapped.path}`}><CloudDownloadIcon/></a>
+                                                            </IconButton>
+                                                        </ListItemSecondaryAction>
+                                                    </ListItem>
+                                                )}
+
+
+                                            </List>
+                                        </>
                                         <div className="message-info">
                                             <div className="message-time">
                                                 <span>{anObjectMapped.sendTime}</span>

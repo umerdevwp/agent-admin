@@ -486,11 +486,13 @@ const NewChatPanel = (props) => {
 
                         <div className="attachmentModal">
                             <Button
+                                disabled={componentLoading}
                                 variant="contained"
                                 component="label"
                             >
                                 <i className="fa fa-paperclip attachment" aria-hidden="true"></i>
                                 <input
+                                    disabled={componentLoading}
                                     multiple="multiple"
                                     accept="application/pdf"
                                     // key={key}
@@ -501,7 +503,7 @@ const NewChatPanel = (props) => {
                             </Button>
                         </div>
 
-                        <button onClick={(e) => sendMessage(e)} className="submit">{componentLoading === false ? <SendIcon/> :    <CircularProgress />}</button>
+                        <button disabled={componentLoading} onClick={(e) => sendMessage(e)} className="submit">{componentLoading === false ? <SendIcon/> :    <CircularProgress />}</button>
                     </div>
                 </div>
             </div>

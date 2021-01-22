@@ -596,7 +596,11 @@ const EntityDetailedPage = (props) => {
                                 <Typography className={classes.messageTitle} variant="h5" component="h2"
                                             color="textPrimary">Messages</Typography>
                                 <Button variant="outlined" color="primary" className={'sendMessageButton'}
-                                        onClick={(event) => toggleDrawer(event, true)}>Send Message</Button>
+                                        onClick={(event) => toggleDrawer(event, true)}>
+                                    {checkRole === 'Administrator' ?
+                                        'Send Message' : 'Message to Support'
+                                    }
+                                </Button>
                             </div>
                             {entitydetail ?
                                 <AllMessages entityName={entitydetail.entity.name} openmodal={openModal}/> :

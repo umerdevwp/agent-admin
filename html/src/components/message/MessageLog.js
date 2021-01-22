@@ -21,6 +21,9 @@ import {FetchMessageLogs, FetchThreads} from "../api/message";
 import VisibilityIcon from "@material-ui/icons/Visibility";
 import Modal from "react-modal";
 import NewChatPanelForLogs from "./NewChatPanelForLogs";
+import CancelIcon from "@material-ui/icons/Cancel";
+
+Modal.setAppElement(document.getElementById('messageModal'));
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -152,7 +155,13 @@ const useStyles = makeStyles(theme => ({
 
     searchButton: {
         marginTop: 26
-    }
+    },
+
+    largeIcon: {
+        width: 40,
+        height: 40,
+        color: '#48465b'
+    },
 
 
 }));
@@ -376,10 +385,11 @@ const MessageLog = (props) => {
 
             <div>
                 <Modal
-                    parentSelector={() => document.querySelector('#messageModal')}
+                    // parentSelector={() => document.querySelector('#messageModal')}
                     isOpen={modalIsOpen}
                     onAfterOpen={afterOpenModal}
                     onRequestClose={closeModal}
+                    ariaHideApp={false}
                     contentLabel="Chat Application"
                     style={{
                         overlay: {
@@ -387,6 +397,9 @@ const MessageLog = (props) => {
                         },
                     }}
                 >
+                    <div className="closeButton">
+                        <CancelIcon onClick={closeModal} className={classes.largeIcon}/>
+                    </div>
                     <div className="chat-wrapper">
                         <NewChatPanelForLogs/>
                     </div>
