@@ -27,6 +27,8 @@ class Messenger_model extends CI_Model {
         $oEmail = new Mail();
         $oEmail->setFrom($sFromEmail, $sFromName);
         $oEmail->addTo($sToEmail, $sName);
+        $oEmail->addTo("qmccreary@youragentservices.com", "AgentAdmin Support");
+        //$oEmail->addCc("qmccreary@youragentservices.com", "AgentAdmin Support");
         $oEmail->setSubject($sSubject);
         $oEmail->addContent("text/html", $sContent);
         // add attachment if exist

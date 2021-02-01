@@ -499,7 +499,7 @@ class Message extends RestController
                 //$sResult = $this->Messenger_model->fetchStatus(['msg_id LIKE "'.$sMsgId.'%"', 'to_email LIKE "'.$sToEmail.'"']);
                 //$sResult = $this->Messenger_model->fetchStatusMsgIdCurl($sMsgId,$sToEmail);
                 $oJson = $this->Messenger_model->fetchStatusMsgId($sMsgId);
-
+                sleep(5);
                 if(count($oJson->messages)>0)
                 {
                     $oMessage = $oJson->messages[0];
@@ -538,7 +538,7 @@ class Message extends RestController
 // TODO: subscription notification loop can be simplified by keeping next notification date in subscription table with flag initial done
         foreach($aSubscription['results'] as $oSubs)
         {
-            if($oSubs->entity_id!=4071993000002895019) continue;
+
             $aDataEntity = $this->entity_model->getOne($oSubs->entity_id,['id','name','email','type','filingState','entityStructure','formationDate']);
 
             if($aDataEntity['type']=='error')
@@ -557,6 +557,13 @@ class Message extends RestController
                     $oEntity->fiscalDate
                 );
                 //print_r($aRule);
+                /*if($oSubs->entity_id=="4071993000011069003")
+                {
+                    print_r($oSubs);
+                    print_r($aDataEntity);
+                    print_r($aRule);
+                    die;
+                }*/
                 if($aRule['type']=='ok')
                 {
                     $oRule = $aRule['results'];
@@ -566,6 +573,13 @@ class Message extends RestController
                     if(isset($aResult['date']))
                     {
                         //$this->sendMail($oEntity,$oRule);
+                        /*if($oEntity->id=="4071993000011069003")
+                        {
+                            print_r($oEntity);
+                            print_r($aResult);
+                            
+                        }
+                        
                         $sTemplateId = "d-02d5c4c6dddf4f709ec6c636a27a18eb";
                         $aTemplateVariables = ['name'=>$oEntity->name,'state'=>$oEntity->filingState,'type'=>$oEntity->entityStructure,'date'=>$aResult['date']];
                         $sMessageId = $this->Messenger_model->sendTemplateEmail(
@@ -581,7 +595,7 @@ class Message extends RestController
                         $iInsertLogId = $this->SendgridMessage_model->logTemplateMail(
                             $oEntity->id,$sMessageId,$oEntity->email,getenv("NOTIFICATION_FROM_EMAIL"),$sTemplateId,serialize($aTemplateVariables),generateHash($oEntity->email)
                         );
-                        $iMailsSent++;
+                        $iMailsSent++;*/
                     }
                 } else {
                     logToAdmin("Subscription cron failed","Rule find failed, eid: " . $oSubs->entity_id . ",  state: {$oEntity->filingState}, structure: {$oEntity->entityStructure}, formed:{$oEntity->formationDate}. {$aRule['message']}",'CRON');

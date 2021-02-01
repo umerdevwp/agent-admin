@@ -301,7 +301,7 @@ class LoraxAttachments_model extends CI_Model
     {
         if(count($aWhere)>0)
         {
-            $this->db->set('token','');
+            $this->db->set('status','downloaded');
             $this->db->where($aWhere);
             $this->db->update($this->table);
 

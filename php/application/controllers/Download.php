@@ -21,7 +21,7 @@ class Download extends CI_Controller
         {
             $this->load->model("SendgridMessage_model");
             //$oNotificationRow = $this->NotificationAttachments_model->getOne(['token'=>$this->input->get('code'),'status'=>'sent']);
-            $oNotificationRow = $this->SendgridMessage_model->get_by(['access_token'=>$this->input->get('code'),'status'=>'sent']);
+            $oNotificationRow = $this->SendgridMessage_model->get_by(['access_token'=>$this->input->get('code')]);
             if($oNotificationRow->id>0)
             {
                 //$aDownloadStatus = $this->NotificationAttachments_model->updateDataArray($oNotificationRow->id,['status'=>'downloaded']);
