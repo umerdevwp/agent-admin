@@ -39,8 +39,8 @@ class Message extends RestController
             ]        
     ];
 
-    private $sSignatureStarter = "Signature::";
-    private $sSignatureEnder = "::";
+    private $sSignatureStarter = "Hash:";
+    private $sSignatureEnder = ":";
     private $sUploadDirectory = "attachments/";
 
     /**
@@ -434,7 +434,13 @@ class Message extends RestController
 
         $iAllowedSize = 10*1000*1000; // 10 Mb
         //$sUploadDir = getenv("ROOT_PATH") . getenv("UPLOAD_PATH");
-        $sUploadDir = $this->sUploadDirectory . generateHash($iEntityId) . "/";
+        $sUploadDir = $this->sUploadDirectory . generateHash($iEntityId);
+        if(!is_dir($sUploadDir))
+        {
+            mkdir($sUploadDir);
+            file_put_contents($sUploadDir."/index.php","<?php header('Location: ../../index.php');");
+        }
+        $sUploadDir .= "/";
         foreach($_FILES as $aLoopFile) {
 
           $sName = $aLoopFile['name'];

@@ -213,7 +213,7 @@ class SendgridMessage_model extends ModelDefault {
 
         $sQueryCombineNotes = "
 SELECT id,`to` AS toEmail,`from` AS fromEmail,entity_id AS entityId,send_time AS sendTime,subject,message,status,group_id AS groupId,from_eid AS fromEid,`read`,attachments
-FROM {$this->sTable} WHERE entity_id={$iEntityId} and status!=pending
+FROM {$this->sTable} WHERE entity_id={$iEntityId} and status!='pending'
 UNION
 SELECT id,'','',entity_id AS entityId,added AS sendTime, subject,message,type AS status,0,0,1,'[]'
 FROM entity_notes WHERE entity_id={$iEntityId}
@@ -367,8 +367,8 @@ ORDER BY sendTime ASC
             $aMyColumns = arrayKeysExist($aColumns,$this->aColumns);
         else {
             $aMyColumns = [
-                "id","to","from","sendTime","subject",
-                "message","gid","fromEid","read"
+                "id","toEmail","fromEmail","sendTime","subject",
+                "message","groupId","fromEid","read"
             ];
             $aMyColumns = arrayKeysExist($aMyColumns,$this->aColumns);
         }
