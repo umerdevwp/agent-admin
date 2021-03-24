@@ -50,7 +50,7 @@ class ZoHo_Account extends CI_Model
         // https://accounts.zoho.com/oauth/v2/auth?scope=ZohoCRM.modules.ALL,aaaserver.profile.READ,ZohoCRM.settings.all&client_id=1000.CF9P2PV0P6H66EY284HQZ8G1HVMU3H&response_type=code&access_type=online&redirect_uri=http://api.agentadmin.loc/
         $sGrantToken = getenv("ZOHO_GRANT_TOKEN");
         
-        if(!empty($sGrantToken) && strpos(getenv("DEVELOPER_IP"),$_SERVER['REMOTE_ADDR'])!==false)
+        if(!empty($sGrantToken))
         {
             echo "Token exist::-- ";
             $oAuthClient = ZohoOAuth::getClientInstance();
@@ -448,7 +448,7 @@ class ZoHo_Account extends CI_Model
 
         //$entityId = strval($this->AccountData->getEntityId());
         //$zcrmModuleTsk = ZCRMModule::getInstance("Attachments");
-        
+
         //$bulkAPIResponse = $zcrmModuleTsk->searchRecordsByCriteria("Status:equals:Not Started", 1, 200);
         $arAttachments = $this->AccountData->getAttachments()->getData();//$zcrmModuleTsk->getData();
         $this->arAttachments = array();
@@ -472,7 +472,7 @@ class ZoHo_Account extends CI_Model
             );
             $this->arAttachments[] =  (object)$map;
         }
-        
+
         $now = new DateTime();
         for($i = 0; $i < count($this->Tasks); $i++){
             $date = date_create($this->Tasks[$i]->getFieldValue('Due_Date'));
@@ -490,7 +490,7 @@ class ZoHo_Account extends CI_Model
         $zcrmModuleIns = ZCRMModule::getInstance("Accounts");
         $bulkAPIResponse = $zcrmModuleIns->searchRecordsByCriteria("id:equals:{$this->input->get("id")}", 1, 1);
         $recordsArray = $bulkAPIResponse->getData();
-        
+
         echo $recordsArray[0]->getFieldValue('Account_Name');
         echo "<pre>";print_r($recordsArray[0]->getAttachments()->getData());
 
@@ -519,10 +519,10 @@ class ZoHo_Account extends CI_Model
 
             $this->load->model("Attachments_model");
             $this->load->helper("custom");
-            
+
             $account = $this->LoadAccountOnly($this->input->get("id"));
             $arAttachments = $account->getAttachments()->getData();//$zcrmModuleTsk->getData();
-            
+
             $data = array();
             //getClassMethods($arAttachments[0]);
 
@@ -544,7 +544,7 @@ class ZoHo_Account extends CI_Model
                     "owner_name"    =>  $record->getOwner()->getName(),
                     "document_count"=>  0,// it is not available in API response
                     "link_url"      =>  $record->getAttachmentType(),
-                );                
+                );
                 $data[] =  (object)$map;
             }
 
@@ -557,7 +557,7 @@ class ZoHo_Account extends CI_Model
             }
         }
     }
- 
+
     /**
      * Get instance of zcrm for api calls
      */
@@ -577,7 +577,7 @@ class ZoHo_Account extends CI_Model
     }
 
     /**
-     * 
+     *
      * @param Array $aData Associative array of keys: First_Name,Last_Name,Email,Phone,Contact_Type,Mailing_Street,Mailing_City,Mailing_State,Mailing_Zip
      */
     public function newZohoContact($sForAccountName,$aData)
@@ -587,9 +587,9 @@ class ZoHo_Account extends CI_Model
         extract($aData);
 
         $oApi = $this->getInstance("Contacts",null);
-            
+
         $oApi->setFieldValue("Account_Name", $sForAccountName);
-        
+
         $oApi->setFieldValue("First_Name",$First_Name);
         $oApi->setFieldValue("Last_Name",$Last_Name);
 
@@ -601,7 +601,7 @@ class ZoHo_Account extends CI_Model
         $oApi->setFieldValue("Mailing_City",$Mailing_City);
         $oApi->setFieldValue("Mailing_State",$Mailing_State);
         $oApi->setFieldValue("Mailing_Zip",$Mailing_Zip);
-        
+
         try {
             $response = $oApi->create();
             $object = $response->getDetails();
@@ -615,7 +615,7 @@ class ZoHo_Account extends CI_Model
 
     /**
      * Edit zoho contact, using the zoho api.
-     * 
+     *
      * @param Array $aData Associative array of keys: First_Name,Last_Name,Email,Phone,Contact_Type,Mailing_Street,Mailing_City,Mailing_State,Mailing_Zip
      */
     public function editZohoContact($iContactId,$aData)
@@ -625,7 +625,7 @@ class ZoHo_Account extends CI_Model
         extract($aData);
 
         $oApi = $this->getInstance("Contacts",$iContactId);
-                
+
         $oApi->setFieldValue("First_Name",$First_Name);
         $oApi->setFieldValue("Last_Name",$Last_Name);
 
@@ -637,7 +637,7 @@ class ZoHo_Account extends CI_Model
         $oApi->setFieldValue("Mailing_City",$Mailing_City);
         $oApi->setFieldValue("Mailing_State",$Mailing_State);
         $oApi->setFieldValue("Mailing_Zip",$Mailing_Zip);
-        
+
         try {
             $response = $oApi->update();
             $object = $response->getDetails();
@@ -651,17 +651,17 @@ class ZoHo_Account extends CI_Model
 
     /**
      * Add note to zoho records entity/contact
-     * 
+     *
      * @param $sNoteFor String can be Accounts/Contacts
      * @param $iRelatedTo Integer record id, the note will be attached to
      */
     public function newZohoNote($sNoteFor,$iRlateToId,$sNoteTitle,$sNoteContent)
     {
-            
+
             $record = $this->getInstance($sNoteFor,$iRlateToId);
-            
+
             $noteIns = ZCRMNote::getInstance($record, NULL); // to get the note instance
-            
+
             $noteIns->setTitle($sNoteTitle); // to set the note title
             $noteIns->setContent($sNoteContent); // to set the note content
             $aError = [];
@@ -674,7 +674,7 @@ class ZoHo_Account extends CI_Model
             } catch(Exception $e){
                 $aError = ['type'=>'error','message'=>$e->getMessage()];
             }
-           
+
            return $aError;
     }
 
@@ -715,14 +715,14 @@ class ZoHo_Account extends CI_Model
 
      /**
      * Add tasks to zoho records entity/account
-     * 
+     *
      * @param Integer $iRelatedTo entity/record id, the task will relate to
      * @param String $sTaskSubject task subject
      * @param String $sDueDate is the date it ends
      */
     public function newZohoTask($iRelateToId,$sTaskSubject,$sDueDate)
     {
-            
+
             $oTaskRecord = $this->getInstance("Tasks",null); // to get the task instance
 
             $oTaskRecord->setFieldValue("\$se_module", "Accounts");// tasks can relate to contacts, therefore need this must
@@ -740,9 +740,9 @@ class ZoHo_Account extends CI_Model
 
             } catch(Exception $e){
                 logToAdmin("ZOHO API Fail",$e->getMessage(),"zoho");
-                $aResult = ['type'=>'error','message'=>$e->getMessage()]; 
+                $aResult = ['type'=>'error','message'=>$e->getMessage()];
             }
-           
+
            return $aResult;
-    }   
+    }
 }

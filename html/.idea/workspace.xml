@@ -3,14 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="d9398c1c-af28-4f73-920d-6f1f684f34d9" name="Default Changelist" comment="Merge branch 'master-notification-react' of https://github.com/United-Agent-Services/agentadmin into local-omer&#10;&#10;# Conflicts:&#10;#&#9;application/controllers/Contacts.php&#10;#&#9;application/controllers/Entity.php&#10;#&#9;application/controllers/Login.php&#10;#&#9;application/controllers/Portal.php&#10;#&#9;application/hooks/Auth.php&#10;#&#9;application/models/Accounts_model.php&#10;#&#9;application/models/Contacts_model.php&#10;#&#9;application/models/Entity_model.php&#10;#&#9;application/views/entity-add.php&#10;#&#9;application/views/entity.php&#10;#&#9;application/views/header.php&#10;#&#9;application/views/portal.php">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/entity/ChildDetailedPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/entity/ChildDetailedPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/entity/EntityDetailedPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/entity/EntityDetailedPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/entity/SelfDetailedPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/entity/SelfDetailedPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/message/AdminSendMessageForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/message/AdminSendMessageForm.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/message/MessageLog.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/message/MessageLog.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/message/NewChatPanel.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/message/NewChatPanel.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/message/NewChatPanelForLogs.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/message/NewChatPanelForLogs.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/message/SendMessageForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/message/SendMessageForm.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../php/application/controllers/Entity.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/controllers/Entity.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../php/application/models/ZoHo_Account.php" beforeDir="false" afterPath="$PROJECT_DIR$/../php/application/models/ZoHo_Account.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,21 +43,23 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/src/components/message" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="web-ide.project.structure" />
     <property name="ts.external.directory.path" value="C:\Program Files\JetBrains\PhpStorm 2019.2.4\plugins\JavaScriptLanguage\jsLanguageServicesImpl\external" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\omer.s\Desktop\update react code\react-ui\src\_metronic\layout" />
-      <recent name="C:\Users\omer.s\Desktop\update react code\react-ui\src\app\pages\entity" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Bitnami\wampstack\apache2\htdocs\html\src\components\message" />
       <recent name="C:\Bitnami\wampstack\apache2\htdocs\html" />
       <recent name="C:\Users\omer.s\Desktop\update react code\react-ui\src\app\pages\entity" />
       <recent name="C:\Users\omer.s\Desktop\update react code\react-ui\src\_metronic\layout" />
       <recent name="C:\Users\omer.s\Desktop\update react code\react-ui\src\app\pages\contacts" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\omer.s\Desktop\update react code\react-ui\src\_metronic\layout" />
+      <recent name="C:\Users\omer.s\Desktop\update react code\react-ui\src\app\pages\entity" />
     </key>
   </component>
   <component name="SvnConfiguration">

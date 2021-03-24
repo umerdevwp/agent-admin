@@ -98,7 +98,7 @@ class Entity extends RestController
                             'userid' => $iParentId,
                             'json_id' => $id,
                             'slug' => $this->Tempmeta_model->slugNewEntity
-                        ]); 
+                        ]);
                     }
                 }
                 if ($aDataTempEntity['type'] == 'ok') {
@@ -230,9 +230,9 @@ class Entity extends RestController
         $bTagSmartyValidated = true;
         $aError = [];
 
-        $aError = $this->validateForm(); 
+        $aError = $this->validateForm();
         if (is_array($aError)) {
-            
+
             $this->response([
                 'status' => false,
                 'field_error' => $aError
@@ -257,7 +257,7 @@ HC;
             $_POST['inputFiscalDate'] = date("Y-m-d", strtotime($this->input->post("inputFiscalDate")));
 
 //            $bEntityExist = $this->checkEntityExist($this->input->post("inputName"),$this->input->post("inputFillingState"));
-            
+
             // entity not found
             //if(!$bEntityExist)
             //{
@@ -273,7 +273,7 @@ HC;
 
                     // check address is valid from smarty is not needed, validation is at interface
                     $sSmartyAddress = $this->input->post("inputSmartyResult");
-                    
+
                     // add a note if smarty validated address successfuly
                     if ($sSmartyAddress != '') {
                         $aResponseNote = $this->ZoHo_Account->newZohoNote("Accounts", $iZohoId, "Smartystreet suggested following", $sSmartyAddress);
@@ -284,7 +284,7 @@ HC;
                             $aResponseZoho['message'] .= "," . $aResponseNote['message'];
                             else
                             $aResponseZoho['message'] = $aResponseNote['message'];
-                            
+
                         }
                     }
 
@@ -319,12 +319,12 @@ HC;
         $aDataWhereTemp = ['json_name'=>$sEntityName,'json_filingState'=>$sFilingState];
 
         $bRowExist = $this->Tempmeta_model->checkRowExistInJson($aDataWhereTemp);
-        
+
         if(!$bRowExist)
         {
             $aDataWhere = ['name'=>$sEntityName,'filingState'=>$sFilingState];
-        
-            $aRow = $this->Entity_model->getWhere($aDataWhere);    
+
+            $aRow = $this->Entity_model->getWhere($aDataWhere);
             if($aRow["type"]=="ok")
             {
                 $bRowExist = true;
@@ -334,54 +334,121 @@ HC;
         return ($bRowExist?false:true);
     }
 
-    private function validateForm()
+    private function validateForm($type="add")
     {
         $bTagSmartyValidated = true;
         $arError = [];
         $this->load->helper("custom");
         $this->load->library('form_validation');
 
-        // try to correct user date format, then validate
-        if ($this->input->post("inputFormationDate") != "") {
-            $strFormationDate = str_replace("  ", " ", $this->input->post("inputFormationDate"));
-            $strFormationDate = str_replace(" ", "-", $strFormationDate);
-            $strFormationDate = date("Y-m-d", strtotime($strFormationDate));
+        if($type == 'add') {
+            // try to correct user date format, then validate
+            if ($this->input->post("inputFormationDate") != "") {
+                $strFormationDate = str_replace("  ", " ", $this->input->post("inputFormationDate"));
+                $strFormationDate = str_replace(" ", "-", $strFormationDate);
+                $strFormationDate = date("Y-m-d", strtotime($strFormationDate));
 
-            if ($strFormationDate == "1970-01-01") {
-                //$_POST["inputFormationDate"] = "0000 00 00";
-            } else {
-                $_POST["inputFormationDate"] = $strFormationDate;
+                if ($strFormationDate == "1970-01-01") {
+                    //$_POST["inputFormationDate"] = "0000 00 00";
+                } else {
+                    $_POST["inputFormationDate"] = $strFormationDate;
+                }
             }
+
+            if ($this->input->post("inputFiscalDate") != "") {
+                $strFiscalDate = str_replace("  ", " ", $this->input->post("inputFiscalDate"));
+                $strFiscalDate = str_replace(" ", "-", $strFiscalDate);
+                $strFiscalDate = date("Y-m-d", strtotime($strFiscalDate));
+
+                if ($strFiscalDate == "1970-01-01") {
+                    //$_POST["inputFormationDate"] = "0000 00 00";
+                } else {
+                    $_POST["inputFiscalDate"] = $strFiscalDate;
+                }
+            } else {
+                $_POST["inputFiscalDate"] = date("Y-12-31");
+            }
+
+
+
+            $this->form_validation->set_rules('inputName', 'Account Name', 'required|regex_match[/[a-zA-Z\s]+/]', ["regex_match" => "Only alphabets and spaces allowed."]);
+
+            $this->form_validation->set_rules('inputEIN', 'EIN', 'numeric|exact_length[9]', ["numeric" => "Only numbers are allowed.", "exact_length" => "Must contain 9 digits"]);
+            $this->form_validation->set_rules('inputFillingState', 'Filing State', 'required|alpha|exact_length[2]|callback_checkEntityExist', ["checkEntityExist" => "Entity: " . $this->input->post('inputName') . ", " . $this->input->post("inputFillingState") . " already exist"]);
+            $this->form_validation->set_rules('inputFillingStructure', 'Entity Type', 'required|regex_match[/[A-Z\-]+/]');
+            $this->form_validation->set_rules('inputFormationDate', 'Formation Date', 'required|regex_match[/[0-9]{4,}\-[0-9]{2,}\-[0-9]{2,}/]', ["regex_match" => "Allowed %s format: 2019-01-01"]);
+            $this->form_validation->set_rules('inputFiscalDate', 'Fiscal Date', 'required|regex_match[/[0-9]{4,}\-[0-9]{2,}\-[0-9]{2,}/]', ["regex_match" => "Allowed %s format: 2019-01-01"]);
+            $this->form_validation->set_rules('inputNotificationEmail', 'Notification Email', 'required|valid_email');
+            $this->form_validation->set_rules('inputNotificationPhone', 'Phone', 'required|regex_match[/[\+\s\-0-9]+/]');
+            $this->form_validation->set_rules('inputNotificationAddress', 'Shipping Street', 'required');
+            $this->form_validation->set_rules('inputNotificationCity', 'Shipping City', 'required');
+            $this->form_validation->set_rules('inputNotificationState', 'Shipping State', 'required');
+            $this->form_validation->set_rules('inputNotificationZip', 'Shipping Code', 'required|exact_length[5]', ['exact_lengt' => "Must contain 5 digits"]);
+            $this->form_validation->set_rules('inputBusinessPurpose', 'Business purpose', 'required');
         }
 
-        if ($this->input->post("inputFiscalDate") != "") {
-            $strFiscalDate = str_replace("  ", " ", $this->input->post("inputFiscalDate"));
-            $strFiscalDate = str_replace(" ", "-", $strFiscalDate);
-            $strFiscalDate = date("Y-m-d", strtotime($strFiscalDate));
 
-            if ($strFiscalDate == "1970-01-01") {
-                //$_POST["inputFormationDate"] = "0000 00 00";
-            } else {
-                $_POST["inputFiscalDate"] = $strFiscalDate;
+        if($type === 'edit'){
+            // try to correct user date format, then validate
+            if ($this->input->post("inputFormationDate") != "") {
+                $strFormationDate = str_replace("  ", " ", $this->input->post("inputFormationDate"));
+                $strFormationDate = str_replace(" ", "-", $strFormationDate);
+                $strFormationDate = date("Y-m-d", strtotime($strFormationDate));
+
+                if ($strFormationDate == "1970-01-01") {
+                    //$_POST["inputFormationDate"] = "0000 00 00";
+                } else {
+                    $_POST["inputFormationDate"] = $strFormationDate;
+                }
             }
-        } else {
-            $_POST["inputFiscalDate"] = date("Y-12-31");
+
+            if ($this->input->post("inputFiscalDate") != "") {
+                $strFiscalDate = str_replace("  ", " ", $this->input->post("inputFiscalDate"));
+                $strFiscalDate = str_replace(" ", "-", $strFiscalDate);
+                $strFiscalDate = date("Y-m-d", strtotime($strFiscalDate));
+
+                if ($strFiscalDate == "1970-01-01") {
+                    //$_POST["inputFormationDate"] = "0000 00 00";
+                } else {
+                    $_POST["inputFiscalDate"] = $strFiscalDate;
+                }
+            } else {
+                $_POST["inputFiscalDate"] = date("Y-12-31");
+            }
+
+            if ($this->input->post("inputExpirationDate") != "") {
+                $strExpirationDate = str_replace("  ", " ", $this->input->post("inputExpirationDate"));
+                $strExpirationDate = str_replace(" ", "-", $strExpirationDate);
+                $strExpirationDate = date("Y-m-d", strtotime($strExpirationDate));
+
+                if ($strExpirationDate == "1970-01-01") {
+                    //$_POST["inputFormationDate"] = "0000 00 00";
+                } else {
+                    $_POST["inputExpirationDate"] = $strExpirationDate;
+                }
+            }
+
+
+
+
+
+//            $this->form_validation->set_rules('inputName', 'Account Name', 'regex_match[/[a-zA-Z\s]+/]', ["regex_match" => "Only alphabets and spaces allowed."]);
+
+            $this->form_validation->set_rules('inputEIN', 'EIN', 'numeric|exact_length[9]',["numeric" => "Only numbers are allowed.","exact_length"=>"Must contain 9 digits"]);
+//            $this->form_validation->set_rules('inputFillingState', 'Filing State', 'alpha|exact_length[2]|callback_checkEntityExist',["checkEntityExist"=>"Entity: ".$this->input->post('inputName').", ".$this->input->post("inputFillingState")." already exist"]);
+            $this->form_validation->set_rules('inputFillingStructure', 'Entity Type', 'regex_match[/[A-Z\-]+/]');
+            $this->form_validation->set_rules('inputFormationDate', 'Formation Date', 'regex_match[/[0-9]{4,}\-[0-9]{2,}\-[0-9]{2,}/]', ["regex_match" => "Allowed %s format: 2019-01-01"]);
+            $this->form_validation->set_rules('inputExpirationDate', 'Expiration Date', 'regex_match[/[0-9]{4,}\-[0-9]{2,}\-[0-9]{2,}/]', ["regex_match" => "Allowed %s format: 2019-01-01"]);
+            $this->form_validation->set_rules('inputFiscalDate', 'Fiscal Date', 'regex_match[/[0-9]{4,}\-[0-9]{2,}\-[0-9]{2,}/]', ["regex_match" => "Allowed %s format: 2019-01-01"]);
+            $this->form_validation->set_rules('inputNotificationEmail', 'Notification Email', 'valid_email');
+            $this->form_validation->set_rules('inputNotificationPhone', 'Phone', 'regex_match[/[\+\s\-0-9]+/]');
+            $this->form_validation->set_rules('inputNotificationAddress', 'Shipping Street', 'max_length[100]');
+            $this->form_validation->set_rules('inputNotificationCity', 'Shipping City', 'max_length[30]');
+            $this->form_validation->set_rules('inputNotificationState', 'Shipping State', 'max_length[15]');
+            $this->form_validation->set_rules('inputNotificationZip', 'Shipping Code', 'exact_length[5]',['exact_lengt'=>"Must contain 5 digits"]);
+            $this->form_validation->set_rules('inputBusinessPurpose', 'Business purpose', 'max_length[500]');
+
         }
-
-        $this->form_validation->set_rules('inputName', 'Account Name', 'required|regex_match[/[a-zA-Z\s]+/]', ["regex_match" => "Only alphabets and spaces allowed."]);
-
-        $this->form_validation->set_rules('inputEIN', 'EIN', 'numeric|exact_length[9]',["numeric" => "Only numbers are allowed.","exact_length"=>"Must contain 9 digits"]);
-        $this->form_validation->set_rules('inputFillingState', 'Filing State', 'required|alpha|exact_length[2]|callback_checkEntityExist',["checkEntityExist"=>"Entity: ".$this->input->post('inputName').", ".$this->input->post("inputFillingState")." already exist"]);
-        $this->form_validation->set_rules('inputFillingStructure', 'Entity Type', 'required|regex_match[/[A-Z\-]+/]');
-        $this->form_validation->set_rules('inputFormationDate', 'Formation Date', 'required|regex_match[/[0-9]{4,}\-[0-9]{2,}\-[0-9]{2,}/]', ["regex_match" => "Allowed %s format: 2019-01-01"]);
-        $this->form_validation->set_rules('inputFiscalDate', 'Fiscal Date', 'required|regex_match[/[0-9]{4,}\-[0-9]{2,}\-[0-9]{2,}/]', ["regex_match" => "Allowed %s format: 2019-01-01"]);
-        $this->form_validation->set_rules('inputNotificationEmail', 'Notification Email', 'required|valid_email');
-        $this->form_validation->set_rules('inputNotificationPhone', 'Phone', 'required|regex_match[/[\+\s\-0-9]+/]');
-        $this->form_validation->set_rules('inputNotificationAddress', 'Shipping Street', 'required');
-        $this->form_validation->set_rules('inputNotificationCity', 'Shipping City', 'required');
-        $this->form_validation->set_rules('inputNotificationState', 'Shipping State', 'required');
-        $this->form_validation->set_rules('inputNotificationZip', 'Shipping Code', 'required|exact_length[5]',['exact_lengt'=>"Must contain 5 digits"]);
-        $this->form_validation->set_rules('inputBusinessPurpose', 'Business purpose', 'required');
 
         if ($this->form_validation->run() === FALSE) {
             return $this->form_validation->error_array();
@@ -396,28 +463,39 @@ HC;
     public function edit_post()
     {
         $this->checkPermission("EDIT", $this->sModule);
-        
         $this->load->model("Entity_model");
 
         // is user editing his child or own profile
         $bAllowEdit = $bValidateParent = false;
+        if(empty($this->input->post("eid"))) {
+            $this->response([
+                'status' => false,
+                'error' => '"Entity ID is required'
+            ], 401);
+        }
 
         // edit request is for child user? check valid parent
-        if($_SESSION['eid']!=$this->input->post("eid"))
-        $bValidateParent = $this->Entity_model->isParentOf($this->input->post("eid"),$_SESSION['eid']);
-        
+        if ($_SESSION['eid'] != $this->input->post("eid"))
+            $bValidateParent = $this->Entity_model->isParentOf($this->input->post("eid"), $_SESSION['eid']);
+
+        if(empty($bValidateParent)) {
+            $this->response([
+                'status' => false,
+                'error' => 'Entity does not belongs to you.'
+            ], 401);
+        }
         // parent is valid
-        if($bValidateParent)
+        if ($bValidateParent)
             $bAllowEdit = true;
         // user editing own profile? allow edit
-        else if($_SESSION['eid']==$this->input->post("eid"))
+        else if ($_SESSION['eid'] == $this->input->post("eid"))
             $bAllowEdit = true;
 
         if($bAllowEdit)
         {
             // return true or error list
-            $aError = $this->validateForm();
-        
+            $aError = $this->validateForm('edit');
+
             if (is_array($aError)) {
 
                 $this->response([
@@ -426,25 +504,30 @@ HC;
                 ], 404);
 
             } else {
-                if(!empty($this->input->post('smartyNotificationAddress')))
-                {
-                $sSmartyAddress = <<<HC
+                if (!empty($this->input->post('smartyNotificationAddress'))) {
+                    $sSmartyAddress = <<<HC
                 Street: {$this->input->post('smartyNotificationAddress')}
                 City: {$this->input->post('smartyNotificationCity')}
                 State: {$this->input->post('smartyNotificationState')}
                 Zipcode: {$this->input->post('smartyNotificationZip')} 
 HC;
             }
-                $_POST['inputFormationDate'] = date("Y-m-d", strtotime($this->input->post("inputFormationDate")));
-                $_POST['inputFiscalDate'] = date("Y-m-d", strtotime($this->input->post("inputFiscalDate")));
-
+                if(!empty($this->input->post("inputFormationDate"))) {
+                    $_POST['inputFormationDate'] = date("Y-m-d", strtotime($this->input->post("inputFormationDate")));
+                }
+                if(!empty($this->input->post("inputFiscalDate"))) {
+                    $_POST['inputFiscalDate'] = date("Y-m-d", strtotime($this->input->post("inputFiscalDate")));
+                }
+                if(!empty($this->input->post("inputExpirationDate"))) {
+                    $_POST['inputExpirationDate'] = date("Y-m-d", strtotime($this->input->post("inputExpirationDate")));
+                }
                 $aResponse = $this->zohoEditEntity($this->input->post("eid"));
 
                 // succcess redirect to dashboard
                 if ($aResponse["entityId"] > 0) {
                     $aResponse['message'] = 'Edit successfully.';
                     $aResponse['id'] = $aResponse['entityId'];
-                    
+
                     $this->redirectAfterAdd($aResponse);// $response['data']['id']);
 
                     // redirect to form, show error
@@ -463,7 +546,7 @@ HC;
             $this->response([
                 'status' => false,
                 'message' => 'Invalid edit request'
-            ], 401);            
+            ], 401);
         }
     }
 
@@ -495,7 +578,7 @@ HC;
         $this->load->model('ZoHo_Account');
         $this->load->model("entity_model");
         $this->load->model("RegisterAgents_model");
-        
+
         $aZohoResponse = $this->zohoAddEntity();
         $iZohoId = $aZohoResponse['entityId'];
         $iAgentId = $aZohoResponse['agentId'];
@@ -522,7 +605,7 @@ HC;
             return ['type'=>'error', 'message' => $aZohoResponse['message']];
         }
         $aResponse = ['type' => 'ok', 'message' => "Entity created successfully.", 'id' => $iZohoId];
-        
+
         if ($aErrorTag['type']=='error' && $aErrorAttachment['type']=='error') {
             $sErrorMessage = $aErrorTag['message'] . ", " . $aErrorAttachment['message'];
             $aResponse['message'] = $sErrorMessage;
@@ -549,12 +632,12 @@ HC;
             $sForeign = ($this->input->post("inputForeign") ?? 0);
             $sNewService = ($this->input->post("inputService") ?? 0);
 
-            
+
             $aTags = [];
             // don't store onboard on tester accounts, as they are not real
             if($_SESSION['accountType']!='tester')
             $aTags = ["name" => "OnBoard"];
-            
+
             if ($sComplianceOnly) {
                 $aTags["ComplianceOnly"] = "Compliance Only";
             }
@@ -566,7 +649,7 @@ HC;
             if (!$bTagSmartyValidated) {
                 $aTags["InvalidatedAddress"] = "Invalidated Address";
             }
-            
+
             if($sNewService)
             {
 				//BC-RA, BC-RAC, UAS-RA, UAS-RAC
@@ -577,7 +660,7 @@ HC;
             // TODO: zoho enable on production server
             try {
                 $this->ZoHo_Account->zohoCreateNewTags($iZohoId, $aTags);
-            } catch(ZCRMException $e) 
+            } catch(ZCRMException $e)
             {
                 logToAdmin("Unable to create tags: ",print_r($aTags,true));
             }
@@ -598,7 +681,7 @@ HC;
     {
         $this->load->model("Notifications_model");
         $this->load->model("Tasks_model");
-        $this->load->model("ZoHo_Account");        
+        $this->load->model("ZoHo_Account");
 
         $oRule = $this->Notifications_model->getRules(
             $this->input->get("inputFillingState"),
@@ -617,7 +700,7 @@ HC;
     {
         $this->load->model("Notifications_model");
         $this->load->model("Tasks_model");
-        $this->load->model("ZoHo_Account");   
+        $this->load->model("ZoHo_Account");
 
         if($this->oRule==null)
         {
@@ -629,9 +712,9 @@ HC;
             );
         }
         // if rule exist get it
-        $oRule = $this->oRule;        
+        $oRule = $this->oRule;
 
-        //$iWhatId = "3743841000001982003"; // remove after 
+        //$iWhatId = "3743841000001982003"; // remove after
         if(!empty($oRule->duedate))
         {
             $aTaskResult = $this->ZoHo_Account->newZohoTask($iEntityId,$oRule->description,$oRule->duedate);
@@ -644,7 +727,7 @@ HC;
                     "what_id"   =>  $iEntityId,
                     "status"    => "Not Started",
                 ];
-    
+
                 // insert id fails as table is not auto_increment
                 $iTaskId = $this->Tasks_model->add($aDataTask);
                 return ["id"=>$iTaskId,"duedate"=>$oRule->duedate,"subject"=>$oRule->description];
@@ -778,7 +861,7 @@ HC;
                         "days_visited" => '0',
                         "visitor_score" => '0'
             ];
-        
+
             $response_contact = $this->Contacts_model->addContact($data);
 
         }
@@ -808,7 +891,7 @@ HC;
                 $this->Tempmeta_model->slugNewEntity
             );
         }
-        
+
         if ($aDataTempEntity['type'] == 'ok')
             if (count($aDataTempEntity['results']) > 0) {
                 $aNewDataChild = [];
@@ -931,7 +1014,7 @@ HC;
         if ($id > 0) {
             $bAttachmentDone = true;
         }
-        
+
         if (!$bAttachmentDone) {
             return ['type' => 'error', 'message' => $sError];
         }
@@ -947,33 +1030,53 @@ HC;
         $iParentZohoId = $_SESSION['eid'];
         $this->load->model("ZoHo_Account");
         $this->load->model("RegisterAgents_model");
-
         $oApi = $this->ZoHo_Account->getInstance()->getRecordInstance("Accounts", $iEid);
 
-        $oApi->setFieldValue("Account_Name", $this->input->post("inputName")); // This function use to set FieldApiName and value similar to all other FieldApis and Custom field
-        $oApi->setFieldValue("Filing_State", $this->input->post("inputFillingState")); // Account Name can be given for a new account, account_id is not mandatory in that case
-        $oApi->setFieldValue("Entity_Type", $this->input->post("inputFillingStructure")); // Account Name can be given for a new account, account_id is not mandatory in that case
-
-        $oApi->setFieldValue("Formation_Date", $this->input->post("inputFormationDate"));
-
-        // firstName, lastName fields going under contacts
-
-        $oApi->setFieldValue("Notification_Email", $this->input->post("inputNotificationEmail"));
-        $oApi->setFieldValue("Phone", $this->input->post("inputNotificationPhone"));
-        $oApi->setFieldValue("Shipping_Street", $this->input->post("inputNotificationAddress"));
-        $oApi->setFieldValue("Shipping_City", $this->input->post("inputNotificationCity"));
-        $oApi->setFieldValue("Shipping_State", $this->input->post("inputNotificationState"));
-        $oApi->setFieldValue("Shipping_Code", $this->input->post("inputNotificationZip"));
-        $oApi->setFieldValue("Business_purpose", $this->input->post("inputBusinessPurpose"));
-        $oApi->setFieldValue("EIN", $this->input->post("inputEIN"));
-
-        // fetch RA (registered agent) id from DB
-        $strFilingState = $this->input->post("inputFillingState");
-        $row = $this->RegisterAgents_model->find(["name" => $strFilingState . " - UAS"]);
-        $iRAId = "";
-        if ($row->id > 0) {
-            $iRAId = $row->id;
+//        $oApi->setFieldValue("Account_Name", $this->input->post("inputName")); // This function use to set FieldApiName and value similar to all other FieldApis and Custom field
+//        $oApi->setFieldValue("Filing_State", $this->input->post("inputFillingState")); // Account Name can be given for a new account, account_id is not mandatory in that case
+        if(!empty($this->input->post("inputFillingStructure"))) {
+            $oApi->setFieldValue("Entity_Type", $this->input->post("inputFillingStructure")); // Account Name can be given for a new account, account_id is not mandatory in that case
         }
+        if(!empty($this->input->post("inputFormationDate"))) {
+            $oApi->setFieldValue("Formation_Date", $this->input->post("inputFormationDate"));
+        }
+//
+//        // firstName, lastName fields going under contacts
+//
+        if(!empty($this->input->post("inputNotificationEmail"))) {
+            $oApi->setFieldValue("Notification_Email", $this->input->post("inputNotificationEmail"));
+        }
+        if(!empty($this->input->post("inputNotificationPhone"))) {
+            $oApi->setFieldValue("Phone", $this->input->post("inputNotificationPhone"));
+        }
+        if(!empty($this->input->post("inputNotificationAddress"))) {
+            $oApi->setFieldValue("Shipping_Street", $this->input->post("inputNotificationAddress"));
+        }
+        if(!empty($this->input->post("inputNotificationCity"))) {
+            $oApi->setFieldValue("Shipping_City", $this->input->post("inputNotificationCity"));
+        }
+        if(!empty($this->input->post("inputNotificationState"))) {
+            $oApi->setFieldValue("Shipping_State", $this->input->post("inputNotificationState"));
+        }
+        if(!empty($this->input->post("inputNotificationZip"))) {
+            $oApi->setFieldValue("Shipping_Code", $this->input->post("inputNotificationZip"));
+        }
+        if(!empty($this->input->post("inputBusinessPurpose"))) {
+            $oApi->setFieldValue("Business_purpose", $this->input->post("inputBusinessPurpose"));
+        }
+        if(!empty($this->input->post("inputEIN"))) {
+            $oApi->setFieldValue("EIN", $this->input->post("inputEIN"));
+        }
+        if(!empty($this->input->post("inputExpirationDate"))) {
+            $oApi->setFieldValue("Expiration_Date", $this->input->post("inputExpirationDate"));
+        }
+        // fetch RA (registered agent) id from DB
+//        $strFilingState = $this->input->post("inputFillingState");
+//        $row = $this->RegisterAgents_model->find(["name" => $strFilingState . " - UAS"]);
+//        $iRAId = "";
+//        if ($row->id > 0) {
+//            $iRAId = $row->id;
+//        }
 
         // additional detail as default values for new entity
         // tag call needs account id instance, added below after attachments
@@ -983,9 +1086,9 @@ HC;
             //$oApi->setFieldValue("Layout", "3743841000000983988");// sandbox id = Customer layout
         } else {
             // push the RA id data to zoho
-            $oApi->setFieldValue("RA", $iRAId);
+//            $oApi->setFieldValue("RA", $iRAId);
             // parent account not needed for edit
-            $oApi->setFieldValue("Layout", "4071993000001376034");// for customer layout id = Customer
+//            $oApi->setFieldValue("Layout", "4071993000001376034");// for customer layout id = Customer
         }
         //$oApi->setFieldValue("Account_Type", "Distributor");
         //$oApi->setFieldValue("status", "InProcess");
@@ -1002,7 +1105,7 @@ HC;
 
             $oResponse = $responseIns->getDetails();
 
-            $aResponse  = ['entityId'=>$oResponse['id'],'agentId'=>$iRAId];
+            $aResponse  = ['entityId'=>$oResponse['id']];
 
         } catch (ZCRMException $oError) {
             // message
@@ -1194,13 +1297,13 @@ HC;
         $this->load->model('entity_model');
 
         $aData = $this->entity_model->getRoleStatus($sid);
-        
+
         $this->response([
             'status' => true,
             'data' => $aData
         ], 200);
     }
-    
+
     public function comboList_get()
     {
         $aColumns = (
