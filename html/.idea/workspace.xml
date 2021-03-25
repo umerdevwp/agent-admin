@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d9398c1c-af28-4f73-920d-6f1f684f34d9" name="Default Changelist" comment="Merge branch 'master-notification-react' of https://github.com/United-Agent-Services/agentadmin into local-omer&#10;&#10;# Conflicts:&#10;#&#9;application/controllers/Contacts.php&#10;#&#9;application/controllers/Entity.php&#10;#&#9;application/controllers/Login.php&#10;#&#9;application/controllers/Portal.php&#10;#&#9;application/hooks/Auth.php&#10;#&#9;application/models/Accounts_model.php&#10;#&#9;application/models/Contacts_model.php&#10;#&#9;application/models/Entity_model.php&#10;#&#9;application/views/entity-add.php&#10;#&#9;application/views/entity.php&#10;#&#9;application/views/header.php&#10;#&#9;application/views/portal.php" />
+    <list default="true" id="d9398c1c-af28-4f73-920d-6f1f684f34d9" name="Default Changelist" comment="Merge branch 'master-notification-react' of https://github.com/United-Agent-Services/agentadmin into local-omer&#10;&#10;# Conflicts:&#10;#&#9;application/controllers/Contacts.php&#10;#&#9;application/controllers/Entity.php&#10;#&#9;application/controllers/Login.php&#10;#&#9;application/controllers/Portal.php&#10;#&#9;application/hooks/Auth.php&#10;#&#9;application/models/Accounts_model.php&#10;#&#9;application/models/Contacts_model.php&#10;#&#9;application/models/Entity_model.php&#10;#&#9;application/views/entity-add.php&#10;#&#9;application/views/entity.php&#10;#&#9;application/views/header.php&#10;#&#9;application/views/portal.php">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -109,34 +112,22 @@
     <option name="version" value="1" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="426" y="171" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1598544511516">
+    <state width="1323" height="243" key="GridCell.Tab.0.bottom" timestamp="1616677597896">
       <screen x="0" y="0" width="1366" height="738" />
     </state>
-    <state x="426" y="171" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1366.738@0.0.1366.738" timestamp="1598544511516" />
-    <state width="1323" height="243" key="GridCell.Tab.0.bottom" timestamp="1607012859876">
+    <state width="1323" height="243" key="GridCell.Tab.0.bottom/0.0.1366.738@0.0.1366.738" timestamp="1616677597896" />
+    <state width="1323" height="243" key="GridCell.Tab.0.center" timestamp="1616677597896">
       <screen x="0" y="0" width="1366" height="738" />
     </state>
-    <state width="1323" height="243" key="GridCell.Tab.0.bottom/0.0.1366.738@0.0.1366.738" timestamp="1607012859876" />
-    <state width="1323" height="243" key="GridCell.Tab.0.center" timestamp="1607012859876">
+    <state width="1323" height="243" key="GridCell.Tab.0.center/0.0.1366.738@0.0.1366.738" timestamp="1616677597896" />
+    <state width="1323" height="243" key="GridCell.Tab.0.left" timestamp="1616677597895">
       <screen x="0" y="0" width="1366" height="738" />
     </state>
-    <state width="1323" height="243" key="GridCell.Tab.0.center/0.0.1366.738@0.0.1366.738" timestamp="1607012859876" />
-    <state width="1323" height="243" key="GridCell.Tab.0.left" timestamp="1607012859876">
+    <state width="1323" height="243" key="GridCell.Tab.0.left/0.0.1366.738@0.0.1366.738" timestamp="1616677597895" />
+    <state width="1323" height="243" key="GridCell.Tab.0.right" timestamp="1616677597896">
       <screen x="0" y="0" width="1366" height="738" />
     </state>
-    <state width="1323" height="243" key="GridCell.Tab.0.left/0.0.1366.738@0.0.1366.738" timestamp="1607012859876" />
-    <state width="1323" height="243" key="GridCell.Tab.0.right" timestamp="1607012859876">
-      <screen x="0" y="0" width="1366" height="738" />
-    </state>
-    <state width="1323" height="243" key="GridCell.Tab.0.right/0.0.1366.738@0.0.1366.738" timestamp="1607012859876" />
-    <state x="129" y="55" key="MergeDialog" timestamp="1598544413085">
-      <screen x="0" y="0" width="1366" height="738" />
-    </state>
-    <state x="129" y="55" key="MergeDialog/0.0.1366.738@0.0.1366.738" timestamp="1598544413085" />
-    <state x="395" y="84" key="MultipleFileMergeDialog" timestamp="1598544422007">
-      <screen x="0" y="0" width="1366" height="738" />
-    </state>
-    <state x="395" y="84" key="MultipleFileMergeDialog/0.0.1366.738@0.0.1366.738" timestamp="1598544422007" />
+    <state width="1323" height="243" key="GridCell.Tab.0.right/0.0.1366.738@0.0.1366.738" timestamp="1616677597896" />
     <state x="379" y="101" width="607" height="536" key="find.popup" timestamp="1608819094824">
       <screen x="0" y="0" width="1366" height="738" />
     </state>
