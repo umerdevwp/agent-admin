@@ -116,6 +116,29 @@ class Entity_model extends CI_Model
     }
 
 
+    public function updateEntity($id = NULL, $data = NULL)
+    {
+        if ($this->db->table_exists($this->table)) {
+            if (!empty($data) and !empty($id)) {
+                $this->db->where('id', $id);
+                $this->db->update($this->table, $data);
+                if ($this->db->affected_rows() > 0) {
+                    return TRUE;
+                } else {
+                    return FALSE;
+                }
+            } else {
+                log_message('error', 'Data or ID is missing');
+                return FALSE;
+            }
+        } else {
+            log_message('error', 'Administrators table does not exit');
+            return NULL;
+        }
+    }
+
+
+
     public function ownerValidity($parent, $entity){
      //make sure the entity belongs to right parent or not.
         $this->db->select('*');
@@ -128,10 +151,10 @@ class Entity_model extends CI_Model
 
     /**
      * Check entity id is under parent id
-     * 
+     *
      * @param Integer $iEntityId Integer id of entity
      * @param Integer $iParentId Integer id of parent
-     * 
+     *
      * @return Bool Bolean false or true
      */
     public function isParentOf(int $iEntityId,int $iParentId){
@@ -153,7 +176,7 @@ class Entity_model extends CI_Model
                 logToAdmin("Query failed","Error in isParent() query: eid=" . $iEntityId . ", parent=" . $iParentId,"DB");
             }
         }
-        
+
         if(isset($aData->id)) return true;
         else return false;
     }
@@ -249,7 +272,7 @@ class Entity_model extends CI_Model
      * @param Array $aColumns (optional) comma seprated columns name
      */
     public function getAllForAdmin($aColumns = [])
-    {        
+    {
         $sQ = "CALL getParentSetForAdmin();";
         $query = $this->db->query($sQ);
         $result = $query->result();
@@ -344,16 +367,16 @@ class Entity_model extends CI_Model
         $this->db->from("entity_roles er");
         $this->db->join("entitymeta em", "er.entity_id = em.zoho_accounts_id","left");
         $this->db->join("roles r","r.id=er.role_id","left");
-        
+
         $this->db->select("er.entity_id id, r.role_name role, em.entity_status status");
         $this->db->where("er.entity_id",$id);
 
         $oResult = $this->db->get();
 
         if($oResult)
-        {            
+        {
             $aData = $oResult->row_array();
-            
+
             if(empty($aData['id']))
             {
                 return null;
@@ -385,7 +408,7 @@ class Entity_model extends CI_Model
             {
                 return ['type'=>'ok','data'=>$oRow];
             } else {
-                return ['type'=>'error','message'=>'No record found'];                
+                return ['type'=>'error','message'=>'No record found'];
             }
         } else {
             $er = $this->db->error();

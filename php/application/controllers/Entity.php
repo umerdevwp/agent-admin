@@ -460,23 +460,24 @@ HC;
     /**
      * Handle API post request to edit entity details
      */
-    public function edit_post()
+    public function edit_post($id='')
     {
-        $this->checkPermission("EDIT", $this->sModule);
+//        $this->checkPermission("EDIT", $this->sModule);
+
         $this->load->model("Entity_model");
 
         // is user editing his child or own profile
         $bAllowEdit = $bValidateParent = false;
-        if(empty($this->input->post("eid"))) {
+        if(empty($id)) {
             $this->response([
                 'status' => false,
-                'error' => '"Entity ID is required'
+                'error' => 'Entity ID is required'
             ], 401);
         }
 
         // edit request is for child user? check valid parent
-        if ($_SESSION['eid'] != $this->input->post("eid"))
-            $bValidateParent = $this->Entity_model->isParentOf($this->input->post("eid"), $_SESSION['eid']);
+        if ($_SESSION['eid'] != $id)
+            $bValidateParent = $this->Entity_model->isParentOf($id, $_SESSION['eid']);
 
         if(empty($bValidateParent)) {
             $this->response([
@@ -488,7 +489,7 @@ HC;
         if ($bValidateParent)
             $bAllowEdit = true;
         // user editing own profile? allow edit
-        else if ($_SESSION['eid'] == $this->input->post("eid"))
+        else if ($_SESSION['eid'] == $id)
             $bAllowEdit = true;
 
         if($bAllowEdit)
@@ -521,14 +522,14 @@ HC;
                 if(!empty($this->input->post("inputExpirationDate"))) {
                     $_POST['inputExpirationDate'] = date("Y-m-d", strtotime($this->input->post("inputExpirationDate")));
                 }
-                $aResponse = $this->zohoEditEntity($this->input->post("eid"));
+                $aResponse = $this->zohoEditEntity($id);
 
                 // succcess redirect to dashboard
                 if ($aResponse["entityId"] > 0) {
                     $aResponse['message'] = 'Edit successfully.';
                     $aResponse['id'] = $aResponse['entityId'];
 
-                    $this->redirectAfterAdd($aResponse);// $response['data']['id']);
+                    $this->redirectAfterAdd($aResponse, false);// $response['data']['id']);
 
                     // redirect to form, show error
                 } else {
@@ -550,7 +551,7 @@ HC;
         }
     }
 
-    private function redirectAfterAdd($aResponse)
+    private function redirectAfterAdd($aResponse, $RA=true)
     {
         if($aResponse['type']=='error')
         {
@@ -561,12 +562,20 @@ HC;
                 'agentAddress' => $_SESSION['oRegisterAgentAddress'],
             ], 200);
         } else {
-            $this->response([
-                'status' => true,
-                'id' => $aResponse['id'],
-                'message' => $aResponse['message'],
-                'agentAddress' => $_SESSION['oRegisterAgentAddress'],
-            ], 200);
+            if($RA) {
+                $this->response([
+                    'status' => true,
+                    'id' => $aResponse['id'],
+                    'message' => $aResponse['message'],
+                    'agentAddress' => $_SESSION['oRegisterAgentAddress'],
+                ], 200);
+            } else{
+                $this->response([
+                    'status' => true,
+                    'id' => $aResponse['id'],
+                    'message' => $aResponse['message'],
+                ], 200);
+            }
         }
     }
 
@@ -1028,48 +1037,65 @@ HC;
     private function zohoEditEntity($iEid)
     {
         $iParentZohoId = $_SESSION['eid'];
+        $this->load->model('Entity_model');
         $this->load->model("ZoHo_Account");
         $this->load->model("RegisterAgents_model");
         $oApi = $this->ZoHo_Account->getInstance()->getRecordInstance("Accounts", $iEid);
-
+        $updateLocal = [];
 //        $oApi->setFieldValue("Account_Name", $this->input->post("inputName")); // This function use to set FieldApiName and value similar to all other FieldApis and Custom field
 //        $oApi->setFieldValue("Filing_State", $this->input->post("inputFillingState")); // Account Name can be given for a new account, account_id is not mandatory in that case
         if(!empty($this->input->post("inputFillingStructure"))) {
+            $updateLocal['entity_type'] = $this->input->post("inputFillingStructure");
             $oApi->setFieldValue("Entity_Type", $this->input->post("inputFillingStructure")); // Account Name can be given for a new account, account_id is not mandatory in that case
         }
+
         if(!empty($this->input->post("inputFormationDate"))) {
+            $updateLocal['formation_date'] = $this->input->post("inputFormationDate");
             $oApi->setFieldValue("Formation_Date", $this->input->post("inputFormationDate"));
         }
 //
 //        // firstName, lastName fields going under contacts
 //
         if(!empty($this->input->post("inputNotificationEmail"))) {
+            $updateLocal['notification_email'] = $this->input->post("inputNotificationEmail");
             $oApi->setFieldValue("Notification_Email", $this->input->post("inputNotificationEmail"));
         }
         if(!empty($this->input->post("inputNotificationPhone"))) {
+            $updateLocal['phone'] = $this->input->post("inputNotificationPhone");
             $oApi->setFieldValue("Phone", $this->input->post("inputNotificationPhone"));
         }
         if(!empty($this->input->post("inputNotificationAddress"))) {
+            $updateLocal['shipping_street'] = $this->input->post("inputNotificationAddress");
             $oApi->setFieldValue("Shipping_Street", $this->input->post("inputNotificationAddress"));
         }
         if(!empty($this->input->post("inputNotificationCity"))) {
+            $updateLocal['shipping_city'] = $this->input->post("inputNotificationCity");
             $oApi->setFieldValue("Shipping_City", $this->input->post("inputNotificationCity"));
         }
         if(!empty($this->input->post("inputNotificationState"))) {
+            $updateLocal['shipping_state'] = $this->input->post("inputNotificationState");
             $oApi->setFieldValue("Shipping_State", $this->input->post("inputNotificationState"));
         }
         if(!empty($this->input->post("inputNotificationZip"))) {
+            $updateLocal['shipping_code'] = $this->input->post("inputNotificationZip");
             $oApi->setFieldValue("Shipping_Code", $this->input->post("inputNotificationZip"));
         }
         if(!empty($this->input->post("inputBusinessPurpose"))) {
+            $updateLocal['business_purpose'] = $this->input->post("inputBusinessPurpose");
             $oApi->setFieldValue("Business_purpose", $this->input->post("inputBusinessPurpose"));
         }
         if(!empty($this->input->post("inputEIN"))) {
+            $updateLocal['ein'] = $this->input->post("inputEIN");
             $oApi->setFieldValue("EIN", $this->input->post("inputEIN"));
         }
         if(!empty($this->input->post("inputExpirationDate"))) {
+            $updateLocal['expiration_date'] = $this->input->post("inputExpirationDate");
             $oApi->setFieldValue("Expiration_Date", $this->input->post("inputExpirationDate"));
         }
+
+
+//        print_r($updateLocal);
+//        die();
         // fetch RA (registered agent) id from DB
 //        $strFilingState = $this->input->post("inputFillingState");
 //        $row = $this->RegisterAgents_model->find(["name" => $strFilingState . " - UAS"]);
@@ -1104,6 +1130,16 @@ HC;
             $responseIns = $oApi->update();//$trigger , $larid optional
 
             $oResponse = $responseIns->getDetails();
+             if(!empty($oResponse['id'])){
+                $updateResponse =  $this->Entity_model->updateEntity($oResponse['id'], $updateLocal);
+                 if($updateResponse == true) {
+                     log_message('log', $oResponse['id']. 'is updated successfully');
+                 } else {
+                     log_message('error', $oResponse['id']. 'entity does not exist in the database');
+
+                 }
+             }
+
 
             $aResponse  = ['entityId'=>$oResponse['id']];
 
