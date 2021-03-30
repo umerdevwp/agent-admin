@@ -1178,6 +1178,11 @@ HC;
         $oApi->setFieldValue("Business_purpose", $this->input->post("inputBusinessPurpose"));
         $oApi->setFieldValue("EIN", $this->input->post("inputEIN"));
 
+        $oApi->setFieldValue("Subscription_Status","Active");
+        $oApi->setFieldValue("State_Status","Active");
+        $oApi->setFieldValue("Expiration_Date",date("Y-m-d",strtotime("+1 year")));
+
+
         // fetch RA (registered agent) id from DB
         $strFilingState = $this->input->post("inputFillingState");
         $row = $this->RegisterAgents_model->find(["name" => $strFilingState . " - UAS"]);
